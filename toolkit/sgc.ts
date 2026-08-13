@@ -34,7 +34,7 @@ const backendArquitetura = backend.command("arquitetura").description("Auditoria
 criarComandoScript(backendArquitetura, "auditar", "Audita god objects (Services, Facades, Controllers) por linhas, metodos e dependencias.", "toolkit/backend/arquitetura-auditar.js");
 
 const backendCoesao = backend.command("coesao").description("Auditorias de coesao do backend.");
-criarComandoScript(backendCoesao, "auditar", "Audita Services com responsabilidades misturadas (consulta, mutacao, workflow, notificacao).", "toolkit/backend/coesao-auditar.js");
+criarComandoScript(backendCoesao, "auditar", "Audita Services com responsabilidades misturadas (consulta, mutacao, workflow, notificacao).", "toolkit/backend/coesao-auditar.ts");
 
 const backendContratos = backend.command("contratos").description("Auditorias de contratos HTTP e DTOs publicos do backend.");
 criarComandoScript(backendContratos, "auditar", "Audita vazamentos de model.* em DTOs expostos por controllers.", "toolkit/backend/contratos-auditar.ts");

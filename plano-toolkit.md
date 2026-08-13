@@ -223,6 +223,9 @@ frontend e para os caminhos OpenAPI.
 - `backend/java-corrigir-fqn.ts` foi convertido para TypeScript com contratos para análise de imports, decisões de
   substituição, preservação de linhas e opções; a mutação continua protegida por `--dry-run`, escrita explícita e
   idempotência.
+- `backend/coesao-auditar.ts` foi convertido para TypeScript com tipos para categorias de responsabilidade, severidade,
+  hotspots, resumo e relatório; o vocabulário SGC de consulta, mutação, workflow, notificação e permissão permanece uma
+  política explícita do auditor.
 - `projeto/diagnostico.ts` foi convertido para TypeScript, deixou de depender de `fs-extra` e aceita catálogos
   configuráveis de recursos e comandos registrados; o catálogo padrão continua sendo o perfil SGC e o mínimo local do
   Node foi alinhado à major 26 (`26.0.0`).
@@ -310,15 +313,15 @@ elevam a cobertura para 101 cenários; esta rodada chega a 102 com o teste compo
 
 Inventário dos arquivos rastreados do toolkit, excluindo `dist`, cobertura e artefatos ignorados:
 
-- 53 arquivos TypeScript de implementação;
-- 19 arquivos JavaScript de implementação ainda pendentes;
+- 54 arquivos TypeScript de implementação;
+- 18 arquivos JavaScript de implementação ainda pendentes;
 - 2 arquivos JavaScript de teste (`test/sgc.test.js` e `test/cdus.test.js`);
 - 2 arquivos de teste concentrando 102 cenários;
 - maior módulo atual: `frontend/arquitetura-lib.ts`, com aproximadamente 1.200 linhas;
 - outros hotspots: `codigo/nomes-simbolos-coletar.js`, `frontend/residuos-lib.ts` e
   `qualidade/coleta-execucao.ts`.
 
-O núcleo TypeScript está adiantado, mas a migração do toolkit como um todo ainda não terminou: aproximadamente 74% dos
+O núcleo TypeScript está adiantado, mas a migração do toolkit como um todo ainda não terminou: aproximadamente 75% dos
 arquivos de implementação rastreados são TypeScript.
 
 ### 3.4 Achados da auditoria crítica

@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+// Auditoria de coesão dos services do backend.
 
 import fs from "node:fs/promises";
 import path from "node:path";
@@ -38,22 +39,55 @@ const CATEGORIAS = {
     }
 };
 
-function normalizarCaminho(caminho) {
+type Categoria = keyof typeof CATEGORIAS;
+type CategoriaDetectada = Categoria | "outro";
+type Severidade = "critico" | "alerta" | "ok";
+
+interface AnaliseCoesao {
+    porCategoria: Partial<Record<CategoriaDetectada, string[]>>;
+    categoriasPresentes: Categoria[];
+    quantidadeCategorias: number;
+    severidade: Severidade;
+    motivos: string[];
+}
+
+interface ResultadoCoesao extends AnaliseCoesao {
+    nomeArquivo: string;
+    caminhoRelativo: string;
+    pacote: string;
+    totalMetodos: number;
+}
+
+interface RelatorioCoesao {
+    geradoEm: string;
+    criterio: string;
+    resumo: {
+        totalAnalisados: number;
+        criticos: number;
+        alertas: number;
+        ok: number;
+    };
+    hotspots: ResultadoCoesao[];
+    todos: ResultadoCoesao[];
+}
+
+function normalizarCaminho(caminho: string): string {
     return caminho.replaceAll(path.sep, "/");
 }
 
-function extrairNomesMetodosPublicos(conteudo) {
+function extrairNomesMetodosPublicos(conteudo: string): string[] {
     const regex = /^\s+public\s+(?:static\s+)?(?!class|interface|enum|record\b)(?:@\w+(?:\([^)]*\))?\s+)*[\w<>[\],\s]+\s+([a-z]\w*)\s*\(/gm;
-    const nomes = [];
+    const nomes: string[] = [];
     for (const correspondencia of conteudo.matchAll(regex)) {
         if (correspondencia[1]) nomes.push(correspondencia[1]);
     }
     return nomes;
 }
 
-function classificarMetodo(nomeMetodo) {
+function classificarMetodo(nomeMetodo: string): CategoriaDetectada {
     const nomeLower = nomeMetodo.toLowerCase();
-    for (const [categoria, def] of Object.entries(CATEGORIAS)) {
+    for (const categoria of Object.keys(CATEGORIAS) as Categoria[]) {
+        const def = CATEGORIAS[categoria];
         if (def.prefixos.some((pref) => nomeLower.startsWith(pref.toLowerCase()))) {
             return categoria;
         }
@@ -61,38 +95,40 @@ function classificarMetodo(nomeMetodo) {
     return "outro";
 }
 
-function analisarCoesao(nomeArquivo, metodos) {
-    const porCategoria = {};
+function analisarCoesao(metodos: string[]): AnaliseCoesao {
+    const porCategoria: Partial<Record<CategoriaDetectada, string[]>> = {};
 
     for (const metodo of metodos) {
         const cat = classificarMetodo(metodo);
-        if (!porCategoria[cat]) porCategoria[cat] = [];
-        porCategoria[cat].push(metodo);
+        const metodosDaCategoria = porCategoria[cat] ?? [];
+        metodosDaCategoria.push(metodo);
+        porCategoria[cat] = metodosDaCategoria;
     }
 
-    const categoriasPresentes = Object.keys(porCategoria).filter((c) => c !== "outro" && porCategoria[c].length > 0);
+    const categoriasPresentes = (Object.keys(porCategoria) as CategoriaDetectada[])
+        .filter((categoria): categoria is Categoria => categoria !== "outro" && (porCategoria[categoria]?.length ?? 0) > 0);
     const quantidadeCategorias = categoriasPresentes.length;
 
-    let severidade;
+    let severidade: Severidade;
     if (quantidadeCategorias >= 4) severidade = "critico";
     else if (quantidadeCategorias >= 3) severidade = "alerta";
     else severidade = "ok";
 
-    const motivoPartes = categoriasPresentes.map((c) => {
-        const def = CATEGORIAS[c];
-        return `${def.descricao} (${porCategoria[c].length})`;
+    const motivoPartes = categoriasPresentes.map((categoria) => {
+        const def = CATEGORIAS[categoria];
+        return `${def.descricao} (${porCategoria[categoria]?.length ?? 0})`;
     });
 
     return {porCategoria, categoriasPresentes, quantidadeCategorias, severidade, motivos: motivoPartes};
 }
 
-function extrairPacote(conteudo) {
+function extrairPacote(conteudo: string): string {
     return conteudo.match(/^package\s+([\w.]+)\s*;/m)?.[1] ?? "";
 }
 
-async function auditarCoesao(diretorioCodigo, diretorioBase) {
+async function auditarCoesao(diretorioCodigo: string, diretorioBase: string): Promise<RelatorioCoesao> {
     const arquivos = await globby(path.join(diretorioCodigo, "**/*Service.java").replace(/\\/g, "/"), {absolute: true});
-    const resultados = [];
+    const resultados: ResultadoCoesao[] = [];
 
     for (const arquivo of arquivos) {
         const conteudo = await fs.readFile(arquivo, "utf-8");
@@ -105,15 +141,16 @@ async function auditarCoesao(diretorioCodigo, diretorioBase) {
         if (caminhoRelativo.includes("/test/")) continue;
 
         const metodos = extrairNomesMetodosPublicos(conteudo);
-        const analise = analisarCoesao(nomeArquivo, metodos);
+        const analise = analisarCoesao(metodos);
 
-        resultados.push({
+        const resultado: ResultadoCoesao = {
             nomeArquivo,
             caminhoRelativo,
             pacote,
             totalMetodos: metodos.length,
             ...analise
-        });
+        };
+        resultados.push(resultado);
     }
 
     resultados.sort((a, b) => {
@@ -139,8 +176,8 @@ async function auditarCoesao(diretorioCodigo, diretorioBase) {
     };
 }
 
-function gerarMarkdown(relatorio) {
-    const linhas = [];
+function gerarMarkdown(relatorio: RelatorioCoesao): string {
+    const linhas: string[] = [];
     linhas.push("# Auditoria de coesão do backend", "");
     linhas.push(`Gerado em: ${relatorio.geradoEm}`, "");
     linhas.push(`> ${relatorio.criterio}`, "");
@@ -178,8 +215,9 @@ function gerarMarkdown(relatorio) {
             linhas.push(`**${def.descricao}** (${metodos.length}): ${metodos.map((m) => `\`${m}\``).join(", ")}`);
         }
 
-        if (item.porCategoria.outro?.length > 0) {
-            linhas.push(`\n**não classificados**: ${item.porCategoria.outro.map((m) => `\`${m}\``).join(", ")}`);
+        const metodosNaoClassificados = item.porCategoria.outro ?? [];
+        if (metodosNaoClassificados.length > 0) {
+            linhas.push(`\n**não classificados**: ${metodosNaoClassificados.map((m) => `\`${m}\``).join(", ")}`);
         }
         linhas.push("");
     }
@@ -201,7 +239,10 @@ function gerarMarkdown(relatorio) {
     return linhas.join("\n");
 }
 
-async function gravarRelatorios(relatorio, diretorioSaida) {
+async function gravarRelatorios(relatorio: RelatorioCoesao, diretorioSaida: string): Promise<{
+    caminhoMarkdown: string;
+    caminhoJson: string;
+}> {
     const caminhoMarkdown = path.join(diretorioSaida, "coesao-auditoria.md");
     const caminhoJson = path.join(diretorioSaida, "coesao-auditoria.json");
     await fs.mkdir(diretorioSaida, {recursive: true});
@@ -210,10 +251,10 @@ async function gravarRelatorios(relatorio, diretorioSaida) {
     return {caminhoMarkdown, caminhoJson};
 }
 
-function exibirAjuda() {
+function exibirAjuda(): void {
     exibirAjudaComando({
         comandoSgc: "backend coesao auditar",
-        scriptDireto: "toolkit/backend/coesao-auditar.js",
+        scriptDireto: "backend/coesao-auditar.ts",
         descricao: "Audita Services do backend detectando mistura de responsabilidades (consulta, mutação, workflow, notificação, permissão).",
         opcoes: [
             "--json              Emite o relatório em JSON.",
@@ -228,7 +269,7 @@ function exibirAjuda() {
     });
 }
 
-async function principal(argumentos = process.argv.slice(2)) {
+async function principal(argumentos: string[] = process.argv.slice(2)): Promise<void> {
 
     if (argumentos.includes("--help") || argumentos.includes("-h")) {
         exibirAjuda();
@@ -237,7 +278,7 @@ async function principal(argumentos = process.argv.slice(2)) {
 
     const emitirJson = argumentos.includes("--json");
     const semGravar = argumentos.includes("--sem-gravar");
-    const diretorioBase = path.resolve(lerOpcao(argumentos, "--base", DIRETORIO_RAIZ));
+    const diretorioBase = path.resolve(lerOpcao(argumentos, "--base", DIRETORIO_RAIZ) ?? DIRETORIO_RAIZ);
     const diretorioCodigo = resolverCaminhoConfigurado("backendCodigo", diretorioBase);
     const diretorioSaida = path.join(resolverCaminhoConfigurado("artefatosQualidade", diretorioBase), "backend", "latest");
 

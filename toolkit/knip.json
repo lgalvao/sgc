@@ -3,7 +3,7 @@
     "backend/arquitetura-auditar.js",
     "backend/cobertura-auditoria.ts",
     "backend/cobertura-ramificacoes.ts",
-    "backend/coesao-auditar.js",
+    "backend/coesao-auditar.ts",
     "backend/contratos-auditar.ts",
     "backend/java-corrigir-fqn.ts",
     "backend/notificacoes-assuntos-auditar.js",

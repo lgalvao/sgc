@@ -37,7 +37,7 @@ const CAMINHOS_COMANDOS_COBERTURA_BACKEND = [
 ].map(nome => path.join(DIRETORIO_RAIZ, "toolkit", "backend", nome));
 const CAMINHOS_COMANDOS_AUDITORIA_BACKEND = [
     "arquitetura-auditar.js",
-    "coesao-auditar.js",
+    "coesao-auditar.ts",
     "contratos-auditar.ts"
 ].map(nome => path.join(DIRETORIO_RAIZ, "toolkit", "backend", nome));
 const CAMINHO_AUDITORIA_ASSUNTOS = path.join(DIRETORIO_RAIZ, "toolkit", "backend", "notificacoes-assuntos-auditar.js");
