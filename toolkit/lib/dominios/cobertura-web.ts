@@ -3,18 +3,55 @@ import path from "node:path";
 import {DIRETORIO_RAIZ} from "../caminhos.js";
 import {resolverCaminhoConfigurado} from "../configuracao.js";
 
-function calcularPercentualPorTotal(cobertos, total) {
+interface DadosCoberturaV8 {
+    s?: Record<string, number>;
+    f?: Record<string, number>;
+    b?: Record<string, number[]>;
+    statementMap?: Record<string, unknown>;
+}
+
+interface ResumoCobertura {
+    cobertos: number;
+    total: number;
+    percentual: number;
+}
+
+interface ArquivoCobertura {
+    arquivo: string;
+    statementsPercentual: number;
+    statementsCobertos: number;
+    statementsTotal: number;
+    branchesPercentual: number;
+    branchesTotal: number;
+    functionsPercentual: number;
+    functionsTotal: number;
+    linesPercentual: number;
+}
+
+interface OpcoesCoberturaFrontend {
+    diretorioBase?: string;
+}
+
+interface ResultadoCoberturaFrontend {
+    statements: ResumoCobertura;
+    branches: ResumoCobertura;
+    functions: ResumoCobertura;
+    lines: ResumoCobertura;
+    arquivos: ArquivoCobertura[];
+}
+
+function calcularPercentualPorTotal(cobertos: number, total: number): number {
     if (total <= 0) return 0;
     return Number(((cobertos / total) * 100).toFixed(2));
 }
 
-function extrairContagemCobertura(mapaCobertura = {}) {
+function extrairContagemCobertura(mapaCobertura: Record<string, number> = {}): {total: number; cobertos: number} {
     const total = Object.keys(mapaCobertura).length;
     const cobertos = Object.values(mapaCobertura).filter((valor) => valor > 0).length;
     return {total, cobertos};
 }
 
-function extrairContagemBranches(mapaBranches = {}) {
+function extrairContagemBranches(mapaBranches: Record<string, number[]> = {}): {total: number; cobertos: number} {
     const total = Object.values(mapaBranches).reduce((acumulado, valores) => acumulado + valores.length, 0);
     const cobertos = Object.values(mapaBranches).reduce(
         (acumulado, valores) => acumulado + valores.filter((valor) => valor > 0).length,
@@ -23,12 +60,16 @@ function extrairContagemBranches(mapaBranches = {}) {
     return {total, cobertos};
 }
 
-function acumularTotaisCobertura(totais, chave, contagem) {
+function acumularTotaisCobertura(
+    totais: Record<string, {cobertos: number; total: number}>,
+    chave: string,
+    contagem: {cobertos: number; total: number}
+): void {
     totais[chave].total += contagem.total;
     totais[chave].cobertos += contagem.cobertos;
 }
 
-function criarResumoCobertura(cobertos, total) {
+function criarResumoCobertura(cobertos: number, total: number): ResumoCobertura {
     return {
         cobertos,
         total,
@@ -36,7 +77,7 @@ function criarResumoCobertura(cobertos, total) {
     };
 }
 
-function normalizarCaminho(caminhoAbsolutoOuRelativo, diretorioBase = null) {
+function normalizarCaminho(caminhoAbsolutoOuRelativo: string, diretorioBase: string | null = null): string {
     if (!diretorioBase) {
         return caminhoAbsolutoOuRelativo.replace(/\\/g, "/");
     }
@@ -47,13 +88,16 @@ function normalizarCaminho(caminhoAbsolutoOuRelativo, diretorioBase = null) {
     return path.relative(diretorioBase, caminhoAbsoluto).replace(/\\/g, "/");
 }
 
-function deveIgnorarArquivo(caminhoRelativo) {
+function deveIgnorarArquivo(caminhoRelativo: string): boolean {
     return caminhoRelativo.includes("node_modules")
         || caminhoRelativo.includes(".spec.ts")
         || caminhoRelativo.includes(".test.ts");
 }
 
-async function extrairCoberturaFrontend(caminhoRelativo = null, opcoes = {}) {
+async function extrairCoberturaFrontend(
+    caminhoRelativo: string | null = null,
+    opcoes: OpcoesCoberturaFrontend = {}
+): Promise<ResultadoCoberturaFrontend> {
     const diretorioBase = opcoes.diretorioBase ?? DIRETORIO_RAIZ;
     const caminhoPadrao = resolverCaminhoConfigurado("coberturaFrontend", diretorioBase);
     const caminhoJson = caminhoRelativo
@@ -66,8 +110,8 @@ async function extrairCoberturaFrontend(caminhoRelativo = null, opcoes = {}) {
         throw new Error(`Relatorio V8 (coverage-final.json) nao encontrado em ${caminhoJson}`);
     }
 
-    const cobertura = JSON.parse(conteudo);
-    const arquivos = [];
+    const cobertura = JSON.parse(conteudo) as Record<string, DadosCoberturaV8>;
+    const arquivos: ArquivoCobertura[] = [];
     const totais = {
         statements: {cobertos: 0, total: 0},
         branches: {cobertos: 0, total: 0},
@@ -115,7 +159,5 @@ async function extrairCoberturaFrontend(caminhoRelativo = null, opcoes = {}) {
 }
 
 export {
-    extrairCoberturaFrontend,
-    normalizarCaminho,
-    deveIgnorarArquivo
+    extrairCoberturaFrontend
 };

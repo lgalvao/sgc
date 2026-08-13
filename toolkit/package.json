@@ -19,7 +19,7 @@
     "./lib/logger": "./lib/logger.ts",
     "./lib/qualidade": "./lib/qualidade.ts",
     "./lib/saida": "./lib/saida.ts",
-    "./lib/*": "./lib/*.js"
+    "./lib/*": "./lib/*.ts"
   },
   "scripts": {
     "sgc": "tsx ./sgc.ts",
