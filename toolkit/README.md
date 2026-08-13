@@ -70,9 +70,11 @@ graph TD
 npx tsx toolkit/sgc.ts backend cobertura auditoria
 npx tsx toolkit/sgc.ts backend testes analisar
 npx tsx toolkit/sgc.ts backend testes priorizar
-npx tsx toolkit/sgc.ts backend java corrigir-fqn
+npx tsx toolkit/sgc.ts backend java corrigir-fqn --gravar
 npx tsx toolkit/sgc.ts backend notificacoes auditar-assuntos
 ```
+
+`backend java corrigir-fqn` apenas lista as substituições por padrão; use `--gravar` para alterar os arquivos Java.
 
 ### Frontend
 

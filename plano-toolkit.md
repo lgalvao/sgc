@@ -262,8 +262,7 @@ frontend e para os caminhos OpenAPI.
   expostos, índice Java, modelos e achados; a política SGC de detectar `model.*` em DTOs permanece e agora tem fixture
   externo cobrindo JSON, `backendCodigo` configurado e gravação explícita com `--gravar`.
 - `backend/java-corrigir-fqn.ts` foi convertido para TypeScript com contratos para análise de imports, decisões de
-  substituição, preservação de linhas e opções; a mutação continua protegida por `--dry-run`, escrita explícita e
-  idempotência.
+  substituição, preservação de linhas e opções; a mutação agora exige `--gravar`, com simulação padrão e idempotência.
 - `backend/coesao-auditar.ts` foi convertido para TypeScript com tipos para categorias de responsabilidade, severidade,
   hotspots, resumo e relatório; o vocabulário SGC de consulta, mutação, workflow, notificação e permissão permanece uma
   política explícita do auditor.
@@ -468,7 +467,7 @@ o comportamento atual; não transforma automaticamente todo comando que gera rel
 | Auditoria read-only | `requisitos cdus *`, `backend cobertura auditoria/ramificacoes`, `frontend cobertura auditoria/ramificacoes`, `frontend arquitetura validar`, `frontend modais validar`, `frontend views templates-validar`, `frontend identificadores-teste *`, `codigo nomes coletar-simbolos/auditar-consistencia/auditar-idioma`, `projeto diagnostico` | Leem código/relatórios e escrevem somente stdout/JSON por padrão; não criam artefatos próprios. As famílias que oferecem persistência usam `--gravar`. Dependências externas podem fazer leitura adicional. |
 | Geração de relatório indicado | `backend cobertura auditoria`, `frontend cobertura auditoria`, `backend testes analisar/priorizar`, `frontend acessibilidade processar` | Criam arquivos Markdown/JSON definidos por `--output`, `--output-json` ou defaults. São geradores explícitos, não auditores read-only. |
 | Artefato de contrato | `integracao contratos exportar-openapi`, `integracao contratos diff` | Exportação grava OpenAPI; diff apenas grava resumo Markdown com `--gravar`; `fixar-baseline` promove uma referência somente quando chamado. |
-| Mutação de fonte ou baseline | `backend java corrigir-fqn`, `projeto versao-sincronizar`, `integracao contratos fixar-baseline` | Alteram código/configuração ou promovem arquivo. FQN ainda usa `--dry-run` opt-in; versão simula por padrão e exige `--gravar`; baseline copia diretamente para o destino. |
+| Mutação de fonte ou baseline | `backend java corrigir-fqn`, `projeto versao-sincronizar`, `integracao contratos fixar-baseline` | Alteram código/configuração ou promovem arquivo. FQN e versão simulam por padrão e exigem `--gravar`; baseline copia diretamente para o destino por ser uma ação de promoção nomeada. |
 | Limpeza confirmada | `projeto limpar` | Lista em prévia por padrão e remove somente com `--confirmar`; é o modelo de confirmação explícita a preservar. |
 | Orquestração externa | `qualidade coletar`, `projeto qualidade`, `projeto dependencias auditar`, `projeto preparar`, `frontend acessibilidade crawler` | Executam Gradle, npm, Playwright, Semgrep ou Git e podem criar artefatos fora da biblioteca do toolkit. Precisam de perfil/ação explícita e limites de raiz. |
 

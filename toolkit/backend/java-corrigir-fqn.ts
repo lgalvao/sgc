@@ -33,7 +33,7 @@ interface AnaliseLinhas {
 
 interface OpcoesCorretorFqn {
     ajuda: boolean;
-    apenasSimulacao: boolean;
+    gravar: boolean;
     diretorioBase: string;
 }
 
@@ -169,7 +169,7 @@ function analisarLinhas(
     return {linhasModificadas, importsNovos, temAlteracoes};
 }
 
-function processarArquivo(caminhoArquivo: string, apenasSimulacao = false): boolean {
+function processarArquivo(caminhoArquivo: string, gravar = false): boolean {
     const linhas: string[] = fs.readFileSync(caminhoArquivo, "utf-8").split(/\r?\n/).map((linha, indice, todas) => (
         indice < todas.length - 1 ? `${linha}\n` : linha
     ));
@@ -195,11 +195,11 @@ function processarArquivo(caminhoArquivo: string, apenasSimulacao = false): bool
         }
     });
 
-    if (!apenasSimulacao) {
+    if (gravar) {
         fs.writeFileSync(caminhoArquivo, saidaFinal.join(""), "utf-8");
     }
 
-    escreverLinha(`${apenasSimulacao ? "[simulacao] " : ""}Atualizado: ${caminhoArquivo} (${importsOrdenados.length} novo(s) import(s))`);
+    escreverLinha(`${gravar ? "" : "[simulação] "}${gravar ? "Atualizado" : "Seria atualizado"}: ${caminhoArquivo} (${importsOrdenados.length} novo(s) import(s))`);
     return true;
 }
 
@@ -211,7 +211,7 @@ function encontrarRaizBackend(diretorioBase: string = DIRETORIO_RAIZ): string {
 function lerArgumentos(argumentos: string[]): OpcoesCorretorFqn {
     return {
         ajuda: argumentos.includes("--help") || argumentos.includes("-h"),
-        apenasSimulacao: argumentos.includes("--dry-run"),
+        gravar: argumentos.includes("--gravar"),
         diretorioBase: lerOpcao(argumentos, "--base", DIRETORIO_RAIZ) ?? DIRETORIO_RAIZ,
     };
 }
@@ -222,12 +222,13 @@ function exibirAjuda(): void {
         scriptDireto: "backend/java-corrigir-fqn.ts",
         descricao: "Substitui nomes totalmente qualificados por imports em arquivos Java.",
         opcoes: [
-            "--dry-run           Apenas mostra os arquivos que seriam alterados.",
+            "--gravar            Persiste as substituições nos arquivos Java.",
             "--base <diretorio>  Usa uma raiz de backend alternativa.",
             "--help, -h          Exibe esta ajuda.",
         ],
         exemplos: [
-            "npx tsx toolkit/sgc.ts backend java corrigir-fqn --dry-run",
+            "npx tsx toolkit/sgc.ts backend java corrigir-fqn",
+            "npx tsx toolkit/sgc.ts backend java corrigir-fqn --gravar",
             "npx tsx toolkit/sgc.ts backend java corrigir-fqn --base /tmp/backend",
         ],
     });
@@ -274,7 +275,7 @@ function principal(argumentos: string[] = process.argv.slice(2)): void {
                 }
 
                 totalArquivosAnalisados++;
-                if (processarArquivo(caminhoCompleto, opcoes.apenasSimulacao)) {
+                if (processarArquivo(caminhoCompleto, opcoes.gravar)) {
                     totalArquivosAtualizados++;
                 }
             });
@@ -282,7 +283,7 @@ function principal(argumentos: string[] = process.argv.slice(2)): void {
     });
 
     escreverLinha(`Total de arquivos analisados: ${totalArquivosAnalisados}`);
-    escreverLinha(`Total de arquivos atualizados: ${totalArquivosAtualizados}`);
+    escreverLinha(`Total de arquivos ${opcoes.gravar ? "atualizados" : "com alterações"}: ${totalArquivosAtualizados}`);
 }
 
 if (ehEntradaPrincipal(import.meta.url)) {

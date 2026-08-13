@@ -418,12 +418,11 @@ describe("CLI raiz do toolkit", () => {
             "java",
             "corrigir-fqn",
             "--base",
-            diretorioBackend,
-            "--dry-run"
+            diretorioBackend
         ]);
 
         expect(resultado.exitCode).toBe(0);
-        expect(resultado.stdout).toContain("[simulacao] Atualizado");
+        expect(resultado.stdout).toContain("[simulação] Seria atualizado");
         expect(await fs.readFile(caminhoJava, "utf8")).toBe(conteudoOriginal);
     });
 
@@ -456,19 +455,33 @@ describe("CLI raiz do toolkit", () => {
         ]);
 
         expect(primeiraExecucao.exitCode).toBe(0);
-        expect(primeiraExecucao.stdout).toContain("Atualizado");
-        expect(await fs.readFile(caminhoJava, "utf8")).toBe(conteudoEsperado);
+        expect(primeiraExecucao.stdout).toContain("[simulação] Seria atualizado");
+        expect(await fs.readFile(caminhoJava, "utf8")).toBe(conteudoOriginal);
 
         const segundaExecucao = await executarSgc([
             "backend",
             "java",
             "corrigir-fqn",
             "--base",
-            diretorioBackend
+            diretorioBackend,
+            "--gravar"
         ]);
 
         expect(segundaExecucao.exitCode).toBe(0);
-        expect(segundaExecucao.stdout).toContain("Total de arquivos atualizados: 0");
+        expect(segundaExecucao.stdout).toContain("Atualizado");
+        expect(await fs.readFile(caminhoJava, "utf8")).toBe(conteudoEsperado);
+
+        const terceiraExecucao = await executarSgc([
+            "backend",
+            "java",
+            "corrigir-fqn",
+            "--base",
+            diretorioBackend,
+            "--gravar"
+        ]);
+
+        expect(terceiraExecucao.exitCode).toBe(0);
+        expect(terceiraExecucao.stdout).toContain("Total de arquivos atualizados: 0");
         expect(await fs.readFile(caminhoJava, "utf8")).toBe(conteudoEsperado);
     });
 
