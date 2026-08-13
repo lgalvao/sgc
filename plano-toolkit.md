@@ -177,7 +177,8 @@ frontend e para os caminhos OpenAPI.
 - A auditoria de efeitos corrigiu um vazamento de gravação em `codigo nomes auditar-consistencia`: a geração automática do
   inventário auxiliar agora acompanha `--gravar` e não grava nem polui o JSON final na execução padrão.
 - A configuração externa agora exige schema versão `1`, valida estrutura, nomes de diretório e caminhos não vazios na
-  borda, antes de qualquer auditoria.
+  borda, antes de qualquer auditoria; o tipo TypeScript dos diretórios agora usa a mesma união de nomes conhecidos do
+  schema, em vez de `Record<string, string>` permissivo.
 - A configuração externa também aceita a seção opcional `execucoes`, com perfis de qualidade, escopos de auditoria de
   dependências e escopos de instalação; cada categoria pode ser substituída separadamente, enquanto categorias ausentes
   continuam usando os defaults do perfil SGC. Opções explícitas da API/CLI têm precedência sobre o arquivo.
@@ -475,6 +476,8 @@ Na rodada seguinte, o despachador deixou de procurar `.js` em `dist`: inclusive 
 execução é delegada ao `tsx` sobre a fonte `.ts`; `dist` permanece apenas um artefato de verificação.
 Na rodada seguinte, a coleta de qualidade passou a aceitar perfis e adaptadores externos por composição, preservando os
 catálogos SGC como defaults; a suíte chega a 121 cenários regulares, com 81 no teste principal e 6 em `qualidade.test.ts`.
+Na rodada seguinte, o contrato TypeScript dos diretórios configuráveis passou a refletir os nomes aceitos pelo schema,
+mantendo a rejeição de chaves desconhecidas e eliminando índices textuais permissivos nos resolvers.
 
 ### 3.3 Tamanho e composição atual
 
@@ -514,6 +517,7 @@ O núcleo TypeScript de implementação foi concluído: 100% dos arquivos de imp
 | Resolvido nesta rodada | Configuração TypeScript ainda incluía JavaScript legado | Os `tsconfig` de checagem e build agora incluem somente `.ts`; o único `.cjs` restante é o launcher deliberadamente externo ao compilador. |
 | Resolvido nesta rodada | Despachador mantinha fallback para implementação compilada | `lib/execucao.ts` agora resolve sempre a fonte `.ts` via `DIRETORIO_TOOLKIT` e `tsx`; o build não cria nem exige uma segunda árvore de comandos `.js`. |
 | Resolvido nesta rodada | Coleta de qualidade dependia de catálogos globais mutáveis | `qualidade/coleta-execucao.ts` agora recebe perfis e adaptadores por opção, valida adaptadores ausentes antes de criar artefatos e mantém os catálogos SGC como defaults. |
+| Resolvido nesta rodada | Contrato TypeScript de diretórios era permissivo | `lib/configuracao.ts` agora restringe chaves aos nomes suportados pelo schema e os resolvers aceitam somente essas chaves; a configuração externa continua rejeitando nomes desconhecidos em runtime. |
 | Resolvido | Efeito colateral oculto de gravação | `codigo nomes auditar-consistencia` gerava o inventário auxiliar com gravação habilitada e contaminava `--json`; a opção `--gravar` agora é propagada e a coleta interna é silenciosa. |
 | Resolvido | Configuração sem validação | `configuracao-toolkit.json` agora exige a versão `1` e valida estrutura, chaves conhecidas e caminhos textuais antes da combinação com defaults. |
 | Resolvido nesta rodada | Políticas de resíduos apontando para legado ausente | Os defaults de orçamento e exceções frontend foram removidos; overrides continuam aceitos, a ausência usa política neutra explícita e arquivo configurado ausente ou inválido falha visivelmente. |

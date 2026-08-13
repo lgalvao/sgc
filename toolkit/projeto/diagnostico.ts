@@ -6,7 +6,7 @@ import {access} from "node:fs/promises";
 import {execa} from "execa";
 import pc from "picocolors";
 import {resolverNaRaiz} from "../lib/caminhos.js";
-import {resolverCaminhoConfigurado} from "../lib/configuracao.js";
+import {resolverCaminhoConfigurado, type NomeDiretorioConfigurado} from "../lib/configuracao.js";
 import {escreverLinha, formatarStatus, imprimirCabecalho, imprimirJson} from "../lib/saida.js";
 
 const CATEGORIAS = {
@@ -103,7 +103,7 @@ function caminhoRelativo(diretorioBase: string, caminhoAbsoluto: string): string
     return caminho || ".";
 }
 
-function caminhoDiretorioConfigurado(diretorioBase: string, nomeDiretorio: string): string {
+function caminhoDiretorioConfigurado(diretorioBase: string, nomeDiretorio: NomeDiretorioConfigurado): string {
     return caminhoRelativo(diretorioBase, resolverCaminhoConfigurado(nomeDiretorio, diretorioBase));
 }
 

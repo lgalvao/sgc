@@ -250,6 +250,8 @@ O arquivo exige a versão `1` e aceita uma seção `diretorios` com nomes conhec
 
 Chaves desconhecidas, versões não suportadas e caminhos vazios falham na borda de configuração, antes de um auditor
 iniciar.
+O contrato TypeScript também restringe os nomes de diretório ao mesmo conjunto aceito pelo schema; componentes que
+resolvem caminhos recebem uma chave conhecida, reduzindo typos antes da execução.
 
 Além dos diretórios, um projeto pode declarar as execuções que substituem os catálogos padrão do perfil SGC. A seção
 `execucoes` aceita escopos de auditoria de dependências, escopos de instalação e perfis de qualidade. Cada comando é

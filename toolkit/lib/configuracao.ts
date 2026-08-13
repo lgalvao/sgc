@@ -2,7 +2,22 @@ import {existsSync, readFileSync} from "node:fs";
 import path from "node:path";
 import {DIRETORIO_RAIZ, DIRETORIO_TOOLKIT} from "./caminhos.js";
 
-type DiretoriosConfigurados = Record<string, string>;
+type NomeDiretorioConfigurado =
+    | "backend"
+    | "frontend"
+    | "backendCodigo"
+    | "backendTestes"
+    | "frontendCodigo"
+    | "testesIntegracao"
+    | "artefatosQualidade"
+    | "coberturaBackend"
+    | "coberturaFrontend"
+    | "regrasSemgrep"
+    | "contratosOpenapi"
+    | "orcamentoResiduosFrontend"
+    | "excecoesResiduosFrontend";
+
+type DiretoriosConfigurados = Partial<Record<NomeDiretorioConfigurado, string>>;
 
 interface TarefaConfigurada {
     titulo: string;
@@ -44,8 +59,8 @@ interface ConfiguracaoSobreposta {
 
 const NOME_ARQUIVO_CONFIGURACAO = "configuracao-toolkit.json";
 const VERSAO_CONFIGURACAO = 1 as const;
-const DIRETORIOS_OPCIONAIS = new Set(["orcamentoResiduosFrontend", "excecoesResiduosFrontend"]);
-const DIRETORIOS_FORNECIDOS_PELO_TOOLKIT = new Set(["regrasSemgrep"]);
+const DIRETORIOS_OPCIONAIS = new Set<NomeDiretorioConfigurado>(["orcamentoResiduosFrontend", "excecoesResiduosFrontend"]);
+const DIRETORIOS_FORNECIDOS_PELO_TOOLKIT = new Set<NomeDiretorioConfigurado>(["regrasSemgrep"]);
 
 const CONFIGURACAO_PADRAO: ConfiguracaoToolkit = {
     versao: VERSAO_CONFIGURACAO,
@@ -213,11 +228,11 @@ function validarConfiguracao(valor: unknown): ConfiguracaoSobreposta {
         throw new Error(`${NOME_ARQUIVO_CONFIGURACAO}.diretorios deve ser um objeto JSON.`);
     }
 
-    const nomesPermitidos = new Set([
-        ...Object.keys(CONFIGURACAO_PADRAO.diretorios),
+    const nomesPermitidos = new Set<NomeDiretorioConfigurado>([
+        ...(Object.keys(CONFIGURACAO_PADRAO.diretorios) as NomeDiretorioConfigurado[]),
         ...DIRETORIOS_OPCIONAIS,
     ]);
-    const nomesDesconhecidos = Object.keys(diretorios).filter(nome => !nomesPermitidos.has(nome));
+    const nomesDesconhecidos = Object.keys(diretorios).filter(nome => !nomesPermitidos.has(nome as NomeDiretorioConfigurado));
     if (nomesDesconhecidos.length > 0) {
         throw new Error(`${NOME_ARQUIVO_CONFIGURACAO}.diretorios possui nome(s) desconhecido(s): ${nomesDesconhecidos.join(", ")}.`);
     }
@@ -227,7 +242,7 @@ function validarConfiguracao(valor: unknown): ConfiguracaoSobreposta {
         if (typeof caminho !== "string" || caminho.trim() === "") {
             throw new Error(`${NOME_ARQUIVO_CONFIGURACAO}.diretorios.${nome} deve ser um caminho textual não vazio.`);
         }
-        diretoriosValidados[nome] = caminho;
+        diretoriosValidados[nome as NomeDiretorioConfigurado] = caminho;
     }
 
     return {
@@ -281,7 +296,7 @@ function carregarConfiguracao(diretorioBase = DIRETORIO_RAIZ): ConfiguracaoToolk
     return combinarConfiguracoes(CONFIGURACAO_PADRAO, configuracaoSobreposta);
 }
 
-function resolverCaminhoConfigurado(nomeDiretorio: string, diretorioBase = DIRETORIO_RAIZ): string {
+function resolverCaminhoConfigurado(nomeDiretorio: NomeDiretorioConfigurado, diretorioBase = DIRETORIO_RAIZ): string {
     const caminho = tentarResolverCaminhoConfigurado(nomeDiretorio, diretorioBase);
     if (!caminho) {
         throw new Error(`Diretorio configurado desconhecido ou ausente: ${nomeDiretorio}`);
@@ -289,7 +304,7 @@ function resolverCaminhoConfigurado(nomeDiretorio: string, diretorioBase = DIRET
     return caminho;
 }
 
-function tentarResolverCaminhoConfigurado(nomeDiretorio: string, diretorioBase = DIRETORIO_RAIZ): string | undefined {
+function tentarResolverCaminhoConfigurado(nomeDiretorio: NomeDiretorioConfigurado, diretorioBase = DIRETORIO_RAIZ): string | undefined {
     const configuracao = carregarConfiguracao(diretorioBase);
     const caminhoRelativo = configuracao.diretorios[nomeDiretorio];
     if (!caminhoRelativo) {
@@ -320,6 +335,7 @@ export {
     validarConfiguracao,
     type ConfiguracaoSobreposta,
     type ConfiguracaoToolkit,
+    type NomeDiretorioConfigurado,
     type EscopoComandoConfigurado,
     type EscopoInstalacaoConfigurado,
     type ExecucoesConfiguradas,
