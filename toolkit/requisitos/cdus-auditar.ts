@@ -1,16 +1,48 @@
 #!/usr/bin/env node
+// Auditoria estrutural dos casos de uso CDU.
 
 import path from "node:path";
 import {ehEntradaPrincipal} from "../lib/execucao.js";
 import {escreverLinha, imprimirJson} from "../lib/saida.js";
 import {analisarArquivo, lerArquivo, listarArquivosCdu, obterOpcoesCdu, validarLinksMarkdown} from "./cdus-lib.js";
 
-function adicionarAchado(achados, severidade, regra, mensagem) {
+type AnaliseCdu = ReturnType<typeof analisarArquivo>;
+type SeveridadeAchado = "erro" | "aviso";
+
+interface AchadoCdu {
+    severidade: SeveridadeAchado;
+    regra: string;
+    mensagem: string;
+}
+
+interface RelatorioArquivoCdu {
+    arquivo: string;
+    achados: AchadoCdu[];
+}
+
+interface RelatorioAuditoriaCdu {
+    resumo: {
+        base: string;
+        totalArquivos: number;
+        arquivosComErro: number;
+        arquivosComAviso: number;
+        erros: number;
+        avisos: number;
+    };
+    relatorio: RelatorioArquivoCdu[];
+}
+
+function adicionarAchado(
+    achados: AchadoCdu[],
+    severidade: SeveridadeAchado,
+    regra: string,
+    mensagem: string
+): void {
     achados.push({severidade, regra, mensagem});
 }
 
-function auditarAnalise(analise) {
-    const achados = [];
+function auditarAnalise(analise: AnaliseCdu): AchadoCdu[] {
+    const achados: AchadoCdu[] = [];
     const numeroArquivo = analise.nomeArquivo.match(/^cdu-(\d{2})\.md$/)?.[1] ?? null;
 
     if (!analise.temTituloCanonico) {
@@ -73,11 +105,11 @@ function auditarAnalise(analise) {
     return achados;
 }
 
-async function principal(argumentos = process.argv.slice(2)) {
+async function principal(argumentos: string[] = process.argv.slice(2)): Promise<void> {
     const {emitirJson, base} = obterOpcoesCdu(argumentos);
 
     const arquivos = await listarArquivosCdu(base);
-    const relatorio = arquivos.map(caminhoArquivo => {
+    const relatorio: RelatorioArquivoCdu[] = arquivos.map(caminhoArquivo => {
         const texto = lerArquivo(caminhoArquivo);
         const analise = analisarArquivo(caminhoArquivo, texto);
         return {
@@ -86,7 +118,7 @@ async function principal(argumentos = process.argv.slice(2)) {
         };
     });
 
-    const resumo = {
+    const resumo: RelatorioAuditoriaCdu["resumo"] = {
         base,
         totalArquivos: relatorio.length,
         arquivosComErro: relatorio.filter(item => item.achados.some(achado => achado.severidade === "erro")).length,

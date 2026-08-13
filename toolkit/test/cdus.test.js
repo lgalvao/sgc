@@ -11,7 +11,7 @@ const CAMINHO_SGC = path.join(DIRETORIO_RAIZ, "toolkit", "sgc.ts");
 const CAMINHO_TSX = path.join(DIRETORIO_RAIZ, "node_modules", ".bin", process.platform === "win32" ? "tsx.cmd" : "tsx");
 const CAMINHOS_COMANDOS_CDU = [
     "cdus-inventariar.js",
-    "cdus-auditar.js",
+    "cdus-auditar.ts",
     "cdus-auditar-estilo.js",
     "cdus-inventariar-vocabulario.js",
     "cdus-auditar-vocabulario.js",

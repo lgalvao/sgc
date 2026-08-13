@@ -95,7 +95,7 @@ criarComandoScript(integracaoContratos, "fixar-baseline", "Promove o OpenAPI mai
 const requisitos = program.command("requisitos").description("Ferramentas de inventario e auditoria de requisitos.");
 const requisitosCdus = requisitos.command("cdus").description("Inventario e auditoria read-only dos casos de uso.");
 criarComandoScript(requisitosCdus, "inventariar", "Inventaria formatos e convenções implícitas dos `specs/cdu-*.md`.", "toolkit/requisitos/cdus-inventariar.js");
-criarComandoScript(requisitosCdus, "auditar", "Audita a estrutura canônica mínima dos `specs/cdu-*.md`.", "toolkit/requisitos/cdus-auditar.js");
+criarComandoScript(requisitosCdus, "auditar", "Audita a estrutura canônica mínima dos `specs/cdu-*.md`.", "toolkit/requisitos/cdus-auditar.ts");
 criarComandoScript(requisitosCdus, "auditar-estilo", "Audita convenções tipográficas de aspas simples, aspas duplas e crases nos `specs/cdu-*.md`.", "toolkit/requisitos/cdus-auditar-estilo.js");
 criarComandoScript(requisitosCdus, "inventariar-vocabulario", "Inventaria perfis, situações, tipos de processo e elementos de UI recorrentes nos `specs/cdu-*.md`.", "toolkit/requisitos/cdus-inventariar-vocabulario.js");
 criarComandoScript(requisitosCdus, "auditar-vocabulario", "Audita variações de vocabulário controlado nos `specs/cdu-*.md`.", "toolkit/requisitos/cdus-auditar-vocabulario.js");

@@ -44,7 +44,7 @@
     "requisitos/cdus-auditar-mensagens-codigo.js",
     "requisitos/cdus-auditar-mensagens.js",
     "requisitos/cdus-auditar-vocabulario.js",
-    "requisitos/cdus-auditar.js",
+    "requisitos/cdus-auditar.ts",
     "requisitos/cdus-inventariar-densidade.js",
     "requisitos/cdus-inventariar-duplicacoes.js",
     "requisitos/cdus-inventariar-mensagens.js",
