@@ -4,12 +4,13 @@ import path from "node:path";
 import pc from "picocolors";
 import {DIRETORIO_RAIZ} from "../lib/caminhos.js";
 import {lerOpcao} from "../lib/cli-opcoes.js";
+import {resolverCaminhoConfigurado} from "../lib/configuracao.js";
 import {exibirAjudaComando} from "../lib/cli-ajuda.js";
 import {ehEntradaPrincipal} from "../lib/execucao.js";
 import {escreverLinha, imprimirJson} from "../lib/saida.js";
 
 const CAMINHOS_PERMITIDOS_BMODAL = new Set([
-    "frontend/src/components/comum/ModalPadrao.vue",
+    "components/comum/ModalPadrao.vue",
 ]);
 
 function listarArquivosVue(diretorio) {
@@ -31,9 +32,10 @@ function localizarLinha(conteudo, trecho) {
     return conteudo.slice(0, indice).split(/\r?\n/u).length;
 }
 
-function auditarArquivo(caminhoArquivo, diretorioBase) {
+function auditarArquivo(caminhoArquivo, diretorioBase, diretorioCodigo) {
     const caminhoRelativo = path.relative(diretorioBase, caminhoArquivo).replaceAll("\\", "/");
-    if (CAMINHOS_PERMITIDOS_BMODAL.has(caminhoRelativo)) {
+    const caminhoRelativoCodigo = path.relative(diretorioCodigo, caminhoArquivo).replaceAll("\\", "/");
+    if (CAMINHOS_PERMITIDOS_BMODAL.has(caminhoRelativoCodigo)) {
         return [];
     }
 
@@ -52,9 +54,10 @@ function auditarArquivo(caminhoArquivo, diretorioBase) {
 
 async function executarValidacaoModais(opcoes = {}) {
     const diretorioBase = path.resolve(opcoes.base ?? DIRETORIO_RAIZ);
-    const diretorioComponentes = path.join(diretorioBase, "frontend", "src", "components");
+    const diretorioCodigo = resolverCaminhoConfigurado("frontendCodigo", diretorioBase);
+    const diretorioComponentes = path.join(diretorioCodigo, "components");
     const arquivosVue = listarArquivosVue(diretorioComponentes);
-    const violacoes = arquivosVue.flatMap((arquivo) => auditarArquivo(arquivo, diretorioBase));
+    const violacoes = arquivosVue.flatMap((arquivo) => auditarArquivo(arquivo, diretorioBase, diretorioCodigo));
     return {
         resumo: {
             totalArquivos: arquivosVue.length,

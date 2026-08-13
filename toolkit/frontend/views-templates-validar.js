@@ -4,6 +4,7 @@ import path from "node:path";
 import pc from "picocolors";
 import {DIRETORIO_RAIZ} from "../lib/caminhos.js";
 import {lerOpcao} from "../lib/cli-opcoes.js";
+import {resolverCaminhoConfigurado} from "../lib/configuracao.js";
 import {exibirAjudaComando} from "../lib/cli-ajuda.js";
 import {ehEntradaPrincipal} from "../lib/execucao.js";
 import {escreverLinha, imprimirJson} from "../lib/saida.js";
@@ -89,7 +90,7 @@ function resumir(violacoes, totalViews) {
 
 async function executarValidacaoTemplatesViews(opcoes = {}) {
     const diretorioBase = path.resolve(opcoes.base ?? DIRETORIO_RAIZ);
-    const diretorioViews = path.join(diretorioBase, "frontend", "src", "views");
+    const diretorioViews = path.join(resolverCaminhoConfigurado("frontendCodigo", diretorioBase), "views");
     const views = listarViews(diretorioViews);
     const violacoes = views.flatMap((arquivo) => auditarView(arquivo, diretorioBase));
     return {

@@ -2028,6 +2028,32 @@ describe("CLI raiz do toolkit", () => {
         expect(conteudo.violacoes[0].regra).toBe("componente-com-bmodal-cru");
     });
 
+    test("resolve frontendCodigo configurado nos validadores estruturais", async () => {
+        const base = await mkdtemp(path.join(os.tmpdir(), "sgc-frontend-validadores-configurados-"));
+        await fs.outputJSON(path.join(base, "configuracao-toolkit.json"), {
+            versao: VERSAO_CONFIGURACAO,
+            diretorios: {frontendCodigo: "cliente/src"},
+        });
+        await fs.outputFile(
+            path.join(base, "cliente", "src", "views", "PainelView.vue"),
+            "<template><LayoutPadrao><PageHeader title=\"Painel\" /></LayoutPadrao></template>"
+        );
+        await fs.outputFile(
+            path.join(base, "cliente", "src", "components", "comum", "ModalPadrao.vue"),
+            "<template><BModal title=\"Base\" /></template>"
+        );
+
+        const [resultadoViews, resultadoModais] = await Promise.all([
+            executarSgc(["frontend", "views", "templates-validar", "--json", "--base", base]),
+            executarSgc(["frontend", "modais", "validar", "--json", "--base", base]),
+        ]);
+
+        expect(resultadoViews.exitCode).toBe(0);
+        expect(JSON.parse(resultadoViews.stdout).resumo.totalViews).toBe(1);
+        expect(resultadoModais.exitCode).toBe(0);
+        expect(JSON.parse(resultadoModais.stdout).resumo.totalViolacoes).toBe(0);
+    });
+
     test("exibe ajuda padronizada no script frontend cobertura auditoria", async () => {
         const resultado = await executarScriptFrontendCobertura(["--help"]);
         expect(resultado.exitCode).toBe(0);
