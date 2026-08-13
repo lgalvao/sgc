@@ -72,6 +72,10 @@ npx tsx toolkit/sgc.ts frontend identificadores-teste listar-duplicados
 `backend testes analisar` e `backend testes priorizar` também são somente leitura por padrão. Use `--json` para alimentar
 agentes e scripts pelo stdout; use `--gravar` para persistir relatórios.
 
+O JSON persistido por `backend testes analisar` usa `versao: 1`, campos em português/camelCase e categorias com os grupos
+`comTeste` e `semTeste`. `backend testes priorizar --json` emite outro contrato versionado, com `versao: 1` e a chave
+`prioridades`; ao receber um relatório JSON incompatível, o comando falha antes de produzir uma priorização.
+
 ### Código e integração
 
 ```bash

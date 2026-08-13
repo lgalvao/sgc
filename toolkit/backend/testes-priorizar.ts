@@ -5,6 +5,7 @@ import {lerOpcao} from "../lib/cli-opcoes.js";
 import {exibirAjudaComando} from "../lib/cli-ajuda.js";
 import {ehEntradaPrincipal, validarArgumentosEntradaDireta} from "../lib/execucao.js";
 import {escreverErro, escreverLinha, imprimirJson} from "../lib/saida.js";
+import {VERSAO_PRIORIZACAO_TESTES, VERSAO_RELATORIO_TESTES} from "./lib/testes-contrato.js";
 
 type Prioridade = "P1" | "P2" | "P3";
 
@@ -18,12 +19,17 @@ interface OpcoesPriorizar {
 }
 
 interface Pendencia {
-    caminho_relativo: string;
-    evidencia_qualidade: string;
+    caminhoRelativo: string;
+    evidenciaQualidade: string;
 }
 
 type PendenciaEntrada = Pendencia | string;
 type PendenciasPriorizadas = Record<Prioridade, Pendencia[]>;
+
+interface ResultadoPriorizacao {
+    versao: typeof VERSAO_PRIORIZACAO_TESTES;
+    prioridades: PendenciasPriorizadas;
+}
 
 interface RegistroJson {
     [chave: string]: unknown;
@@ -124,30 +130,36 @@ function ehRegistroJson(valor: unknown): valor is RegistroJson {
 
 function extrairPendenciasDeJson(caminhoEntrada: string): Pendencia[] {
     const dados: unknown = JSON.parse(fs.readFileSync(caminhoEntrada, "utf-8"));
-    if (!ehRegistroJson(dados) || !ehRegistroJson(dados.categorias)) {
-        return [];
+    if (!ehRegistroJson(dados)) {
+        throw new Error("Relatorio de analise de testes invalido: o JSON deve conter um objeto na raiz.");
+    }
+    if (dados.versao !== VERSAO_RELATORIO_TESTES) {
+        throw new Error(`Relatorio de analise de testes possui versao ausente ou incompativel: esperado ${VERSAO_RELATORIO_TESTES}.`);
+    }
+    if (!ehRegistroJson(dados.categorias)) {
+        throw new Error("Relatorio de analise de testes invalido: campo categorias ausente ou invalido.");
     }
 
     const pendencias: Pendencia[] = [];
     for (const categoria of Object.values(dados.categorias)) {
-        if (!ehRegistroJson(categoria) || !Array.isArray(categoria.untested)) {
-            continue;
+        if (!ehRegistroJson(categoria) || !Array.isArray(categoria.semTeste)) {
+            throw new Error("Relatorio de analise de testes invalido: cada categoria deve conter o grupo semTeste.");
         }
 
-        for (const item of categoria.untested) {
-            if (!ehRegistroJson(item) || typeof item.caminho_relativo !== "string") {
+        for (const item of categoria.semTeste) {
+            if (!ehRegistroJson(item) || typeof item.caminhoRelativo !== "string") {
                 continue;
             }
 
-            const ignorado = item.dto_ruido_ignorado || item.model_ruido_ignorado || item.other_ruido_ignorado;
-            if (ignorado || item.evidencia_qualidade === "fora_escopo_jacoco") {
+            const ignorado = item.ruidoDtoIgnorado || item.ruidoModeloIgnorado || item.ruidoOutroIgnorado;
+            if (ignorado || item.evidenciaQualidade === "foraEscopoJacoco") {
                 continue;
             }
 
             pendencias.push({
-                caminho_relativo: item.caminho_relativo,
-                evidencia_qualidade: typeof item.evidencia_qualidade === "string"
-                    ? item.evidencia_qualidade
+                caminhoRelativo: item.caminhoRelativo,
+                evidenciaQualidade: typeof item.evidenciaQualidade === "string"
+                    ? item.evidenciaQualidade
                     : "desconhecida"
             });
         }
@@ -170,8 +182,8 @@ function carregarPendencias(caminhoEntrada: string): Pendencia[] {
         ? extrairPendenciasDeJson(caminhoEntrada)
         : extrairPendenciasDeMarkdown(caminhoEntrada);
     return pendencias.map((item: PendenciaEntrada): Pendencia => typeof item === 'string' ? {
-        caminho_relativo: item,
-        evidencia_qualidade: "desconhecida"
+        caminhoRelativo: item,
+        evidenciaQualidade: "desconhecida"
     } : item);
 }
 
@@ -179,29 +191,29 @@ function priorizar(caminhoEntrada: string): PendenciasPriorizadas {
     const pendencias = carregarPendencias(caminhoEntrada);
     const priorizadas: PendenciasPriorizadas = {P1: [], P2: [], P3: []};
 
-    pendencias.forEach(({caminho_relativo, evidencia_qualidade}) => {
-        const prioridade = classificarArquivo(caminho_relativo);
+    pendencias.forEach(({caminhoRelativo, evidenciaQualidade}) => {
+        const prioridade = classificarArquivo(caminhoRelativo);
         if (prioridade) {
             priorizadas[prioridade].push({
-                caminho_relativo,
-                evidencia_qualidade
+                caminhoRelativo,
+                evidenciaQualidade
             });
         }
     });
 
     (Object.keys(priorizadas) as Prioridade[]).forEach(chave => priorizadas[chave].sort((a, b) => {
-        const pesoA = a.evidencia_qualidade === 'sem_evidencia_no_escopo' ? 0 : 1;
-        const pesoB = b.evidencia_qualidade === 'sem_evidencia_no_escopo' ? 0 : 1;
-        return pesoA - pesoB || a.caminho_relativo.localeCompare(b.caminho_relativo, 'pt-BR');
+        const pesoA = a.evidenciaQualidade === 'semEvidenciaNoEscopo' ? 0 : 1;
+        const pesoB = b.evidenciaQualidade === 'semEvidenciaNoEscopo' ? 0 : 1;
+        return pesoA - pesoB || a.caminhoRelativo.localeCompare(b.caminhoRelativo, 'pt-BR');
     }));
     return priorizadas;
 }
 
 function descricaoEvidencia(item: Pendencia): string {
-    if (item.evidencia_qualidade === 'cobertura_indireta') {
+    if (item.evidenciaQualidade === 'coberturaIndireta') {
         return 'cobertura indireta';
     }
-    if (item.evidencia_qualidade === 'sem_evidencia_no_escopo') {
+    if (item.evidenciaQualidade === 'semEvidenciaNoEscopo') {
         return 'sem evidência';
     }
     return 'pendência';
@@ -217,26 +229,33 @@ function gerarMarkdown(priorizadas: PendenciasPriorizadas): string {
     if (priorizadas.P1.length === 0) {
         linhas.push('Nenhuma pendencia critica de logica encontrada.\n');
     } else {
-        priorizadas.P1.forEach(item => linhas.push(`- [ ] \`${item.caminho_relativo}\` (${descricaoEvidencia(item)})`));
+        priorizadas.P1.forEach(item => linhas.push(`- [ ] \`${item.caminhoRelativo}\` (${descricaoEvidencia(item)})`));
     }
 
     linhas.push('\n## P2: Importantes (Integracao e Contratos)\n');
-    linhas.push('Controladores e mappers. Importantes para garantir que a API respeite os contratos e que os dados sejam transformados corretamente.\n');
+    linhas.push('Controladores e mapeadores. Importantes para garantir que a API respeite os contratos e que os dados sejam transformados corretamente.\n');
     if (priorizadas.P2.length === 0) {
         linhas.push('_Nenhum arquivo encontrado._');
     } else {
-        priorizadas.P2.forEach(item => linhas.push(`- [ ] \`${item.caminho_relativo}\` (${descricaoEvidencia(item)})`));
+        priorizadas.P2.forEach(item => linhas.push(`- [ ] \`${item.caminhoRelativo}\` (${descricaoEvidencia(item)})`));
     }
 
     linhas.push('\n## P3: Baixa Prioridade (Dados e Infraestrutura)\n');
-    linhas.push('DTOs, modelos, repositorios e configuracoes. Geralmente cobertos por testes de integracao ou seguros por natureza.\n');
+    linhas.push('dtos, modelos, repositorios e configuracoes. Geralmente cobertos por testes de integracao ou seguros por natureza.\n');
     if (priorizadas.P3.length === 0) {
         linhas.push('_Nenhum arquivo encontrado._');
     } else {
-        priorizadas.P3.forEach(item => linhas.push(`- [ ] \`${item.caminho_relativo}\` (${descricaoEvidencia(item)})`));
+        priorizadas.P3.forEach(item => linhas.push(`- [ ] \`${item.caminhoRelativo}\` (${descricaoEvidencia(item)})`));
     }
 
     return `${linhas.join('\n')}\n`;
+}
+
+function criarResultado(prioridades: PendenciasPriorizadas): ResultadoPriorizacao {
+    return {
+        versao: VERSAO_PRIORIZACAO_TESTES,
+        prioridades
+    };
 }
 
 function principal(argumentos: string[] = process.argv.slice(2)): void {
@@ -247,11 +266,11 @@ function principal(argumentos: string[] = process.argv.slice(2)): void {
     }
 
     const caminhoEntrada = opcoes.entradaExplicita ? opcoes.entrada : resolverEntradaPadrao(opcoes.entrada);
-    const priorizadas = priorizar(caminhoEntrada);
+    const resultado = criarResultado(priorizar(caminhoEntrada));
     if (opcoes.emitirJson) {
-        imprimirJson(priorizadas);
+        imprimirJson(resultado);
     } else if (!opcoes.gravar) {
-        escreverLinha(gerarMarkdown(priorizadas).trimEnd());
+        escreverLinha(gerarMarkdown(resultado.prioridades).trimEnd());
     }
 
     if (!opcoes.gravar) {
@@ -259,10 +278,10 @@ function principal(argumentos: string[] = process.argv.slice(2)): void {
     }
 
     fs.mkdirSync(path.dirname(opcoes.saida), {recursive: true});
-    fs.writeFileSync(opcoes.saida, gerarMarkdown(priorizadas), 'utf-8');
+    fs.writeFileSync(opcoes.saida, gerarMarkdown(resultado.prioridades), 'utf-8');
     const escreverStatus = opcoes.emitirJson ? escreverErro : escreverLinha;
     escreverStatus(`Entrada utilizada: ${caminhoEntrada}`);
-    escreverStatus(`Priorizacao concluida. Encontrados ${priorizadas.P1.length} P1, ${priorizadas.P2.length} P2, ${priorizadas.P3.length} P3.`);
+    escreverStatus(`Priorizacao concluida. Encontrados ${resultado.prioridades.P1.length} P1, ${resultado.prioridades.P2.length} P2, ${resultado.prioridades.P3.length} P3.`);
     escreverStatus(`Plano gerado em: ${opcoes.saida}`);
 }
 
@@ -271,7 +290,7 @@ if (ehEntradaPrincipal(import.meta.url)) {
         principal();
     } catch (erro) {
         const mensagem = erro instanceof Error ? erro.message : String(erro);
-        escreverLinha(`Erro ao processar priorizacao: ${mensagem}`);
+        escreverErro(`Erro ao processar priorizacao: ${mensagem}`);
         process.exitCode = 1;
     }
 }

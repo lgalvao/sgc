@@ -19,9 +19,10 @@ import {VERSAO_CONFIGURACAO} from "../lib/configuracao.js";
 type ObjetoJson = Record<string, unknown>;
 
 interface RelatorioAnaliseTestesJson {
-    backend_dir: string;
+    versao: number;
+    diretorioBackend: string;
     estatisticas: Record<string, number>;
-    categorias: Record<string, {tested: ObjetoJson[]; untested: ObjetoJson[]}>;
+    categorias: Record<string, {comTeste: ObjetoJson[]; semTeste: ObjetoJson[]}>;
 }
 
 const CAMINHO_TESTES_PRIORIZAR = path.join(DIRETORIO_RAIZ, "toolkit", "backend", "testes-priorizar.ts");
@@ -49,19 +50,20 @@ describe("Análise e priorização dos testes backend", () => {
 
         expect(resultado.exitCode).toBe(0);
         expect(resultado.stdout).toContain("Resumo:");
-        expect(resultado.stdout).toContain("Repositories:");
+        expect(resultado.stdout).toContain("repositorios:");
         expect(resultado.stdout).toContain("Cobertura indireta:");
-        expect(resultado.stdout).toContain("DTOs:");
+        expect(resultado.stdout).toContain("dtos:");
         expect(await existe(markdown)).toBe(true);
         expect(await existe(json)).toBe(true);
 
         const conteudoJson = await lerJson<RelatorioAnaliseTestesJson>(json);
-        expect(conteudoJson.estatisticas.total_classes).toBeGreaterThan(0);
-        expect(typeof conteudoJson.estatisticas.classes_com_cobertura_indireta).toBe("number");
-        expect(typeof conteudoJson.estatisticas.classes_sem_evidencia_no_escopo).toBe("number");
-        expect(typeof conteudoJson.estatisticas.classes_fora_escopo_jacoco).toBe("number");
-        expect(typeof conteudoJson.estatisticas.classes_ruido_ignorado).toBe("number");
-        expect(conteudoJson.categorias.Repositories.tested.length).toBeGreaterThanOrEqual(1);
+        expect(conteudoJson.versao).toBe(1);
+        expect(conteudoJson.estatisticas.totalClasses).toBeGreaterThan(0);
+        expect(typeof conteudoJson.estatisticas.classesComCoberturaIndireta).toBe("number");
+        expect(typeof conteudoJson.estatisticas.classesSemEvidenciaNoEscopo).toBe("number");
+        expect(typeof conteudoJson.estatisticas.classesForaEscopoJacoco).toBe("number");
+        expect(typeof conteudoJson.estatisticas.classesRuidoIgnorado).toBe("number");
+        expect(conteudoJson.categorias.repositorios.comTeste.length).toBeGreaterThanOrEqual(1);
     }, 60000);
 
     test("analisa testes sem gravar por padrao e permite JSON no stdout", async () => {
@@ -136,8 +138,8 @@ describe("Análise e priorização dos testes backend", () => {
 
         expect(resultado.exitCode).toBe(0);
         const conteudo = await lerJson<RelatorioAnaliseTestesJson>(json);
-        expect(conteudo.backend_dir).toBe(path.join(base, "servidor", "java"));
-        expect(conteudo.estatisticas.classes_com_teste_dedicado).toBe(1);
+        expect(conteudo.diretorioBackend).toBe(path.join(base, "servidor", "java"));
+        expect(conteudo.estatisticas.classesComTesteDedicado).toBe(1);
     });
 
     test("resolve diretorio backend relativo a base explicita", async () => {
@@ -173,11 +175,11 @@ describe("Análise e priorização dos testes backend", () => {
 
         expect(resultado.exitCode).toBe(0);
         const conteudo = await lerJson<RelatorioAnaliseTestesJson>(json);
-        expect(conteudo.backend_dir).toBe(path.join(base, "servidor", "src", "main", "java"));
-        expect(conteudo.estatisticas.classes_com_teste_dedicado).toBe(1);
+        expect(conteudo.diretorioBackend).toBe(path.join(base, "servidor", "src", "main", "java"));
+        expect(conteudo.estatisticas.classesComTesteDedicado).toBe(1);
     });
 
-    test("ignora DTOs estruturais e contratuais do backlog real", async () => {
+    test("ignora dtos estruturais e contratuais do backlog real", async () => {
         const base = await mkdtemp(path.join(os.tmpdir(), "sgc-testes-analise-dto-"));
         const backendDir = path.join(base, "backend-fake");
         const dtoDir = path.join(backendDir, "src", "main", "java", "sgc", "exemplo", "dto");
@@ -211,21 +213,21 @@ describe("Análise e priorização dos testes backend", () => {
         ], {cwd: base});
 
         expect(resultado.exitCode).toBe(0);
-        expect(resultado.stdout).toContain("DTOs: 0/1 testados no backlog real (2 ignorados)");
+        expect(resultado.stdout).toContain("dtos: 0/1 testados no backlog real (2 ignorados)");
 
         const conteudoJson = await lerJson<RelatorioAnaliseTestesJson>(json);
-        expect(conteudoJson.estatisticas.dtos_comportamentais).toBe(1);
-        expect(conteudoJson.estatisticas.dtos_estruturais).toBe(2);
-        expect(conteudoJson.estatisticas.dtos_estruturais_contratuais).toBe(1);
-        expect(conteudoJson.estatisticas.classes_ruido_ignorado).toBe(2);
+        expect(conteudoJson.estatisticas.dtosComportamentais).toBe(1);
+        expect(conteudoJson.estatisticas.dtosEstruturais).toBe(2);
+        expect(conteudoJson.estatisticas.dtosEstruturaisContratuais).toBe(1);
+        expect(conteudoJson.estatisticas.classesRuidoIgnorado).toBe(2);
 
-        const dtoUntested = conteudoJson.categorias.DTOs.untested;
-        expect(dtoUntested.find((item: ObjetoJson) => item.classe === "DtoEstrutural")!.dto_ruido_ignorado).toBe(true);
-        expect(dtoUntested.find((item: ObjetoJson) => item.classe === "RequestContratual")!.perfil_dto).toBe("estrutural_contrato");
-        expect(dtoUntested.find((item: ObjetoJson) => item.classe === "DtoComportamental")!.dto_ruido_ignorado).toBe(false);
+        const semTesteDtos = conteudoJson.categorias.dtos.semTeste;
+        expect(semTesteDtos.find((item: ObjetoJson) => item.classe === "DtoEstrutural")!.ruidoDtoIgnorado).toBe(true);
+        expect(semTesteDtos.find((item: ObjetoJson) => item.classe === "RequestContratual")!.perfilDto).toBe("estruturalContrato");
+        expect(semTesteDtos.find((item: ObjetoJson) => item.classe === "DtoComportamental")!.ruidoDtoIgnorado).toBe(false);
     });
 
-    test("ignora models estruturais e contratuais do backlog real", async () => {
+    test("ignora modelos estruturais e contratuais do backlog real", async () => {
         const base = await mkdtemp(path.join(os.tmpdir(), "sgc-testes-analise-model-"));
         const backendDir = path.join(base, "backend-fake");
         const modelDir = path.join(backendDir, "src", "main", "java", "sgc", "exemplo", "model");
@@ -259,21 +261,21 @@ describe("Análise e priorização dos testes backend", () => {
         ], {cwd: base});
 
         expect(resultado.exitCode).toBe(0);
-        expect(resultado.stdout).toContain("Models: 0/1 testados no backlog real (2 ignorados)");
+        expect(resultado.stdout).toContain("modelos: 0/1 testados no backlog real (2 ignorados)");
 
         const conteudoJson = await lerJson<RelatorioAnaliseTestesJson>(json);
-        expect(conteudoJson.estatisticas.models_comportamentais).toBe(1);
-        expect(conteudoJson.estatisticas.models_estruturais).toBe(2);
-        expect(conteudoJson.estatisticas.models_estruturais_contratuais).toBe(1);
+        expect(conteudoJson.estatisticas.modelosComportamentais).toBe(1);
+        expect(conteudoJson.estatisticas.modelosEstruturais).toBe(2);
+        expect(conteudoJson.estatisticas.modelosEstruturaisContratuais).toBe(1);
 
-        const modelUntested = conteudoJson.categorias.Models.untested;
-        expect(modelUntested.find((item: ObjetoJson) => item.classe === "SituacaoExemplo")!.model_ruido_ignorado).toBe(true);
-        expect(modelUntested.find((item: ObjetoJson) => item.classe === "AnotacaoExemplo")!.perfil_model).toBe("estrutural_contrato");
-        expect(modelUntested.find((item: ObjetoJson) => item.classe === "ProcessoExemplo")!.model_ruido_ignorado).toBe(false);
+        const semTesteModelos = conteudoJson.categorias.modelos.semTeste;
+        expect(semTesteModelos.find((item: ObjetoJson) => item.classe === "SituacaoExemplo")!.ruidoModeloIgnorado).toBe(true);
+        expect(semTesteModelos.find((item: ObjetoJson) => item.classe === "AnotacaoExemplo")!.perfilModelo).toBe("estruturalContrato");
+        expect(semTesteModelos.find((item: ObjetoJson) => item.classe === "ProcessoExemplo")!.ruidoModeloIgnorado).toBe(false);
     });
 
-    test("ignora others estruturais e contratuais do backlog real e reclassifica commands como DTOs", async () => {
-        const base = await mkdtemp(path.join(os.tmpdir(), "sgc-testes-analise-others-"));
+    test("ignora outros estruturais e contratuais do backlog real e reclassifica comandos como dtos", async () => {
+        const base = await mkdtemp(path.join(os.tmpdir(), "sgc-testes-analise-outros-"));
         const backendDir = path.join(base, "backend-fake");
         const otherDir = path.join(backendDir, "src", "main", "java", "sgc", "exemplo");
         const dtoDir = path.join(otherDir, "dto");
@@ -311,21 +313,21 @@ describe("Análise e priorização dos testes backend", () => {
         ], {cwd: base});
 
         expect(resultado.exitCode).toBe(0);
-        expect(resultado.stdout).toContain("Others: 0/1 testados no backlog real (2 ignorados)");
-        expect(resultado.stdout).toContain("DTOs: 0/0 testados no backlog real (1 ignorados)");
+        expect(resultado.stdout).toContain("outros: 0/1 testados no backlog real (2 ignorados)");
+        expect(resultado.stdout).toContain("dtos: 0/0 testados no backlog real (1 ignorados)");
 
         const conteudoJson = await lerJson<RelatorioAnaliseTestesJson>(json);
-        expect(conteudoJson.estatisticas.others_comportamentais).toBe(1);
-        expect(conteudoJson.estatisticas.others_estruturais).toBe(2);
-        expect(conteudoJson.estatisticas.others_estruturais_contratuais).toBe(1);
+        expect(conteudoJson.estatisticas.outrosComportamentais).toBe(1);
+        expect(conteudoJson.estatisticas.outrosEstruturais).toBe(2);
+        expect(conteudoJson.estatisticas.outrosEstruturaisContratuais).toBe(1);
 
-        const otherUntested = conteudoJson.categorias.Others.untested;
-        expect(otherUntested.find((item: ObjetoJson) => item.classe === "Mensagens")!.other_ruido_ignorado).toBe(true);
-        expect(otherUntested.find((item: ObjetoJson) => item.classe === "AnotacaoSegura")!.perfil_other).toBe("estrutural_contrato");
-        expect(otherUntested.find((item: ObjetoJson) => item.classe === "LimitadorExemplo")!.other_ruido_ignorado).toBe(false);
+        const semTesteOutros = conteudoJson.categorias.outros.semTeste;
+        expect(semTesteOutros.find((item: ObjetoJson) => item.classe === "Mensagens")!.ruidoOutroIgnorado).toBe(true);
+        expect(semTesteOutros.find((item: ObjetoJson) => item.classe === "AnotacaoSegura")!.perfilOutro).toBe("estruturalContrato");
+        expect(semTesteOutros.find((item: ObjetoJson) => item.classe === "LimitadorExemplo")!.ruidoOutroIgnorado).toBe(false);
 
-        const dtoUntested = conteudoJson.categorias.DTOs.untested;
-        expect(dtoUntested.find((item: ObjetoJson) => item.classe === "WorkflowCommand")!.dto_ruido_ignorado).toBe(true);
+        const semTesteDtos = conteudoJson.categorias.dtos.semTeste;
+        expect(semTesteDtos.find((item: ObjetoJson) => item.classe === "WorkflowCommand")!.ruidoDtoIgnorado).toBe(true);
     });
 
     test("classifica separadamente teste dedicado, cobertura indireta, sem evidencia e fora do escopo", async () => {
@@ -390,17 +392,17 @@ describe("Análise e priorização dos testes backend", () => {
         expect(resultado.stdout).toContain("Fora do escopo do JaCoCo: 1");
 
         const conteudoJson = await lerJson<RelatorioAnaliseTestesJson>(json);
-        expect(conteudoJson.estatisticas.classes_com_teste_dedicado).toBe(1);
-        expect(conteudoJson.estatisticas.classes_com_cobertura_indireta).toBe(1);
-        expect(conteudoJson.estatisticas.classes_sem_evidencia_no_escopo).toBe(1);
-        expect(conteudoJson.estatisticas.classes_fora_escopo_jacoco).toBe(1);
+        expect(conteudoJson.estatisticas.classesComTesteDedicado).toBe(1);
+        expect(conteudoJson.estatisticas.classesComCoberturaIndireta).toBe(1);
+        expect(conteudoJson.estatisticas.classesSemEvidenciaNoEscopo).toBe(1);
+        expect(conteudoJson.estatisticas.classesForaEscopoJacoco).toBe(1);
 
-        const others = conteudoJson.categorias.Others;
-        expect(others.tested).toHaveLength(1);
-        expect(others.untested).toHaveLength(3);
-        expect(others.untested.find((item: ObjetoJson) => item.classe === "ClasseIndireta")!.coberta_somente_indiretamente).toBe(true);
-        expect(others.untested.find((item: ObjetoJson) => item.classe === "ClasseSemEvidencia")!.evidencia_qualidade).toBe("sem_evidencia_no_escopo");
-        expect(others.untested.find((item: ObjetoJson) => item.classe === "ClasseForaEscopo")!.fora_escopo_jacoco).toBe(true);
+        const itensOutros = conteudoJson.categorias.outros;
+        expect(itensOutros.comTeste).toHaveLength(1);
+        expect(itensOutros.semTeste).toHaveLength(3);
+        expect(itensOutros.semTeste.find((item: ObjetoJson) => item.classe === "ClasseIndireta")!.cobertaSomenteIndiretamente).toBe(true);
+        expect(itensOutros.semTeste.find((item: ObjetoJson) => item.classe === "ClasseSemEvidencia")!.evidenciaQualidade).toBe("semEvidenciaNoEscopo");
+        expect(itensOutros.semTeste.find((item: ObjetoJson) => item.classe === "ClasseForaEscopo")!.foraEscopoJacoco).toBe(true);
     });
 
     test("prioriza testes usando sidecar JSON automaticamente quando disponivel", async () => {
@@ -411,15 +413,16 @@ describe("Análise e priorização dos testes backend", () => {
 
         await escreverArquivo(markdown, "# Relatorio simplificado\n");
         await escreverJson(json, {
+            versao: 1,
             categorias: {
-                Services: {
-                    untested: [
-                        {caminho_relativo: "sgc/mapa/service/MapaCriticoService.java"}
+                servicos: {
+                    semTeste: [
+                        {caminhoRelativo: "sgc/mapa/service/MapaCriticoService.java"}
                     ]
                 },
-                Repositories: {
-                    untested: [
-                        {caminho_relativo: "sgc/mapa/model/CompetenciaRepo.java"}
+                repositorios: {
+                    semTeste: [
+                        {caminhoRelativo: "sgc/mapa/model/CompetenciaRepo.java"}
                     ]
                 }
             }
@@ -436,14 +439,57 @@ describe("Análise e priorização dos testes backend", () => {
         expect(conteudo).toContain("sgc/mapa/model/CompetenciaRepo.java");
     });
 
+    test("emite priorizacao JSON versionada", async () => {
+        const diretorioSaida = await mkdtemp(path.join(os.tmpdir(), "sgc-testes-priorizar-json-"));
+        const entrada = path.join(diretorioSaida, "analise-testes.json");
+
+        await escreverJson(entrada, {
+            versao: 1,
+            categorias: {
+                servicos: {
+                    semTeste: [{caminhoRelativo: "sgc/mapa/service/MapaCriticoService.java"}]
+                }
+            }
+        });
+
+        const resultado = await executarScriptTestesPriorizar(["--entrada", entrada, "--json"]);
+
+        expect(resultado.exitCode).toBe(0);
+        expect(resultado.stderr).toBe("");
+        const conteudo = JSON.parse(resultado.stdout) as {versao: number; prioridades: Record<string, ObjetoJson[]>};
+        expect(conteudo.versao).toBe(1);
+        expect(conteudo.prioridades.P1).toHaveLength(1);
+    });
+
+    test("rejeita versao incompativel do relatorio de analise", async () => {
+        const diretorioSaida = await mkdtemp(path.join(os.tmpdir(), "sgc-testes-priorizar-versao-"));
+        const entrada = path.join(diretorioSaida, "analise-testes.json");
+
+        await escreverJson(entrada, {
+            versao: 99,
+            categorias: {
+                servicos: {
+                    semTeste: [{caminhoRelativo: "sgc/mapa/service/MapaCriticoService.java"}]
+                }
+            }
+        });
+
+        const resultado = await executarScriptTestesPriorizar(["--entrada", entrada]);
+
+        expect(resultado.exitCode).toBe(1);
+        expect(resultado.stdout).toBe("");
+        expect(resultado.stderr).toContain("versao ausente ou incompativel");
+    });
+
     test("prioriza testes em stdout sem gravar por padrao", async () => {
         const diretorioSaida = await mkdtemp(path.join(os.tmpdir(), "sgc-testes-priorizar-somente-leitura-"));
         const entrada = path.join(diretorioSaida, "analise-testes.json");
 
         await escreverJson(entrada, {
+            versao: 1,
             categorias: {
-                Services: {
-                    untested: [{caminho_relativo: "sgc/mapa/service/MapaCriticoService.java"}]
+                servicos: {
+                    semTeste: [{caminhoRelativo: "sgc/mapa/service/MapaCriticoService.java"}]
                 }
             }
         });
@@ -461,30 +507,31 @@ describe("Análise e priorização dos testes backend", () => {
         const saida = path.join(diretorioSaida, "priorizacao-testes.md");
 
         await escreverJson(json, {
+            versao: 1,
             categorias: {
-                Services: {
-                    untested: [
+                servicos: {
+                    semTeste: [
                         {
-                            caminho_relativo: "sgc/mapa/service/MapaCriticoService.java",
-                            evidencia_qualidade: "sem_evidencia_no_escopo"
+                            caminhoRelativo: "sgc/mapa/service/MapaCriticoService.java",
+                            evidenciaQualidade: "semEvidenciaNoEscopo"
                         }
                     ]
                 },
-                DTOs: {
-                    untested: [
+                dtos: {
+                    semTeste: [
                         {
-                            caminho_relativo: "sgc/mapa/dto/MapaRuidoCommand.java",
-                            evidencia_qualidade: "ruido_dto_estrutural",
-                            dto_ruido_ignorado: true
+                            caminhoRelativo: "sgc/mapa/dto/MapaRuidoCommand.java",
+                            evidenciaQualidade: "ruidoDtoEstrutural",
+                            ruidoDtoIgnorado: true
                         }
                     ]
                 },
-                Others: {
-                    untested: [
-                        {caminho_relativo: "sgc/comum/Mensagens.java", evidencia_qualidade: "fora_escopo_jacoco"},
+                outros: {
+                    semTeste: [
+                        {caminhoRelativo: "sgc/comum/Mensagens.java", evidenciaQualidade: "foraEscopoJacoco"},
                         {
-                            caminho_relativo: "sgc/seguranca/AcaoPermissao.java",
-                            evidencia_qualidade: "cobertura_indireta"
+                            caminhoRelativo: "sgc/seguranca/AcaoPermissao.java",
+                            evidenciaQualidade: "coberturaIndireta"
                         }
                     ]
                 }

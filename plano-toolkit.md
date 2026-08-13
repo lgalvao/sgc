@@ -159,7 +159,8 @@ isolado funciona, mas as fronteiras ainda não estão concluídas:
   persistência, remoção, subprocessos e rede;
 - os entrypoints diretos ainda atribuem `process.exitCode` ao converter erros ou achados em status do processo; isso é
   deliberado na borda CLI, enquanto as funções reutilizáveis retornam resultados ou lançam erros;
-- resultados próprios ainda misturam português, inglês, `camelCase` e `snake_case`, especialmente na análise de testes;
+- a análise e a priorização de testes já usam contratos versionados, campos em português/camelCase e categorias em
+  português; os demais formatos próprios ainda precisam de revisão semelhante;
 - apenas cobertura Java e web está publicada como API programática horizontal;
 - defaults de Gradle, Vue, OpenAPI, Semgrep e políticas SGC ainda aparecem dentro de módulos adaptáveis;
 - os maiores módulos concentram análise, política, formatação, persistência e CLI, dificultando reuso seletivo.
@@ -219,10 +220,12 @@ Critério de saída: é possível apontar, por arquivo e contrato, o que é moto
 
 ### 4. Normalizar resultados e fronteiras programáticas
 
-- começar pela análise e priorização de testes, pois uma consome o resultado da outra;
+- manter a análise de testes com relatório JSON `versao: 1` e a priorização com contrato JSON próprio `versao: 1`; o
+  priorizador deve rejeitar versões ausentes ou incompatíveis antes de interpretar categorias;
 - converter campos próprios para português em `camelCase`, mantendo nomes externos apenas nos adaptadores de leitura;
 - exportar tipo, versão e validação para formatos persistidos, consumidos por outro comando/CI ou deliberadamente expostos
   a scripts e agentes;
+- revisar os demais relatórios persistidos e saídas JSON, priorizando os que atravessam comandos ou são usados por agentes;
 - separar análise, formatação e persistência para que a API de domínio não dependa de arquivo ou console;
 - evitar um envelope universal para saídas sem consumidor automático;
 - ampliar exports públicos apenas após teste por tarball em um projeto TypeScript isolado, mesmo que esse projeto seja uma

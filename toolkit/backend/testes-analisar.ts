@@ -8,12 +8,13 @@ import {exibirAjudaComando} from "../lib/cli-ajuda.js";
 import {ehEntradaPrincipal, validarArgumentosEntradaDireta} from "../lib/execucao.js";
 import {escreverErro, escreverLinha, imprimirJson} from "../lib/saida.js";
 import {extrairCoberturaJacoco, type ClasseCobertura} from "../lib/dominios/cobertura-java.js";
+import {VERSAO_RELATORIO_TESTES} from "./lib/testes-contrato.js";
 import {
     CATEGORIAS_PRIORITARIAS,
     CATEGORIAS_SECUNDARIAS,
     classificarPerfilDto,
-    classificarPerfilModel,
-    classificarPerfilOther,
+    classificarPerfilModelo,
+    classificarPerfilOutro,
     construirNomeClasseCompleto,
     criarItemRelatorio,
     EXTENSAO_JAVA,
@@ -24,19 +25,19 @@ import {
 } from "./lib/testes-analisar-regras.js";
 
 type Categoria = (typeof CATEGORIAS_PRIORITARIAS | typeof CATEGORIAS_SECUNDARIAS)[number];
-type PerfilFonte = "comportamental" | "estrutural_contrato" | "estrutural_puro";
-type EstrategiaCorrespondencia = "mesmo_pacote" | "nome_correspondente_outro_pacote" | "nenhum";
+type PerfilFonte = "comportamental" | "estruturalContrato" | "estruturalPuro";
+type EstrategiaCorrespondencia = "mesmoPacote" | "nomeCorrespondenteOutroPacote" | "nenhum";
 type ItemRelatorioBase = ReturnType<typeof criarItemRelatorio>;
 type ItemRelatorio = ItemRelatorioBase & {
-    perfil_model: PerfilFonte | null;
-    model_ruido_ignorado: boolean;
-    perfil_other: PerfilFonte | null;
-    other_ruido_ignorado: boolean;
+    perfilModelo: PerfilFonte | null;
+    ruidoModeloIgnorado: boolean;
+    perfilOutro: PerfilFonte | null;
+    ruidoOutroIgnorado: boolean;
 };
 
 interface ArquivoFonte {
-    caminho_relativo: string;
-    nome_classe: string;
+    caminhoRelativo: string;
+    nomeClasse: string;
     pacote: string;
     categoria: Categoria;
 }
@@ -52,39 +53,40 @@ interface LocalizacaoTestes {
 }
 
 interface GrupoRelatorio {
-    tested: ItemRelatorio[];
-    untested: ItemRelatorio[];
+    comTeste: ItemRelatorio[];
+    semTeste: ItemRelatorio[];
 }
 
 type CategoriasRelatorio = Record<Categoria, GrupoRelatorio>;
 
 interface EstatisticasRelatorio {
-    total_classes: number;
-    classes_com_teste_dedicado: number;
-    classes_com_cobertura_indireta: number;
-    classes_sem_evidencia_no_escopo: number;
-    classes_fora_escopo_jacoco: number;
-    classes_ruido_ignorado: number;
-    classes_sem_teste_dedicado: number;
-    cobertura_arquivos_percentual: number;
-    cobertura_backlog_real_percentual: number;
-    cobertura_observada_percentual: number;
-    correspondencias_ambiguas: number;
-    jacoco_disponivel: boolean;
-    dtos_comportamentais: number;
-    dtos_estruturais: number;
-    dtos_estruturais_contratuais: number;
-    models_comportamentais: number;
-    models_estruturais: number;
-    models_estruturais_contratuais: number;
-    others_comportamentais: number;
-    others_estruturais: number;
-    others_estruturais_contratuais: number;
+    totalClasses: number;
+    classesComTesteDedicado: number;
+    classesComCoberturaIndireta: number;
+    classesSemEvidenciaNoEscopo: number;
+    classesForaEscopoJacoco: number;
+    classesRuidoIgnorado: number;
+    classesSemTesteDedicado: number;
+    coberturaArquivosPercentual: number;
+    coberturaBacklogRealPercentual: number;
+    coberturaObservadaPercentual: number;
+    correspondenciasAmbiguas: number;
+    jacocoDisponivel: boolean;
+    dtosComportamentais: number;
+    dtosEstruturais: number;
+    dtosEstruturaisContratuais: number;
+    modelosComportamentais: number;
+    modelosEstruturais: number;
+    modelosEstruturaisContratuais: number;
+    outrosComportamentais: number;
+    outrosEstruturais: number;
+    outrosEstruturaisContratuais: number;
 }
 
 interface RelatorioTestes {
-    gerado_em: string;
-    backend_dir: string;
+    versao: typeof VERSAO_RELATORIO_TESTES;
+    geradoEm: string;
+    diretorioBackend: string;
     estatisticas: EstatisticasRelatorio;
     categorias: CategoriasRelatorio;
 }
@@ -179,8 +181,8 @@ function listarFontes(backendSrc: string): ArquivoFonte[] {
             const pacote = normalizarCaminho(path.dirname(caminhoRelativo));
 
             arquivos.push({
-                caminho_relativo: caminhoRelativo,
-                nome_classe: nomeClasse,
+                caminhoRelativo: caminhoRelativo,
+                nomeClasse: nomeClasse,
                 pacote,
                 categoria: inferirCategoria(nomeClasse, caminhoRelativo)
             });
@@ -248,7 +250,7 @@ function localizarTestes(
     if (encontradosMesmoPacote.length > 0) {
         return {
             caminhos: [...new Set(encontradosMesmoPacote)].toSorted(),
-            estrategia: 'mesmo_pacote'
+            estrategia: 'mesmoPacote'
         };
     }
 
@@ -260,7 +262,7 @@ function localizarTestes(
     if (encontradosPorNome.length > 0) {
         return {
             caminhos: [...new Set(encontradosPorNome)].toSorted(),
-            estrategia: 'nome_correspondente_outro_pacote'
+            estrategia: 'nomeCorrespondenteOutroPacote'
         };
     }
 
@@ -309,14 +311,14 @@ async function analisarTestes({
     const coberturaPorClasse = await carregarCoberturaPorClasse(caminhoJacocoXml, base);
 
     const relatorio: CategoriasRelatorio = {
-        Controllers: {tested: [], untested: []},
-        Services: {tested: [], untested: []},
-        Facades: {tested: [], untested: []},
-        Mappers: {tested: [], untested: []},
-        Models: {tested: [], untested: []},
-        DTOs: {tested: [], untested: []},
-        Repositories: {tested: [], untested: []},
-        Others: {tested: [], untested: []}
+        controladores: {comTeste: [], semTeste: []},
+        servicos: {comTeste: [], semTeste: []},
+        fachadas: {comTeste: [], semTeste: []},
+        mapeadores: {comTeste: [], semTeste: []},
+        modelos: {comTeste: [], semTeste: []},
+        dtos: {comTeste: [], semTeste: []},
+        repositorios: {comTeste: [], semTeste: []},
+        outros: {comTeste: [], semTeste: []}
     };
 
     let totalComTeste = 0;
@@ -328,40 +330,40 @@ async function analisarTestes({
     let totalDtosComportamentais = 0;
     let totalDtosEstruturais = 0;
     let totalDtosEstruturaisContratuais = 0;
-    let totalModelsComportamentais = 0;
-    let totalModelsEstruturais = 0;
-    let totalModelsEstruturaisContratuais = 0;
-    let totalOthersComportamentais = 0;
-    let totalOthersEstruturais = 0;
-    let totalOthersEstruturaisContratuais = 0;
+    let totalModelosComportamentais = 0;
+    let totalModelosEstruturais = 0;
+    let totalModelosEstruturaisContratuais = 0;
+    let totalOutrosComportamentais = 0;
+    let totalOutrosEstruturais = 0;
+    let totalOutrosEstruturaisContratuais = 0;
 
     arquivosFonte.forEach(arquivo => {
-        const conteudoFonte = lerConteudoFonte(backendSrc, arquivo.caminho_relativo);
-        const perfilDto = arquivo.categoria === 'DTOs' ? classificarPerfilDto(conteudoFonte) : null;
-        const perfilModel = arquivo.categoria === 'Models'
-            ? classificarPerfilModel({
-                nomeClasse: arquivo.nome_classe,
+        const conteudoFonte = lerConteudoFonte(backendSrc, arquivo.caminhoRelativo);
+        const perfilDto = arquivo.categoria === 'dtos' ? classificarPerfilDto(conteudoFonte) : null;
+        const perfilModelo = arquivo.categoria === 'modelos'
+            ? classificarPerfilModelo({
+                nomeClasse: arquivo.nomeClasse,
                 conteudoFonte
             })
             : null;
-        const perfilOther = arquivo.categoria === 'Others'
-            ? classificarPerfilOther({
-                nomeClasse: arquivo.nome_classe,
-                caminhoRelativo: arquivo.caminho_relativo,
+        const perfilOutro = arquivo.categoria === 'outros'
+            ? classificarPerfilOutro({
+                nomeClasse: arquivo.nomeClasse,
+                caminhoRelativo: arquivo.caminhoRelativo,
                 conteudoFonte
             })
             : null;
-        const dtoEstrutural = perfilDto === 'estrutural_puro' || perfilDto === 'estrutural_contrato';
-        const modelEstrutural = perfilModel === 'estrutural_puro' || perfilModel === 'estrutural_contrato';
-        const otherEstrutural = perfilOther === 'estrutural_puro' || perfilOther === 'estrutural_contrato';
+        const dtoEstrutural = perfilDto === 'estruturalPuro' || perfilDto === 'estruturalContrato';
+        const modeloEstrutural = perfilModelo === 'estruturalPuro' || perfilModelo === 'estruturalContrato';
+        const outroEstrutural = perfilOutro === 'estruturalPuro' || perfilOutro === 'estruturalContrato';
         const {caminhos, estrategia} = localizarTestes(
-            arquivo.nome_classe,
+            arquivo.nomeClasse,
             arquivo.pacote,
             indicePorNome,
             indicePorPacote
         );
         const possuiTeste = caminhos.length > 0;
-        const nomeClasseCompleto = construirNomeClasseCompleto(arquivo.caminho_relativo);
+        const nomeClasseCompleto = construirNomeClasseCompleto(arquivo.caminhoRelativo);
         const coberturaClasse = coberturaPorClasse.get(nomeClasseCompleto) || null;
         const estaNoEscopoJacoco = coberturaPorClasse.size === 0 || coberturaClasse !== null;
         const possuiCoberturaJacoco = coberturaClasse !== null && coberturaClasse.linhasCobertas > 0;
@@ -371,7 +373,7 @@ async function analisarTestes({
             ...criarItemRelatorio({
             arquivo,
             perfilDto,
-            dtoEstrutural: dtoEstrutural || modelEstrutural || otherEstrutural,
+            dtoEstrutural: dtoEstrutural || modeloEstrutural || outroEstrutural,
             possuiTeste,
             estaNoEscopoJacoco,
             possuiCoberturaJacoco,
@@ -381,54 +383,54 @@ async function analisarTestes({
             caminhos,
             coberturaClasse
             }),
-            perfil_model: perfilModel,
-            model_ruido_ignorado: modelEstrutural,
-            perfil_other: perfilOther,
-            other_ruido_ignorado: otherEstrutural
+            perfilModelo,
+            ruidoModeloIgnorado: modeloEstrutural,
+            perfilOutro: perfilOutro,
+            ruidoOutroIgnorado: outroEstrutural
         };
 
-        if (arquivo.categoria === 'DTOs') {
+        if (arquivo.categoria === 'dtos') {
             if (perfilDto === 'comportamental') {
                 totalDtosComportamentais++;
             } else {
                 totalDtosEstruturais++;
-                if (perfilDto === 'estrutural_contrato') {
+                if (perfilDto === 'estruturalContrato') {
                     totalDtosEstruturaisContratuais++;
                 }
             }
         }
 
-        if (arquivo.categoria === 'Models') {
-            if (perfilModel === 'comportamental') {
-                totalModelsComportamentais++;
+        if (arquivo.categoria === 'modelos') {
+            if (perfilModelo === 'comportamental') {
+                totalModelosComportamentais++;
             } else {
-                totalModelsEstruturais++;
-                if (perfilModel === 'estrutural_contrato') {
-                    totalModelsEstruturaisContratuais++;
+                totalModelosEstruturais++;
+                if (perfilModelo === 'estruturalContrato') {
+                    totalModelosEstruturaisContratuais++;
                 }
             }
         }
 
-        if (arquivo.categoria === 'Others') {
-            if (perfilOther === 'comportamental') {
-                totalOthersComportamentais++;
+        if (arquivo.categoria === 'outros') {
+            if (perfilOutro === 'comportamental') {
+                totalOutrosComportamentais++;
             } else {
-                totalOthersEstruturais++;
-                if (perfilOther === 'estrutural_contrato') {
-                    totalOthersEstruturaisContratuais++;
+                totalOutrosEstruturais++;
+                if (perfilOutro === 'estruturalContrato') {
+                    totalOutrosEstruturaisContratuais++;
                 }
             }
         }
 
         if (possuiTeste) {
             totalComTeste++;
-            relatorio[arquivo.categoria].tested.push(item);
-            if (estrategia === 'nome_correspondente_outro_pacote') {
+            relatorio[arquivo.categoria].comTeste.push(item);
+            if (estrategia === 'nomeCorrespondenteOutroPacote') {
                 correspondenciasAmbiguas++;
             }
         } else {
-            relatorio[arquivo.categoria].untested.push(item);
-            if (dtoEstrutural || modelEstrutural || otherEstrutural) {
+            relatorio[arquivo.categoria].semTeste.push(item);
+            if (dtoEstrutural || modeloEstrutural || outroEstrutural) {
                 totalRuidoIgnorado++;
             } else if (estaForaEscopoJacoco) {
                 totalForaEscopoJacoco++;
@@ -451,30 +453,31 @@ async function analisarTestes({
         : 0;
 
     return {
-        gerado_em: new Date().toISOString(),
-        backend_dir: backendSrc,
+        versao: VERSAO_RELATORIO_TESTES,
+        geradoEm: new Date().toISOString(),
+        diretorioBackend: backendSrc,
         estatisticas: {
-            total_classes: totalClasses,
-            classes_com_teste_dedicado: totalComTeste,
-            classes_com_cobertura_indireta: totalComCoberturaIndireta,
-            classes_sem_evidencia_no_escopo: totalSemEvidenciaNoEscopo,
-            classes_fora_escopo_jacoco: totalForaEscopoJacoco,
-            classes_ruido_ignorado: totalRuidoIgnorado,
-            classes_sem_teste_dedicado: totalClasses - totalComTeste,
-            cobertura_arquivos_percentual: Number(cobertura.toFixed(2)),
-            cobertura_backlog_real_percentual: Number(coberturaBacklogReal.toFixed(2)),
-            cobertura_observada_percentual: Number(coberturaObservada.toFixed(2)),
-            correspondencias_ambiguas: correspondenciasAmbiguas,
-            jacoco_disponivel: coberturaPorClasse.size > 0,
-            dtos_comportamentais: totalDtosComportamentais,
-            dtos_estruturais: totalDtosEstruturais,
-            dtos_estruturais_contratuais: totalDtosEstruturaisContratuais,
-            models_comportamentais: totalModelsComportamentais,
-            models_estruturais: totalModelsEstruturais,
-            models_estruturais_contratuais: totalModelsEstruturaisContratuais,
-            others_comportamentais: totalOthersComportamentais,
-            others_estruturais: totalOthersEstruturais,
-            others_estruturais_contratuais: totalOthersEstruturaisContratuais
+            totalClasses: totalClasses,
+            classesComTesteDedicado: totalComTeste,
+            classesComCoberturaIndireta: totalComCoberturaIndireta,
+            classesSemEvidenciaNoEscopo: totalSemEvidenciaNoEscopo,
+            classesForaEscopoJacoco: totalForaEscopoJacoco,
+            classesRuidoIgnorado: totalRuidoIgnorado,
+            classesSemTesteDedicado: totalClasses - totalComTeste,
+            coberturaArquivosPercentual: Number(cobertura.toFixed(2)),
+            coberturaBacklogRealPercentual: Number(coberturaBacklogReal.toFixed(2)),
+            coberturaObservadaPercentual: Number(coberturaObservada.toFixed(2)),
+            correspondenciasAmbiguas: correspondenciasAmbiguas,
+            jacocoDisponivel: coberturaPorClasse.size > 0,
+            dtosComportamentais: totalDtosComportamentais,
+            dtosEstruturais: totalDtosEstruturais,
+            dtosEstruturaisContratuais: totalDtosEstruturaisContratuais,
+            modelosComportamentais: totalModelosComportamentais,
+            modelosEstruturais: totalModelosEstruturais,
+            modelosEstruturaisContratuais: totalModelosEstruturaisContratuais,
+            outrosComportamentais: totalOutrosComportamentais,
+            outrosEstruturais: totalOutrosEstruturais,
+            outrosEstruturaisContratuais: totalOutrosEstruturaisContratuais
         },
         categorias: relatorio
     };
@@ -482,27 +485,27 @@ async function analisarTestes({
 
 function gerarMarkdown(dados: RelatorioTestes): string {
     const estatisticas = dados.estatisticas;
-    const dataFormatada = new Date(dados.gerado_em).toLocaleString('pt-BR');
+    const dataFormatada = new Date(dados.geradoEm).toLocaleString('pt-BR');
     const linhas = [
         '# Relatorio de Cobertura de Testes Unitarios (Backend)\n',
         `**Data:** ${dataFormatada}`,
-        `**Total de Classes:** ${estatisticas.total_classes}`,
-        `**Com Teste Dedicado:** ${estatisticas.classes_com_teste_dedicado}`,
-        `**Com Cobertura Indireta:** ${estatisticas.classes_com_cobertura_indireta}`,
-        `**Sem Evidencia no Escopo do JaCoCo:** ${estatisticas.classes_sem_evidencia_no_escopo}`,
-        `**Fora do Escopo do JaCoCo:** ${estatisticas.classes_fora_escopo_jacoco}`,
-        `**Ruido Ignorado no Backlog:** ${estatisticas.classes_ruido_ignorado}`,
-        `**Sem Teste Dedicado:** ${estatisticas.classes_sem_teste_dedicado}`,
-        `**Correspondencia Direta (Arquivos):** ${estatisticas.cobertura_arquivos_percentual.toFixed(2)}%`,
-        `**Correspondencia Direta no Backlog Real:** ${estatisticas.cobertura_backlog_real_percentual.toFixed(2)}%`,
-        `**Cobertura Observada (Teste Dedicado + Indireta):** ${estatisticas.cobertura_observada_percentual.toFixed(2)}%`
+        `**Total de Classes:** ${estatisticas.totalClasses}`,
+        `**Com Teste Dedicado:** ${estatisticas.classesComTesteDedicado}`,
+        `**Com Cobertura Indireta:** ${estatisticas.classesComCoberturaIndireta}`,
+        `**Sem Evidencia no Escopo do JaCoCo:** ${estatisticas.classesSemEvidenciaNoEscopo}`,
+        `**Fora do Escopo do JaCoCo:** ${estatisticas.classesForaEscopoJacoco}`,
+        `**Ruido Ignorado no Backlog:** ${estatisticas.classesRuidoIgnorado}`,
+        `**Sem Teste Dedicado:** ${estatisticas.classesSemTesteDedicado}`,
+        `**Correspondencia Direta (Arquivos):** ${estatisticas.coberturaArquivosPercentual.toFixed(2)}%`,
+        `**Correspondencia Direta no Backlog Real:** ${estatisticas.coberturaBacklogRealPercentual.toFixed(2)}%`,
+        `**Cobertura Observada (Teste Dedicado + Indireta):** ${estatisticas.coberturaObservadaPercentual.toFixed(2)}%`
     ];
 
-    if (estatisticas.correspondencias_ambiguas > 0) {
-        linhas.push(`**Aviso:** ${estatisticas.correspondencias_ambiguas} classe(s) foram marcadas como cobertas apenas por nome de teste em outro pacote.`);
+    if (estatisticas.correspondenciasAmbiguas > 0) {
+        linhas.push(`**Aviso:** ${estatisticas.correspondenciasAmbiguas} classe(s) foram marcadas como cobertas apenas por nome de teste em outro pacote.`);
     }
 
-    if (!estatisticas.jacoco_disponivel) {
+    if (!estatisticas.jacocoDisponivel) {
         linhas.push('**Aviso:** relatório JaCoCo indisponível; a coluna de cobertura indireta não foi calculada.');
     }
 
@@ -510,82 +513,82 @@ function gerarMarkdown(dados: RelatorioTestes): string {
 
     [...CATEGORIAS_PRIORITARIAS, ...CATEGORIAS_SECUNDARIAS].forEach(categoria => {
         const itens = dados.categorias[categoria];
-        const total = itens.tested.length + itens.untested.length;
+        const total = itens.comTeste.length + itens.semTeste.length;
         if (total === 0) {
             return;
         }
 
-        const totalRelevanteCategoria = categoria === 'DTOs'
-            ? itens.tested.length + itens.untested.filter(item => !item.dto_ruido_ignorado).length
-            : (categoria === 'Models'
-                ? itens.tested.length + itens.untested.filter(item => !item.model_ruido_ignorado).length
-                : (categoria === 'Others'
-                    ? itens.tested.length + itens.untested.filter(item => !item.other_ruido_ignorado).length
+        const totalRelevanteCategoria = categoria === 'dtos'
+            ? itens.comTeste.length + itens.semTeste.filter(item => !item.ruidoDtoIgnorado).length
+            : (categoria === 'modelos'
+                ? itens.comTeste.length + itens.semTeste.filter(item => !item.ruidoModeloIgnorado).length
+                : (categoria === 'outros'
+                    ? itens.comTeste.length + itens.semTeste.filter(item => !item.ruidoOutroIgnorado).length
                     : total));
-        linhas.push(`### ${categoria} (${itens.tested.length}/${totalRelevanteCategoria} testados${categoria === 'DTOs' || categoria === 'Models' || categoria === 'Others' ? ' no backlog real' : ''})`);
-        if (itens.untested.length > 0) {
-            const candidatos = categoria === 'DTOs'
-                ? itens.untested.filter(item => !item.dto_ruido_ignorado)
-                : (categoria === 'Models'
-                    ? itens.untested.filter(item => !item.model_ruido_ignorado)
-                    : (categoria === 'Others'
-                        ? itens.untested.filter(item => !item.other_ruido_ignorado)
-                        : itens.untested));
-            const dtoRuido = categoria === 'DTOs'
-                ? itens.untested.filter(item => item.dto_ruido_ignorado)
+        linhas.push(`### ${categoria} (${itens.comTeste.length}/${totalRelevanteCategoria} testados${categoria === 'dtos' || categoria === 'modelos' || categoria === 'outros' ? ' no backlog real' : ''})`);
+        if (itens.semTeste.length > 0) {
+            const candidatos = categoria === 'dtos'
+                ? itens.semTeste.filter(item => !item.ruidoDtoIgnorado)
+                : (categoria === 'modelos'
+                    ? itens.semTeste.filter(item => !item.ruidoModeloIgnorado)
+                    : (categoria === 'outros'
+                        ? itens.semTeste.filter(item => !item.ruidoOutroIgnorado)
+                        : itens.semTeste));
+            const dtoRuido = categoria === 'dtos'
+                ? itens.semTeste.filter(item => item.ruidoDtoIgnorado)
                 : [];
-            const modelRuido = categoria === 'Models'
-                ? itens.untested.filter(item => item.model_ruido_ignorado)
+            const ruidoModelo = categoria === 'modelos'
+                ? itens.semTeste.filter(item => item.ruidoModeloIgnorado)
                 : [];
-            const otherRuido = categoria === 'Others'
-                ? itens.untested.filter(item => item.other_ruido_ignorado)
+            const ruidoOutro = categoria === 'outros'
+                ? itens.semTeste.filter(item => item.ruidoOutroIgnorado)
                 : [];
-            const indiretos = candidatos.filter(item => item.coberta_somente_indiretamente);
-            const foraEscopo = candidatos.filter(item => item.fora_escopo_jacoco);
-            const semEvidencia = candidatos.filter(item => !item.coberta_somente_indiretamente && !item.fora_escopo_jacoco);
+            const indiretos = candidatos.filter(item => item.cobertaSomenteIndiretamente);
+            const foraEscopo = candidatos.filter(item => item.foraEscopoJacoco);
+            const semEvidencia = candidatos.filter(item => !item.cobertaSomenteIndiretamente && !item.foraEscopoJacoco);
 
             linhas.push(`**Faltando Testes Dedicados (${candidatos.length}):**`);
             if (indiretos.length > 0) {
                 linhas.push(`Cobertos apenas indiretamente (${indiretos.length}):`);
                 indiretos
                     .slice()
-                    .toSorted((a, b) => a.caminho_relativo.localeCompare(b.caminho_relativo, 'pt-BR'))
-                    .forEach(item => linhas.push(`- \`${item.caminho_relativo}\` (${item.cobertura?.cobertura_linhas_percentual.toFixed(2)}% linhas)`));
+                    .toSorted((a, b) => a.caminhoRelativo.localeCompare(b.caminhoRelativo, 'pt-BR'))
+                    .forEach(item => linhas.push(`- \`${item.caminhoRelativo}\` (${item.cobertura?.coberturaLinhasPercentual.toFixed(2)}% linhas)`));
             }
             if (foraEscopo.length > 0) {
                 linhas.push(`Fora do escopo do JaCoCo (${foraEscopo.length}):`);
                 foraEscopo
                     .slice()
-                    .toSorted((a, b) => a.caminho_relativo.localeCompare(b.caminho_relativo, 'pt-BR'))
-                    .forEach(item => linhas.push(`- \`${item.caminho_relativo}\``));
+                    .toSorted((a, b) => a.caminhoRelativo.localeCompare(b.caminhoRelativo, 'pt-BR'))
+                    .forEach(item => linhas.push(`- \`${item.caminhoRelativo}\``));
             }
             if (semEvidencia.length > 0) {
                 linhas.push(`Sem evidencia de cobertura no escopo (${semEvidencia.length}):`);
                 semEvidencia
                     .slice()
-                    .toSorted((a, b) => a.caminho_relativo.localeCompare(b.caminho_relativo, 'pt-BR'))
-                    .forEach(item => linhas.push(`- \`${item.caminho_relativo}\``));
+                    .toSorted((a, b) => a.caminhoRelativo.localeCompare(b.caminhoRelativo, 'pt-BR'))
+                    .forEach(item => linhas.push(`- \`${item.caminhoRelativo}\``));
             }
             if (dtoRuido.length > 0) {
                 linhas.push(`Ignorados como DTO estrutural/contratual (${dtoRuido.length}):`);
                 dtoRuido
                     .slice()
-                    .toSorted((a, b) => a.caminho_relativo.localeCompare(b.caminho_relativo, 'pt-BR'))
-                    .forEach(item => linhas.push(`- \`${item.caminho_relativo}\` (${item.perfil_dto})`));
+                    .toSorted((a, b) => a.caminhoRelativo.localeCompare(b.caminhoRelativo, 'pt-BR'))
+                    .forEach(item => linhas.push(`- \`${item.caminhoRelativo}\` (${item.perfilDto})`));
             }
-            if (modelRuido.length > 0) {
-                linhas.push(`Ignorados como model estrutural/contratual (${modelRuido.length}):`);
-                modelRuido
+            if (ruidoModelo.length > 0) {
+                linhas.push(`Ignorados como modelo estrutural/contratual (${ruidoModelo.length}):`);
+                ruidoModelo
                     .slice()
-                    .toSorted((a, b) => a.caminho_relativo.localeCompare(b.caminho_relativo, 'pt-BR'))
-                    .forEach(item => linhas.push(`- \`${item.caminho_relativo}\` (${item.perfil_model})`));
+                    .toSorted((a, b) => a.caminhoRelativo.localeCompare(b.caminhoRelativo, 'pt-BR'))
+                    .forEach(item => linhas.push(`- \`${item.caminhoRelativo}\` (${item.perfilModelo})`));
             }
-            if (otherRuido.length > 0) {
-                linhas.push(`Ignorados como others estrutural/contratual (${otherRuido.length}):`);
-                otherRuido
+            if (ruidoOutro.length > 0) {
+                linhas.push(`Ignorados como outro estrutural/contratual (${ruidoOutro.length}):`);
+                ruidoOutro
                     .slice()
-                    .toSorted((a, b) => a.caminho_relativo.localeCompare(b.caminho_relativo, 'pt-BR'))
-                    .forEach(item => linhas.push(`- \`${item.caminho_relativo}\` (${item.perfil_other})`));
+                    .toSorted((a, b) => a.caminhoRelativo.localeCompare(b.caminhoRelativo, 'pt-BR'))
+                    .forEach(item => linhas.push(`- \`${item.caminhoRelativo}\` (${item.perfilOutro})`));
             }
         } else {
             linhas.push('Todos cobertos.');
@@ -603,47 +606,47 @@ function gravarArquivo(caminho: string, conteudo: string): void {
 
 function imprimirResumoConsole(dados: RelatorioTestes): void {
     const {estatisticas, categorias} = dados;
-    escreverLinha(`Resumo: ${estatisticas.classes_com_teste_dedicado}/${estatisticas.total_classes} classes com teste dedicado (${estatisticas.cobertura_arquivos_percentual.toFixed(2)}%).`);
-    escreverLinha(`- Cobertura indireta: ${estatisticas.classes_com_cobertura_indireta}`);
-    escreverLinha(`- Sem evidencia no escopo: ${estatisticas.classes_sem_evidencia_no_escopo}`);
-    escreverLinha(`- Fora do escopo do JaCoCo: ${estatisticas.classes_fora_escopo_jacoco}`);
-    escreverLinha(`- Ruido ignorado no backlog: ${estatisticas.classes_ruido_ignorado}`);
-    escreverLinha(`- Backlog real coberto por teste dedicado: ${estatisticas.cobertura_backlog_real_percentual.toFixed(2)}%`);
-    if (estatisticas.jacoco_disponivel) {
-        escreverLinha(`- Cobertura observada: ${estatisticas.cobertura_observada_percentual.toFixed(2)}%`);
+    escreverLinha(`Resumo: ${estatisticas.classesComTesteDedicado}/${estatisticas.totalClasses} classes com teste dedicado (${estatisticas.coberturaArquivosPercentual.toFixed(2)}%).`);
+    escreverLinha(`- Cobertura indireta: ${estatisticas.classesComCoberturaIndireta}`);
+    escreverLinha(`- Sem evidencia no escopo: ${estatisticas.classesSemEvidenciaNoEscopo}`);
+    escreverLinha(`- Fora do escopo do JaCoCo: ${estatisticas.classesForaEscopoJacoco}`);
+    escreverLinha(`- Ruido ignorado no backlog: ${estatisticas.classesRuidoIgnorado}`);
+    escreverLinha(`- Backlog real coberto por teste dedicado: ${estatisticas.coberturaBacklogRealPercentual.toFixed(2)}%`);
+    if (estatisticas.jacocoDisponivel) {
+        escreverLinha(`- Cobertura observada: ${estatisticas.coberturaObservadaPercentual.toFixed(2)}%`);
     } else {
         escreverLinha('- Cobertura observada: indisponivel (JaCoCo ausente)');
     }
 
     [...CATEGORIAS_PRIORITARIAS, ...CATEGORIAS_SECUNDARIAS].forEach(categoria => {
         const itens = categorias[categoria];
-        const total = itens.tested.length + itens.untested.length;
+        const total = itens.comTeste.length + itens.semTeste.length;
         if (total === 0) {
             return;
         }
-        if (categoria === 'DTOs') {
-            const totalRelevante = itens.tested.length + itens.untested.filter(item => !item.dto_ruido_ignorado).length;
-            const ignorados = itens.untested.filter(item => item.dto_ruido_ignorado).length;
-            escreverLinha(`- ${categoria}: ${itens.tested.length}/${totalRelevante} testados no backlog real (${ignorados} ignorados)`);
+        if (categoria === 'dtos') {
+            const totalRelevante = itens.comTeste.length + itens.semTeste.filter(item => !item.ruidoDtoIgnorado).length;
+            const ignorados = itens.semTeste.filter(item => item.ruidoDtoIgnorado).length;
+            escreverLinha(`- ${categoria}: ${itens.comTeste.length}/${totalRelevante} testados no backlog real (${ignorados} ignorados)`);
             return;
         }
-        if (categoria === 'Models') {
-            const totalRelevante = itens.tested.length + itens.untested.filter(item => !item.model_ruido_ignorado).length;
-            const ignorados = itens.untested.filter(item => item.model_ruido_ignorado).length;
-            escreverLinha(`- ${categoria}: ${itens.tested.length}/${totalRelevante} testados no backlog real (${ignorados} ignorados)`);
+        if (categoria === 'modelos') {
+            const totalRelevante = itens.comTeste.length + itens.semTeste.filter(item => !item.ruidoModeloIgnorado).length;
+            const ignorados = itens.semTeste.filter(item => item.ruidoModeloIgnorado).length;
+            escreverLinha(`- ${categoria}: ${itens.comTeste.length}/${totalRelevante} testados no backlog real (${ignorados} ignorados)`);
             return;
         }
-        if (categoria === 'Others') {
-            const totalRelevante = itens.tested.length + itens.untested.filter(item => !item.other_ruido_ignorado).length;
-            const ignorados = itens.untested.filter(item => item.other_ruido_ignorado).length;
-            escreverLinha(`- ${categoria}: ${itens.tested.length}/${totalRelevante} testados no backlog real (${ignorados} ignorados)`);
+        if (categoria === 'outros') {
+            const totalRelevante = itens.comTeste.length + itens.semTeste.filter(item => !item.ruidoOutroIgnorado).length;
+            const ignorados = itens.semTeste.filter(item => item.ruidoOutroIgnorado).length;
+            escreverLinha(`- ${categoria}: ${itens.comTeste.length}/${totalRelevante} testados no backlog real (${ignorados} ignorados)`);
             return;
         }
-        escreverLinha(`- ${categoria}: ${itens.tested.length}/${total} testados`);
+        escreverLinha(`- ${categoria}: ${itens.comTeste.length}/${total} testados`);
     });
 
-    if (estatisticas.correspondencias_ambiguas > 0) {
-        escreverLinha(`- Correspondencias ambiguas: ${estatisticas.correspondencias_ambiguas}`);
+    if (estatisticas.correspondenciasAmbiguas > 0) {
+        escreverLinha(`- Correspondencias ambiguas: ${estatisticas.correspondenciasAmbiguas}`);
     }
 }
 
@@ -681,11 +684,12 @@ async function principal(argumentos: string[] = process.argv.slice(2)): Promise<
 if (ehEntradaPrincipal(import.meta.url)) {
     principal().catch((erro) => {
         const mensagem = erro instanceof Error ? erro.message : String(erro);
-        escreverLinha(`Erro ao analisar testes: ${mensagem}`);
+        escreverErro(`Erro ao analisar testes: ${mensagem}`);
         process.exitCode = 1;
     });
 }
 
 export {
     principal,
+    type RelatorioTestes
 };

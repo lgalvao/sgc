@@ -3,23 +3,23 @@ import path from "node:path";
 import type {ClasseCobertura} from "../../lib/dominios/cobertura-java.js";
 
 export const EXTENSAO_JAVA = ".java" as const;
-export const CATEGORIAS_PRIORITARIAS = ["Controllers", "Facades", "Services", "Mappers"] as const;
-export const CATEGORIAS_SECUNDARIAS = ["Models", "Repositories", "DTOs", "Others"] as const;
+export const CATEGORIAS_PRIORITARIAS = ["controladores", "fachadas", "servicos", "mapeadores"] as const;
+export const CATEGORIAS_SECUNDARIAS = ["modelos", "repositorios", "dtos", "outros"] as const;
 export const SUFIXOS_TESTE = ["Test", "CoverageTest", "UnitTest", "IntegrationTest"] as const;
 
 type Categoria = typeof CATEGORIAS_PRIORITARIAS[number] | typeof CATEGORIAS_SECUNDARIAS[number];
-type PerfilFonte = "comportamental" | "estrutural_contrato" | "estrutural_puro";
-type EstrategiaCorrespondencia = "mesmo_pacote" | "nome_correspondente_outro_pacote" | "nenhum";
+type PerfilFonte = "comportamental" | "estruturalContrato" | "estruturalPuro";
+type EstrategiaCorrespondencia = "mesmoPacote" | "nomeCorrespondenteOutroPacote" | "nenhum";
 type EvidenciaQualidade =
-    | "teste_dedicado"
-    | "ruido_dto_estrutural"
-    | "fora_escopo_jacoco"
-    | "cobertura_indireta"
-    | "sem_evidencia_no_escopo";
+    | "testeDedicado"
+    | "ruidoDtoEstrutural"
+    | "foraEscopoJacoco"
+    | "coberturaIndireta"
+    | "semEvidenciaNoEscopo";
 
 interface ArquivoFonte {
-    caminho_relativo: string;
-    nome_classe: string;
+    caminhoRelativo: string;
+    nomeClasse: string;
     pacote: string;
     categoria: Categoria;
 }
@@ -29,34 +29,34 @@ interface OpcoesClassificacaoFonte {
     conteudoFonte: string;
 }
 
-interface OpcoesClassificacaoOther extends OpcoesClassificacaoFonte {
+interface OpcoesClassificacaoOutro extends OpcoesClassificacaoFonte {
     caminhoRelativo: string;
 }
 
 interface CoberturaRelatorio {
-    nome_classe: string;
-    cobertura_linhas_percentual: number;
-    linhas_cobertas: number;
-    linhas_total: number;
-    cobertura_ramificacoes_percentual: number;
-    ramificacoes_cobertas: number;
-    ramificacoes_total: number;
+    nomeClasse: string;
+    coberturaLinhasPercentual: number;
+    linhasCobertas: number;
+    linhasTotais: number;
+    coberturaRamificacoesPercentual: number;
+    ramificacoesCobertas: number;
+    ramificacoesTotais: number;
 }
 
 interface ItemRelatorio {
     classe: string;
-    caminho_relativo: string;
+    caminhoRelativo: string;
     categoria: Categoria;
-    perfil_dto: PerfilFonte | null;
-    dto_ruido_ignorado: boolean;
-    possui_teste: boolean;
-    esta_no_escopo_jacoco: boolean;
-    possui_cobertura_jacoco: boolean;
-    coberta_somente_indiretamente: boolean;
-    fora_escopo_jacoco: boolean;
-    evidencia_qualidade: EvidenciaQualidade;
-    estrategia_correspondencia: EstrategiaCorrespondencia;
-    testes_encontrados: string[];
+    perfilDto: PerfilFonte | null;
+    ruidoDtoIgnorado: boolean;
+    possuiTeste: boolean;
+    estaNoEscopoJacoco: boolean;
+    possuiCoberturaJacoco: boolean;
+    cobertaSomenteIndiretamente: boolean;
+    foraEscopoJacoco: boolean;
+    evidenciaQualidade: EvidenciaQualidade;
+    estrategiaCorrespondencia: EstrategiaCorrespondencia;
+    testesEncontrados: string[];
     cobertura: CoberturaRelatorio | null;
 }
 
@@ -81,20 +81,20 @@ function normalizarCaminho(caminho: string): string {
 function inferirCategoria(nomeClasse: string, caminhoRelativo: string): Categoria {
     const caminhoNormalizado = normalizarCaminho(caminhoRelativo);
 
-    if (nomeClasse.includes("Controller")) return "Controllers";
-    if (nomeClasse.includes("Service") || nomeClasse.includes("Policy")) return "Services";
-    if (nomeClasse.includes("Facade")) return "Facades";
-    if (nomeClasse.includes("Mapper")) return "Mappers";
+    if (nomeClasse.includes("Controller")) return "controladores";
+    if (nomeClasse.includes("Service") || nomeClasse.includes("Policy")) return "servicos";
+    if (nomeClasse.includes("Facade")) return "fachadas";
+    if (nomeClasse.includes("Mapper")) return "mapeadores";
     if (
         caminhoNormalizado.includes("/dto/")
         || nomeClasse.includes("Dto")
         || nomeClasse.includes("Request")
         || nomeClasse.includes("Response")
         || nomeClasse.includes("Command")
-    ) return "DTOs";
-    if (nomeClasse.includes("Repo")) return "Repositories";
-    if (caminhoNormalizado.includes("/model/") || caminhoNormalizado.includes("/dominio/")) return "Models";
-    return "Others";
+    ) return "dtos";
+    if (nomeClasse.includes("Repo")) return "repositorios";
+    if (caminhoNormalizado.includes("/model/") || caminhoNormalizado.includes("/dominio/")) return "modelos";
+    return "outros";
 }
 
 function lerConteudoFonte(backendSrc: string, caminhoRelativo: string): string {
@@ -115,13 +115,13 @@ function classificarPerfilDto(conteudoFonte: string): PerfilFonte {
     }
 
     if (possuiValidacaoOuContrato) {
-        return "estrutural_contrato";
+        return "estruturalContrato";
     }
 
-    return "estrutural_puro";
+    return "estruturalPuro";
 }
 
-function classificarPerfilModel({nomeClasse, conteudoFonte}: OpcoesClassificacaoFonte): PerfilFonte {
+function classificarPerfilModelo({nomeClasse, conteudoFonte}: OpcoesClassificacaoFonte): PerfilFonte {
     const conteudoSemComentarios = conteudoFonte
         .replace(/\/\*[\s\S]*?\*\//g, "")
         .replace(/\/\/.*$/gm, "");
@@ -133,11 +133,11 @@ function classificarPerfilModel({nomeClasse, conteudoFonte}: OpcoesClassificacao
         || nomeClasse === "Perfil"
         || nomeClasse.endsWith("Id")
     ) {
-        return "estrutural_puro";
+        return "estruturalPuro";
     }
 
     if (/\bpublic\s+@interface\b/.test(conteudoSemComentarios)) {
-        return "estrutural_contrato";
+        return "estruturalContrato";
     }
 
     const possuiMetodoExplicito = /\b(public|private|protected)\s+(?!class\b|interface\b|enum\b|record\b)(static\s+)?[\w@.<>[\]?]+\s+\w+\s*\(/.test(conteudoSemComentarios);
@@ -151,13 +151,13 @@ function classificarPerfilModel({nomeClasse, conteudoFonte}: OpcoesClassificacao
     }
 
     if (possuiMetodoExplicito) {
-        return "estrutural_contrato";
+        return "estruturalContrato";
     }
 
-    return "estrutural_puro";
+    return "estruturalPuro";
 }
 
-function classificarPerfilOther({nomeClasse, caminhoRelativo, conteudoFonte}: OpcoesClassificacaoOther): PerfilFonte {
+function classificarPerfilOutro({nomeClasse, caminhoRelativo, conteudoFonte}: OpcoesClassificacaoOutro): PerfilFonte {
     const caminhoNormalizado = normalizarCaminho(caminhoRelativo);
     const conteudoSemComentarios = conteudoFonte
         .replace(/\/\*[\s\S]*?\*\//g, "")
@@ -173,11 +173,11 @@ function classificarPerfilOther({nomeClasse, caminhoRelativo, conteudoFonte}: Op
         || caminhoNormalizado.includes("/config/")
         || caminhoNormalizado.includes("/erros/")
     ) {
-        return "estrutural_puro";
+        return "estruturalPuro";
     }
 
     if (/\bpublic\s+@interface\b/.test(conteudoSemComentarios)) {
-        return "estrutural_contrato";
+        return "estruturalContrato";
     }
 
     const possuiMetodoExplicito = /\b(public|private|protected)\s+(?!class\b|interface\b|enum\b|record\b)(static\s+)?[\w@.<>[\]?]+\s+\w+\s*\(/.test(conteudoSemComentarios);
@@ -190,10 +190,10 @@ function classificarPerfilOther({nomeClasse, caminhoRelativo, conteudoFonte}: Op
     }
 
     if (possuiMetodoExplicito) {
-        return "estrutural_contrato";
+        return "estruturalContrato";
     }
 
-    return "estrutural_puro";
+    return "estruturalPuro";
 }
 
 function construirNomeClasseCompleto(caminhoRelativo: string): string {
@@ -214,35 +214,35 @@ function criarItemRelatorio({
     coberturaClasse
 }: OpcoesCriacaoItemRelatorio): ItemRelatorio {
     const evidenciaQualidade: EvidenciaQualidade = possuiTeste
-        ? "teste_dedicado"
+        ? "testeDedicado"
         : (dtoEstrutural
-            ? "ruido_dto_estrutural"
+            ? "ruidoDtoEstrutural"
             : (estaForaEscopoJacoco
-                ? "fora_escopo_jacoco"
-                : (possuiCoberturaSomenteIndireta ? "cobertura_indireta" : "sem_evidencia_no_escopo")));
+                ? "foraEscopoJacoco"
+                : (possuiCoberturaSomenteIndireta ? "coberturaIndireta" : "semEvidenciaNoEscopo")));
 
     return {
-        classe: arquivo.nome_classe,
-        caminho_relativo: arquivo.caminho_relativo,
+        classe: arquivo.nomeClasse,
+        caminhoRelativo: arquivo.caminhoRelativo,
         categoria: arquivo.categoria,
-        perfil_dto: perfilDto,
-        dto_ruido_ignorado: dtoEstrutural,
-        possui_teste: possuiTeste,
-        esta_no_escopo_jacoco: estaNoEscopoJacoco,
-        possui_cobertura_jacoco: possuiCoberturaJacoco,
-        coberta_somente_indiretamente: possuiCoberturaSomenteIndireta,
-        fora_escopo_jacoco: estaForaEscopoJacoco,
-        evidencia_qualidade: evidenciaQualidade,
-        estrategia_correspondencia: estrategia,
-        testes_encontrados: caminhos,
+        perfilDto: perfilDto,
+        ruidoDtoIgnorado: dtoEstrutural,
+        possuiTeste: possuiTeste,
+        estaNoEscopoJacoco: estaNoEscopoJacoco,
+        possuiCoberturaJacoco: possuiCoberturaJacoco,
+        cobertaSomenteIndiretamente: possuiCoberturaSomenteIndireta,
+        foraEscopoJacoco: estaForaEscopoJacoco,
+        evidenciaQualidade: evidenciaQualidade,
+        estrategiaCorrespondencia: estrategia,
+        testesEncontrados: caminhos,
         cobertura: coberturaClasse ? {
-            nome_classe: coberturaClasse.nomeClasse,
-            cobertura_linhas_percentual: Number(coberturaClasse.coberturaLinhas.toFixed(2)),
-            linhas_cobertas: coberturaClasse.linhasCobertas,
-            linhas_total: coberturaClasse.totalLinhas,
-            cobertura_ramificacoes_percentual: Number(coberturaClasse.coberturaRamificacoes.toFixed(2)),
-            ramificacoes_cobertas: coberturaClasse.ramificacoesCobertas,
-            ramificacoes_total: coberturaClasse.totalRamificacoes
+            nomeClasse: coberturaClasse.nomeClasse,
+            coberturaLinhasPercentual: Number(coberturaClasse.coberturaLinhas.toFixed(2)),
+            linhasCobertas: coberturaClasse.linhasCobertas,
+            linhasTotais: coberturaClasse.totalLinhas,
+            coberturaRamificacoesPercentual: Number(coberturaClasse.coberturaRamificacoes.toFixed(2)),
+            ramificacoesCobertas: coberturaClasse.ramificacoesCobertas,
+            ramificacoesTotais: coberturaClasse.totalRamificacoes
         } : null
     };
 }
@@ -252,8 +252,8 @@ export {
     inferirCategoria,
     lerConteudoFonte,
     classificarPerfilDto,
-    classificarPerfilModel,
-    classificarPerfilOther,
+    classificarPerfilModelo,
+    classificarPerfilOutro,
     construirNomeClasseCompleto,
     criarItemRelatorio
 };
