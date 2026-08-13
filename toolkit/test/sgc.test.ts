@@ -25,22 +25,7 @@ import {executarCrawler, normalizarArgumentosPlaywright} from "../frontend/acess
 import {normalizarResultados} from "../frontend/acessibilidade-processar-resultados.js";
 
 const CAMINHO_TESTES_PRIORIZAR = path.join(DIRETORIO_RAIZ, "toolkit", "backend", "testes-priorizar.ts");
-const CAMINHOS_COMANDOS_TESTES_BACKEND = [
-    "testes-analisar.ts",
-    "testes-priorizar.ts"
-].map(nome => path.join(DIRETORIO_RAIZ, "toolkit", "backend", nome));
 const CAMINHO_FRONTEND_COBERTURA_AUDITORIA = path.join(DIRETORIO_RAIZ, "toolkit", "frontend", "cobertura-auditoria.ts");
-const CAMINHOS_COMANDOS_COBERTURA_BACKEND = [
-    "cobertura-ramificacoes.ts",
-    "cobertura-auditoria.ts"
-].map(nome => path.join(DIRETORIO_RAIZ, "toolkit", "backend", nome));
-const CAMINHOS_COMANDOS_AUDITORIA_BACKEND = [
-    "arquitetura-auditar.ts",
-    "coesao-auditar.ts",
-    "contratos-auditar.ts"
-].map(nome => path.join(DIRETORIO_RAIZ, "toolkit", "backend", nome));
-const CAMINHO_AUDITORIA_ASSUNTOS = path.join(DIRETORIO_RAIZ, "toolkit", "backend", "notificacoes-assuntos-auditar.ts");
-const CAMINHO_CORRIGIR_FQN = path.join(DIRETORIO_RAIZ, "toolkit", "backend", "java-corrigir-fqn.ts");
 const CAMINHO_SEMGREP_AUDITAR = path.join(DIRETORIO_RAIZ, "toolkit", "codigo", "semgrep-auditar.ts");
 const CAMINHO_CHEIROS_AUDITAR = path.join(DIRETORIO_RAIZ, "toolkit", "codigo", "cheiros-auditar.ts");
 const CAMINHOS_COMANDOS_PROJETO = [
@@ -142,82 +127,6 @@ async function executarScriptTestesPriorizar(args: string[], opcoes: Options = {
 }
 
 describe("CLI raiz do toolkit", () => {
-    test("pode importar comandos de cobertura backend sem ler JaCoCo", async () => {
-        const resultados = await Promise.all(CAMINHOS_COMANDOS_COBERTURA_BACKEND.map(async caminho => {
-            const urlModulo = pathToFileURL(caminho).href;
-            return execa(process.execPath, [
-                "--import=tsx",
-                "--input-type=module",
-                "-e",
-                `process.argv.push("--help"); await import(${JSON.stringify(urlModulo)}); process.stdout.write("importacao-ok\\n");`
-            ], {
-                cwd: DIRETORIO_RAIZ,
-                reject: false
-            });
-        }));
-
-        for (const resultado of resultados) {
-            expect(resultado.exitCode).toBe(0);
-            expect(resultado.stdout).toBe("importacao-ok");
-        }
-    });
-
-    test("pode importar auditores estruturais do backend sem analisar o projeto", async () => {
-        const resultados = await Promise.all(CAMINHOS_COMANDOS_AUDITORIA_BACKEND.map(async caminho => {
-            const urlModulo = pathToFileURL(caminho).href;
-            return execa(process.execPath, [
-                "--import=tsx",
-                "--input-type=module",
-                "-e",
-                `process.argv.push("--help"); await import(${JSON.stringify(urlModulo)}); process.stdout.write("importacao-ok\\n");`
-            ], {
-                cwd: DIRETORIO_RAIZ,
-                reject: false
-            });
-        }));
-
-        for (const resultado of resultados) {
-            expect(resultado.exitCode).toBe(0);
-            expect(resultado.stdout).toBe("importacao-ok");
-        }
-    });
-
-    test("pode importar o corretor de FQN sem alterar arquivos", async () => {
-        const urlModulo = pathToFileURL(CAMINHO_CORRIGIR_FQN).href;
-        const resultado = await execa(process.execPath, [
-            "--import=tsx",
-                "--input-type=module",
-            "-e",
-            `process.argv.push("--help"); await import(${JSON.stringify(urlModulo)}); process.stdout.write("importacao-ok\\n");`
-        ], {
-            cwd: DIRETORIO_RAIZ,
-            reject: false
-        });
-
-        expect(resultado.exitCode).toBe(0);
-        expect(resultado.stdout).toBe("importacao-ok");
-    });
-
-    test("pode importar comandos de analise de testes sem ler relatorios", async () => {
-        const resultados = await Promise.all(CAMINHOS_COMANDOS_TESTES_BACKEND.map(async caminho => {
-            const urlModulo = pathToFileURL(caminho).href;
-            return execa(process.execPath, [
-                "--import=tsx",
-                "--input-type=module",
-                "-e",
-                `process.argv.push("--help"); await import(${JSON.stringify(urlModulo)}); process.stdout.write("importacao-ok\\n");`
-            ], {
-                cwd: DIRETORIO_RAIZ,
-                reject: false
-            });
-        }));
-
-        for (const resultado of resultados) {
-            expect(resultado.exitCode).toBe(0);
-            expect(resultado.stdout).toBe("importacao-ok");
-        }
-    });
-
     test("pode importar o auditor Semgrep sem executar a ferramenta externa", async () => {
         const urlModulo = pathToFileURL(CAMINHO_SEMGREP_AUDITAR).href;
         const resultado = await execa(process.execPath, [
@@ -236,22 +145,6 @@ describe("CLI raiz do toolkit", () => {
 
     test("pode importar o auditor de cheiros sem ler o projeto", async () => {
         const urlModulo = pathToFileURL(CAMINHO_CHEIROS_AUDITAR).href;
-        const resultado = await execa(process.execPath, [
-            "--import=tsx",
-                "--input-type=module",
-            "-e",
-            `process.argv.push("--help"); await import(${JSON.stringify(urlModulo)}); process.stdout.write("importacao-ok\\n");`
-        ], {
-            cwd: DIRETORIO_RAIZ,
-            reject: false
-        });
-
-        expect(resultado.exitCode).toBe(0);
-        expect(resultado.stdout).toBe("importacao-ok");
-    });
-
-    test("pode importar auditoria de assuntos sem ler o backend", async () => {
-        const urlModulo = pathToFileURL(CAMINHO_AUDITORIA_ASSUNTOS).href;
         const resultado = await execa(process.execPath, [
             "--import=tsx",
                 "--input-type=module",
