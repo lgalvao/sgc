@@ -41,7 +41,7 @@
     "qualidade/coleta.ts",
     "qualidade/resumo.ts",
     "requisitos/cdus-auditar-estilo.ts",
-    "requisitos/cdus-auditar-mensagens-codigo.js",
+    "requisitos/cdus-auditar-mensagens-codigo.ts",
     "requisitos/cdus-auditar-mensagens.ts",
     "requisitos/cdus-auditar-vocabulario.ts",
     "requisitos/cdus-auditar.ts",

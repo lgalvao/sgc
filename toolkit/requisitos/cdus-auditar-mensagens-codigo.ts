@@ -5,10 +5,57 @@ import {ehEntradaPrincipal} from "../lib/execucao.js";
 import {escreverLinha, imprimirJson} from "../lib/saida.js";
 import {lerArquivo, listarArquivosCdu, obterOpcoesCdu} from "./cdus-lib.js";
 import {extrairAssuntos, extrairDescricoes, extrairMensagens, extrairToasts} from "./cdus-mensagens-lib.js";
-import {carregarMensagensCanonicas, normalizarTextoComparacao, sugerirCanonicos} from "./cdus-mensagens-codigo-lib.js";
+import {
+    carregarMensagensCanonicas,
+    normalizarTextoComparacao,
+    sugerirCanonicos,
+    type CategoriaMensagem,
+    type MensagemCanonica
+} from "./cdus-mensagens-codigo-lib.js";
 
-function consolidarOcorrencias(base, arquivos, extrator, tipo) {
-    const mapa = new Map();
+type TipoItem = "descricoes" | "assuntos" | "mensagens" | "toasts";
+
+interface OcorrenciasMensagem {
+    tipo: TipoItem;
+    valor: string;
+    ocorrencias: string[];
+}
+
+interface ReferenciaRelatorio {
+    texto: string;
+    origem: string;
+    grupo: string;
+}
+
+interface SugestaoRelatorio extends ReferenciaRelatorio {
+    similaridade: number;
+}
+
+interface ItemRelatorio {
+    tipo: TipoItem;
+    valor: string;
+    quantidade: number;
+    ocorrencias: string[];
+    referenciasExatas: ReferenciaRelatorio[];
+    sugestoes: SugestaoRelatorio[];
+}
+
+interface ResumoRelatorio {
+    base: string;
+    totalArquivos: number;
+    totalItens: number;
+    itensComReferenciaExata: number;
+    itensSemReferenciaExata: number;
+    itensComSugestao: number;
+}
+
+function consolidarOcorrencias(
+    base: string,
+    arquivos: string[],
+    extrator: (texto: string) => string[],
+    tipo: TipoItem
+): OcorrenciasMensagem[] {
+    const mapa = new Map<string, OcorrenciasMensagem>();
 
     for (const caminhoArquivo of arquivos) {
         const arquivoRelativo = path.relative(base, caminhoArquivo).replaceAll("\\", "/");
@@ -24,8 +71,12 @@ function consolidarOcorrencias(base, arquivos, extrator, tipo) {
     return [...mapa.values()];
 }
 
-function auditarItem(item, indiceCanonicos, todosCanonicos) {
-    const categorias = {
+function auditarItem(
+    item: OcorrenciasMensagem,
+    indiceCanonicos: Map<string, MensagemCanonica[]>,
+    todosCanonicos: MensagemCanonica[]
+): ItemRelatorio {
+    const categorias: Record<TipoItem, CategoriaMensagem> = {
         descricoes: "descricao",
         assuntos: "assunto",
         mensagens: "mensagem",
@@ -33,7 +84,9 @@ function auditarItem(item, indiceCanonicos, todosCanonicos) {
     };
     const categoria = categorias[item.tipo];
     const canonicosCategoria = todosCanonicos.filter(canonico => canonico.categoria === categoria);
-    const referenciasExatas = indiceCanonicos.get(normalizarTextoComparacao(item.valor))?.filter(ref => ref.categoria === categoria) ?? [];
+    const referenciasExatas = indiceCanonicos
+        .get(normalizarTextoComparacao(item.valor))
+        ?.filter(ref => ref.categoria === categoria) ?? [];
     const sugestoes = referenciasExatas.length === 0 ? sugerirCanonicos(item.valor, canonicosCategoria) : [];
 
     return {
@@ -55,7 +108,7 @@ function auditarItem(item, indiceCanonicos, todosCanonicos) {
     };
 }
 
-async function principal(argumentos = process.argv.slice(2)) {
+async function principal(argumentos: string[] = process.argv.slice(2)): Promise<void> {
     const {emitirJson, base} = obterOpcoesCdu(argumentos);
 
     const arquivos = await listarArquivosCdu(base);
@@ -69,7 +122,7 @@ async function principal(argumentos = process.argv.slice(2)) {
     ].toSorted((a, b) => a.tipo.localeCompare(b.tipo, "pt-BR") || b.ocorrencias.length - a.ocorrencias.length || a.valor.localeCompare(b.valor, "pt-BR"));
 
     const relatorio = itens.map(item => auditarItem(item, indiceCanonicos, canonicos));
-    const resumo = {
+    const resumo: ResumoRelatorio = {
         base,
         totalArquivos: arquivos.length,
         totalItens: relatorio.length,

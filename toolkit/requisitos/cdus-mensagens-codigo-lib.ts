@@ -44,9 +44,9 @@ interface MensagemExtraida {
     origem: string;
 }
 
-type CategoriaMensagem = "descricao" | "assunto" | "toast" | "mensagem";
+export type CategoriaMensagem = "descricao" | "assunto" | "toast" | "mensagem";
 
-interface MensagemCanonica extends MensagemExtraida {
+export interface MensagemCanonica extends MensagemExtraida {
     categoria: CategoriaMensagem;
     grupo: string;
 }

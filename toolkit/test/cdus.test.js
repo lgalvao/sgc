@@ -17,7 +17,7 @@ const CAMINHOS_COMANDOS_CDU = [
     "cdus-auditar-vocabulario.ts",
     "cdus-inventariar-mensagens.ts",
     "cdus-auditar-mensagens.ts",
-    "cdus-auditar-mensagens-codigo.js",
+    "cdus-auditar-mensagens-codigo.ts",
     "cdus-inventariar-densidade.ts",
     "cdus-inventariar-duplicacoes.ts"
 ].map(nome => path.join(DIRETORIO_RAIZ, "toolkit", "requisitos", nome));
