@@ -218,9 +218,9 @@ documentado.
 - A configuração externa agora exige schema versão `1`, valida estrutura, nomes de diretório e caminhos não vazios na
   borda, antes de qualquer auditoria; o tipo TypeScript dos diretórios agora usa a mesma união de nomes conhecidos do
   schema, em vez de `Record<string, string>` permissivo.
-- A configuração externa também aceita a seção opcional `execucoes`, com perfis de qualidade, escopos de auditoria de
-  dependências e escopos de instalação; cada categoria pode ser substituída separadamente, enquanto categorias ausentes
-  continuam usando os defaults do perfil SGC. Opções explícitas da API/CLI têm precedência sobre o arquivo.
+- A configuração externa também aceita a seção opcional `execucoes`, com perfis de qualidade e escopos de auditoria de
+  dependências; cada categoria pode ser substituída separadamente, enquanto categorias ausentes continuam usando os
+  defaults do perfil SGC. Opções explícitas da API/CLI têm precedência sobre o arquivo.
 - Os defaults obsoletos de orçamento e exceções de resíduos frontend foram removidos: os dois nomes continuam aceitos
   somente como overrides opcionais da configuração. Sem override, a política neutra fica explícita no resultado; com
   override, arquivo ausente ou inválido gera erro visível.
@@ -263,12 +263,14 @@ documentado.
 - `frontend/identificadores-teste-lib.ts` foi convertido para TypeScript com tipos para identificadores coletados e
   resultado da busca; o contrato de ausência de opções foi alinhado ao `lerOpcao` (`undefined`).
 - `requisitos/cdus-lib.ts` foi convertido para TypeScript com tipos para opções, índices de seções, contagens e análise
-  estrutural; o parser Markdown CDU continua preservando seus campos e diagnósticos atuais.
+  estrutural; o parser Markdown CDU preserva o formato e os diagnósticos do corpus, com o caminho do corpus destinado à
+  configuração do projeto.
 - `requisitos/cdus-vocabulario-lib.ts` foi convertido para TypeScript; `sugerirCanonico` aceita qualquer `Iterable` de
-  candidatos, enquanto perfis, tipos de processo e o caminho de situações continuam declarados como perfil SGC.
+  candidatos. O motor pode receber vocabulários externos; os perfis, tipos de processo e situações atuais continuam
+  fornecidos pelo perfil SGC.
 - `requisitos/cdus-mensagens-codigo-lib.ts` foi convertido para TypeScript com tipos para mensagens extraídas,
-  categorias, grupos, índice e sugestões; seus caminhos, prefixes e chaves canônicas continuam explicitamente no perfil
-  SGC. A similaridade textual é um candidato separado para reutilização futura, não uma abstração inventada nesta etapa.
+  categorias, grupos, índice e sugestões. O comparador é potencialmente horizontal, mas seus caminhos, prefixes e
+  chaves canônicas atuais ainda são fornecidos pelo perfil SGC.
 - `frontend/acoes-backend-lib.ts` foi convertido para TypeScript com tipos para ocorrências, violações, exceções e
   resultado da auditoria; o núcleo usa APIs `node:fs` diretamente e valida o JSON de exceções como `unknown`, enquanto
   as heurísticas de domínio continuam explicitamente específicas do SGC.
@@ -332,7 +334,7 @@ documentado.
   e relatório estão tipados, mantendo as exceções específicas de `AssuntosNotificacao`/`E2eController` e o exit code de
   violação do perfil SGC.
 - `requisitos/cdus-auditar.ts` foi convertido para TypeScript; achados, relatórios e severidades agora são tipados a
-  partir do contrato do parser CDU, mantendo a auditoria read-only e as regras canônicas do perfil SGC.
+  partir do contrato do parser CDU, mantendo a auditoria read-only; as políticas canônicas são fornecidas pelo perfil SGC.
 - `requisitos/cdus-auditar-estilo.ts` foi convertido para TypeScript; regras de estilo, perfis, linhas e achados agora
   têm tipos explícitos, preservando a auditoria read-only de aspas, placeholders legados e títulos de UI.
 - `requisitos/cdus-inventariar-densidade.ts` foi convertido para TypeScript com contratos explícitos de documento,
@@ -812,7 +814,7 @@ regra que deve continuar no toolkit, mas não deve ser apresentada como regra ho
 | Código transversal: `cheiros-auditar`, `nomes-simbolos-coletar`, `nomes-consistencia-auditar`, `semgrep-auditar`, `nomes-caminhos` | Comandos catalogados e usados por qualidade; Semgrep e inventários têm política/saída configuráveis | Manter; núcleo de análise com políticas do perfil | `adaptável` |
 | Idioma e identificadores SGC: `idioma-consistencia-auditar` | A regra de português e `codigo` é uma convenção deliberada deste repositório, não uma verdade universal | Manter no perfil SGC | `perfil-sgc` |
 | Contratos: `contratos-openapi-caminhos`, `contratos-exportar-openapi`, `contratos-diff`, `contratos-fixar-baseline` | Exportação, comparação e baseline continuam documentados e testados; somente o gerador de tipos foi removido | Manter e parametrizar URL/artefatos | `adaptável` |
-| Requisitos/CDUs: `requisitos/cdus-*` | Dez comandos cobrem os 55 documentos em `specs/cdu/cdu-*.md`; mensagens canônicas apontam arquivos concretos do SGC | Manter no perfil SGC; inventários são utilitários ocasionais | `perfil-sgc` |
+| Requisitos/CDUs: `requisitos/cdus-*`, `cdus-lib`, `cdus-vocabulario-lib`, `cdus-mensagens-lib`, `cdus-mensagens-codigo-lib` | Dez comandos analisam os 55 documentos em `specs/cdu/cdu-*.md`; a estrutura CDU pode ser usada por outros projetos, enquanto vocabulários, caminhos e mensagens canônicas atuais vêm do SGC | Manter; separar motor CDU horizontal, adaptadores e políticas SGC; inventários permanecem ocasionais | `núcleo` + `adaptável` + `perfil-sgc` |
 | Projeto: `arvore-linhas`, `artefatos-limpar`, `ambiente-verificar`, `dependencias-auditar`, `versao-sincronizar` | Comandos têm uso em scripts/testes e execução manual; base e diretórios são configuráveis | Manter; separar orquestração e defaults SGC | `adaptável` |
 | Coleta: `qualidade/coleta`, `coleta-execucao`, `coleta-executor`, `coleta-leitores`, `coleta-fotografia`, `coleta-contexto`, `coleta-metadados`, `coleta-adaptadores-sgc`, `resumo` | Coleta é usada pela CLI e por testes de composição; motor e adaptadores já estão separados | Manter; núcleo no motor, perfil nos adaptadores | `núcleo` + `perfil-sgc` |
 | Políticas: `qualidade/politicas/semgrep/sgc-qualidade.yml`, `qualidade/frontend-arquitetura/acoes-backend-excecoes.json` | São assets empacotados e consumidos como defaults SGC; não são regras horizontais | Manter no perfil SGC | `perfil-sgc` |
@@ -854,7 +856,7 @@ evidência válida.
 | Três comandos OpenAPI | Manter como utilitário ocasional adaptável | Springdoc, Swagger e o ciclo E2E continuam presentes no SGC; exportar, comparar e promover baseline formam um fluxo completo e têm testes externos. Não entram na coleta padrão e o gerador de tipos continua removido. |
 | `backend java corrigir-fqn` | Manter como utilitário ocasional adaptável | A simulação atual encontrou 114 arquivos e 685 arquivos analisados; portanto há trabalho real no SGC. O comando é mutável, exige `--gravar` e já tem teste de prévia, efeito e idempotência. |
 | `projeto preparar` | Remover | Era apenas uma combinação de verificação de ambiente, `npm install` e instalação do Chromium, sem script, CI ou teste de comportamento que justificasse outra camada. A configuração `execucoes.instalacao` foi removida com ele. |
-| Família de CDUs | Manter no perfil SGC; inventários são ocasionais | São 55 documentos e 55 cenários E2E correspondentes. Os pares inventário/auditoria respondem perguntas diferentes. A busca quebrada pelo diretório antigo foi corrigida nesta rodada para `specs/cdu/cdu-*.md`. |
+| Família de CDUs | Manter e horizontalizar | O formato de caso de uso será usado em vários projetos. A auditoria estrutural e os inventários de corpus são capacidades horizontais; estilo, vocabulário e comparação com código precisam de políticas/adaptadores. No SGC são 55 documentos e 55 cenários E2E correspondentes, e a busca foi corrigida para `specs/cdu/cdu-*.md`. |
 | `codigo cheiros auditar` e `codigo semgrep auditar` | Manter separados | Cheiros aplica oito heurísticas internas com pontuação e fotografia; Semgrep executa regras estruturais externas/configuráveis. Há complementaridade, não duplicação de implementação. |
 | Views, modais, notificações, coesão e ramificações de erro | Manter no perfil SGC | Templates e modais têm scripts explícitos no `frontend/package.json` e ADR de enforcement. Coesão, assuntos de notificação e tratamento de erro codificam políticas do SGC e permanecem gates manuais. |
 | Auditorias unificadas versus ramificações de cobertura | Manter separados; ramificações como utilitários focados | A auditoria unificada calcula risco/hotspots; a variante de ramificações lista lacunas objetivas. A variante de erros ainda agrega uma heurística SGC e precisa apenas tolerar fontes removidas do relatório V8. |
@@ -873,7 +875,9 @@ Estes componentes podem formar o pacote reutilizável:
 - leitura de JaCoCo e de cobertura V8, desde que caminhos e schema de entrada sejam parâmetros;
 - comparação de fotografias JSON e geração de relatórios determinísticos;
 - exportação/diff/baseline de OpenAPI, desde que URL e diretórios de artefatos sejam configuráveis;
-- primitivas para detectar resíduos, dependências, convenções e violações estruturais.
+- primitivas para detectar resíduos, dependências, convenções e violações estruturais;
+- parser, auditoria estrutural e inventários do formato CDU, recebendo o diretório/glob do corpus por configuração;
+- análise de densidade e duplicações de documentos CDU como relatórios ocasionais, não como gates automáticos.
 
 ### 4.2 Horizontal com adaptador de projeto
 
@@ -884,6 +888,8 @@ Estas capacidades são úteis em projetos Spring Boot/Vue, mas hoje carregam dec
 - auditorias de cobertura e priorização de testes Java/Gradle;
 - coleta de qualidade que coordena Gradle, npm, Playwright e auditores;
 - Semgrep, regras de nomenclatura e contratos OpenAPI;
+- auditorias de estilo, vocabulário e mensagens CDU com políticas fornecidas pelo projeto;
+- comparação de mensagens CDU com código por meio de extratores/adaptadores de cada stack.
 - diagnóstico de ambiente e execução de tarefas configuradas.
 
 Elas devem receber um perfil/adaptador com:
@@ -903,7 +909,9 @@ Não promover diretamente ao núcleo horizontal:
 - `backend/src/main/java/sgc` e o pacote Java `sgc`;
 - `AssuntosNotificacao`, `Mensagens.java` e a lista de constantes de mensagens do SGC;
 - regras de nomenclatura `codigo` e auditoria de inglês próprias do SGC;
-- estrutura `specs/cdu/cdu-*.md`, vocabulário e convenções de CDU;
+- o caminho padrão SGC `specs/cdu/cdu-*.md`, que deve ser configurável no núcleo CDU;
+- vocabulário SGC de perfis, tipos de processo e situações, incluindo `intro_3_situacoes.md`;
+- mensagens, assuntos, toasts, placeholders e extratores concretos de Java/TypeScript do SGC;
 - arquivos concretos de constantes e stores do frontend do SGC;
 - `ModalPadrao`, `LayoutPadrao`, `PageHeader` e exceções específicas de views do SGC;
 - tarefas Gradle e perfis E2E fixos do SGC;
@@ -992,12 +1000,15 @@ foi removido por ficar vazio; os 126 cenários regulares permanecem distribuído
 12. **[pendente] Defaults de perfil ainda implícitos**: URL OpenAPI, tarefas Gradle, convenções Vue e caminhos de políticas devem
    ser associados explicitamente ao perfil SGC ou à configuração. Um default SGC é válido; o problema é o núcleo não
    conseguir distingui-lo de uma regra horizontal.
+13. **[novo] Núcleo CDU ainda acoplado ao SGC**: o parser e a forma do documento têm potencial horizontal, mas caminho do corpus,
+   vocabulário, situações, mensagens e extratores de código ainda estão embutidos ou assumidos pelos comandos. É preciso separar
+   contrato CDU, configuração de corpus e adaptadores de política antes de promover essa família ao reuso externo.
 
 ### Prioridade baixa
 
-13. **Artefatos e limpeza**: revisar políticas, arquivos ignorados e nomes de `mais-recente`/`execucoes` para evitar que
+14. **Artefatos e limpeza**: revisar políticas, arquivos ignorados e nomes de `mais-recente`/`execucoes` para evitar que
     saídas locais sejam confundidas com recursos do pacote.
-14. **Performance**: medir antes de otimizar. A coleta e os auditores só devem ser otimizados por gargalo observado, com
+15. **Performance**: medir antes de otimizar. A coleta e os auditores só devem ser otimizados por gargalo observado, com
     comparação antes/depois e sem sacrificar a legibilidade do relatório.
 
 ## 6. Próximos passos ordenados
@@ -1050,10 +1061,16 @@ As fases históricas abaixo continuam úteis como registro, mas a execução dev
    agrupamento monolítico pendente.
 9. **Formalizar resultados consumidos**: começar pelos JSON usados por coleta, resumo ou CI; acrescentar versão e
    validação de entrada por família, sem envelope universal obrigatório.
+10. **[próxima rodada] Horizontalizar o núcleo CDU**: separar parser/formato, configuração do corpus, políticas de estilo e
+   vocabulário, e adaptadores de mensagens/código. Manter os defaults do SGC em um perfil explícito e cobrir o mesmo contrato
+   com fixture externa que use o formato CDU em outro projeto.
 
 Cada item só deve ser considerado concluído quando o perfil SGC e o consumidor externo relevante estiverem cobertos no
 mesmo recorte. O inventário e a remoção precedem novas generalizações: não se deve estabilizar, exportar ou ampliar uma
 funcionalidade antes de decidir se ela ainda merece existir.
+
+A família CDU é a exceção já confirmada à antiga classificação exclusivamente SGC: o formato documental é uma capacidade
+horizontal; vocabulário, mensagens, caminhos e integrações concretas continuam sendo responsabilidade dos adaptadores.
 
 ### Fase 0 — estabilizar os contratos existentes
 
@@ -1143,7 +1160,8 @@ Lotes sugeridos:
 4. **[concluído nesta rodada]** Integração: exportação, diff e baseline OpenAPI; o módulo permanece independente do
    gerador de tipos removido.
 5. **[concluído nesta rodada]** Requisitos: o motor Markdown, as bibliotecas de mensagens e os dez comandos CDU foram
-   convertidos para TypeScript, preservando as regras específicas do SGC; o isolamento do perfil CDU continua na Fase D.
+   convertidos para TypeScript, preservando o comportamento do SGC; a separação entre formato CDU horizontal e políticas
+   do perfil SGC continua na Fase D.
 6. **[concluído nesta rodada]** Código transversal: cheiros, Semgrep e inventários de nomes/idioma foram convertidos
    para TypeScript, preservando as políticas locais e os contratos do SGC; a parametrização horizontal continua na
    Fase D.
@@ -1170,7 +1188,8 @@ Para cada comando convertido:
    - layout de frontend Vue;
    - contratos OpenAPI;
    - coleta de qualidade;
-   - políticas de nomenclatura, CDU, modais e arquitetura.
+   - políticas de nomenclatura, vocabulário CDU, mensagens, modais e arquitetura;
+   - configuração do corpus CDU e adaptadores de mensagens/código.
 3. **[parcial]** Fazer o núcleo receber adaptadores por composição, sem `if (projeto === "sgc")` espalhado. A coleta de
    qualidade já separa e injeta perfis, adaptadores, contexto, metadados e persistência; a pendência está nas demais
    famílias horizontais, não em continuar decompondo `coleta-execucao.ts`.
@@ -1187,8 +1206,8 @@ Para cada comando convertido:
    o resultado no perfil SGC ou registrar explicitamente a correção de comportamento.
 
 Critério de aceite: um segundo projeto consegue configurar raiz, globs, tarefas e políticas sem editar o código do
-núcleo; as regras CDU e `AssuntosNotificacao` não aparecem nesse projeto fictício e continuam funcionando quando o perfil
-SGC está ativo.
+núcleo; consegue analisar documentos no formato CDU com seu próprio vocabulário e caminho de corpus, enquanto as políticas
+CDU e `AssuntosNotificacao` específicas do SGC continuam funcionando quando o perfil SGC está ativo.
 
 ### Fase E — padronizar CLI e resultados
 
