@@ -426,6 +426,7 @@ O diretório `test/` contém:
 - `backend-importacao.test.ts`: testes de importação segura dos comandos e auditores backend
 - `frontend-importacao.test.ts`: testes de importação segura dos comandos e auditores frontend
 - `frontend-acessibilidade.test.ts`: testes do processamento e da execução configurada de acessibilidade
+- `cobertura-cli.test.ts`: testes de leitura, gravação explícita e caminhos externos de cobertura
 - `projeto.test.ts`: testes dos comandos de projeto (versão, árvore de linhas, diagnóstico, limpeza, preparação,
   qualidade e dependências)
 - `configuracao.test.ts`: testes da configuração versionada e das execuções parametrizadas do projeto
