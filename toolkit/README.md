@@ -429,6 +429,7 @@ O diretório `test/` contém:
 - `cobertura-cli.test.ts`: testes de leitura, gravação explícita e caminhos externos de cobertura
 - `consistencia.test.ts`: testes das auditorias de símbolos, nomenclatura e idioma
 - `superficie-cli.test.ts`: testes de ajuda, roteamento e remoção de diretórios legados
+- `importacao-nucleos.test.ts`: testes de importação segura dos comandos de projeto, qualidade e consistência
 - `projeto.test.ts`: testes dos comandos de projeto (versão, árvore de linhas, diagnóstico, limpeza, preparação,
   qualidade e dependências)
 - `configuracao.test.ts`: testes da configuração versionada e das execuções parametrizadas do projeto

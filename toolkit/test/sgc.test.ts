@@ -25,25 +25,6 @@ import {executarAuditoria as executarAuditoriaCheiros} from "../codigo/cheiros-a
 const CAMINHO_TESTES_PRIORIZAR = path.join(DIRETORIO_RAIZ, "toolkit", "backend", "testes-priorizar.ts");
 const CAMINHO_SEMGREP_AUDITAR = path.join(DIRETORIO_RAIZ, "toolkit", "codigo", "semgrep-auditar.ts");
 const CAMINHO_CHEIROS_AUDITAR = path.join(DIRETORIO_RAIZ, "toolkit", "codigo", "cheiros-auditar.ts");
-const CAMINHOS_COMANDOS_PROJETO = [
-    "arvore-linhas.ts",
-    "dependencias-auditar.ts",
-    "diagnostico.ts",
-    "limpar.ts",
-    "preparar.ts",
-    "qualidade.ts",
-    "versao-sincronizar.ts"
-].map(nome => path.join(DIRETORIO_RAIZ, "toolkit", "projeto", nome));
-const CAMINHOS_COMANDOS_QUALIDADE = [
-    "coleta.ts",
-    "coleta-execucao.ts",
-    "resumo.ts"
-].map(nome => path.join(DIRETORIO_RAIZ, "toolkit", "qualidade", nome));
-const CAMINHOS_COMANDOS_CONSISTENCIA = [
-    "nomes-simbolos-coletar.ts",
-    "nomes-consistencia-auditar.ts",
-    "idioma-consistencia-auditar.ts"
-].map(nome => path.join(DIRETORIO_RAIZ, "toolkit", "codigo", nome));
 
 type ObjetoJson = Record<string, unknown>;
 
@@ -113,66 +94,6 @@ describe("CLI raiz do toolkit", () => {
 
         expect(resultado.exitCode).toBe(0);
         expect(resultado.stdout).toBe("importacao-ok");
-    });
-
-    test("pode importar comandos de projeto sem executar efeitos", async () => {
-        const resultados = await Promise.all(CAMINHOS_COMANDOS_PROJETO.map(async caminho => {
-            const urlModulo = pathToFileURL(caminho).href;
-            return execa(process.execPath, [
-                "--import=tsx",
-                "--input-type=module",
-                "-e",
-                `process.argv.push("--help"); await import(${JSON.stringify(urlModulo)}); process.stdout.write("importacao-ok\\n");`
-            ], {
-                cwd: DIRETORIO_RAIZ,
-                reject: false
-            });
-        }));
-
-        for (const resultado of resultados) {
-            expect(resultado.exitCode).toBe(0);
-            expect(resultado.stdout).toBe("importacao-ok");
-        }
-    });
-
-    test("pode importar comandos de qualidade sem executar coleta ou resumo", async () => {
-        const resultados = await Promise.all(CAMINHOS_COMANDOS_QUALIDADE.map(async caminho => {
-            const urlModulo = pathToFileURL(caminho).href;
-            return execa(process.execPath, [
-                "--import=tsx",
-                "--input-type=module",
-                "-e",
-                `process.argv.push("--help"); await import(${JSON.stringify(urlModulo)}); process.stdout.write("importacao-ok\\n");`
-            ], {
-                cwd: DIRETORIO_RAIZ,
-                reject: false
-            });
-        }));
-
-        for (const resultado of resultados) {
-            expect(resultado.exitCode).toBe(0);
-            expect(resultado.stdout).toBe("importacao-ok");
-        }
-    });
-
-    test("pode importar auditores de consistencia sem gerar artefatos", async () => {
-        const resultados = await Promise.all(CAMINHOS_COMANDOS_CONSISTENCIA.map(async caminho => {
-            const urlModulo = pathToFileURL(caminho).href;
-            return execa(process.execPath, [
-                "--import=tsx",
-                "--input-type=module",
-                "-e",
-                `process.argv.push("--help"); await import(${JSON.stringify(urlModulo)}); process.stdout.write("importacao-ok\\n");`
-            ], {
-                cwd: DIRETORIO_RAIZ,
-                reject: false
-            });
-        }));
-
-        for (const resultado of resultados) {
-            expect(resultado.exitCode).toBe(0);
-            expect(resultado.stdout).toBe("importacao-ok");
-        }
     });
 
     test("audita assuntos literais fora de AssuntosNotificacao", async () => {
