@@ -11,7 +11,7 @@ const CAMINHOS_CONSTANTES_FRONTEND = [
     "frontend/src/constants/textos-processo.ts"
 ];
 
-const STOPWORDS = new Set(["a", "ao", "as", "da", "das", "de", "do", "dos", "e", "em", "na", "no", "o", "os", "para"]);
+const STOPWORDS = new Set<string>(["a", "ao", "as", "da", "das", "de", "do", "dos", "e", "em", "na", "no", "o", "os", "para"]);
 const PREFIXOS_UI_EXCLUIDOS = [
     "BOTAO_",
     "BTN_",
@@ -28,7 +28,7 @@ const PREFIXOS_UI_EXCLUIDOS = [
     "NOTA_",
     "DETALHE_"
 ];
-const CHAVES_MENSAGEM_EXPLICITAS = new Set([
+const CHAVES_MENSAGEM_EXPLICITAS = new Set<string>([
     "ACEITE_REGISTRADO",
     "DEVOLUCAO_REALIZADA",
     "HOMOLOGACAO_EFETIVADA",
@@ -38,8 +38,30 @@ const CHAVES_MENSAGEM_EXPLICITAS = new Set([
     "PROCESSO_INICIADO"
 ]);
 
-function extrairConstantesJava(texto, caminhoRelativo) {
-    const resultados = [];
+interface MensagemExtraida {
+    chave: string;
+    texto: string;
+    origem: string;
+}
+
+type CategoriaMensagem = "descricao" | "assunto" | "toast" | "mensagem";
+
+interface MensagemCanonica extends MensagemExtraida {
+    categoria: CategoriaMensagem;
+    grupo: string;
+}
+
+interface SugestaoCanonica extends MensagemCanonica {
+    similaridade: number;
+}
+
+interface ResultadoMensagensCanonicas {
+    itens: MensagemCanonica[];
+    indice: Map<string, MensagemCanonica[]>;
+}
+
+function extrairConstantesJava(texto: string, caminhoRelativo: string): MensagemExtraida[] {
+    const resultados: MensagemExtraida[] = [];
     for (const match of texto.matchAll(/public static final String\s+([A-Z0-9_]+)\s*=\s*"([^"]+)";/g)) {
         resultados.push({
             chave: match[1],
@@ -50,8 +72,8 @@ function extrairConstantesJava(texto, caminhoRelativo) {
     return resultados;
 }
 
-function extrairAssuntosBackend(texto, caminhoRelativo) {
-    const resultados = [];
+function extrairAssuntosBackend(texto: string, caminhoRelativo: string): MensagemExtraida[] {
+    const resultados: MensagemExtraida[] = [];
 
     for (const match of texto.matchAll(/return\s+"([^"]+)";/g)) {
         const literal = match[1];
@@ -114,8 +136,8 @@ function extrairAssuntosBackend(texto, caminhoRelativo) {
     return resultados;
 }
 
-function extrairConstantesTypescript(texto, caminhoRelativo) {
-    const resultados = [];
+function extrairConstantesTypescript(texto: string, caminhoRelativo: string): MensagemExtraida[] {
+    const resultados: MensagemExtraida[] = [];
     for (const match of texto.matchAll(/([A-Z0-9_]+):\s*(?:"([^"]+)"|'([^']+)')/g)) {
         resultados.push({
             chave: match[1],
@@ -126,7 +148,7 @@ function extrairConstantesTypescript(texto, caminhoRelativo) {
     return resultados;
 }
 
-function normalizarTextoComparacao(texto) {
+function normalizarTextoComparacao(texto: string): string {
     return texto
         .normalize("NFD")
         .replaceAll(/[\u0300-\u036f]/g, "")
@@ -137,22 +159,22 @@ function normalizarTextoComparacao(texto) {
         .toLowerCase();
 }
 
-function tokenizar(texto) {
+function tokenizar(texto: string): string[] {
     return normalizarTextoComparacao(texto)
         .split(" ")
         .filter(token => token.length > 1 && !STOPWORDS.has(token));
 }
 
-function bigramas(texto) {
+function bigramas(texto: string): string[] {
     const base = ` ${normalizarTextoComparacao(texto)} `;
-    const pares = [];
+    const pares: string[] = [];
     for (let indice = 0; indice < base.length - 1; indice += 1) {
         pares.push(base.slice(indice, indice + 2));
     }
     return pares;
 }
 
-function calcularSimilaridade(a, b) {
+function calcularSimilaridade(a: string, b: string): number {
     const tokensA = new Set(tokenizar(a));
     const tokensB = new Set(tokenizar(b));
     const intersecao = [...tokensA].filter(token => tokensB.has(token)).length;
@@ -161,7 +183,7 @@ function calcularSimilaridade(a, b) {
 
     const paresA = bigramas(a);
     const paresB = bigramas(b);
-    const contagemB = new Map();
+    const contagemB = new Map<string, number>();
     for (const par of paresB) {
         contagemB.set(par, (contagemB.get(par) ?? 0) + 1);
     }
@@ -177,8 +199,8 @@ function calcularSimilaridade(a, b) {
     return Number(((scoreTokens * 0.6) + (scoreBigramas * 0.4)).toFixed(3));
 }
 
-function indexarCanonicos(itens) {
-    const indice = new Map();
+function indexarCanonicos(itens: MensagemCanonica[]): Map<string, MensagemCanonica[]> {
+    const indice = new Map<string, MensagemCanonica[]>();
     for (const item of itens) {
         const chave = normalizarTextoComparacao(item.texto);
         const lista = indice.get(chave) ?? [];
@@ -188,7 +210,7 @@ function indexarCanonicos(itens) {
     return indice;
 }
 
-function sugerirCanonicos(texto, canonicos, limite = 3) {
+function sugerirCanonicos(texto: string, canonicos: MensagemCanonica[], limite: number = 3): SugestaoCanonica[] {
     return canonicos
         .map(item => ({...item, similaridade: calcularSimilaridade(texto, item.texto)}))
         .filter(item => item.similaridade >= 0.35)
@@ -196,8 +218,8 @@ function sugerirCanonicos(texto, canonicos, limite = 3) {
         .slice(0, limite);
 }
 
-function carregarMensagensCanonicas(base) {
-    const itens = [];
+function carregarMensagensCanonicas(base: string): ResultadoMensagensCanonicas {
+    const itens: MensagemCanonica[] = [];
 
     const caminhoBackend = path.join(base, CAMINHO_MENSAGENS_BACKEND);
     const constantesBackend = extrairConstantesJava(lerArquivo(caminhoBackend), CAMINHO_MENSAGENS_BACKEND);

@@ -199,6 +199,9 @@ frontend e para os caminhos OpenAPI.
   estrutural; o parser Markdown CDU continua preservando seus campos e diagnósticos atuais.
 - `requisitos/cdus-vocabulario-lib.ts` foi convertido para TypeScript; `sugerirCanonico` aceita qualquer `Iterable` de
   candidatos, enquanto perfis, tipos de processo e o caminho de situações continuam declarados como perfil SGC.
+- `requisitos/cdus-mensagens-codigo-lib.ts` foi convertido para TypeScript com tipos para mensagens extraídas,
+  categorias, grupos, índice e sugestões; seus caminhos, prefixes e chaves canônicas continuam explicitamente no perfil
+  SGC. A similaridade textual é um candidato separado para reutilização futura, não uma abstração inventada nesta etapa.
 - A configuração já aceita alguns caminhos diferentes do layout do SGC; auditores de cobertura, arquitetura, coesão,
   contratos, resíduos e coleta possuem parametrização parcial por `--base`, `--arquivo`, `--saida` ou configuração.
   Arquitetura, resíduos, OpenAPI e coleta já resolvem seus defaults após a base; outros comandos ainda têm defaults
@@ -467,10 +470,10 @@ roteador fonte/compilado possuir testes de smoke equivalentes.
 1. **[concluído nesta rodada]** Migrar `lib/dominios/cobertura-java.ts` e `lib/dominios/cobertura-web.ts`, mantendo os
    contratos de métricas, os caminhos relativos à base auditada e os fixtures existentes.
 2. **[parcial nesta rodada]** Migrar `backend/lib/testes-analisar-regras.ts`, `requisitos/cdus-mensagens-lib.ts`,
-   `frontend/identificadores-teste-lib.ts`, `requisitos/cdus-lib.ts` e `requisitos/cdus-vocabulario-lib.ts`; ainda
-   faltam as bibliotecas maiores de frontend e mensagens de código.
-3. **[parcial nesta rodada]** Introduzir tipos para JaCoCo, V8 e regras da análise de testes backend; ainda faltam
-   fotografia de qualidade, achados de auditoria e diagnósticos.
+   `frontend/identificadores-teste-lib.ts`, `requisitos/cdus-lib.ts`, `requisitos/cdus-vocabulario-lib.ts` e
+   `requisitos/cdus-mensagens-codigo-lib.ts`; ainda faltam as bibliotecas maiores de frontend.
+3. **[parcial nesta rodada]** Introduzir tipos para JaCoCo, V8, regras da análise de testes backend e mensagens CDU;
+   ainda faltam fotografia de qualidade, achados de auditoria e diagnósticos.
 4. Substituir `any` implícito por `unknown` na entrada JSON e validar apenas o que o consumidor realmente exige.
 5. Criar `tsconfig.toolkit-estrito.json` ou equivalente com `strict`, aplicando-o aos módulos já convertidos e aos
    próximos lotes.
