@@ -1,5 +1,6 @@
 import path from "node:path";
-import fs from "fs-extra";
+import {existsSync, readFileSync} from "node:fs";
+import {readFile} from "node:fs/promises";
 import {globby} from "globby";
 import {parse} from "@vue/compiler-sfc";
 import {DIRETORIO_RAIZ} from "../lib/caminhos.js";
@@ -19,15 +20,65 @@ const CAMINHOS_IGNORADOS = [
     "**/fixtures/**",
 ];
 
-function normalizarCaminho(caminho) {
+type RegraViolacao = "frontend-sem-regra-local-acoes";
+
+interface OcorrenciaAcao {
+    identificador: string;
+    expressao: string;
+    linha: number;
+}
+
+interface ContextoAuditoria {
+    arquivoRelativo: string;
+}
+
+interface ClassificacaoViolacao {
+    regra: RegraViolacao;
+    motivo: string;
+}
+
+interface ViolacaoAcao {
+    arquivo: string;
+    linha: number;
+    identificador: string;
+    regra: RegraViolacao;
+    motivo: string;
+    trecho: string;
+}
+
+interface ViolacaoEnriquecida extends ViolacaoAcao {
+    dispensada: boolean;
+}
+
+interface RegistroExcecao {
+    arquivo: string;
+    identificador: string;
+    regra: string;
+}
+
+interface OpcoesAuditoriaAcoes {
+    base?: string;
+    excecoes?: string;
+}
+
+interface ResultadoAuditoriaAcoes {
+    regra: RegraViolacao;
+    caminhoExcecoes: string;
+    total: number;
+    dispensadas: number;
+    violacoes: ViolacaoEnriquecida[];
+    todasViolacoes: ViolacaoEnriquecida[];
+}
+
+function normalizarCaminho(caminho: string): string {
     return caminho.replaceAll("\\", "/");
 }
 
-function contarLinha(conteudo, indice) {
+function contarLinha(conteudo: string, indice: number): number {
     return conteudo.slice(0, indice).split("\n").length;
 }
 
-async function listarArquivosFrontend(diretorioFrontend) {
+async function listarArquivosFrontend(diretorioFrontend: string): Promise<string[]> {
     return globby(["src/**/*.{ts,vue}"], {
         cwd: diretorioFrontend,
         absolute: true,
@@ -36,7 +87,7 @@ async function listarArquivosFrontend(diretorioFrontend) {
     });
 }
 
-function extrairConteudoAnalise(caminhoArquivo, conteudo) {
+function extrairConteudoAnalise(caminhoArquivo: string, conteudo: string): string {
     if (!caminhoArquivo.endsWith(".vue")) {
         return conteudo;
     }
@@ -48,27 +99,47 @@ function extrairConteudoAnalise(caminhoArquivo, conteudo) {
     ].filter(Boolean).join("\n");
 }
 
-function lerExcecoes(caminhoExcecoes) {
-    if (!fs.existsSync(caminhoExcecoes)) {
+function ehRegistroExcecao(valor: unknown): valor is RegistroExcecao {
+    if (!valor || typeof valor !== "object") {
+        return false;
+    }
+
+    const registro = valor as Record<string, unknown>;
+    return typeof registro.arquivo === "string"
+        && typeof registro.identificador === "string"
+        && typeof registro.regra === "string";
+}
+
+function lerExcecoes(caminhoExcecoes: string): Set<string> {
+    if (!existsSync(caminhoExcecoes)) {
         return new Set();
     }
 
-    const conteudo = fs.readJsonSync(caminhoExcecoes);
-    return new Set((conteudo.excecoes ?? []).map((item) => chaveViolacao(item)));
+    const conteudo: unknown = JSON.parse(readFileSync(caminhoExcecoes, "utf-8"));
+    if (!conteudo || typeof conteudo !== "object") {
+        return new Set();
+    }
+
+    const registros = (conteudo as {excecoes?: unknown}).excecoes;
+    if (!Array.isArray(registros)) {
+        return new Set();
+    }
+
+    return new Set(registros.filter(ehRegistroExcecao).map(chaveViolacao));
 }
 
-function chaveViolacao(item) {
+function chaveViolacao(item: Pick<RegistroExcecao, "arquivo" | "identificador" | "regra">): string {
     return `${normalizarCaminho(item.arquivo)}::${item.identificador}::${item.regra}`;
 }
 
-function simplificarExpressao(expressao) {
+function simplificarExpressao(expressao: string): string {
     return expressao
         .replaceAll(/\s+/g, " ")
         .replaceAll(/;$/g, "")
         .trim();
 }
 
-function normalizarExpressaoComputed(expressao) {
+function normalizarExpressaoComputed(expressao: string): string {
     const limpa = simplificarExpressao(expressao);
     const matchComputed = limpa.match(/^computed\s*\(\s*(?:\(\s*\)\s*=>|function\s*\(\s*\)\s*\{?\s*return)\s*(?<corpo>[\s\S]*?)\s*\)?$/);
     if (!matchComputed?.groups?.corpo) {
@@ -77,7 +148,7 @@ function normalizarExpressaoComputed(expressao) {
     return simplificarExpressao(matchComputed.groups.corpo.replaceAll(/}\s*$/g, ""));
 }
 
-function ehPassagemDiretaBackend(expressao) {
+function ehPassagemDiretaBackend(expressao: string): boolean {
     const corpo = normalizarExpressaoComputed(expressao)
         .replace(/^Boolean\s*\((.*)\)$/u, "$1")
         .replace(/^!!/u, "")
@@ -97,7 +168,7 @@ function ehPassagemDiretaBackend(expressao) {
         && !/[&|?:]/u.test(corpoSemOperadoresSeguros);
 }
 
-function classificarViolacao(expressao) {
+function classificarViolacao(expressao: string): ClassificacaoViolacao | null {
     const corpo = normalizarExpressaoComputed(expressao);
 
     if (ehPassagemDiretaBackend(corpo)) {
@@ -128,7 +199,11 @@ function classificarViolacao(expressao) {
     return null;
 }
 
-function registrarViolacao(violacoes, contexto, ocorrencia) {
+function registrarViolacao(
+    violacoes: ViolacaoAcao[],
+    contexto: ContextoAuditoria,
+    ocorrencia: OcorrenciaAcao
+): void {
     if (!PREFIXO_ACAO.test(ocorrencia.identificador) || NOMES_UI_LOCAL.test(ocorrencia.identificador)) {
         return;
     }
@@ -138,53 +213,60 @@ function registrarViolacao(violacoes, contexto, ocorrencia) {
         return;
     }
 
-    const violacao = {
+    violacoes.push({
         arquivo: contexto.arquivoRelativo,
         linha: ocorrencia.linha,
         identificador: ocorrencia.identificador,
         regra: classificacao.regra,
         motivo: classificacao.motivo,
         trecho: simplificarExpressao(ocorrencia.expressao).slice(0, 180),
-    };
-    violacoes.push(violacao);
+    });
 }
 
-function encontrarDeclaracoes(conteudo) {
-    const declaracoes = [];
+function encontrarDeclaracoes(conteudo: string): OcorrenciaAcao[] {
+    const declaracoes: OcorrenciaAcao[] = [];
     const regex = /\bconst\s+(?<identificador>[A-Za-z_$][\w$]*)\s*=\s*(?<expressao>computed\s*\([\s\S]*?\)\s*|[^;\n]+)\s*;/gu;
     let match = regex.exec(conteudo);
 
     while (match) {
-        declaracoes.push({
-            identificador: match.groups.identificador,
-            expressao: match.groups.expressao,
-            linha: contarLinha(conteudo, match.index),
-        });
+        const identificador = match.groups?.identificador;
+        const expressao = match.groups?.expressao;
+        if (identificador && expressao) {
+            declaracoes.push({
+                identificador,
+                expressao,
+                linha: contarLinha(conteudo, match.index),
+            });
+        }
         match = regex.exec(conteudo);
     }
 
     return declaracoes;
 }
 
-function encontrarPropriedadesAcao(conteudo) {
-    const propriedades = [];
+function encontrarPropriedadesAcao(conteudo: string): OcorrenciaAcao[] {
+    const propriedades: OcorrenciaAcao[] = [];
     const regex = /(?<identificador>pode[A-Z]\w*|habilitar[A-Z]\w*|mostrar[A-Z]\w*|exibir[A-Z]\w*|ocultar[A-Z]\w*|desabilitar[A-Z]\w*|permitir[A-Z]\w*)\s*:\s*(?<expressao>[^,\n}]+)/gu;
     let match = regex.exec(conteudo);
 
     while (match) {
-        propriedades.push({
-            identificador: match.groups.identificador,
-            expressao: match.groups.expressao,
-            linha: contarLinha(conteudo, match.index),
-        });
+        const identificador = match.groups?.identificador;
+        const expressao = match.groups?.expressao;
+        if (identificador && expressao) {
+            propriedades.push({
+                identificador,
+                expressao,
+                linha: contarLinha(conteudo, match.index),
+            });
+        }
         match = regex.exec(conteudo);
     }
 
     return propriedades;
 }
 
-function auditarConteudo({conteudo, arquivoRelativo}) {
-    const violacoes = [];
+function auditarConteudo({conteudo, arquivoRelativo}: {conteudo: string; arquivoRelativo: string}): ViolacaoAcao[] {
+    const violacoes: ViolacaoAcao[] = [];
     const contexto = {arquivoRelativo};
 
     encontrarDeclaracoes(conteudo).forEach((ocorrencia) => registrarViolacao(violacoes, contexto, ocorrencia));
@@ -193,7 +275,7 @@ function auditarConteudo({conteudo, arquivoRelativo}) {
     return violacoes;
 }
 
-async function auditarAcoesBackendFrontend(opcoes = {}) {
+async function auditarAcoesBackendFrontend(opcoes: OpcoesAuditoriaAcoes = {}): Promise<ResultadoAuditoriaAcoes> {
     const diretorioBase = path.resolve(opcoes.base ?? DIRETORIO_RAIZ);
     const diretorioFrontend = resolverCaminhoConfigurado("frontend", diretorioBase);
     const caminhoExcecoes = opcoes.excecoes ?? path.join(
@@ -205,16 +287,16 @@ async function auditarAcoesBackendFrontend(opcoes = {}) {
     );
     const excecoes = lerExcecoes(caminhoExcecoes);
     const arquivos = await listarArquivosFrontend(diretorioFrontend);
-    const violacoes = [];
+    const violacoes: ViolacaoAcao[] = [];
 
     for (const caminhoArquivo of arquivos) {
-        const conteudoOriginal = await fs.readFile(caminhoArquivo, "utf-8");
+        const conteudoOriginal = await readFile(caminhoArquivo, "utf-8");
         const conteudo = extrairConteudoAnalise(caminhoArquivo, conteudoOriginal);
         const arquivoRelativo = normalizarCaminho(path.relative(diretorioBase, caminhoArquivo));
         violacoes.push(...auditarConteudo({conteudo, arquivoRelativo}));
     }
 
-    const enriquecidas = violacoes.map((violacao) => ({
+    const enriquecidas: ViolacaoEnriquecida[] = violacoes.map((violacao) => ({
         ...violacao,
         dispensada: excecoes.has(chaveViolacao(violacao)),
     }));
