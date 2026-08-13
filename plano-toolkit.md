@@ -99,7 +99,10 @@ quando houver contrato claro e uso horizontal plausível ou comprovado.
 ### Fronteiras já esclarecidas
 
 - `qualidade coletar` produz uma fotografia consolidada; `qualidade tarefas executar` apenas orquestra tarefas configuradas.
-- A auditoria de dependências combina Knip, versões desatualizadas, vulnerabilidades npm e atualizações Gradle.
+- A auditoria de dependências combina Knip, versões desatualizadas, vulnerabilidades npm e atualizações Gradle. O Knip
+  está na série 6 (`^6.32.2`); o comando Gradle já usa a série 0.61 do plugin, `--no-parallel` e `-Drevision=release`.
+  O plugin relata dependências declaradas pelo projeto, plugins e plataformas do build; filtrar configurações específicas
+  do Spring Boot é responsabilidade do build consumidor, não de um argumento genérico do toolkit.
 - Acessibilidade Playwright/Axe pertence ao workspace `e2e/`, não ao toolkit.
 - OpenAPI mantém exportação, comparação e baseline; o documento externo permanece intacto, enquanto os resultados
   operacionais usam campos próprios em português/camelCase e caminhos relativos são resolvidos pela base; geração de tipos
@@ -121,8 +124,8 @@ O formato CDU será usado em vários projetos e deve ser tratado como capacidade
 
 O padrão de arquivos do corpus já pode ser substituído por `requisitos.cdus.padraoArquivos` em
 `configuracao-toolkit.json`; o default continua sendo `specs/cdu/cdu-*.md`. As fontes da comparação com mensagens do código
-também podem ser declaradas por caminho e tipo de adaptador; prefixos, grupos e convenções de mensagens ainda são política
-do perfil.
+podem ser declaradas por caminho e tipo de adaptador, e sua política de prefixos, grupos e convenções pode ser substituída
+em `requisitos.cdus.politicaMensagensCodigo`; o default continua sendo o perfil SGC.
 
 O SGC deve continuar funcionando com `specs/cdu/cdu-*.md`, mas esse caminho não pode permanecer uma regra rígida do
 motor horizontal.
@@ -148,12 +151,14 @@ isolado funciona, mas as fronteiras ainda não estão concluídas:
   continuam como módulos internos compostos por eles;
 - os dois agregadores aceitam `--secoes` e produzem JSON versionado; o caminho do corpus já é configurável por
   `requisitos.cdus.padraoArquivos`, com default `specs/cdu/cdu-*.md`;
-- a configuração já representa corpus, fontes de mensagens, vocabulário, situações, tipos e perfis tipográficos; estilo
-  textual, placeholders e heurísticas de contexto ainda não são políticas configuráveis;
+- a configuração já representa corpus, fontes de mensagens, vocabulário, situações, tipos, perfis tipográficos e a política
+  de mensagens do código; placeholders de análise estrutural e heurísticas de contexto continuam fora da política até
+  existir uma necessidade horizontal clara;
 - o inventário de vocabulário já usa os tipos de processo configurados em contexto textual, e uma regressão externa
   comprova os dois agregadores com corpus, perfis, tipos, situações e fontes de mensagens próprios;
-- a comparação com mensagens do código usa fontes configuráveis por caminho e tipo de adaptador; o default SGC mantém sete
-  fontes e as heurísticas de prefixos e grupos ainda estão dentro do adaptador;
+- a comparação com mensagens do código usa fontes configuráveis por caminho e tipo de adaptador; prefixos, grupos,
+  marcadores, palavras vazias e exclusões de UI agora são política configurável, enquanto o default SGC mantém sete fontes
+  e os resultados anteriores;
 - `servidor testes analisar` e `servidor testes priorizar` são somente leitura por padrão, persistem apenas com `--gravar` e
   já aparecem no mesmo catálogo de opções da CLI principal;
 - o roteador e os entrypoints diretos publicados validam opções, valores e posicionais pelo mesmo preflight, inclusive a
@@ -187,7 +192,7 @@ isolado funciona, mas as fronteiras ainda não estão concluídas:
 - os três comandos de ramificações agora também possuem `versaoSchema: "1.0.0"` e `geradoEm`; o `timestamp` próprio foi
   removido e a mensagem de `hotspot` foi padronizada como ponto crítico;
 - apenas cobertura Java e web está publicada como API programática horizontal;
-- defaults de Gradle, Vue, OpenAPI, Semgrep e políticas SGC ainda aparecem dentro de módulos adaptáveis;
+- defaults de Gradle, Vue, OpenAPI, Semgrep e outras políticas SGC ainda aparecem dentro de módulos adaptáveis;
 - os maiores módulos concentram análise, política, formatação, persistência e CLI, dificultando reuso seletivo.
 
 ## Próximos passos
@@ -224,10 +229,12 @@ permite determinar efeitos sem ler a implementação.
 - extrair parser e análise estrutural para contratos independentes do SGC;
 - manter perfis, tipos de processo, arquivo de situações e perfis tipográficos em política explícita; avaliar placeholders e
   demais heurísticas somente quando houver contrato horizontal claro;
-- separar a comparação de mensagens das heurísticas de prefixos e grupos e permitir composição por stack;
+- manter a comparação de mensagens separada da política de prefixos e grupos; a configuração parcial já permite composição
+  por projeto, e uma API de políticas por stack só deve ser criada se a composição programática se provar necessária;
 - reclassificar cada comando CDU individualmente: análise estrutural no núcleo, integração no adaptador e convenções no
   perfil SGC;
-- criar fixture de um segundo projeto com caminho e vocabulário próprios e preservar o SGC por regressão;
+- manter a fixture de segundo projeto com caminho, vocabulário e política de mensagens próprios e preservar o SGC por
+  regressão;
 - publicar um subpath CDU quando o modelo e as análises agregadas formarem uma fronteira programática estável, validada por
   fixture isolada e útil para composição por scripts, humanos ou agentes.
 

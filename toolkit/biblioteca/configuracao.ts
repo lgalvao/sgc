@@ -42,6 +42,51 @@ interface ExecucoesConfiguradas {
 
 type TipoFonteMensagensCodigo = "mensagensJava" | "assuntosJava" | "notificacoesTypescript" | "textosTypescript";
 
+type CategoriaMensagemConfigurada = "descricao" | "assunto" | "toast" | "mensagem";
+
+interface RegraMensagemJavaConfigurada {
+    prefixo: string;
+    categoria: CategoriaMensagemConfigurada;
+    grupo: string;
+}
+
+interface PoliticaAssuntosJavaConfigurada {
+    prefixo: string;
+    grupo: string;
+    marcadorSubprocesso: string;
+    marcadorFormatado: string;
+    sufixoSuperior: string;
+}
+
+interface PoliticaMensagensTypescriptConfigurada {
+    prefixoSucesso: string;
+    grupoSucesso: string;
+    grupoNotificacao: string;
+    prefixoMovimentacao: string;
+    grupoMovimentacao: string;
+    grupoResultado: string;
+}
+
+interface PoliticaMensagensCodigo {
+    palavrasVazias: string[];
+    prefixosUiExcluidos: string[];
+    chavesMensagem: string[];
+    categoriasChavesMensagem: CategoriaMensagemConfigurada[];
+    regrasJava: RegraMensagemJavaConfigurada[];
+    assuntosJava: PoliticaAssuntosJavaConfigurada;
+    typescript: PoliticaMensagensTypescriptConfigurada;
+}
+
+interface PoliticaMensagensCodigoSobreposta {
+    palavrasVazias?: string[];
+    prefixosUiExcluidos?: string[];
+    chavesMensagem?: string[];
+    categoriasChavesMensagem?: CategoriaMensagemConfigurada[];
+    regrasJava?: RegraMensagemJavaConfigurada[];
+    assuntosJava?: Partial<PoliticaAssuntosJavaConfigurada>;
+    typescript?: Partial<PoliticaMensagensTypescriptConfigurada>;
+}
+
 interface FonteMensagensCodigo {
     caminho: string;
     tipo: TipoFonteMensagensCodigo;
@@ -62,6 +107,7 @@ interface ConfiguracaoCdu {
     fontesMensagensCodigo: FonteMensagensCodigo[];
     vocabulario: VocabularioCduConfigurado;
     estilo: EstiloCduConfigurado;
+    politicaMensagensCodigo: PoliticaMensagensCodigo;
 }
 
 interface RequisitosConfigurados {
@@ -73,6 +119,7 @@ interface ConfiguracaoCduSobreposta {
     fontesMensagensCodigo?: FonteMensagensCodigo[];
     vocabulario?: Partial<VocabularioCduConfigurado>;
     estilo?: Partial<EstiloCduConfigurado>;
+    politicaMensagensCodigo?: PoliticaMensagensCodigoSobreposta;
 }
 
 interface RequisitosSobrepostos {
@@ -132,6 +179,54 @@ const CONFIGURACAO_PADRAO: ConfiguracaoToolkit = {
             },
             estilo: {
                 perfisEmCrases: ["ADMIN", "GESTOR", "CHEFE", "SERVIDOR", "TODOS"]
+            },
+            politicaMensagensCodigo: {
+                palavrasVazias: ["a", "ao", "as", "da", "das", "de", "do", "dos", "e", "em", "na", "no", "o", "os", "para"],
+                prefixosUiExcluidos: [
+                    "BOTAO_",
+                    "BTN_",
+                    "LABEL_",
+                    "COLUNA_",
+                    "TITULO",
+                    "EMPTY_",
+                    "VAZIO_",
+                    "CARREGANDO",
+                    "ERRO_",
+                    "MODAL_",
+                    "INFO_",
+                    "ESCALA_",
+                    "NOTA_",
+                    "DETALHE_"
+                ],
+                chavesMensagem: [
+                    "ACEITE_REGISTRADO",
+                    "DEVOLUCAO_REALIZADA",
+                    "HOMOLOGACAO_EFETIVADA",
+                    "PROCESSO_ALTERADO",
+                    "PROCESSO_CRIADO",
+                    "PROCESSO_FINALIZADO",
+                    "PROCESSO_INICIADO"
+                ],
+                categoriasChavesMensagem: ["toast", "mensagem"],
+                regrasJava: [
+                    {prefixo: "HIST_", categoria: "descricao", grupo: "historico_servidor"},
+                    {prefixo: "ALERTA_", categoria: "descricao", grupo: "alerta_servidor"}
+                ],
+                assuntosJava: {
+                    prefixo: "SGC: ",
+                    grupo: "assunto_servidor",
+                    marcadorSubprocesso: ":SIGLA_UNIDADE_SUBPROCESSO:",
+                    marcadorFormatado: ":VALOR:",
+                    sufixoSuperior: " - :SIGLA_UNIDADE_SUBPROCESSO:"
+                },
+                typescript: {
+                    prefixoSucesso: "SUCESSO_",
+                    grupoSucesso: "sucesso_cliente",
+                    grupoNotificacao: "notificacao_cliente",
+                    prefixoMovimentacao: "PROCESSO_",
+                    grupoMovimentacao: "movimentacao_cliente",
+                    grupoResultado: "resultado_cliente"
+                }
             }
         }
     }
@@ -141,8 +236,8 @@ function ehObjeto(valor: unknown): valor is Record<string, unknown> {
     return typeof valor === "object" && valor !== null && !Array.isArray(valor);
 }
 
-function validarTexto(valor: unknown, caminho: string): string {
-    if (typeof valor !== "string" || valor.trim() === "") {
+function validarTexto(valor: unknown, caminho: string, permitirVazio = false): string {
+    if (typeof valor !== "string" || (!permitirVazio && valor.trim() === "")) {
         throw new Error(`${NOME_ARQUIVO_CONFIGURACAO}.${caminho} deve ser um texto não vazio.`);
     }
     return valor;
@@ -291,6 +386,123 @@ function validarEstiloCdu(valor: unknown): Partial<EstiloCduConfigurado> {
         : {perfisEmCrases: validarListaTextos(valor.perfisEmCrases, "requisitos.cdus.estilo.perfisEmCrases")};
 }
 
+function validarCategoriaMensagem(valor: unknown, caminho: string): CategoriaMensagemConfigurada {
+    const categorias: readonly CategoriaMensagemConfigurada[] = ["descricao", "assunto", "toast", "mensagem"];
+    if (typeof valor !== "string" || !categorias.includes(valor as CategoriaMensagemConfigurada)) {
+        throw new Error(`${NOME_ARQUIVO_CONFIGURACAO}.${caminho} deve ser uma categoria de mensagem conhecida.`);
+    }
+    return valor as CategoriaMensagemConfigurada;
+}
+
+function validarRegrasJava(valor: unknown, caminho: string): RegraMensagemJavaConfigurada[] {
+    if (!Array.isArray(valor)) {
+        throw new Error(`${NOME_ARQUIVO_CONFIGURACAO}.${caminho} deve ser uma lista.`);
+    }
+    return valor.map((regra, indice) => {
+        const caminhoRegra = `${caminho}[${indice}]`;
+        if (!ehObjeto(regra)) {
+            throw new Error(`${NOME_ARQUIVO_CONFIGURACAO}.${caminhoRegra} deve ser um objeto.`);
+        }
+        const chavesDesconhecidas = Object.keys(regra).filter(chave => !["prefixo", "categoria", "grupo"].includes(chave));
+        if (chavesDesconhecidas.length > 0) {
+            throw new Error(`${NOME_ARQUIVO_CONFIGURACAO}.${caminhoRegra} possui chave(s) desconhecida(s): ${chavesDesconhecidas.join(", ")}.`);
+        }
+        return {
+            prefixo: validarTexto(regra.prefixo, `${caminhoRegra}.prefixo`),
+            categoria: validarCategoriaMensagem(regra.categoria, `${caminhoRegra}.categoria`),
+            grupo: validarTexto(regra.grupo, `${caminhoRegra}.grupo`)
+        };
+    });
+}
+
+function validarPoliticaMensagensCodigo(valor: unknown): PoliticaMensagensCodigoSobreposta {
+    if (!ehObjeto(valor)) {
+        throw new Error(`${NOME_ARQUIVO_CONFIGURACAO}.requisitos.cdus.politicaMensagensCodigo deve ser um objeto JSON.`);
+    }
+
+    const chavesPermitidas = new Set([
+        "palavrasVazias",
+        "prefixosUiExcluidos",
+        "chavesMensagem",
+        "categoriasChavesMensagem",
+        "regrasJava",
+        "assuntosJava",
+        "typescript"
+    ]);
+    const chavesDesconhecidas = Object.keys(valor).filter(chave => !chavesPermitidas.has(chave));
+    if (chavesDesconhecidas.length > 0) {
+        throw new Error(`${NOME_ARQUIVO_CONFIGURACAO}.requisitos.cdus.politicaMensagensCodigo possui chave(s) desconhecida(s): ${chavesDesconhecidas.join(", ")}.`);
+    }
+
+    const resultado: PoliticaMensagensCodigoSobreposta = {};
+    if (valor.palavrasVazias !== undefined) {
+        resultado.palavrasVazias = validarListaTextos(valor.palavrasVazias, "requisitos.cdus.politicaMensagensCodigo.palavrasVazias");
+    }
+    if (valor.prefixosUiExcluidos !== undefined) {
+        resultado.prefixosUiExcluidos = validarListaTextos(valor.prefixosUiExcluidos, "requisitos.cdus.politicaMensagensCodigo.prefixosUiExcluidos");
+    }
+    if (valor.chavesMensagem !== undefined) {
+        resultado.chavesMensagem = validarListaTextos(valor.chavesMensagem, "requisitos.cdus.politicaMensagensCodigo.chavesMensagem");
+    }
+    if (valor.categoriasChavesMensagem !== undefined) {
+        if (!Array.isArray(valor.categoriasChavesMensagem)) {
+            throw new Error(`${NOME_ARQUIVO_CONFIGURACAO}.requisitos.cdus.politicaMensagensCodigo.categoriasChavesMensagem deve ser uma lista.`);
+        }
+        resultado.categoriasChavesMensagem = valor.categoriasChavesMensagem.map((categoria, indice) =>
+            validarCategoriaMensagem(categoria, `requisitos.cdus.politicaMensagensCodigo.categoriasChavesMensagem[${indice}]`)
+        );
+    }
+    if (valor.regrasJava !== undefined) {
+        resultado.regrasJava = validarRegrasJava(valor.regrasJava, "requisitos.cdus.politicaMensagensCodigo.regrasJava");
+    }
+
+    if (valor.assuntosJava !== undefined) {
+        if (!ehObjeto(valor.assuntosJava)) {
+            throw new Error(`${NOME_ARQUIVO_CONFIGURACAO}.requisitos.cdus.politicaMensagensCodigo.assuntosJava deve ser um objeto.`);
+        }
+        const chavesPermitidasAssuntos = ["prefixo", "grupo", "marcadorSubprocesso", "marcadorFormatado", "sufixoSuperior"];
+        const chavesDesconhecidasAssuntos = Object.keys(valor.assuntosJava).filter(chave => !chavesPermitidasAssuntos.includes(chave));
+        if (chavesDesconhecidasAssuntos.length > 0) {
+            throw new Error(`${NOME_ARQUIVO_CONFIGURACAO}.requisitos.cdus.politicaMensagensCodigo.assuntosJava possui chave(s) desconhecida(s): ${chavesDesconhecidasAssuntos.join(", ")}.`);
+        }
+        resultado.assuntosJava = {
+            ...(valor.assuntosJava.prefixo === undefined ? {} : {prefixo: validarTexto(valor.assuntosJava.prefixo, "requisitos.cdus.politicaMensagensCodigo.assuntosJava.prefixo")}),
+            ...(valor.assuntosJava.grupo === undefined ? {} : {grupo: validarTexto(valor.assuntosJava.grupo, "requisitos.cdus.politicaMensagensCodigo.assuntosJava.grupo")}),
+            ...(valor.assuntosJava.marcadorSubprocesso === undefined ? {} : {marcadorSubprocesso: validarTexto(valor.assuntosJava.marcadorSubprocesso, "requisitos.cdus.politicaMensagensCodigo.assuntosJava.marcadorSubprocesso")}),
+            ...(valor.assuntosJava.marcadorFormatado === undefined ? {} : {marcadorFormatado: validarTexto(valor.assuntosJava.marcadorFormatado, "requisitos.cdus.politicaMensagensCodigo.assuntosJava.marcadorFormatado")}),
+            ...(valor.assuntosJava.sufixoSuperior === undefined ? {} : {sufixoSuperior: validarTexto(valor.assuntosJava.sufixoSuperior, "requisitos.cdus.politicaMensagensCodigo.assuntosJava.sufixoSuperior", true)})
+        };
+    }
+
+    if (valor.typescript !== undefined) {
+        if (!ehObjeto(valor.typescript)) {
+            throw new Error(`${NOME_ARQUIVO_CONFIGURACAO}.requisitos.cdus.politicaMensagensCodigo.typescript deve ser um objeto.`);
+        }
+        const chavesPermitidasTypescript = [
+            "prefixoSucesso",
+            "grupoSucesso",
+            "grupoNotificacao",
+            "prefixoMovimentacao",
+            "grupoMovimentacao",
+            "grupoResultado"
+        ];
+        const chavesDesconhecidasTypescript = Object.keys(valor.typescript).filter(chave => !chavesPermitidasTypescript.includes(chave));
+        if (chavesDesconhecidasTypescript.length > 0) {
+            throw new Error(`${NOME_ARQUIVO_CONFIGURACAO}.requisitos.cdus.politicaMensagensCodigo.typescript possui chave(s) desconhecida(s): ${chavesDesconhecidasTypescript.join(", ")}.`);
+        }
+        resultado.typescript = {
+            ...(valor.typescript.prefixoSucesso === undefined ? {} : {prefixoSucesso: validarTexto(valor.typescript.prefixoSucesso, "requisitos.cdus.politicaMensagensCodigo.typescript.prefixoSucesso")}),
+            ...(valor.typescript.grupoSucesso === undefined ? {} : {grupoSucesso: validarTexto(valor.typescript.grupoSucesso, "requisitos.cdus.politicaMensagensCodigo.typescript.grupoSucesso")}),
+            ...(valor.typescript.grupoNotificacao === undefined ? {} : {grupoNotificacao: validarTexto(valor.typescript.grupoNotificacao, "requisitos.cdus.politicaMensagensCodigo.typescript.grupoNotificacao")}),
+            ...(valor.typescript.prefixoMovimentacao === undefined ? {} : {prefixoMovimentacao: validarTexto(valor.typescript.prefixoMovimentacao, "requisitos.cdus.politicaMensagensCodigo.typescript.prefixoMovimentacao")}),
+            ...(valor.typescript.grupoMovimentacao === undefined ? {} : {grupoMovimentacao: validarTexto(valor.typescript.grupoMovimentacao, "requisitos.cdus.politicaMensagensCodigo.typescript.grupoMovimentacao")}),
+            ...(valor.typescript.grupoResultado === undefined ? {} : {grupoResultado: validarTexto(valor.typescript.grupoResultado, "requisitos.cdus.politicaMensagensCodigo.typescript.grupoResultado")})
+        };
+    }
+
+    return resultado;
+}
+
 function validarRequisitos(valor: unknown): RequisitosSobrepostos {
     if (!ehObjeto(valor)) {
         throw new Error(`${NOME_ARQUIVO_CONFIGURACAO}.requisitos deve ser um objeto JSON.`);
@@ -309,7 +521,7 @@ function validarRequisitos(valor: unknown): RequisitosSobrepostos {
         throw new Error(`${NOME_ARQUIVO_CONFIGURACAO}.requisitos.cdus deve ser um objeto JSON.`);
     }
 
-    const chavesPermitidasCdus = new Set(["padraoArquivos", "fontesMensagensCodigo", "vocabulario", "estilo"]);
+    const chavesPermitidasCdus = new Set(["padraoArquivos", "fontesMensagensCodigo", "vocabulario", "estilo", "politicaMensagensCodigo"]);
     const chavesDesconhecidasCdus = Object.keys(valor.cdus).filter(chave => !chavesPermitidasCdus.has(chave));
     if (chavesDesconhecidasCdus.length > 0) {
         throw new Error(`${NOME_ARQUIVO_CONFIGURACAO}.requisitos.cdus possui chave(s) desconhecida(s): ${chavesDesconhecidasCdus.join(", ")}.`);
@@ -349,7 +561,10 @@ function validarRequisitos(valor: unknown): RequisitosSobrepostos {
                 : {padraoArquivos: validarTexto(valor.cdus.padraoArquivos, "requisitos.cdus.padraoArquivos")}),
             ...(fontesValidadas === undefined ? {} : {fontesMensagensCodigo: fontesValidadas}),
             ...(valor.cdus.vocabulario === undefined ? {} : {vocabulario: validarVocabularioCdu(valor.cdus.vocabulario)}),
-            ...(valor.cdus.estilo === undefined ? {} : {estilo: validarEstiloCdu(valor.cdus.estilo)})
+            ...(valor.cdus.estilo === undefined ? {} : {estilo: validarEstiloCdu(valor.cdus.estilo)}),
+            ...(valor.cdus.politicaMensagensCodigo === undefined
+                ? {}
+                : {politicaMensagensCodigo: validarPoliticaMensagensCodigo(valor.cdus.politicaMensagensCodigo)})
         }
     };
 }
@@ -441,6 +656,18 @@ function combinarConfiguracoes(
             estilo: {
                 ...configuracaoBase.requisitos.cdus.estilo,
                 ...cdusSobrepostos.estilo
+            },
+            politicaMensagensCodigo: {
+                ...configuracaoBase.requisitos.cdus.politicaMensagensCodigo,
+                ...cdusSobrepostos.politicaMensagensCodigo,
+                assuntosJava: {
+                    ...configuracaoBase.requisitos.cdus.politicaMensagensCodigo.assuntosJava,
+                    ...cdusSobrepostos.politicaMensagensCodigo?.assuntosJava
+                },
+                typescript: {
+                    ...configuracaoBase.requisitos.cdus.politicaMensagensCodigo.typescript,
+                    ...cdusSobrepostos.politicaMensagensCodigo?.typescript
+                }
             }
         }
     };
@@ -514,6 +741,7 @@ export {
     type NomeDiretorioConfigurado,
     type EscopoComandoConfigurado,
     type FonteMensagensCodigo,
+    type PoliticaMensagensCodigo,
     type PerfilQualidadeConfigurado,
     type TarefaConfigurada
 };

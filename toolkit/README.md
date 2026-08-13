@@ -154,7 +154,9 @@ npx tsx toolkit/sgc.ts projeto versao-sincronizar 1.2.3
 o perfil configurado em `execucoes.qualidade`.
 
 `projeto dependencias auditar` reúne uso e declarações pelo Knip, versões npm desatualizadas, vulnerabilidades npm e
-atualizações Gradle. Achados são diferenciados de falhas de execução.
+atualizações Gradle. Achados são diferenciados de falhas de execução. A verificação Gradle usa `dependencyUpdates`,
+`--no-parallel` e `-Drevision=release`; o plugin pode ainda exibir dependências declaradas sem versão explícita e plugins
+ou plataformas do build, algo que precisa ser filtrado no próprio build consumidor, não pelo toolkit.
 
 `projeto artefatos limpar` mostra uma prévia e só remove com `--confirmar`. `projeto versao-sincronizar` simula e só
 altera arquivos com `--gravar`.
@@ -231,8 +233,38 @@ o caminho e o adaptador de cada arquivo; uma lista vazia desativa essa comparaç
 ```
 
 Os tipos aceitos são `mensagensJava`, `assuntosJava`, `notificacoesTypescript` e `textosTypescript`. Eles definem o
-adaptador de leitura; prefixos, grupos e convenções de mensagens continuam sendo políticas que precisam ser extraídas do
-perfil quando houver necessidade de generalização adicional.
+adaptador de leitura. Prefixos, grupos, marcadores e convenções de mensagens podem ser substituídos em
+`requisitos.cdus.politicaMensagensCodigo`; o default mantém as políticas do SGC.
+
+O override é parcial e substitui listas inteiras quando informado. Por exemplo, um projeto pode trocar a convenção de
+assuntos Java e as regras de classificação sem alterar o toolkit:
+
+```json
+{
+  "versao": 2,
+  "requisitos": {
+    "cdus": {
+      "politicaMensagensCodigo": {
+        "regrasJava": [
+          {"prefixo": "HIST_", "categoria": "descricao", "grupo": "historico_aplicacao"}
+        ],
+        "assuntosJava": {
+          "prefixo": "APP: ",
+          "grupo": "assunto_aplicacao",
+          "marcadorSubprocesso": ":SIGLA_APLICACAO:",
+          "marcadorFormatado": ":VALOR:",
+          "sufixoSuperior": ""
+        },
+        "chavesMensagem": ["SOLICITACAO_CRIADA"],
+        "categoriasChavesMensagem": ["toast", "mensagem"]
+      }
+    }
+  }
+}
+```
+
+`palavrasVazias`, `prefixosUiExcluidos` e os grupos de TypeScript também fazem parte da política. A comparação continua
+somente leitura e a prova de um projeto externo com convenções próprias faz parte da suíte do toolkit.
 
 Os valores controlados do CDU também podem ser substituídos em `requisitos.cdus.vocabulario` (`perfisCanonicos`,
 `tiposProcessoCanonicos` e `arquivoSituacoesCanonicas`) e `requisitos.cdus.estilo.perfisEmCrases`. O default preserva os

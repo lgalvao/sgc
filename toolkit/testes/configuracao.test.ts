@@ -62,6 +62,14 @@ describe("Configuracao do toolkit", () => {
         })).toThrow("perfisEmCrases deve ser uma lista");
         expect(() => validarConfiguracao({
             versao: VERSAO_CONFIGURACAO,
+            requisitos: {cdus: {politicaMensagensCodigo: {categoriaInvalida: "descricao"}}}
+        })).toThrow("categoriaInvalida");
+        expect(() => validarConfiguracao({
+            versao: VERSAO_CONFIGURACAO,
+            requisitos: {cdus: {politicaMensagensCodigo: {regrasJava: [{prefixo: "HIST_", categoria: "evento", grupo: "historico"}]}}}
+        })).toThrow("categoria de mensagem conhecida");
+        expect(() => validarConfiguracao({
+            versao: VERSAO_CONFIGURACAO,
             execucoes: {qualidade: {rapido: {descricao: "", tarefas: []}}}
         })).toThrow("execucoes.qualidade.rapido.descricao");
         expect(() => validarConfiguracao({
@@ -113,5 +121,20 @@ describe("Configuracao do toolkit", () => {
             argumentos: ["--version"],
             diretorio: base
         }]);
+
+        await escreverJson(path.join(base, "configuracao-toolkit.json"), {
+            versao: VERSAO_CONFIGURACAO,
+            requisitos: {
+                cdus: {
+                    politicaMensagensCodigo: {
+                        assuntosJava: {prefixo: "APP: "}
+                    }
+                }
+            }
+        });
+        const politica = carregarConfiguracao(base).requisitos.cdus.politicaMensagensCodigo;
+        expect(politica.assuntosJava.prefixo).toBe("APP: ");
+        expect(politica.assuntosJava.grupo).toBe("assunto_servidor");
+        expect(politica.typescript.grupoResultado).toBe("resultado_cliente");
     });
 }, 30000);

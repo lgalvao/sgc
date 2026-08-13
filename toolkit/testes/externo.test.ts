@@ -226,4 +226,106 @@ describe("reuso do toolkit em projeto externo", () => {
             resumo: {erros: 0, avisos: 0}
         });
     }, 60000);
+
+    test("aplica política de mensagens própria sem herdar convenções do SGC", async () => {
+        const diretorioBase = await mkdtemp(path.join(os.tmpdir(), "sgc-projeto-mensagens-horizontal-"));
+
+        await escreverArquivo(
+            path.join(diretorioBase, "documentacao", "casos", "cdu-01.md"),
+            [
+                "# CDU-01 - Registrar solicitação",
+                "",
+                "## Atores",
+                "",
+                "- OPERADOR",
+                "",
+                "## Pré-condições",
+                "",
+                "- Sistema disponível.",
+                "",
+                "## Fluxo principal",
+                "",
+                "1. O sistema registra:",
+                "   - `Descrição`: \"Solicitação criada\"",
+                "",
+                "   Assunto: APP: Solicitação criada",
+                "",
+                "2. O sistema mostra a mensagem \"Solicitação criada\".",
+                "3. O sistema mostra *toast* \"Solicitação criada\"."
+            ].join("\n")
+        );
+        await escreverArquivo(
+            path.join(diretorioBase, "codigo", "mensagens.java"),
+            "public static final String HIST_SOLICITACAO_CRIADA = \"Solicitação criada\";\n"
+        );
+        await escreverArquivo(
+            path.join(diretorioBase, "codigo", "assuntos.java"),
+            "String assunto() { return \"APP: Solicitação criada\"; }\n"
+        );
+        await escreverArquivo(
+            path.join(diretorioBase, "codigo", "textos.ts"),
+            "export const TEXTOS = { SOLICITACAO_CRIADA: \"Solicitação criada\" };\n"
+        );
+        await escreverArquivo(
+            path.join(diretorioBase, "configuracao-toolkit.json"),
+            JSON.stringify({
+                versao: 2,
+                requisitos: {
+                    cdus: {
+                        padraoArquivos: "documentacao/casos/cdu-*.md",
+                        fontesMensagensCodigo: [
+                            {caminho: "codigo/mensagens.java", tipo: "mensagensJava"},
+                            {caminho: "codigo/assuntos.java", tipo: "assuntosJava"},
+                            {caminho: "codigo/textos.ts", tipo: "textosTypescript"}
+                        ],
+                        politicaMensagensCodigo: {
+                            prefixosUiExcluidos: [],
+                            chavesMensagem: ["SOLICITACAO_CRIADA"],
+                            categoriasChavesMensagem: ["toast", "mensagem"],
+                            regrasJava: [{prefixo: "HIST_", categoria: "descricao", grupo: "historico_aplicacao"}],
+                            assuntosJava: {
+                                prefixo: "APP: ",
+                                grupo: "assunto_aplicacao",
+                                marcadorSubprocesso: ":SIGLA_APLICACAO:",
+                                marcadorFormatado: ":VALOR:",
+                                sufixoSuperior: ""
+                            },
+                            typescript: {
+                                prefixoSucesso: "CONCLUIDO_",
+                                grupoSucesso: "sucesso_aplicacao",
+                                grupoNotificacao: "notificacao_aplicacao",
+                                prefixoMovimentacao: "FLUXO_",
+                                grupoMovimentacao: "movimentacao_aplicacao",
+                                grupoResultado: "resultado_aplicacao"
+                            }
+                        }
+                    }
+                }
+            })
+        );
+
+        const auditoria = await executarSgc(diretorioBase, [
+            "requisitos",
+            "cdus",
+            "auditar",
+            "--secoes",
+            "mensagens-codigo",
+            "--json",
+            "--base",
+            diretorioBase
+        ]);
+
+        expect(auditoria.exitCode).toBe(0);
+        const relatorio = JSON.parse(auditoria.stdout).secoes.mensagensCodigo.relatorio as Array<{
+            tipo: string;
+            valor: string;
+            referenciasExatas: Array<{grupo: string}>;
+        }>;
+        expect(relatorio.find(item => item.tipo === "descricoes" && item.valor === "Solicitação criada")?.referenciasExatas)
+            .toEqual(expect.arrayContaining([expect.objectContaining({grupo: "historico_aplicacao"})]));
+        expect(relatorio.find(item => item.tipo === "assuntos" && item.valor === "APP: Solicitação criada")?.referenciasExatas)
+            .toEqual(expect.arrayContaining([expect.objectContaining({grupo: "assunto_aplicacao"})]));
+        expect(relatorio.find(item => item.tipo === "mensagens" && item.valor === "Solicitação criada")?.referenciasExatas)
+            .toEqual(expect.arrayContaining([expect.objectContaining({grupo: "resultado_aplicacao"})]));
+    }, 60000);
 });

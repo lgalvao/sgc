@@ -1,6 +1,7 @@
 
 import path from "node:path";
 import {ehEntradaPrincipal} from "../biblioteca/execucao.js";
+import {carregarConfiguracao} from "../biblioteca/configuracao.js";
 import {escreverLinha, imprimirJson} from "../biblioteca/saida.js";
 import {lerArquivo, listarArquivosCdu, obterOpcoesCdu} from "./cdus-lib.js";
 import {extrairAssuntos, extrairDescricoes, extrairMensagens, extrairToasts} from "./cdus-mensagens-lib.js";
@@ -73,7 +74,8 @@ function consolidarOcorrencias(
 function auditarItem(
     item: OcorrenciasMensagem,
     indiceCanonicos: Map<string, MensagemCanonica[]>,
-    todosCanonicos: MensagemCanonica[]
+    todosCanonicos: MensagemCanonica[],
+    palavrasVazias: readonly string[]
 ): ItemRelatorio {
     const categorias: Record<TipoItem, CategoriaMensagem> = {
         descricoes: "descricao",
@@ -86,7 +88,7 @@ function auditarItem(
     const referenciasExatas = indiceCanonicos
         .get(normalizarTextoComparacao(item.valor))
         ?.filter(ref => ref.categoria === categoria) ?? [];
-    const sugestoes = referenciasExatas.length === 0 ? sugerirCanonicos(item.valor, canonicosCategoria) : [];
+    const sugestoes = referenciasExatas.length === 0 ? sugerirCanonicos(item.valor, canonicosCategoria, 3, palavrasVazias) : [];
 
     return {
         tipo: item.tipo,
@@ -109,7 +111,8 @@ function auditarItem(
 
 async function auditarMensagensCodigo(base: string, arquivosInformados?: string[]): Promise<{resumo: ResumoRelatorio; relatorio: ItemRelatorio[]}> {
     const arquivos = arquivosInformados ?? await listarArquivosCdu(base);
-    const {itens: canonicos, indice: indiceCanonicos} = carregarMensagensCanonicas(base);
+    const politica = carregarConfiguracao(base).requisitos.cdus.politicaMensagensCodigo;
+    const {itens: canonicos, indice: indiceCanonicos} = carregarMensagensCanonicas(base, undefined, politica);
 
     const itens = [
         ...consolidarOcorrencias(base, arquivos, extrairDescricoes, "descricoes"),
@@ -118,7 +121,7 @@ async function auditarMensagensCodigo(base: string, arquivosInformados?: string[
         ...consolidarOcorrencias(base, arquivos, extrairToasts, "toasts")
     ].toSorted((a, b) => a.tipo.localeCompare(b.tipo, "pt-BR") || b.ocorrencias.length - a.ocorrencias.length || a.valor.localeCompare(b.valor, "pt-BR"));
 
-    const relatorio = itens.map(item => auditarItem(item, indiceCanonicos, canonicos));
+    const relatorio = itens.map(item => auditarItem(item, indiceCanonicos, canonicos, politica.palavrasVazias));
     const resumo: ResumoRelatorio = {
         base,
         totalArquivos: arquivos.length,
