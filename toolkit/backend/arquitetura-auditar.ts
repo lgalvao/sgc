@@ -17,6 +17,7 @@ const LIMITE_METODOS_ALERTA = 15;
 const LIMITE_METODOS_CRITICO = 25;
 const LIMITE_DEPENDENCIAS_ALERTA = 8;
 const LIMITE_DEPENDENCIAS_CRITICO = 12;
+const VERSAO_RELATORIO = 1 as const;
 
 const SUFIXOS_ALVO = ["Service.java", "Facade.java", "Controller.java"];
 
@@ -42,6 +43,7 @@ interface ResultadoArquitetura {
 }
 
 interface RelatorioArquitetura {
+    versao: typeof VERSAO_RELATORIO;
     geradoEm: string;
     limites: LimitesArquitetura;
     resumo: {
@@ -142,6 +144,7 @@ async function auditarArquitetura(diretorioCodigo: string, diretorioBase: string
     const alertas = resultados.filter((r) => r.severidade === "alerta");
 
     return {
+        versao: VERSAO_RELATORIO,
         geradoEm: new Date().toISOString(),
         limites: {
             linhas: {alerta: LIMITE_LINHAS_ALERTA, critico: LIMITE_LINHAS_CRITICO},

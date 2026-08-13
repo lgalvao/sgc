@@ -45,6 +45,7 @@ describe("Auditorias backend", () => {
 
         expect(resultado.exitCode).toBe(0);
         const conteudo = JSON.parse(resultado.stdout);
+        expect(conteudo.versao).toBe(1);
         expect(conteudo.resumo.totalAnalisados).toBe(1);
         expect(conteudo.todos[0].caminhoRelativo).toBe("servidor/java/exemplo/ExemploService.java");
         expect(await existe(path.join(base, "artefatos", "backend", "mais-recente", "coesao-auditoria.json"))).toBe(false);
@@ -94,6 +95,7 @@ describe("Auditorias backend", () => {
 
         expect(resultado.exitCode).toBe(0);
         const conteudo = JSON.parse(resultado.stdout);
+        expect(conteudo.versao).toBe(1);
         expect(conteudo.resumo).toMatchObject({totalAnalisados: 1, criticos: 0, alertas: 1, ok: 0});
         expect(conteudo.todos[0]).toMatchObject({
             nomeArquivo: "ExemploService.java",

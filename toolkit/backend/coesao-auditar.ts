@@ -11,6 +11,8 @@ import {exibirAjudaComando} from "../lib/cli-ajuda.js";
 import {ehEntradaPrincipal, validarArgumentosEntradaDireta} from "../lib/execucao.js";
 import {escreverLinha, imprimirCabecalho, imprimirJson} from "../lib/saida.js";
 
+const VERSAO_RELATORIO = 1 as const;
+
 // Agrupamento por responsabilidade a partir de prefixos de método
 const CATEGORIAS = {
     consulta: {
@@ -58,6 +60,7 @@ interface ResultadoCoesao extends AnaliseCoesao {
 }
 
 interface RelatorioCoesao {
+    versao: typeof VERSAO_RELATORIO;
     geradoEm: string;
     criterio: string;
     resumo: {
@@ -162,6 +165,7 @@ async function auditarCoesao(diretorioCodigo: string, diretorioBase: string): Pr
     const alertas = resultados.filter((r) => r.severidade === "alerta");
 
     return {
+        versao: VERSAO_RELATORIO,
         geradoEm: new Date().toISOString(),
         criterio: "Services com 3+ categorias de responsabilidade: consulta, mutação, workflow, notificação, permissão.",
         resumo: {

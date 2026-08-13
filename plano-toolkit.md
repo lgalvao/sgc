@@ -166,6 +166,8 @@ isolado funciona, mas as fronteiras ainda não estão concluídas:
   arquivo ausente pode ser coletado sob demanda, mas arquivo existente incompatível falha explicitamente;
 - a fotografia persistida de `codigo cheiros auditar` agora é versionada, usa chaves próprias em camelCase e valida o
   arquivo anterior antes de calcular deltas;
+- os relatórios próprios persistidos de `backend arquitetura auditar` e `backend coesao auditar` agora carregam
+  `versao: 1`; o JSON persistido pelo Semgrep permanece externo e não recebe envelope do toolkit;
 - `qualidade resumo` agora valida `versaoSchema: "1.0.0"` e deixou de carregar campos históricos (`indiceSaude` e
   `confiabilidade`) que não são produzidos pela fotografia atual;
 - apenas cobertura Java e web está publicada como API programática horizontal;
