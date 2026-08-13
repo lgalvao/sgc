@@ -17,7 +17,7 @@ const CATEGORIAS = {
 } as const;
 
 type Categoria = typeof CATEGORIAS[keyof typeof CATEGORIAS];
-type Status = "ok" | "alerta" | "falha";
+type StatusVerificacao = "ok" | "alerta" | "falha";
 
 interface RecursoBase {
     nome: string;
@@ -45,7 +45,7 @@ interface RecursoPorta extends RecursoBase {
 type Recurso = RecursoComando | RecursoArquivo | RecursoPorta;
 
 type RecursoVerificado = Recurso & {
-    status: Status;
+    status: StatusVerificacao;
     detalhe: string;
 };
 
@@ -56,7 +56,7 @@ interface TotaisVerificacaoAmbiente {
 }
 
 interface ResultadoConsolidadoAmbiente {
-    statusGeral: Status;
+    statusGeral: StatusVerificacao;
     totais: TotaisVerificacaoAmbiente;
 }
 
@@ -183,7 +183,7 @@ function obterRecursosAmbientePadrao(diretorioBase: string): Recurso[] {
     return recursos;
 }
 
-function determinarStatus(sucesso: boolean, obrigatorio: boolean | undefined): Status {
+function determinarStatus(sucesso: boolean, obrigatorio: boolean | undefined): StatusVerificacao {
     if (sucesso) return "ok";
     return obrigatorio ? "falha" : "alerta";
 }
@@ -225,7 +225,7 @@ async function verificarComando(recurso: RecursoComando): Promise<RecursoVerific
     }
 
     let detalhe = encontrado;
-    let status: Status = "ok";
+    let status: StatusVerificacao = "ok";
 
     if (recurso.versaoEsperada || recurso.versaoMin) {
         const versao = await obterVersao(recurso.nome);
@@ -322,7 +322,7 @@ async function verificarRecurso(recurso: Recurso, diretorioBase: string): Promis
     };
 }
 
-function calcularStatusGeral(totais: TotaisVerificacaoAmbiente): Status {
+function calcularStatusGeral(totais: TotaisVerificacaoAmbiente): StatusVerificacao {
     if (totais.falha > 0) return "falha";
     if (totais.alerta > 0) return "alerta";
     return "ok";

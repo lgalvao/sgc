@@ -25,7 +25,7 @@ const CHAMADAS_COLADA_QUERY = new Set(["useQuery", "useMutation", "useInfiniteQu
 const CHAMADAS_COLADA_CACHE = new Set(["useQueryCache"]);
 const PADROES = {
     palavraStale: /\bstale\b/g,
-    palavraSnapshot: /\bsnapshot\b/g,
+    palavraFotografia: /\bsnapshot\b/g,
 };
 const LIMITE_LINHAS_FACHADA_PURA = 25;
 const LIMITE_LINHAS_ARQUIVO_MINUSCULO = 30;
@@ -73,7 +73,7 @@ interface SinaisLexicais {
     booleanoPosicional: number;
     palavraForcar: number;
     palavraStale: number;
-    palavraSnapshot: number;
+    palavraFotografia: number;
 }
 
 interface MetricasAst {
@@ -102,7 +102,7 @@ interface MetricasResumo {
     invalidacoesExplicitasEmViews: number;
     booleanosPosicionais: number;
     ocorrenciasStale: number;
-    ocorrenciasSnapshot: number;
+    ocorrenciasFotografia: number;
     ocorrenciasForcar: number;
     arquivosComBolsaDependenciasLarga: number;
     arquivosComSuperficieAmpla: number;
@@ -503,7 +503,7 @@ function computarSinaisLexicais(sourceFile: SourceFile, conteudoOriginal: string
         booleanoPosicional,
         palavraForcar,
         palavraStale: contarOcorrencias(conteudoOriginal, PADROES.palavraStale),
-        palavraSnapshot: contarOcorrencias(conteudoOriginal, PADROES.palavraSnapshot),
+        palavraFotografia: contarOcorrencias(conteudoOriginal, PADROES.palavraFotografia),
     };
 }
 
@@ -777,7 +777,7 @@ function calcularScoreArquivo({camada, sinaisLexicais, analiseAst, hubCentral, f
         + (sinaisLexicais.metodoEmCache * 6)
         + (sinaisLexicais.booleanoPosicional * 4)
         + (sinaisLexicais.palavraStale * 3)
-        + (sinaisLexicais.palavraSnapshot * 2);
+        + (sinaisLexicais.palavraFotografia * 2);
 
     if (!hubCentral) {
         total += sinaisLexicais.invalidacaoExplicita * 5;
@@ -822,35 +822,35 @@ function calcularFaixa(score: number): FaixaScore {
     return "critico";
 }
 
-function criarResumoMarkdown(snapshot: FotografiaArquitetura): string {
+function criarResumoMarkdown(fotografia: FotografiaArquitetura): string {
     const linhas: string[] = [
         "# Auditoria Arquitetural do Frontend",
         "",
-        `- Score total: **${snapshot.resumo.scoreTotal}** (${snapshot.resumo.faixa})`,
-        `- Arquivos de producao: **${snapshot.resumo.arquivosProducao}**`,
-        `- Views com vazamento de estrategia de cache: **${snapshot.resumo.metricas.viewsComVazamentoCache}**`,
-        `- Views com chamadas diretas a service: **${snapshot.resumo.metricas.viewsComServiceDireto}**`,
-        `- Views com server state caseiro: **${snapshot.resumo.metricas.viewsComServerStateCaseiro}**`,
-        `- Views com fan-out arquitetural alto: **${snapshot.resumo.metricas.viewsComFanoutAlto}**`,
-        `- Acessos diretos a cache de store: **${snapshot.resumo.metricas.acessosDiretosCache}**`,
-        `- Chamadas com booleano posicional: **${snapshot.resumo.metricas.booleanosPosicionais}**`,
-        `- Bolsas de dependencias/estado largas: **${snapshot.resumo.metricas.arquivosComBolsaDependenciasLarga}**`,
-        `- Superficies exportadas amplas: **${snapshot.resumo.metricas.arquivosComSuperficieAmpla}**`,
-        `- Arquivos com mistura de camadas arquiteturais: **${snapshot.resumo.metricas.arquivosComMisturaCamadas}**`,
-        `- Arquivos com server state caseiro: **${snapshot.resumo.metricas.arquivosComServerStateCaseiro}**`,
-        `- Hubs centrais com sinais: **${snapshot.resumo.metricas.hubsCentraisComSinais}**`,
-        `- Fachadas puras (composables sem lógica): **${snapshot.resumo.metricas.fachadasPuras}**`,
-        `- Composables minúsculos (< ${LIMITE_LINHAS_ARQUIVO_MINUSCULO}L): **${snapshot.resumo.metricas.composablesMinusculos}**`,
-        `- Famílias pulverizadas (>= ${LIMITE_FAMILIA_PULVERIZADA} membros): **${snapshot.resumo.metricas.familiasPulverizadas}**`,
+        `- Score total: **${fotografia.resumo.scoreTotal}** (${fotografia.resumo.faixa})`,
+        `- Arquivos de producao: **${fotografia.resumo.arquivosProducao}**`,
+        `- Views com vazamento de estrategia de cache: **${fotografia.resumo.metricas.viewsComVazamentoCache}**`,
+        `- Views com chamadas diretas a service: **${fotografia.resumo.metricas.viewsComServiceDireto}**`,
+        `- Views com server state caseiro: **${fotografia.resumo.metricas.viewsComServerStateCaseiro}**`,
+        `- Views com fan-out arquitetural alto: **${fotografia.resumo.metricas.viewsComFanoutAlto}**`,
+        `- Acessos diretos a cache de store: **${fotografia.resumo.metricas.acessosDiretosCache}**`,
+        `- Chamadas com booleano posicional: **${fotografia.resumo.metricas.booleanosPosicionais}**`,
+        `- Bolsas de dependencias/estado largas: **${fotografia.resumo.metricas.arquivosComBolsaDependenciasLarga}**`,
+        `- Superficies exportadas amplas: **${fotografia.resumo.metricas.arquivosComSuperficieAmpla}**`,
+        `- Arquivos com mistura de camadas arquiteturais: **${fotografia.resumo.metricas.arquivosComMisturaCamadas}**`,
+        `- Arquivos com server state caseiro: **${fotografia.resumo.metricas.arquivosComServerStateCaseiro}**`,
+        `- Hubs centrais com sinais: **${fotografia.resumo.metricas.hubsCentraisComSinais}**`,
+        `- Fachadas puras (composables sem lógica): **${fotografia.resumo.metricas.fachadasPuras}**`,
+        `- Composables minúsculos (< ${LIMITE_LINHAS_ARQUIVO_MINUSCULO}L): **${fotografia.resumo.metricas.composablesMinusculos}**`,
+        `- Famílias pulverizadas (>= ${LIMITE_FAMILIA_PULVERIZADA} membros): **${fotografia.resumo.metricas.familiasPulverizadas}**`,
         "",
         "## Hotspots",
         "",
     ];
 
-    if (snapshot.hotspots.length === 0) {
+    if (fotografia.hotspots.length === 0) {
         linhas.push("Nenhum hotspot arquitetural detectado.");
     } else {
-        snapshot.hotspots.slice(0, 10).forEach((hotspot, indice) => {
+        fotografia.hotspots.slice(0, 10).forEach((hotspot, indice) => {
             linhas.push(`${indice + 1}. \`${hotspot.arquivo}\` [${hotspot.camada}]`);
             linhas.push(`   - score: ${hotspot.score}`);
             linhas.push(`   - sinais: ${hotspot.sinaisAtivos.join(", ")}`);
@@ -858,8 +858,8 @@ function criarResumoMarkdown(snapshot: FotografiaArquitetura): string {
         });
     }
 
-    if (snapshot.familias) {
-        const familiasGrandes = Object.entries(snapshot.familias)
+    if (fotografia.familias) {
+        const familiasGrandes = Object.entries(fotografia.familias)
             .filter(([, f]) => f.arquivos.length >= LIMITE_FAMILIA_PULVERIZADA)
             .toSorted(([, a], [, b]) => b.arquivos.length - a.arquivos.length);
         if (familiasGrandes.length > 0) {
@@ -876,13 +876,13 @@ function criarResumoMarkdown(snapshot: FotografiaArquitetura): string {
         }
     }
 
-    if (snapshot.excecoesDocumentadas?.length > 0) {
+    if (fotografia.excecoesDocumentadas?.length > 0) {
         linhas.push("");
         linhas.push("## Exceções documentadas");
         linhas.push("");
         linhas.push("Arquivos com sinais suprimidos via `@sgc-auditoria ignorar:` com motivo explícito:");
         linhas.push("");
-        for (const excecao of snapshot.excecoesDocumentadas) {
+        for (const excecao of fotografia.excecoesDocumentadas) {
             linhas.push(`- \`${excecao.arquivo}\``);
             linhas.push(`  - sinais ignorados: ${excecao.sinais.join(", ")}`);
             linhas.push(`  - motivo: ${excecao.motivo}`);
@@ -903,12 +903,12 @@ function criarResumoMarkdown(snapshot: FotografiaArquitetura): string {
 }
 
 async function gravarFotografiaArquitetura(
-    snapshot: FotografiaArquitetura,
-    diretorioSaida: string = resolverDiretorioSaidaArquitetura(snapshot.base)
+    fotografia: FotografiaArquitetura,
+    diretorioSaida: string = resolverDiretorioSaidaArquitetura(fotografia.base)
 ): Promise<void> {
     await fs.mkdir(diretorioSaida, {recursive: true});
-    await fs.writeFile(path.join(diretorioSaida, "fotografia.json"), JSON.stringify(snapshot, null, 2));
-    await fs.writeFile(path.join(diretorioSaida, "resumo.md"), criarResumoMarkdown(snapshot));
+    await fs.writeFile(path.join(diretorioSaida, "fotografia.json"), JSON.stringify(fotografia, null, 2));
+    await fs.writeFile(path.join(diretorioSaida, "resumo.md"), criarResumoMarkdown(fotografia));
 }
 
 function criarMetricasResumo(): MetricasResumo {
@@ -922,7 +922,7 @@ function criarMetricasResumo(): MetricasResumo {
         invalidacoesExplicitasEmViews: 0,
         booleanosPosicionais: 0,
         ocorrenciasStale: 0,
-        ocorrenciasSnapshot: 0,
+        ocorrenciasFotografia: 0,
         ocorrenciasForcar: 0,
         arquivosComBolsaDependenciasLarga: 0,
         arquivosComSuperficieAmpla: 0,
@@ -1061,7 +1061,7 @@ async function analisarArquiteturaFrontend({base = DIRETORIO_RAIZ}: OpcoesAnalis
             booleanoPosicional: 0,
             palavraForcar: 0,
             palavraStale: contarOcorrencias(conteudo, PADROES.palavraStale),
-            palavraSnapshot: contarOcorrencias(conteudo, PADROES.palavraSnapshot),
+            palavraFotografia: contarOcorrencias(conteudo, PADROES.palavraFotografia),
         };
         const categoriasAcoplamento = contarCategoriasAcoplamento(analiseAst.importsPorCategoria);
         const importacoesArquiteturais = contarImportacoesArquiteturais(analiseAst.importsPorCategoria);
@@ -1115,7 +1115,7 @@ async function analisarArquiteturaFrontend({base = DIRETORIO_RAIZ}: OpcoesAnalis
         }
         metricas.booleanosPosicionais += sinaisLexicais.booleanoPosicional;
         metricas.ocorrenciasStale += sinaisLexicais.palavraStale;
-        metricas.ocorrenciasSnapshot += sinaisLexicais.palavraSnapshot;
+        metricas.ocorrenciasFotografia += sinaisLexicais.palavraFotografia;
         metricas.ocorrenciasForcar += sinaisLexicais.palavraForcar;
         metricas.chamadasEstrategiaCache += analiseAst.chamadasEstrategiaCache;
         metricas.chamadasInvalidacao += analiseAst.chamadasInvalidacao;

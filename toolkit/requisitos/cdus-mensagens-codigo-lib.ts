@@ -3,7 +3,7 @@ import path from "node:path";
 import {carregarConfiguracao, type FonteMensagensCodigo} from "../lib/configuracao.js";
 import {lerArquivo} from "./cdus-lib.js";
 
-const STOPWORDS = new Set<string>(["a", "ao", "as", "da", "das", "de", "do", "dos", "e", "em", "na", "no", "o", "os", "para"]);
+const PALAVRAS_VAZIAS = new Set<string>(["a", "ao", "as", "da", "das", "de", "do", "dos", "e", "em", "na", "no", "o", "os", "para"]);
 const PREFIXOS_UI_EXCLUIDOS = [
     "BOTAO_",
     "BTN_",
@@ -166,7 +166,7 @@ function normalizarTextoComparacao(texto: string): string {
 function tokenizar(texto: string): string[] {
     return normalizarTextoComparacao(texto)
         .split(" ")
-        .filter(token => token.length > 1 && !STOPWORDS.has(token));
+        .filter(token => token.length > 1 && !PALAVRAS_VAZIAS.has(token));
 }
 
 function bigramas(texto: string): string[] {

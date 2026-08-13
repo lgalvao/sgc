@@ -47,7 +47,7 @@ type ContagensCheiros = Record<ChavePadrao, number>;
 type DeltasCheiros = Record<ChavePadrao, number>;
 type PontuacaoPorEscopo = Record<EscopoCheiro, number>;
 
-interface SnapshotCheiros {
+interface FotografiaCheiros {
     versao: typeof VERSAO_FOTOGRAFIA_CHEIROS;
     geradoEm: string;
     base: string;
@@ -62,7 +62,7 @@ interface SnapshotCheiros {
 }
 
 interface ResultadoAuditoriaCheiros {
-    snapshot: SnapshotCheiros;
+    fotografia: FotografiaCheiros;
     caminhoFotografia: string;
     caminhoResumo: string;
 }
@@ -291,16 +291,16 @@ function formatarDelta(valor: number): string {
     return valor > 0 ? `+${valor}` : `${valor}`;
 }
 
-function gerarMarkdown(snapshot: SnapshotCheiros): string {
+function gerarMarkdown(fotografia: FotografiaCheiros): string {
     const linhas: string[] = [];
-    linhas.push("# Auditoria de cheiros de codigo", "", `Gerado em: ${snapshot.geradoEm}`, `Pontuacao: ${snapshot.pontuacao.total} (${snapshot.pontuacao.faixa})`, "");
+    linhas.push("# Auditoria de cheiros de codigo", "", `Gerado em: ${fotografia.geradoEm}`, `Pontuacao: ${fotografia.pontuacao.total} (${fotografia.pontuacao.faixa})`, "");
     linhas.push("## Contagens", "", "| Sinal | Total | Delta | Peso |", "|---|---:|---:|---:|");
     for (const padrao of PADROES) {
-        linhas.push(`| ${padrao.titulo} | ${snapshot.contagens[padrao.chave]} | ${formatarDelta(snapshot.deltas[padrao.chave])} | ${padrao.peso} |`);
+        linhas.push(`| ${padrao.titulo} | ${fotografia.contagens[padrao.chave]} | ${formatarDelta(fotografia.deltas[padrao.chave])} | ${padrao.peso} |`);
     }
 
     linhas.push("", "## Hotspots", "", "| Arquivo | Pontos | Sinais |", "|---|---:|---|");
-    for (const hotspot of snapshot.hotspots) {
+    for (const hotspot of fotografia.hotspots) {
         const sinais = Object.entries(hotspot.categorias)
             .toSorted((a, b) => b[1] - a[1])
             .map(([categoria, valor]) => `${categoria}: ${valor}`)
@@ -309,7 +309,7 @@ function gerarMarkdown(snapshot: SnapshotCheiros): string {
     }
 
     linhas.push("", "## Escopos", "");
-    for (const [escopo, valor] of Object.entries(snapshot.pontuacao.porEscopo)) {
+    for (const [escopo, valor] of Object.entries(fotografia.pontuacao.porEscopo)) {
         linhas.push(`- ${escopo}: ${valor} ponto(s)`);
     }
     return `${linhas.join("\n")}\n`;
@@ -364,7 +364,7 @@ async function executarAuditoria({
 
     const anterior = await lerFotografiaAnterior(caminhoFotografia);
     const pontuacaoTotal = PADROES.reduce((soma, padrao) => soma + (contagens[padrao.chave] * padrao.peso), 0);
-    const snapshot: SnapshotCheiros = {
+    const fotografia: FotografiaCheiros = {
         versao: VERSAO_FOTOGRAFIA_CHEIROS,
         geradoEm: new Date().toISOString(),
         base: baseResolvida,
@@ -378,11 +378,11 @@ async function executarAuditoria({
 
     if (gravar) {
         await fs.mkdir(saidaResolvida, {recursive: true});
-        await fs.writeFile(caminhoFotografia, JSON.stringify(snapshot, null, 2));
-        await fs.writeFile(caminhoResumo, gerarMarkdown(snapshot));
+        await fs.writeFile(caminhoFotografia, JSON.stringify(fotografia, null, 2));
+        await fs.writeFile(caminhoResumo, gerarMarkdown(fotografia));
     }
 
-    return {snapshot, caminhoFotografia, caminhoResumo};
+    return {fotografia, caminhoFotografia, caminhoResumo};
 }
 
 async function principal(argumentosInformados: string[] = process.argv.slice(2)): Promise<void> {
@@ -404,21 +404,21 @@ async function principal(argumentosInformados: string[] = process.argv.slice(2))
 
     const base = path.resolve(lerOpcao(argumentos, "--base", DIRETORIO_RAIZ) ?? DIRETORIO_RAIZ);
     const execucao = await executarAuditoria({base, gravar: argumentos.includes("--gravar")});
-    const {snapshot} = execucao;
+    const {fotografia} = execucao;
     if (emitirJson) {
-        imprimirJson(snapshot);
+        imprimirJson(fotografia);
         return;
     }
 
-    imprimirCabecalho("Auditoria de cheiros de codigo", `Base: ${snapshot.base}`);
-    escreverLinha(`Pontuacao total: ${snapshot.pontuacao.total} (${snapshot.pontuacao.faixa})`);
+    imprimirCabecalho("Auditoria de cheiros de codigo", `Base: ${fotografia.base}`);
+    escreverLinha(`Pontuacao total: ${fotografia.pontuacao.total} (${fotografia.pontuacao.faixa})`);
     escreverLinha("");
     for (const padrao of PADROES) {
-        escreverLinha(`- ${padrao.titulo}: ${snapshot.contagens[padrao.chave]} (delta ${formatarDelta(snapshot.deltas[padrao.chave])})`);
+        escreverLinha(`- ${padrao.titulo}: ${fotografia.contagens[padrao.chave]} (delta ${formatarDelta(fotografia.deltas[padrao.chave])})`);
     }
     escreverLinha("");
     escreverLinha("Hotspots:");
-    for (const hotspot of snapshot.hotspots.slice(0, 10)) {
+    for (const hotspot of fotografia.hotspots.slice(0, 10)) {
         escreverLinha(`- ${hotspot.arquivo}: ${hotspot.pontuacao} ponto(s)`);
     }
     if (argumentos.includes("--gravar")) {

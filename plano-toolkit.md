@@ -170,6 +170,8 @@ isolado funciona, mas as fronteiras ainda não estão concluídas:
   `versao: 1`; o JSON persistido pelo Semgrep permanece externo e não recebe envelope do toolkit;
 - a política de orçamento e exceções de `frontend resíduos` foi extraída para um módulo próprio, com validação estrita
   de versão e estrutura, sem misturar carregamento de configuração ao motor de análise;
+- identificadores próprios que ainda estavam em inglês (`snapshot`, `STOPWORDS` e `Status`) foram padronizados em
+  português; vocabulário externo de bibliotecas, formatos e código auditado continua preservado na fronteira correta;
 - `qualidade resumo` agora valida `versaoSchema: "1.0.0"` e deixou de carregar campos históricos (`indiceSaude` e
   `confiabilidade`) que não são produzidos pela fotografia atual;
 - apenas cobertura Java e web está publicada como API programática horizontal;

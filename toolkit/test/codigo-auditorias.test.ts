@@ -145,9 +145,9 @@ describe("Auditores de código", () => {
 
         const resultado = await executarAuditoriaCheiros({base});
 
-        expect(resultado.snapshot.contagens.backendDtoNulavel).toBe(1);
-        expect(resultado.snapshot.contagens.frontendAnyProducao).toBe(1);
-        expect(resultado.snapshot.contagens.frontendFallbackOu).toBe(1);
+        expect(resultado.fotografia.contagens.backendDtoNulavel).toBe(1);
+        expect(resultado.fotografia.contagens.frontendAnyProducao).toBe(1);
+        expect(resultado.fotografia.contagens.frontendFallbackOu).toBe(1);
     });
 
     test("rejeita fotografia anterior de cheiros invalida", async () => {
