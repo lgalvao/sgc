@@ -1,13 +1,13 @@
 import fs from "node:fs/promises";
 import path from "node:path";
-import {Node, Project, SyntaxKind, ts} from "ts-morph";
+import {Node, Project, SyntaxKind, ts, type SourceFile} from "ts-morph";
 import {DIRETORIO_RAIZ} from "../lib/caminhos.js";
 import {resolverCaminhoConfigurado} from "../lib/configuracao.js";
 
 const VERSAO_SCHEMA = "3.0.0";
 const EXTENSOES_SUPORTADAS = new Set([".ts", ".vue"]);
 const EXTENSOES_RESOLUCAO = [".ts", ".vue", ".js", "/index.ts", "/index.vue", "/index.js"];
-const CATEGORIAS_ACOPLAMENTO = ["store", "composable", "service", "router"];
+const CATEGORIAS_ACOPLAMENTO = ["store", "composable", "service", "router"] as const;
 const HUBS_CENTRAIS_RELATIVOS = [
     "App.vue",
     "stores/perfil.ts",
@@ -31,25 +31,162 @@ const LIMITE_LINHAS_FACHADA_PURA = 25;
 const LIMITE_LINHAS_ARQUIVO_MINUSCULO = 30;
 const LIMITE_FAMILIA_PULVERIZADA = 4;
 
-function resolverDiretorioSaidaArquitetura(base = DIRETORIO_RAIZ) {
+type Camada = "view" | "composable" | "store" | "component" | "service" | "router" | "outro";
+type CategoriaImportacao = keyof ImportacoesPorCategoria | "externo";
+type FaixaScore = "excelente" | "bom" | "atencao" | "critico";
+
+interface ImportacoesPorCategoria {
+    store: Set<string>;
+    composable: Set<string>;
+    service: Set<string>;
+    router: Set<string>;
+    view: Set<string>;
+    component: Set<string>;
+    outro: Set<string>;
+}
+
+interface AnaliseAst {
+    importsPorCategoria: ImportacoesPorCategoria;
+    aliasesServicosNamespace: Set<string>;
+    aliasesServicosNomeados: Set<string>;
+    aliasesColadaNomeados: Set<string>;
+    variaveisStore: Set<string>;
+    membrosStoreDesestruturados: Set<string>;
+    chamadasStore: number;
+    chamadasServiceDiretas: number;
+    chamadasEstrategiaCache: number;
+    chamadasInvalidacao: number;
+    chamadasColadaQuery: number;
+    chamadasColadaCache: number;
+    estadosAssincronosManuais: number;
+    coordenacaoServerStateCaseiro: number;
+    mapasPromessasDedupe: number;
+    bolsasDependenciasLargas: number;
+    superficieExportadaAmpla: number;
+    usaDefineStore: boolean;
+}
+
+interface SinaisLexicais {
+    acessoDiretoCache: number;
+    metodoEmCache: number;
+    invalidacaoExplicita: number;
+    booleanoPosicional: number;
+    palavraForcar: number;
+    palavraStale: number;
+    palavraSnapshot: number;
+}
+
+interface MetricasAst {
+    chamadasStore: number;
+    chamadasServiceDiretas: number;
+    chamadasEstrategiaCache: number;
+    chamadasInvalidacao: number;
+    chamadasColadaQuery: number;
+    chamadasColadaCache: number;
+    estadosAssincronosManuais: number;
+    coordenacaoServerStateCaseiro: number;
+    mapasPromessasDedupe: number;
+    bolsasDependenciasLargas: number;
+    superficieExportadaAmpla: number;
+    categoriasAcoplamento: number;
+    importacoesArquiteturais: number;
+}
+
+interface MetricasResumo {
+    viewsComVazamentoCache: number;
+    viewsComServiceDireto: number;
+    viewsComServerStateCaseiro: number;
+    viewsComFanoutAlto: number;
+    acessosDiretosCache: number;
+    metodosEmCache: number;
+    invalidacoesExplicitasEmViews: number;
+    booleanosPosicionais: number;
+    ocorrenciasStale: number;
+    ocorrenciasSnapshot: number;
+    ocorrenciasForcar: number;
+    arquivosComBolsaDependenciasLarga: number;
+    arquivosComSuperficieAmpla: number;
+    arquivosComMisturaCamadas: number;
+    arquivosComServerStateCaseiro: number;
+    arquivosComAcoplamentoStoreAlto: number;
+    arquivosComServiceDireto: number;
+    chamadasEstrategiaCache: number;
+    chamadasInvalidacao: number;
+    hubsCentraisComSinais: number;
+    composablesMinusculos: number;
+    fachadasPuras: number;
+    familiasPulverizadas: number;
+}
+
+interface ArquivoAnalisado {
+    arquivo: string;
+    camada: Camada;
+    linhas: number;
+    score: number;
+    sinaisLexicais: SinaisLexicais;
+    metricasAst: MetricasAst;
+    sinaisAtivos: string[];
+    hubCentral: boolean;
+}
+
+interface FamiliaComposables {
+    arquivos: string[];
+    totalLinhas: number;
+}
+
+interface ExcecaoDocumentada {
+    arquivo: string;
+    sinais: string[];
+    motivo: string;
+}
+
+interface FotografiaArquitetura {
+    base: string;
+    versaoSchema: string;
+    geradoEm: string;
+    resumo: {
+        arquivosProducao: number;
+        scoreTotal: number;
+        faixa: FaixaScore;
+        metricas: MetricasResumo;
+    };
+    hotspots: ArquivoAnalisado[];
+    familias: Record<string, FamiliaComposables>;
+    excecoesDocumentadas: ExcecaoDocumentada[];
+}
+
+interface OpcoesAnaliseArquitetura {
+    base?: string;
+}
+
+interface OpcoesScoreArquivo {
+    camada: Camada;
+    sinaisLexicais: SinaisLexicais;
+    analiseAst: AnaliseAst;
+    hubCentral: boolean;
+    fachadaPura: boolean;
+    arquivoMinusculo: boolean;
+}
+
+function resolverDiretorioSaidaArquitetura(base: string = DIRETORIO_RAIZ): string {
     return path.join(resolverCaminhoConfigurado("artefatosQualidade", base), "frontend-arquitetura", "mais-recente");
 }
 
-function normalizarCaminho(caminhoArquivo) {
+function normalizarCaminho(caminhoArquivo: string): string {
     return caminhoArquivo.split(path.sep).join("/");
 }
 
-function resolverPrefixoCodigo(base) {
+function resolverPrefixoCodigo(base: string): string {
     const diretorioCodigo = resolverCaminhoConfigurado("frontendCodigo", base);
     const relativo = normalizarCaminho(path.relative(base, diretorioCodigo));
     return relativo ? `${relativo}/` : "";
 }
 
-function criarHubsCentrais(prefixoCodigo) {
+function criarHubsCentrais(prefixoCodigo: string): Set<string> {
     return new Set(HUBS_CENTRAIS_RELATIVOS.map((caminho) => path.posix.join(prefixoCodigo, caminho)));
 }
 
-function ehArquivoTesteOuStory(caminhoRelativo) {
+function ehArquivoTesteOuStory(caminhoRelativo: string): boolean {
     return caminhoRelativo.includes("/__tests__/")
         || caminhoRelativo.includes("/__mocks__/")
         || caminhoRelativo.includes("/test/")
@@ -59,12 +196,12 @@ function ehArquivoTesteOuStory(caminhoRelativo) {
         || caminhoRelativo.endsWith(".stories.ts");
 }
 
-function ehArquivoProducaoFrontend(caminhoRelativo, prefixoCodigo) {
+function ehArquivoProducaoFrontend(caminhoRelativo: string, prefixoCodigo: string): boolean {
     return (prefixoCodigo === "" || caminhoRelativo.startsWith(prefixoCodigo))
         && !ehArquivoTesteOuStory(caminhoRelativo);
 }
 
-function classificarCamada(caminhoRelativo, prefixoCodigo) {
+function classificarCamada(caminhoRelativo: string, prefixoCodigo: string): Camada {
     if (caminhoRelativo.startsWith(`${prefixoCodigo}views/`)) {
         return caminhoRelativo.endsWith(".vue") ? "view" : "composable";
     }
@@ -76,15 +213,15 @@ function classificarCamada(caminhoRelativo, prefixoCodigo) {
     return "outro";
 }
 
-function contarOcorrencias(conteudo, regex) {
+function contarOcorrencias(conteudo: string, regex: RegExp): number {
     return conteudo.match(regex)?.length ?? 0;
 }
 
-async function listarArquivosFrontend(base) {
+async function listarArquivosFrontend(base: string): Promise<string[]> {
     const diretorioFrontend = resolverCaminhoConfigurado("frontendCodigo", base);
-    const arquivos = [];
+    const arquivos: string[] = [];
 
-    async function percorrer(diretorioAtual) {
+    async function percorrer(diretorioAtual: string): Promise<void> {
         const entradas = await fs.readdir(diretorioAtual, {withFileTypes: true}).catch(() => []);
         for (const entrada of entradas) {
             const caminhoCompleto = path.join(diretorioAtual, entrada.name);
@@ -111,7 +248,7 @@ async function listarArquivosFrontend(base) {
     return arquivos;
 }
 
-function extrairCodigoScript(caminhoRelativo, conteudoOriginal) {
+function extrairCodigoScript(caminhoRelativo: string, conteudoOriginal: string): string {
     if (!caminhoRelativo.endsWith(".vue")) {
         return conteudoOriginal;
     }
@@ -123,7 +260,7 @@ function extrairCodigoScript(caminhoRelativo, conteudoOriginal) {
     return blocos.join("\n\n");
 }
 
-function resolverImportacao(caminhoRelativo, especificador, prefixoCodigo) {
+function resolverImportacao(caminhoRelativo: string, especificador: string, prefixoCodigo: string): string | null {
     if (especificador.startsWith("@/")) {
         return normalizarCaminho(path.posix.join(prefixoCodigo, especificador.slice(2)));
     }
@@ -144,7 +281,7 @@ function resolverImportacao(caminhoRelativo, especificador, prefixoCodigo) {
     return normalizarCaminho(caminhoBase);
 }
 
-function classificarImportacaoResolvida(caminhoImportado, prefixoCodigo) {
+function classificarImportacaoResolvida(caminhoImportado: string | null, prefixoCodigo: string): CategoriaImportacao {
     if (!caminhoImportado) return "externo";
     if (caminhoImportado.startsWith(`${prefixoCodigo}stores/`)) return "store";
     if (caminhoImportado.startsWith(`${prefixoCodigo}composables/`)) return "composable";
@@ -155,7 +292,7 @@ function classificarImportacaoResolvida(caminhoImportado, prefixoCodigo) {
     return "outro";
 }
 
-function criarAnaliseAst() {
+function criarAnaliseAst(): AnaliseAst {
     return {
         importsPorCategoria: {
             store: new Set(),
@@ -186,7 +323,7 @@ function criarAnaliseAst() {
     };
 }
 
-function obterNomeChamada(expressao) {
+function obterNomeChamada(expressao: Node): string | null {
     if (Node.isIdentifier(expressao)) {
         return expressao.getText();
     }
@@ -196,31 +333,37 @@ function obterNomeChamada(expressao) {
     return null;
 }
 
-function adicionarSet(destino, valor) {
+function adicionarSet(destino: Set<string>, valor: string | null): void {
     if (valor) {
         destino.add(valor);
     }
 }
 
-function contarMembrosBolsa(noTipo) {
+function contarMembrosBolsa(noTipo: Node | undefined): number {
     if (noTipo && Node.isTypeLiteral(noTipo)) {
         return noTipo.getMembers().length;
     }
     return 0;
 }
 
-function ehFuncaoLike(no) {
+function ehFuncaoLike(no: Node): boolean {
     return Node.isFunctionDeclaration(no)
         || Node.isArrowFunction(no)
         || Node.isFunctionExpression(no)
         || Node.isMethodDeclaration(no);
 }
 
-function obterProfundidadeFuncao(no) {
+function obterProfundidadeFuncao(no: Node): number {
     return no.getAncestors().filter(ehFuncaoLike).length;
 }
 
-function analisarSuperficieExportada(sourceFile, camada, analiseAst, caminhoRelativo, ehComposableDeView) {
+function analisarSuperficieExportada(
+    sourceFile: SourceFile,
+    camada: Camada,
+    analiseAst: AnaliseAst,
+    caminhoRelativo: string,
+    ehComposableDeView: boolean
+): void {
     const retornos = sourceFile.getDescendantsOfKind(SyntaxKind.ReturnStatement);
     for (const retorno of retornos) {
         const expressao = retorno.getExpression();
@@ -257,7 +400,7 @@ function analisarSuperficieExportada(sourceFile, camada, analiseAst, caminhoRela
     }
 }
 
-function analisarBolsasDependencias(sourceFile, analiseAst, ehComposableDeView) {
+function analisarBolsasDependencias(sourceFile: SourceFile, analiseAst: AnaliseAst, ehComposableDeView: boolean): void {
     if (ehComposableDeView) {
         return;
     }
@@ -307,7 +450,7 @@ function analisarBolsasDependencias(sourceFile, analiseAst, ehComposableDeView) 
     }
 }
 
-function computarSinaisLexicais(sourceFile, conteudoOriginal) {
+function computarSinaisLexicais(sourceFile: SourceFile, conteudoOriginal: string): SinaisLexicais {
     const propertyAccesses = sourceFile.getDescendantsOfKind(SyntaxKind.PropertyAccessExpression);
     const callExpressions = sourceFile.getDescendantsOfKind(SyntaxKind.CallExpression);
 
@@ -364,7 +507,13 @@ function computarSinaisLexicais(sourceFile, conteudoOriginal) {
     };
 }
 
-function analisarArquivoAst(project, caminhoRelativo, conteudoOriginal, camada, prefixoCodigo) {
+function analisarArquivoAst(
+    project: Project,
+    caminhoRelativo: string,
+    conteudoOriginal: string,
+    camada: Camada,
+    prefixoCodigo: string
+): {analiseAst: AnaliseAst; sourceFile: SourceFile | null} {
     const codigo = extrairCodigoScript(caminhoRelativo, conteudoOriginal);
     const analiseAst = criarAnaliseAst();
 
@@ -383,7 +532,10 @@ function analisarArquivoAst(project, caminhoRelativo, conteudoOriginal, camada, 
         const especificador = declaracao.getModuleSpecifierValue();
         const resolvido = resolverImportacao(caminhoRelativo, especificador, prefixoCodigo);
         const categoria = classificarImportacaoResolvida(resolvido, prefixoCodigo);
-        adicionarSet(analiseAst.importsPorCategoria[categoria] ?? analiseAst.importsPorCategoria.outro, resolvido ?? especificador);
+        const destino = categoria === "externo"
+            ? analiseAst.importsPorCategoria.outro
+            : analiseAst.importsPorCategoria[categoria];
+        adicionarSet(destino, resolvido ?? especificador);
 
         const namespaceImport = declaracao.getNamespaceImport();
         if (categoria === "service" && namespaceImport) {
@@ -509,22 +661,22 @@ function analisarArquivoAst(project, caminhoRelativo, conteudoOriginal, camada, 
     return {analiseAst, sourceFile};
 }
 
-function contarCategoriasAcoplamento(importsPorCategoria) {
+function contarCategoriasAcoplamento(importsPorCategoria: ImportacoesPorCategoria): number {
     return CATEGORIAS_ACOPLAMENTO.filter((categoria) => importsPorCategoria[categoria].size > 0).length;
 }
 
-function contarImportacoesArquiteturais(importsPorCategoria) {
+function contarImportacoesArquiteturais(importsPorCategoria: ImportacoesPorCategoria): number {
     return CATEGORIAS_ACOPLAMENTO.reduce((total, categoria) => total + importsPorCategoria[categoria].size, 0);
 }
 
-function pesoServiceDireto(camada) {
+function pesoServiceDireto(camada: Camada): number {
     if (camada === "view") return 10;
     if (camada === "component") return 6;
     if (camada === "store") return 4;
     return 0;
 }
 
-function detectarServerStateCaseiro({camada, analiseAst}) {
+function detectarServerStateCaseiro({camada, analiseAst}: {camada: Camada; analiseAst: AnaliseAst}): boolean {
     const usaColadaServerState = analiseAst.chamadasColadaQuery > 0;
     const coordenaServerStateNaMao = analiseAst.estadosAssincronosManuais >= 2
         || analiseAst.coordenacaoServerStateCaseiro >= 2
@@ -552,7 +704,15 @@ function detectarServerStateCaseiro({camada, analiseAst}) {
  * composables, sem lógica própria (sem ref, computed, calls a services/stores).
  * Usa análise AST positiva — não regex negativa.
  */
-function detectarFachadaPura(camada, analiseAst, sourceFile, linhas, caminhoRelativo, hubCentral, prefixoCodigo) {
+function detectarFachadaPura(
+    camada: Camada,
+    analiseAst: AnaliseAst,
+    sourceFile: SourceFile | null,
+    linhas: number,
+    caminhoRelativo: string,
+    hubCentral: boolean,
+    prefixoCodigo: string
+): boolean {
     if (camada !== "composable" || hubCentral || linhas >= LIMITE_LINHAS_FACHADA_PURA) return false;
     if (!sourceFile) return false;
     if (!caminhoRelativo.startsWith(`${prefixoCodigo}composables/`)) return false;
@@ -566,7 +726,7 @@ function detectarFachadaPura(camada, analiseAst, sourceFile, linhas, caminhoRela
     if (funcoesExportadas.length !== 1) return false;
 
     const corpo = funcoesExportadas[0].getBody();
-    if (!corpo) return false;
+    if (!corpo || !Node.isBlock(corpo)) return false;
 
     let temReturn = false;
     for (const stmt of corpo.getStatements()) {
@@ -598,14 +758,14 @@ function detectarFachadaPura(camada, analiseAst, sourceFile, linhas, caminhoRela
  * Detecta composables pequenos demais para justificar arquivo próprio.
  * Restrito a `composables/use*.ts` — exclui views, tipos e utilitários sem prefixo `use`.
  */
-function detectarArquivoMinusculo(caminhoRelativo, linhas, hubCentral, prefixoCodigo) {
+function detectarArquivoMinusculo(caminhoRelativo: string, linhas: number, hubCentral: boolean, prefixoCodigo: string): boolean {
     return !hubCentral
         && linhas < LIMITE_LINHAS_ARQUIVO_MINUSCULO
         && caminhoRelativo.startsWith(`${prefixoCodigo}composables/`)
         && path.basename(caminhoRelativo).startsWith("use");
 }
 
-function calcularScoreArquivo({camada, sinaisLexicais, analiseAst, hubCentral, fachadaPura, arquivoMinusculo}) {
+function calcularScoreArquivo({camada, sinaisLexicais, analiseAst, hubCentral, fachadaPura, arquivoMinusculo}: OpcoesScoreArquivo): number {
     const camadaEfetiva = (camada === "store" && !analiseAst.usaDefineStore) ? "outro" : camada;
     const ehFacadeDeStore = camadaEfetiva === "composable"
         && analiseAst.importsPorCategoria.store.size === 1
@@ -655,15 +815,15 @@ function calcularScoreArquivo({camada, sinaisLexicais, analiseAst, hubCentral, f
     return total;
 }
 
-function calcularFaixa(score) {
+function calcularFaixa(score: number): FaixaScore {
     if (score === 0) return "excelente";
     if (score <= 15) return "bom";
     if (score <= 50) return "atencao";
     return "critico";
 }
 
-function criarResumoMarkdown(snapshot) {
-    const linhas = [
+function criarResumoMarkdown(snapshot: FotografiaArquitetura): string {
+    const linhas: string[] = [
         "# Auditoria Arquitetural do Frontend",
         "",
         `- Score total: **${snapshot.resumo.scoreTotal}** (${snapshot.resumo.faixa})`,
@@ -742,13 +902,16 @@ function criarResumoMarkdown(snapshot) {
     return `${linhas.join("\n")}\n`;
 }
 
-async function gravarFotografiaArquitetura(snapshot, diretorioSaida = resolverDiretorioSaidaArquitetura(snapshot.base)) {
+async function gravarFotografiaArquitetura(
+    snapshot: FotografiaArquitetura,
+    diretorioSaida: string = resolverDiretorioSaidaArquitetura(snapshot.base)
+): Promise<void> {
     await fs.mkdir(diretorioSaida, {recursive: true});
     await fs.writeFile(path.join(diretorioSaida, "fotografia.json"), JSON.stringify(snapshot, null, 2));
     await fs.writeFile(path.join(diretorioSaida, "resumo.md"), criarResumoMarkdown(snapshot));
 }
 
-function criarMetricasResumo() {
+function criarMetricasResumo(): MetricasResumo {
     return {
         viewsComVazamentoCache: 0,
         viewsComServiceDireto: 0,
@@ -776,7 +939,16 @@ function criarMetricasResumo() {
     };
 }
 
-function obterSinaisAtivos(camada, sinaisLexicais, analiseAst, categoriasAcoplamento, importacoesArquiteturais, hubCentral, fachadaPura, arquivoMinusculo) {
+function obterSinaisAtivos(
+    camada: Camada,
+    sinaisLexicais: SinaisLexicais,
+    analiseAst: AnaliseAst,
+    categoriasAcoplamento: number,
+    importacoesArquiteturais: number,
+    hubCentral: boolean,
+    fachadaPura: boolean,
+    arquivoMinusculo: boolean
+): string[] {
     const camadaEfetiva = (camada === "store" && !analiseAst.usaDefineStore) ? "outro" : camada;
 
     const sinais = [];
@@ -800,7 +972,7 @@ function obterSinaisAtivos(camada, sinaisLexicais, analiseAst, categoriasAcoplam
     return sinais;
 }
 
-function criarProjetoAnalise() {
+function criarProjetoAnalise(): Project {
     return new Project({
         useInMemoryFileSystem: true,
         compilerOptions: {
@@ -815,8 +987,8 @@ function criarProjetoAnalise() {
  * Ex.: useFluxoSubprocessoExecucao → família "Fluxo"; useBuscadorUsuarios → "Buscador".
  * Retorna objeto { [familia]: { arquivos: string[], totalLinhas: number } }.
  */
-function calcularFamilias(analisados, prefixoCodigo) {
-    const familias = {};
+function calcularFamilias(analisados: ArquivoAnalisado[], prefixoCodigo: string): Record<string, FamiliaComposables> {
+    const familias: Record<string, FamiliaComposables> = {};
     for (const arquivo of analisados) {
         if (!arquivo.arquivo.startsWith(`${prefixoCodigo}composables/`)) continue;
         const nome = path.basename(arquivo.arquivo, ".ts");
@@ -838,8 +1010,12 @@ function calcularFamilias(analisados, prefixoCodigo) {
  * Retorna um Set com os nomes dos sinais a ignorar para este arquivo.
  * Efeito colateral: registra cada exceção em `excecoesDocumentadas` para o relatório.
  */
-function lerExcecoesAuditoria(conteudo, caminhoRelativo, excecoesDocumentadas) {
-    const sinaisExcetos = new Set();
+function lerExcecoesAuditoria(
+    conteudo: string,
+    caminhoRelativo: string,
+    excecoesDocumentadas: ExcecaoDocumentada[]
+): Set<string> {
+    const sinaisExcetos = new Set<string>();
     const regex = /\/\/ @sgc-auditoria ignorar:\s*([^|]+)\|\s*(.+)/g;
     let match;
     while ((match = regex.exec(conteudo)) !== null) {
@@ -853,15 +1029,15 @@ function lerExcecoesAuditoria(conteudo, caminhoRelativo, excecoesDocumentadas) {
     return sinaisExcetos;
 }
 
-async function analisarArquiteturaFrontend({base = DIRETORIO_RAIZ} = {}) {
+async function analisarArquiteturaFrontend({base = DIRETORIO_RAIZ}: OpcoesAnaliseArquitetura = {}): Promise<FotografiaArquitetura> {
     const baseResolvida = path.resolve(base ?? DIRETORIO_RAIZ);
     const prefixoCodigo = resolverPrefixoCodigo(baseResolvida);
     const hubsCentrais = criarHubsCentrais(prefixoCodigo);
     const arquivos = await listarArquivosFrontend(baseResolvida);
-    const analisados = [];
+    const analisados: ArquivoAnalisado[] = [];
     const metricas = criarMetricasResumo();
     const project = criarProjetoAnalise();
-    const excecoesDocumentadas = [];
+    const excecoesDocumentadas: ExcecaoDocumentada[] = [];
 
     for (const arquivo of arquivos) {
         const caminhoRelativo = normalizarCaminho(path.relative(baseResolvida, arquivo));

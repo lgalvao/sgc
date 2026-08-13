@@ -208,6 +208,9 @@ frontend e para os caminhos OpenAPI.
 - `frontend/residuos-lib.ts` foi convertido para TypeScript com tipos para orçamento, camadas, contagens, arquivos,
   hotspots, fotografia e exceções; os budgets, pesos e classificações atuais foram preservados como política do perfil
   SGC, e o carregamento JSON passou a filtrar entradas de exceção inválidas.
+- `frontend/arquitetura-lib.ts` foi convertido para TypeScript com tipos para análise AST, imports por camada, sinais,
+  métricas, hotspots, famílias, exceções documentadas e fotografia; os hubs e heurísticas arquiteturais continuam
+  explícitos no perfil SGC.
 - A configuração já aceita alguns caminhos diferentes do layout do SGC; auditores de cobertura, arquitetura, coesão,
   contratos, resíduos e coleta possuem parametrização parcial por `--base`, `--arquivo`, `--saida` ou configuração.
   Arquitetura, resíduos, OpenAPI e coleta já resolvem seus defaults após a base; outros comandos ainda têm defaults
@@ -477,10 +480,10 @@ roteador fonte/compilado possuir testes de smoke equivalentes.
    contratos de métricas, os caminhos relativos à base auditada e os fixtures existentes.
 2. **[parcial nesta rodada]** Migrar `backend/lib/testes-analisar-regras.ts`, `requisitos/cdus-mensagens-lib.ts`,
    `frontend/identificadores-teste-lib.ts`, `requisitos/cdus-lib.ts`, `requisitos/cdus-vocabulario-lib.ts`,
-   `requisitos/cdus-mensagens-codigo-lib.ts`, `frontend/acoes-backend-lib.ts` e `frontend/residuos-lib.ts`; ainda
-   faltam `frontend/arquitetura-lib.ts` e outras bibliotecas/comandos maiores.
+   `requisitos/cdus-mensagens-codigo-lib.ts`, `frontend/acoes-backend-lib.ts`, `frontend/residuos-lib.ts` e
+   `frontend/arquitetura-lib.ts`; ainda faltam fotografia de qualidade, bibliotecas de diagnóstico e comandos maiores.
 3. **[parcial nesta rodada]** Introduzir tipos para JaCoCo, V8, regras da análise de testes backend, mensagens CDU,
-   violações de ações, resíduos, fotografia e exceções; ainda faltam fotografia de qualidade, achados de auditoria e
+   violações de ações, resíduos, arquitetura AST, fotografias e exceções; ainda faltam achados de auditoria e
    diagnósticos.
 4. Substituir `any` implícito por `unknown` na entrada JSON e validar apenas o que o consumidor realmente exige.
 5. Criar `tsconfig.toolkit-estrito.json` ou equivalente com `strict`, aplicando-o aos módulos já convertidos e aos
