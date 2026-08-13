@@ -173,6 +173,8 @@ frontend e para os caminhos OpenAPI.
   reserva `--dir` para um diretório de busca explícito; o coletor de qualidade foi ajustado para esse contrato.
 - Os validadores estruturais de views e modais frontend agora resolvem `frontendCodigo` pela base, preservando as
   políticas SGC de `LayoutPadrao`, cabeçalhos e `ModalPadrao` sem fixar `frontend/src`.
+- O gate de arquitetura frontend e sua auditoria de ações agora resolvem o pacote Vue por `frontend` configurado,
+  permitindo que o projeto auditado mova o pacote sem alterar o toolkit.
 - A configuração já aceita alguns caminhos diferentes do layout do SGC; auditores de cobertura, arquitetura, coesão,
   contratos, resíduos e coleta possuem parametrização parcial por `--base`, `--arquivo`, `--saida` ou configuração.
   Arquitetura, resíduos, OpenAPI e coleta já resolvem seus defaults após a base; outros comandos ainda têm defaults
@@ -186,7 +188,7 @@ frontend e para os caminhos OpenAPI.
 
 Nas validações desta rodada, executadas diretamente sob Node `26.5.1` (Node 26 disponível no ambiente):
 
-- `npm --prefix toolkit run test`: 89 testes aprovados em 2 arquivos;
+- `npm --prefix toolkit run test`: 90 testes aprovados em 2 arquivos;
 - `npm --prefix toolkit run build`: aprovado;
 - `npm --prefix toolkit run typecheck`: aprovado;
 - `npm --prefix toolkit run lint`: aprovado;
@@ -206,7 +208,8 @@ da base externa; outra chegou a 83 com o coletor de qualidade dependente da base
 configuráveis do Semgrep; outra chegou a 85 com filtros de cheiros dependentes da configuração; outra chegou a 86 com a
 auditoria de assuntos dependente de `backendCodigo`; outra chegou a 87 com as raízes separadas da análise de testes backend;
 esta chega a 88 com a separação entre raiz e diretório de busca dos identificadores de teste frontend; agora chega a 89
-com os validadores estruturais dependentes de `frontendCodigo`. Nenhuma dessas mudanças
+com os validadores estruturais dependentes de `frontendCodigo`; agora chega a 90 com o pacote Vue resolvido por
+`frontend` configurado no gate arquitetural. Nenhuma dessas mudanças
 reintroduz o wrapper obsoleto.
 
 ### 3.3 Tamanho e composição atual
@@ -216,7 +219,7 @@ Inventário dos arquivos rastreados do toolkit, excluindo `dist`, cobertura e ar
 - 10 arquivos TypeScript de implementação;
 - 62 arquivos JavaScript de implementação ainda pendentes;
 - 2 arquivos JavaScript de teste (`test/sgc.test.js` e `test/cdus.test.js`);
-- 2 arquivos de teste concentrando 89 cenários;
+- 2 arquivos de teste concentrando 90 cenários;
 - maior módulo atual: `frontend/arquitetura-lib.js`, com aproximadamente 1.000 linhas;
 - outros hotspots: `codigo/nomes-simbolos-coletar.js`, `backend/testes-analisar.js`,
   `frontend/residuos-lib.js`, `backend/contratos-auditar.js` e `qualidade/coleta-execucao.js`.
@@ -238,7 +241,7 @@ dos arquivos de implementação rastreados são TypeScript.
 | Resolvido | Efeito colateral oculto de `--sem-gravar` | `codigo nomes auditar-consistencia` gerava o inventário auxiliar com gravação habilitada e contaminava `--json`; a opção agora é propagada e a coleta interna é silenciosa. |
 | Resolvido | Configuração sem validação | `configuracao-toolkit.json` agora exige a versão `1` e valida estrutura, chaves conhecidas e caminhos textuais antes da combinação com defaults. |
 | Média | Opções e efeitos divergentes | Há `--input`/`--output` e `--entrada`/`--saida`, `--dry-run` e `--sem-gravar`, além de comandos mutáveis sem modo de prévia uniforme. |
-| Média | Testes não representam pacote externo | Os 89 testes rodam dentro do monorepo e encontram dependências hoisted. Não existe instalação em diretório isolado nem teste de raiz do consumidor. |
+| Média | Testes não representam pacote externo | Os 90 testes rodam dentro do monorepo e encontram dependências hoisted. Não existe instalação em diretório isolado nem teste de raiz do consumidor. |
 | Média | Cobertura funcional não medida | `@vitest/coverage-v8` está instalado, mas não há script, threshold ou relatório de cobertura do próprio toolkit. Quantidade de testes não mede contratos não exercitados. |
 | Média | Roteador monolítico e inventário duplicado | `sgc.js` registra todos os comandos e a documentação repete a lista manualmente; é fácil haver deriva de nomes, extensões e ajuda. |
 | Baixa | APIs nativas e dependências se sobrepõem | Parte do núcleo já substituiu `fs-extra` por Node nativo; a migração deve reavaliar dependências por uso real, sem remoção antecipada. |
@@ -252,7 +255,7 @@ dos arquivos de implementação rastreados são TypeScript.
 - Parametrização parcial não significa generalização concluída.
 - Build aprovado prova que a árvore pode ser emitida; não prova que o pacote emitido contém assets, configuração e
   resolução de raiz adequados para distribuição.
-- Knip aprovado e 89 testes verdes são gates úteis, mas ainda insuficientes para afirmar ausência de código morto fora
+- Knip aprovado e 90 testes verdes são gates úteis, mas ainda insuficientes para afirmar ausência de código morto fora
   do grafo declarado, segurança de todos os comandos mutáveis ou portabilidade. O grafo do Knip agora é uma evidência
   útil de exports não consumidos; não substitui testes de pacote externo.
 

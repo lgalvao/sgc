@@ -3,6 +3,7 @@ import fs from "fs-extra";
 import {globby} from "globby";
 import {parse} from "@vue/compiler-sfc";
 import {DIRETORIO_RAIZ} from "../lib/caminhos.js";
+import {resolverCaminhoConfigurado} from "../lib/configuracao.js";
 
 const PREFIXO_ACAO = /^(pode|habilitar|mostrar|exibir|ocultar|desabilitar|permitir)[A-Z]/;
 const NOMES_UI_LOCAL = /(Modal|Popover|Tooltip|Detalhes|Preview|Filtro|Filtros|Busca|Resultado|Calendario|Dropdown|Menu|Toast|Alerta|Aba|Painel|Bloco)/;
@@ -194,7 +195,7 @@ function auditarConteudo({conteudo, arquivoRelativo}) {
 
 async function auditarAcoesBackendFrontend(opcoes = {}) {
     const diretorioBase = path.resolve(opcoes.base ?? DIRETORIO_RAIZ);
-    const diretorioFrontend = path.join(diretorioBase, "frontend");
+    const diretorioFrontend = resolverCaminhoConfigurado("frontend", diretorioBase);
     const caminhoExcecoes = opcoes.excecoes ?? path.join(
         diretorioBase,
         "toolkit",

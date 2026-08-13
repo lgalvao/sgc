@@ -6,6 +6,7 @@ import pc from "picocolors";
 import {cruise} from "dependency-cruiser";
 import {DIRETORIO_RAIZ} from "../lib/caminhos.js";
 import {lerOpcao} from "../lib/cli-opcoes.js";
+import {resolverCaminhoConfigurado} from "../lib/configuracao.js";
 import {exibirAjudaComando} from "../lib/cli-ajuda.js";
 import {ehEntradaPrincipal} from "../lib/execucao.js";
 import {escreverLinha, imprimirJson} from "../lib/saida.js";
@@ -80,7 +81,7 @@ function imprimirViolacoesAcoesBackend(resultado) {
 
 async function executarValidacaoArquiteturaFrontend(opcoes = {}) {
     const diretorioBase = realpathSync(path.resolve(opcoes.base ?? DIRETORIO_RAIZ));
-    const diretorioFrontend = realpathSync(path.join(diretorioBase, "frontend"));
+    const diretorioFrontend = realpathSync(resolverCaminhoConfigurado("frontend", diretorioBase));
     const caminhoSrc = "src";
     const caminhoConfiguracao = path.join(diretorioFrontend, ".dependency-cruiser.cjs");
     const regrasBase = carregarRegras(caminhoConfiguracao);

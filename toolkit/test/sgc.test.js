@@ -1306,6 +1306,39 @@ describe("CLI raiz do toolkit", () => {
         expect(resultado.stdout).toContain("Nenhuma violacao arquitetural encontrada");
     });
 
+    test("resolve diretorio frontend configurado no gate arquitetural", async () => {
+        const base = await mkdtemp(path.join(os.tmpdir(), "sgc-arquitetura-diretorio-configurado-"));
+        const frontendDir = path.join(base, "cliente");
+
+        await fs.outputJSON(path.join(base, "configuracao-toolkit.json"), {
+            versao: VERSAO_CONFIGURACAO,
+            diretorios: {frontend: "cliente"},
+        });
+        await fs.outputJSON(path.join(frontendDir, "package.json"), {name: "frontend-fixture", private: true});
+        await fs.outputJSON(path.join(frontendDir, "tsconfig.json"), {
+            compilerOptions: {
+                baseUrl: ".",
+                paths: {"@/*": ["./src/*"]},
+            },
+            include: ["src/**/*.ts", "src/**/*.vue"],
+        });
+        await fs.outputFile(path.join(frontendDir, "src", "services", "unidadeService.ts"), "export async function buscarUnidade() { return null; }");
+        await fs.outputFile(
+            path.join(frontendDir, "src", "composables", "useUnidadeTela.ts"),
+            "import {buscarUnidade} from '../services/unidadeService'; export function useUnidadeTela() { return {carregar: () => buscarUnidade()}; }"
+        );
+        await fs.outputFile(
+            path.join(frontendDir, "src", "views", "UnidadeView.vue"),
+            "<script setup lang=\"ts\">import {useUnidadeTela} from '../composables/useUnidadeTela'; const tela = useUnidadeTela(); void tela.carregar();</script>"
+        );
+        await fs.copy(path.join(DIRETORIO_RAIZ, "frontend", ".dependency-cruiser.cjs"), path.join(frontendDir, ".dependency-cruiser.cjs"));
+
+        const resultado = await executarSgc(["frontend", "arquitetura", "validar", "--base", base]);
+
+        expect(resultado.exitCode).toBe(0);
+        expect(resultado.stdout).toContain("Nenhuma violacao arquitetural encontrada");
+    });
+
     test("gate arquitetural falha quando frontend calcula habilitacao de acao por perfil ou situacao", async () => {
         const base = await mkdtemp(path.join(os.tmpdir(), "sgc-arquitetura-acoes-backend-falha-"));
         const frontendDir = path.join(base, "frontend");
