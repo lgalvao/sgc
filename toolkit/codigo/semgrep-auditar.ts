@@ -117,7 +117,7 @@ function criarResumo(resultadoJson: ResultadoSemgrep, regra: string, diretorioBa
     }
 
     const linhas: string[] = [];
-    linhas.push("# Auditoria Semgrep do SGC", "", `Regra: \`${regra}\``, "", `Total de achados: ${achados.length}`, "");
+    linhas.push("# Auditoria Semgrep", "", `Regra: \`${regra}\``, "", `Total de achados: ${achados.length}`, "");
 
     if (achados.length === 0) {
         linhas.push("Nenhum achado encontrado.");
@@ -192,7 +192,7 @@ async function principal(argumentos: string[] = process.argv.slice(2)): Promise<
         exibirAjudaComando({
             comandoSgc: "codigo semgrep auditar",
             scriptDireto: "codigo/semgrep-auditar.ts",
-            descricao: "Executa um piloto de Semgrep OSS com regras locais do SGC para monitorar deriva estrutural em backend, frontend e integração.",
+            descricao: "Executa um piloto de Semgrep OSS com a política configurada para monitorar deriva estrutural no projeto.",
             opcoes: [
                 "--regra <arquivo>     Sobrescreve o arquivo de regras YAML.",
                 "--dir <caminho>       Adiciona diretório-alvo; pode ser repetido.",
@@ -203,7 +203,7 @@ async function principal(argumentos: string[] = process.argv.slice(2)): Promise<
             ],
             exemplos: [
                 "npx tsx toolkit/sgc.ts codigo semgrep auditar",
-                "npx tsx toolkit/sgc.ts codigo semgrep auditar --dir backend/src/main/java/sgc/subprocesso",
+                "npx tsx toolkit/sgc.ts codigo semgrep auditar --dir backend/src/main/java/exemplo",
                 "npx tsx toolkit/sgc.ts codigo semgrep auditar --auto --json"
             ]
         });

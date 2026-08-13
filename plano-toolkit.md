@@ -241,7 +241,8 @@ frontend e para os caminhos OpenAPI.
 - `frontend/residuos-auditar.ts` e `frontend/residuos-validar.ts` adotaram a mesma fronteira read-only, com `--gravar`
   como ação positiva; o coletor consolidado informa a opção para manter a fotografia mais recente do perfil SGC.
 - `codigo/semgrep-auditar.ts` adotou a mesma fronteira read-only, com `--gravar` como ação positiva; o smoke do pacote
-  cobre execução sem gravação e persistência explícita junto com a resolução da política empacotada.
+  cobre execução sem gravação e persistência explícita junto com a resolução da política empacotada. O motor não exibe
+  mais `SGC` fixo no relatório ou na ajuda; a política padrão continua sendo a do perfil SGC e pode ser substituída.
 - `integracao/contratos-diff.ts` adotou a mesma fronteira read-only, com `--gravar` como ação positiva; exportação e
   fixação de baseline continuam separadas como ações explicitamente geradoras/promotoras.
 - `backend/cobertura-auditoria.ts` e `frontend/cobertura-auditoria.ts` adotaram a mesma fronteira read-only, com

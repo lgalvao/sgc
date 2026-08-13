@@ -105,5 +105,7 @@ test("pacote fonte executa em um projeto consumidor isolado", async () => {
         }
     });
     expect(JSON.parse(gravacaoSemgrep.stdout)).toMatchObject({totalAchados: 0, codigoSaida: 0});
+    const caminhoResumoSemgrep = path.join(diretorioConsumidor, "toolkit", "qualidade", "artefatos", "semgrep", "mais-recente", "resumo.md");
     expect(await fs.pathExists(path.join(diretorioConsumidor, "toolkit", "qualidade", "artefatos", "semgrep", "mais-recente", "resultado.json"))).toBe(true);
+    expect(await fs.readFile(caminhoResumoSemgrep, "utf8")).toContain("# Auditoria Semgrep\n");
 }, 60000);
