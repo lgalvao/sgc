@@ -47,25 +47,6 @@ const CAMINHOS_COMANDOS_CONSISTENCIA = [
     "nomes-consistencia-auditar.ts",
     "idioma-consistencia-auditar.ts"
 ].map(nome => path.join(DIRETORIO_RAIZ, "toolkit", "codigo", nome));
-const CAMINHOS_COMANDOS_ESTRUTURA_FRONTEND = [
-    "arquitetura-auditar.ts",
-    "arquitetura-validar.ts",
-    "modais-validar.ts",
-    "residuos-auditar.ts",
-    "residuos-validar.ts",
-    "identificadores-teste-listar.ts",
-    "identificadores-teste-listar-duplicados.ts",
-    "views-templates-validar.ts"
-].map(nome => path.join(DIRETORIO_RAIZ, "toolkit", "frontend", nome));
-const CAMINHOS_COMANDOS_COBERTURA_FRONTEND = [
-    "cobertura-auditoria.ts",
-    "cobertura-ramificacoes.ts",
-    "cobertura-ramificacoes-erros.ts"
-].map(nome => path.join(DIRETORIO_RAIZ, "toolkit", "frontend", nome));
-const CAMINHOS_COMANDOS_ACESSIBILIDADE_FRONTEND = [
-    "acessibilidade-crawler.ts",
-    "acessibilidade-processar-resultados.ts"
-].map(nome => path.join(DIRETORIO_RAIZ, "toolkit", "frontend", nome));
 const DIRETORIO_SCRIPTS_BACKEND_LEGADO = path.join(DIRETORIO_RAIZ, "backend", "etc", "scripts");
 const DIRETORIO_SCRIPTS_FRONTEND_LEGADO = path.join(DIRETORIO_RAIZ, "frontend", "etc", "scripts");
 
@@ -219,26 +200,6 @@ describe("CLI raiz do toolkit", () => {
         }
     });
 
-    test("pode importar auditores estruturais do frontend sem auditar o projeto", async () => {
-        const resultados = await Promise.all(CAMINHOS_COMANDOS_ESTRUTURA_FRONTEND.map(async caminho => {
-            const urlModulo = pathToFileURL(caminho).href;
-            return execa(process.execPath, [
-                "--import=tsx",
-                "--input-type=module",
-                "-e",
-                `process.argv.push("--help"); await import(${JSON.stringify(urlModulo)}); process.stdout.write("importacao-ok\\n");`
-            ], {
-                cwd: DIRETORIO_RAIZ,
-                reject: false
-            });
-        }));
-
-        for (const resultado of resultados) {
-            expect(resultado.exitCode).toBe(0);
-            expect(resultado.stdout).toBe("importacao-ok");
-        }
-    });
-
     test("mantem auditorias de cobertura read-only e grava sob demanda", async () => {
         const base = await mkdtemp(path.join(os.tmpdir(), "sgc-cobertura-auditoria-"));
         const caminhoJacoco = path.join(base, "relatorios", "jacoco.xml");
@@ -323,46 +284,6 @@ describe("CLI raiz do toolkit", () => {
         expect(frontendGravacao.exitCode).toBe(0);
         expect(await existe(path.join(base, "backend-cobertura-auditoria.md"))).toBe(true);
         expect(await existe(path.join(base, "frontend-cobertura-auditoria.md"))).toBe(true);
-    });
-
-    test("pode importar comandos de cobertura frontend sem ler o relatorio V8", async () => {
-        const resultados = await Promise.all(CAMINHOS_COMANDOS_COBERTURA_FRONTEND.map(async caminho => {
-            const urlModulo = pathToFileURL(caminho).href;
-            return execa(process.execPath, [
-                "--import=tsx",
-                "--input-type=module",
-                "-e",
-                `process.argv.push("--help"); await import(${JSON.stringify(urlModulo)}); process.stdout.write("importacao-ok\\n");`
-            ], {
-                cwd: DIRETORIO_RAIZ,
-                reject: false
-            });
-        }));
-
-        for (const resultado of resultados) {
-            expect(resultado.exitCode).toBe(0);
-            expect(resultado.stdout).toBe("importacao-ok");
-        }
-    });
-
-    test("pode importar comandos de acessibilidade sem executar o crawler ou ler resultados", async () => {
-        const resultados = await Promise.all(CAMINHOS_COMANDOS_ACESSIBILIDADE_FRONTEND.map(async caminho => {
-            const urlModulo = pathToFileURL(caminho).href;
-            return execa(process.execPath, [
-                "--import=tsx",
-                "--input-type=module",
-                "-e",
-                `process.argv.push("--help"); await import(${JSON.stringify(urlModulo)}); process.stdout.write("importacao-ok\\n");`
-            ], {
-                cwd: DIRETORIO_RAIZ,
-                reject: false
-            });
-        }));
-
-        for (const resultado of resultados) {
-            expect(resultado.exitCode).toBe(0);
-            expect(resultado.stdout).toBe("importacao-ok");
-        }
     });
 
     test("processa resultados de acessibilidade em uma base externa", async () => {
