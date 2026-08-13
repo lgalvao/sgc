@@ -7,14 +7,25 @@ import {resolverCaminhoConfigurado} from "../lib/configuracao.js";
 
 const PADRAO_IDENTIFICADOR = /(^|[\s<])(:?)(data-test-codigo|test-codigo|data-test-id|test-id|data-testid)=("([^"]*)"|'([^']*)')/gm;
 
-function obterDiretorioBusca(argumentos = [], diretorioBase = DIRETORIO_RAIZ) {
-    const diretorioInformado = lerOpcao(argumentos, "--dir", null);
+interface IdentificadorTeste {
+    arquivo: string;
+    atributo: string;
+    valor: string;
+}
+
+interface ResultadoColetaIdentificadores {
+    diretorioBusca: string;
+    identificadores: IdentificadorTeste[];
+}
+
+function obterDiretorioBusca(argumentos: string[] = [], diretorioBase: string = DIRETORIO_RAIZ): string {
+    const diretorioInformado = lerOpcao(argumentos, "--dir", undefined);
     return diretorioInformado
         ? path.resolve(diretorioBase, diretorioInformado)
         : resolverCaminhoConfigurado("frontendCodigo", diretorioBase);
 }
 
-function normalizarCaminhoArquivo(caminhoArquivo, diretorioBase, diretorioBusca) {
+function normalizarCaminhoArquivo(caminhoArquivo: string, diretorioBase: string, diretorioBusca: string): string {
     const relativoRaiz = path.relative(diretorioBase, caminhoArquivo).replaceAll("\\", "/");
     if (!relativoRaiz.startsWith("../") && relativoRaiz !== "..") {
         return relativoRaiz;
@@ -22,19 +33,22 @@ function normalizarCaminhoArquivo(caminhoArquivo, diretorioBase, diretorioBusca)
     return path.relative(diretorioBusca, caminhoArquivo).replaceAll("\\", "/");
 }
 
-async function coletarIdentificadores(diretorioBusca, diretorioBase = DIRETORIO_RAIZ) {
+async function coletarIdentificadores(
+    diretorioBusca: string,
+    diretorioBase: string = DIRETORIO_RAIZ
+): Promise<ResultadoColetaIdentificadores> {
     if (!fs.existsSync(diretorioBusca)) {
         throw new Error(`Diretorio frontend nao encontrado: ${path.relative(diretorioBase, diretorioBusca)}`);
     }
 
     const padraoVue = path.join(diretorioBusca, "**/*.vue").replace(/\\/g, "/");
     const caminhosArquivos = await globby(padraoVue, {absolute: true});
-    const identificadores = [];
+    const identificadores: IdentificadorTeste[] = [];
 
     for (const caminhoArquivo of caminhosArquivos) {
         const conteudo = fs.readFileSync(caminhoArquivo, "utf8");
         PADRAO_IDENTIFICADOR.lastIndex = 0;
-        let correspondencia;
+        let correspondencia: RegExpExecArray | null;
         while ((correspondencia = PADRAO_IDENTIFICADOR.exec(conteudo)) !== null) {
             const dinamico = correspondencia[2] === ":";
             let valor = correspondencia[5] ?? correspondencia[6] ?? "";
