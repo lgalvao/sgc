@@ -268,6 +268,8 @@ frontend e para os caminhos OpenAPI.
 - `codigo/semgrep-auditar.ts` foi convertido para TypeScript com contratos para achados, posições, resultados,
   execução e relatórios; a entrada JSON externa é normalizada como `unknown`, mantendo regras, alvos configuráveis,
   modo automático e o schema de saída do Semgrep.
+- O despachador agora resolve exclusivamente os caminhos TypeScript registrados; o fallback transitório `.js` → `.ts`
+  foi removido depois da migração integral dos comandos.
 - `projeto/diagnostico.ts` foi convertido para TypeScript, deixou de depender de `fs-extra` e aceita catálogos
   configuráveis de recursos e comandos registrados; o catálogo padrão continua sendo o perfil SGC e o mínimo local do
   Node foi alinhado à major 26 (`26.0.0`).
@@ -570,8 +572,8 @@ configuração externa possui testes de precedência e erro.
    `npx tsx` e `npm --prefix toolkit run sgc`.
 6. Decidir e implementar o modelo de instalação externo: manter fonte+`tsx` como dependência ou adotar distribuição compilada.
 7. Criar teste de pacote isolado com `npm pack`, instalação em diretório temporário e projeto consumidor fixture.
-8. Remover o fallback `.js` → `.ts` do despachador somente depois de todos os comandos registrados terem extensões e
-   imports consistentes.
+8. **[concluído nesta rodada]** Remover o fallback `.js` → `.ts` do despachador depois de todos os comandos registrados
+   passarem a usar caminhos TypeScript explícitos.
 
 Critério de aceite: nenhum comando fonte depender de `node` puro, nenhum binário apontar para um caminho quebrado e o
 roteador fonte/compilado possuir testes de smoke equivalentes.

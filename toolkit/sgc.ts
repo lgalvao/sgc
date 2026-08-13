@@ -27,8 +27,8 @@ program
 
 const backend = program.command("backend").description("Ferramentas do backend.");
 const backendCobertura = backend.command("cobertura").description("Cobertura e diagnosticos do backend.");
-criarComandoScript(backendCobertura, "auditoria", "Auditoria unificada de cobertura e risco (Backend).", "toolkit/backend/cobertura-auditoria.js");
-criarComandoScript(backendCobertura, "ramificacoes", "Lista classes com lacunas de ramificacoes no backend.", "toolkit/backend/cobertura-ramificacoes.js");
+criarComandoScript(backendCobertura, "auditoria", "Auditoria unificada de cobertura e risco (Backend).", "toolkit/backend/cobertura-auditoria.ts");
+criarComandoScript(backendCobertura, "ramificacoes", "Lista classes com lacunas de ramificacoes no backend.", "toolkit/backend/cobertura-ramificacoes.ts");
 
 const backendArquitetura = backend.command("arquitetura").description("Auditorias de arquitetura do backend.");
 criarComandoScript(backendArquitetura, "auditar", "Audita god objects (Services, Facades, Controllers) por linhas, metodos e dependencias.", "toolkit/backend/arquitetura-auditar.ts");
@@ -50,31 +50,31 @@ criarComandoScript(backendNotificacoes, "auditar-assuntos", "Audita literais de 
 
 const frontend = program.command("frontend").description("Ferramentas do frontend.");
 const frontendCobertura = frontend.command("cobertura").description("Cobertura e diagnosticos do frontend.");
-criarComandoScript(frontendCobertura, "auditoria", "Auditoria unificada de cobertura e risco (Frontend).", "toolkit/frontend/cobertura-auditoria.js");
-criarComandoScript(frontendCobertura, "ramificacoes", "Lista arquivos com lacunas de ramificacoes no frontend.", "toolkit/frontend/cobertura-ramificacoes.js");
-criarComandoScript(frontendCobertura, "ramificacoes-erros", "Cruza lacunas de ramificacoes com sinais de tratamento de erro suspeito no frontend.", "toolkit/frontend/cobertura-ramificacoes-erros.js");
+criarComandoScript(frontendCobertura, "auditoria", "Auditoria unificada de cobertura e risco (Frontend).", "toolkit/frontend/cobertura-auditoria.ts");
+criarComandoScript(frontendCobertura, "ramificacoes", "Lista arquivos com lacunas de ramificacoes no frontend.", "toolkit/frontend/cobertura-ramificacoes.ts");
+criarComandoScript(frontendCobertura, "ramificacoes-erros", "Cruza lacunas de ramificacoes com sinais de tratamento de erro suspeito no frontend.", "toolkit/frontend/cobertura-ramificacoes-erros.ts");
 
 const frontendResiduos = frontend.command("residuos").description("Auditorias de residuos estruturais e orcamentos do frontend.");
-criarComandoScript(frontendResiduos, "auditar", "Audita residuos estruturais do frontend.", "toolkit/frontend/residuos-auditar.js");
-criarComandoScript(frontendResiduos, "validar", "Valida orcamentos e excecoes dos residuos do frontend.", "toolkit/frontend/residuos-validar.js");
+criarComandoScript(frontendResiduos, "auditar", "Audita residuos estruturais do frontend.", "toolkit/frontend/residuos-auditar.ts");
+criarComandoScript(frontendResiduos, "validar", "Valida orcamentos e excecoes dos residuos do frontend.", "toolkit/frontend/residuos-validar.ts");
 
 const frontendArquitetura = frontend.command("arquitetura").description("Auditorias de arquitetura e vazamento de contratos no frontend.");
-criarComandoScript(frontendArquitetura, "auditar", "Audita vazamentos arquiteturais e estrategia de cache exposta no frontend.", "toolkit/frontend/arquitetura-auditar.js");
-criarComandoScript(frontendArquitetura, "validar", "Valida regras arquiteturais do frontend (gate duro).", "toolkit/frontend/arquitetura-validar.js");
+criarComandoScript(frontendArquitetura, "auditar", "Audita vazamentos arquiteturais e estrategia de cache exposta no frontend.", "toolkit/frontend/arquitetura-auditar.ts");
+criarComandoScript(frontendArquitetura, "validar", "Valida regras arquiteturais do frontend (gate duro).", "toolkit/frontend/arquitetura-validar.ts");
 
 const frontendViews = frontend.command("views").description("Auditorias especificas de views.");
-criarComandoScript(frontendViews, "templates-validar", "Valida previsibilidade estrutural de templates das views.", "toolkit/frontend/views-templates-validar.js");
+criarComandoScript(frontendViews, "templates-validar", "Valida previsibilidade estrutural de templates das views.", "toolkit/frontend/views-templates-validar.ts");
 
 const frontendModais = frontend.command("modais").description("Auditorias especificas de modais.");
-criarComandoScript(frontendModais, "validar", "Valida o uso padronizado de ModalPadrao e proibe BModal cru fora do componente-base.", "toolkit/frontend/modais-validar.js");
+criarComandoScript(frontendModais, "validar", "Valida o uso padronizado de ModalPadrao e proibe BModal cru fora do componente-base.", "toolkit/frontend/modais-validar.ts");
 
 const frontendIdentificadoresTeste = frontend.command("identificadores-teste").description("Ferramentas para identificadores de teste.");
-criarComandoScript(frontendIdentificadoresTeste, "listar", "Lista identificadores de teste do frontend.", "toolkit/frontend/identificadores-teste-listar.js");
-criarComandoScript(frontendIdentificadoresTeste, "listar-duplicados", "Lista identificadores de teste duplicados.", "toolkit/frontend/identificadores-teste-listar-duplicados.js");
+criarComandoScript(frontendIdentificadoresTeste, "listar", "Lista identificadores de teste do frontend.", "toolkit/frontend/identificadores-teste-listar.ts");
+criarComandoScript(frontendIdentificadoresTeste, "listar-duplicados", "Lista identificadores de teste duplicados.", "toolkit/frontend/identificadores-teste-listar-duplicados.ts");
 
 const frontendAcessibilidade = frontend.command("acessibilidade").description("Auditorias de acessibilidade do frontend.");
-criarComandoScript(frontendAcessibilidade, "crawler", "Executa o crawler Axe-core em todas as rotas principais.", "toolkit/frontend/acessibilidade-crawler.js");
-criarComandoScript(frontendAcessibilidade, "processar", "Processa os resultados do crawler em um relatorio Markdown.", "toolkit/frontend/acessibilidade-processar-resultados.js");
+criarComandoScript(frontendAcessibilidade, "crawler", "Executa o crawler Axe-core em todas as rotas principais.", "toolkit/frontend/acessibilidade-crawler.ts");
+criarComandoScript(frontendAcessibilidade, "processar", "Processa os resultados do crawler em um relatorio Markdown.", "toolkit/frontend/acessibilidade-processar-resultados.ts");
 
 const codigo = program.command("codigo").description("Ferramentas de manutencao e higiene do código.");
 const codigoCheiros = codigo.command("cheiros").description("Auditorias de cheiros de codigo.");
@@ -88,9 +88,9 @@ criarComandoScript(codigoNomes, "auditar-idioma", "Detecta nomes em inglês e ca
 
 const integracao = program.command("integracao").description("Ferramentas de qualidade na fronteira backend/frontend.");
 const integracaoContratos = integracao.command("contratos").description("Auditorias e artefatos de contrato HTTP.");
-criarComandoScript(integracaoContratos, "exportar-openapi", "Exporta o OpenAPI atual da aplicação para arquivo local.", "toolkit/integracao/contratos-exportar-openapi.js");
-criarComandoScript(integracaoContratos, "diff", "Compara duas versões do OpenAPI e resume mudanças de contrato.", "toolkit/integracao/contratos-diff.js");
-criarComandoScript(integracaoContratos, "fixar-baseline", "Promove o OpenAPI mais recente como baseline de comparação.", "toolkit/integracao/contratos-fixar-baseline.js");
+criarComandoScript(integracaoContratos, "exportar-openapi", "Exporta o OpenAPI atual da aplicação para arquivo local.", "toolkit/integracao/contratos-exportar-openapi.ts");
+criarComandoScript(integracaoContratos, "diff", "Compara duas versões do OpenAPI e resume mudanças de contrato.", "toolkit/integracao/contratos-diff.ts");
+criarComandoScript(integracaoContratos, "fixar-baseline", "Promove o OpenAPI mais recente como baseline de comparação.", "toolkit/integracao/contratos-fixar-baseline.ts");
 
 const requisitos = program.command("requisitos").description("Ferramentas de inventario e auditoria de requisitos.");
 const requisitosCdus = requisitos.command("cdus").description("Inventario e auditoria read-only dos casos de uso.");
@@ -192,8 +192,8 @@ projeto
         await executarPreparacao(opcoes);
     });
 
-criarComandoScript(projeto, "arvore-linhas", "Gera arvore agregada de linhas do repositório.", "toolkit/projeto/arvore-linhas.js");
-criarComandoScript(projeto, "versao-sincronizar", "Sincroniza a versao entre gradle.properties e frontend/package.json.", "toolkit/projeto/versao-sincronizar.js");
+criarComandoScript(projeto, "arvore-linhas", "Gera arvore agregada de linhas do repositório.", "toolkit/projeto/arvore-linhas.ts");
+criarComandoScript(projeto, "versao-sincronizar", "Sincroniza a versao entre gradle.properties e frontend/package.json.", "toolkit/projeto/versao-sincronizar.ts");
 
 program.addHelpText(
     "after",

@@ -20,14 +20,10 @@ function garantirArquivo(relativo: string): string {
         ? relativo.slice("toolkit/".length)
         : relativo;
     const absoluto = path.resolve(DIRETORIO_EXECUCAO_TOOLKIT, caminhoRelativo);
-    const candidatos = absoluto.endsWith(".js")
-        ? [absoluto, `${absoluto.slice(0, -3)}.ts`]
-        : [absoluto];
-    const caminhoExistente = candidatos.find(caminho => existsSync(caminho));
-    if (!caminhoExistente) {
+    if (!existsSync(absoluto)) {
         throw new Error(`Script nao encontrado: ${relativo}`);
     }
-    return caminhoExistente;
+    return absoluto;
 }
 
 async function executarNode(relativo: string, argumentos: string[] = []) {
