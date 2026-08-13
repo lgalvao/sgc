@@ -237,6 +237,9 @@ frontend e para os caminhos OpenAPI.
   suspeitas e relatórios; os filtros de arquivos e heurísticas de erro do perfil SGC foram preservados.
 - `frontend/residuos-auditar.ts` e `frontend/residuos-validar.ts` foram convertidos para TypeScript; fotografia,
   violações, avisos, exceções e opções de persistência agora têm contratos explícitos, mantendo os budgets do SGC.
+- `frontend/acessibilidade-crawler.ts` e `frontend/acessibilidade-processar-resultados.ts` foram convertidos para
+  TypeScript; o processador valida o JSON externo antes de gerar Markdown e o crawler aceita base, spec, configuração e
+  executor Playwright parametrizados, mantendo os defaults SGC.
 - `integracao/contratos-openapi-caminhos.ts` foi convertido para TypeScript com o contrato explícito dos caminhos
   atual, de referência e de relatório; ele permanece independente do gerador de tipos removido.
 - `integracao/contratos-exportar-openapi.ts`, `integracao/contratos-diff.ts` e
@@ -255,7 +258,7 @@ frontend e para os caminhos OpenAPI.
 
 Nas validações desta rodada, executadas diretamente sob Node `26.5.1` (Node 26 disponível no ambiente):
 
-- `npm --prefix toolkit run test`: 100 testes aprovados em 2 arquivos;
+- `npm --prefix toolkit run test`: 101 testes aprovados em 2 arquivos;
 - `npm --prefix toolkit run build`: aprovado;
 - `npm --prefix toolkit run typecheck`: aprovado;
 - `npm --prefix toolkit run lint`: aprovado;
@@ -279,22 +282,22 @@ com os validadores estruturais dependentes de `frontendCodigo`; agora chega a 90
 `frontend` configurado no gate arquitetural; outra chegou a 91 com a coleta de resíduos dependente de `frontendCodigo`;
 outra chegou a 92 com o núcleo AST de arquitetura dependente de `frontendCodigo`; outra chegou a 93 com a normalização
 de caminhos dos relatórios V8 frontend; esta chega a 96 com o launcher `tsx` do binário npm. Nenhuma dessas mudanças
-reintroduz o wrapper obsoleto; as rodadas posteriores de limpeza, preparação, qualidade e dependências elevam a cobertura
-para 100 cenários.
+reintroduz o wrapper obsoleto; as rodadas posteriores de limpeza, preparação, qualidade, dependências e acessibilidade
+elevam a cobertura para 101 cenários.
 
 ### 3.3 Tamanho e composição atual
 
 Inventário dos arquivos rastreados do toolkit, excluindo `dist`, cobertura e artefatos ignorados:
 
-- 41 arquivos TypeScript de implementação;
-- 31 arquivos JavaScript de implementação ainda pendentes;
+- 43 arquivos TypeScript de implementação;
+- 29 arquivos JavaScript de implementação ainda pendentes;
 - 2 arquivos JavaScript de teste (`test/sgc.test.js` e `test/cdus.test.js`);
-- 2 arquivos de teste concentrando 100 cenários;
+- 2 arquivos de teste concentrando 101 cenários;
 - maior módulo atual: `frontend/arquitetura-lib.ts`, com aproximadamente 1.200 linhas;
 - outros hotspots: `codigo/nomes-simbolos-coletar.js`, `backend/testes-analisar.js`,
   `frontend/residuos-lib.ts`, `backend/contratos-auditar.js` e `qualidade/coleta-execucao.ts`.
 
-O núcleo TypeScript está adiantado, mas a migração do toolkit como um todo ainda não terminou: aproximadamente 57% dos
+O núcleo TypeScript está adiantado, mas a migração do toolkit como um todo ainda não terminou: aproximadamente 60% dos
 arquivos de implementação rastreados são TypeScript.
 
 ### 3.4 Achados da auditoria crítica
@@ -311,7 +314,7 @@ arquivos de implementação rastreados são TypeScript.
 | Resolvido | Efeito colateral oculto de `--sem-gravar` | `codigo nomes auditar-consistencia` gerava o inventário auxiliar com gravação habilitada e contaminava `--json`; a opção agora é propagada e a coleta interna é silenciosa. |
 | Resolvido | Configuração sem validação | `configuracao-toolkit.json` agora exige a versão `1` e valida estrutura, chaves conhecidas e caminhos textuais antes da combinação com defaults. |
 | Média | Opções e efeitos divergentes | Há `--input`/`--output` e `--entrada`/`--saida`, `--dry-run` e `--sem-gravar`, além de comandos mutáveis sem modo de prévia uniforme. |
-| Média | Testes não representam pacote externo | Os 100 testes rodam dentro do monorepo e encontram dependências hoisted. Não existe instalação em diretório isolado nem teste de raiz do consumidor. |
+| Média | Testes não representam pacote externo | Os 101 testes rodam dentro do monorepo e encontram dependências hoisted. Não existe instalação em diretório isolado nem teste de raiz do consumidor. |
 | Média | Cobertura funcional não medida | `@vitest/coverage-v8` está instalado, mas não há script, threshold ou relatório de cobertura do próprio toolkit. Quantidade de testes não mede contratos não exercitados. |
 | Média | Roteador monolítico e inventário duplicado | `sgc.ts` registra todos os comandos e a documentação repete a lista manualmente; é fácil haver deriva de nomes, extensões e ajuda. |
 | Baixa | APIs nativas e dependências se sobrepõem | Parte do núcleo já substituiu `fs-extra` por Node nativo; a migração deve reavaliar dependências por uso real, sem remoção antecipada. |
@@ -326,7 +329,7 @@ arquivos de implementação rastreados são TypeScript.
 - Parametrização parcial não significa generalização concluída.
 - Build aprovado prova que a árvore pode ser emitida; não prova que o pacote emitido contém assets, configuração e
   resolução de raiz adequados para distribuição.
-- Knip aprovado e 100 testes verdes são gates úteis, mas ainda insuficientes para afirmar ausência de código morto fora
+- Knip aprovado e 101 testes verdes são gates úteis, mas ainda insuficientes para afirmar ausência de código morto fora
   do grafo declarado, segurança de todos os comandos mutáveis ou portabilidade. O grafo do Knip agora é uma evidência
   útil de exports não consumidos; não substitui testes de pacote externo.
 
@@ -537,9 +540,9 @@ Lotes sugeridos:
 
 1. **[concluído nesta rodada]** Projeto: diagnóstico, limpeza, preparação e perfil de qualidade convertidos. O
    catálogo padrão continua sendo o perfil SGC, com base e execução parametrizáveis para reuso externo.
-2. **Backend**: cobertura, análise/priorização de testes, contratos e FQN; parametrizar raiz Java, tarefas Gradle e
+2. **Backend**: cobertura já convertida; faltam análise/priorização de testes, contratos e FQN. Parametrizar raiz Java, tarefas Gradle e
    categorias.
-3. **[parcial nesta rodada]** Frontend: cobertura V8 e resíduos já convertidos; faltam acessibilidade e identificadores
+3. **[parcial nesta rodada]** Frontend: cobertura V8, resíduos e acessibilidade já convertidos; faltam identificadores
    de teste. Parametrizar raiz Vue, globs e convenções de componentes.
 4. **[concluído nesta rodada]** Integração: exportação, diff e baseline OpenAPI; o módulo permanece independente do
    gerador de tipos removido.

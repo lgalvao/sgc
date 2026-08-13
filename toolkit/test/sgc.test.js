@@ -17,6 +17,8 @@ import {resolverCaminhosOpenapi} from "../integracao/contratos-openapi-caminhos.
 import {ADAPTADORES, PERFIS, principal as coletarFotografiaQualidade} from "../qualidade/coleta-execucao.ts";
 import {resolverDiretoriosPadrao} from "../codigo/semgrep-auditar.js";
 import {executarAuditoria as executarAuditoriaCheiros} from "../codigo/cheiros-auditar.js";
+import {executarCrawler, normalizarArgumentosPlaywright} from "../frontend/acessibilidade-crawler.ts";
+import {normalizarResultados} from "../frontend/acessibilidade-processar-resultados.ts";
 
 const DIRETORIO_RAIZ = path.resolve(import.meta.dirname, "..", "..");
 const CAMINHO_SGC = path.join(DIRETORIO_RAIZ, "toolkit", "sgc.ts");
@@ -82,8 +84,8 @@ const CAMINHOS_COMANDOS_COBERTURA_FRONTEND = [
     "cobertura-ramificacoes-erros.ts"
 ].map(nome => path.join(DIRETORIO_RAIZ, "toolkit", "frontend", nome));
 const CAMINHOS_COMANDOS_ACESSIBILIDADE_FRONTEND = [
-    "acessibilidade-crawler.js",
-    "acessibilidade-processar-resultados.js"
+    "acessibilidade-crawler.ts",
+    "acessibilidade-processar-resultados.ts"
 ].map(nome => path.join(DIRETORIO_RAIZ, "toolkit", "frontend", nome));
 const DIRETORIO_SCRIPTS_BACKEND_LEGADO = path.join(DIRETORIO_RAIZ, "backend", "etc", "scripts");
 const DIRETORIO_SCRIPTS_FRONTEND_LEGADO = path.join(DIRETORIO_RAIZ, "frontend", "etc", "scripts");
@@ -612,6 +614,45 @@ describe("CLI raiz do toolkit", () => {
         expect(resultado.exitCode).toBe(0);
         expect(await fs.pathExists(saida)).toBe(true);
         expect(await fs.readFile(saida, "utf8")).toContain("botao-com-nome");
+    });
+
+    test("parametriza crawler Playwright e valida resultados de acessibilidade", async () => {
+        const diretorioBase = await mkdtemp(path.join(os.tmpdir(), "sgc-a11y-crawler-"));
+        const chamadas = [];
+        const resultado = await executarCrawler(["--projeto", "chromium", "--lista"], {
+            base: diretorioBase,
+            especificacao: "testes/a11y.spec.ts",
+            configuracao: "testes/playwright.config.ts",
+            executarComando: async (comando, argumentos, base) => {
+                chamadas.push({comando, argumentos, base});
+            }
+        });
+
+        expect(normalizarArgumentosPlaywright(["--projeto", "chromium", "--lista"])).toEqual([
+            "--project",
+            "chromium",
+            "--list"
+        ]);
+        expect(resultado).toMatchObject({
+            diretorioBase,
+            especificacao: "testes/a11y.spec.ts",
+            configuracao: "testes/playwright.config.ts"
+        });
+        expect(chamadas).toEqual([{
+            comando: "npx",
+            argumentos: [
+                "playwright",
+                "test",
+                "testes/a11y.spec.ts",
+                "--config=testes/playwright.config.ts",
+                "--project",
+                "chromium",
+                "--list"
+            ],
+            base: diretorioBase
+        }]);
+
+        expect(() => normalizarResultados({})).toThrow("a raiz deve ser uma lista");
     });
 
     test("analisa cobertura frontend a partir de base e relatorio V8 externos", async () => {
