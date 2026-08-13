@@ -214,6 +214,9 @@ frontend e para os caminhos OpenAPI.
 - `projeto/diagnostico.ts` foi convertido para TypeScript, deixou de depender de `fs-extra` e aceita catálogos
   configuráveis de recursos e comandos registrados; o catálogo padrão continua sendo o perfil SGC e o mínimo local do
   Node foi alinhado à major 26 (`26.0.0`).
+- `qualidade/coleta-execucao.ts` foi convertido para TypeScript com contratos de contexto, adaptadores, execução de
+  subprocessos, JUnit, métricas heterogêneas e fotografia; hotspots vindos de JSON são filtrados como `unknown`, e os
+  perfis Gradle/npm/Playwright continuam declarados como orquestração específica do SGC.
 - A configuração já aceita alguns caminhos diferentes do layout do SGC; auditores de cobertura, arquitetura, coesão,
   contratos, resíduos e coleta possuem parametrização parcial por `--base`, `--arquivo`, `--saida` ou configuração.
   Arquitetura, resíduos, OpenAPI e coleta já resolvem seus defaults após a base; outros comandos ainda têm defaults
@@ -263,7 +266,7 @@ Inventário dos arquivos rastreados do toolkit, excluindo `dist`, cobertura e ar
 - 2 arquivos de teste concentrando 95 cenários;
 - maior módulo atual: `frontend/arquitetura-lib.js`, com aproximadamente 1.000 linhas;
 - outros hotspots: `codigo/nomes-simbolos-coletar.js`, `backend/testes-analisar.js`,
-  `frontend/residuos-lib.js`, `backend/contratos-auditar.js` e `qualidade/coleta-execucao.js`.
+  `frontend/residuos-lib.ts`, `backend/contratos-auditar.js` e `qualidade/coleta-execucao.ts`.
 
 O núcleo TypeScript está adiantado, mas a migração do toolkit como um todo ainda está no início: aproximadamente 14%
 dos arquivos de implementação rastreados são TypeScript.
@@ -421,7 +424,7 @@ do perfil.
    Definir opções canônicas em português e remover formas antigas diretamente, atualizando o catálogo e os testes.
 12. **Documentação derivada**: o catálogo já foi atualizado para `sgc.ts`, mas ainda precisa ser centralizado para não
     derivar ajuda, comandos e exports em fontes duplicadas. O inventário de comandos não deve divergir do roteador.
-13. **Orquestração pesada**: `qualidade/coleta-execucao.js` mistura subprocessos, Gradle, npm, Playwright, parsing de
+13. **Orquestração pesada**: `qualidade/coleta-execucao.ts` mistura subprocessos, Gradle, npm, Playwright, parsing de
     relatórios e schema da fotografia. Separar executor, adaptadores de ferramenta e agregador.
 
 ### Prioridade baixa
@@ -486,8 +489,8 @@ roteador fonte/compilado possuir testes de smoke equivalentes.
    `requisitos/cdus-mensagens-codigo-lib.ts`, `frontend/acoes-backend-lib.ts`, `frontend/residuos-lib.ts` e
    `frontend/arquitetura-lib.ts`; ainda faltam fotografia de qualidade, bibliotecas de diagnóstico e comandos maiores.
 3. **[parcial nesta rodada]** Introduzir tipos para JaCoCo, V8, regras da análise de testes backend, mensagens CDU,
-   violações de ações, resíduos, arquitetura AST, fotografias e exceções; ainda faltam achados de auditoria e
-   diagnósticos.
+   violações de ações, resíduos, arquitetura AST, execução de qualidade, fotografias e exceções; ainda faltam achados
+   de auditoria e diagnósticos de comandos restantes.
 4. Substituir `any` implícito por `unknown` na entrada JSON e validar apenas o que o consumidor realmente exige.
 5. Criar `tsconfig.toolkit-estrito.json` ou equivalente com `strict`, aplicando-o aos módulos já convertidos e aos
    próximos lotes.

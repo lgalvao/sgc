@@ -10,7 +10,7 @@ import {sincronizarVersao} from "../projeto/versao-sincronizar.ts";
 import {executarDiagnostico} from "../projeto/diagnostico.ts";
 import {carregarConfiguracao, validarConfiguracao, VERSAO_CONFIGURACAO} from "../lib/configuracao.ts";
 import {resolverCaminhosOpenapi} from "../integracao/contratos-openapi-caminhos.js";
-import {ADAPTADORES, PERFIS, principal as coletarFotografiaQualidade} from "../qualidade/coleta-execucao.js";
+import {ADAPTADORES, PERFIS, principal as coletarFotografiaQualidade} from "../qualidade/coleta-execucao.ts";
 import {resolverDiretoriosPadrao} from "../codigo/semgrep-auditar.js";
 import {executarAuditoria as executarAuditoriaCheiros} from "../codigo/cheiros-auditar.js";
 
@@ -50,7 +50,7 @@ const CAMINHOS_COMANDOS_PROJETO = [
 ].map(nome => path.join(DIRETORIO_RAIZ, "toolkit", "projeto", nome));
 const CAMINHOS_COMANDOS_QUALIDADE = [
     "coleta.js",
-    "coleta-execucao.js",
+    "coleta-execucao.ts",
     "resumo.js"
 ].map(nome => path.join(DIRETORIO_RAIZ, "toolkit", "qualidade", nome));
 const CAMINHOS_COMANDOS_CONSISTENCIA = [

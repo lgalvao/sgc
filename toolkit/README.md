@@ -189,7 +189,7 @@ repositório Git, e a sincronização de versão aceita um diretório base nas f
 atual por padrão.
 
 Na camada de qualidade, `coleta.js` e `resumo.js` têm fronteira reutilizável e não executam trabalho durante o `import`.
-Já `coleta-execucao.js` permanece específico do SGC por coordenar Gradle, npm, Playwright e os auditores locais; ele não
+Já `coleta-execucao.ts` permanece específico do SGC por coordenar Gradle, npm, Playwright e os auditores locais; ele não
 deve ser promovido a abstração horizontal antes de existir um contrato de adaptadores para outro projeto.
 
 Os comandos `codigo nomes` também resolvem `simbolos.json`, `consistencia.json` e `idioma.json` relativos ao `--base`

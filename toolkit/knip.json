@@ -37,7 +37,7 @@
     "projeto/preparar.js",
     "projeto/qualidade.js",
     "projeto/versao-sincronizar.ts",
-    "qualidade/coleta-execucao.js",
+    "qualidade/coleta-execucao.ts",
     "qualidade/coleta.js",
     "qualidade/resumo.js",
     "requisitos/cdus-auditar-estilo.js",

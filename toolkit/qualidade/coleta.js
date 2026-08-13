@@ -74,7 +74,7 @@ async function executarColetaQualidade(argumentos = []) {
     }
 
     const argumentosNormalizados = normalizarArgumentosColeta(argumentos);
-    await executarNode("toolkit/qualidade/coleta-execucao.js", argumentosNormalizados);
+    await executarNode("toolkit/qualidade/coleta-execucao.ts", argumentosNormalizados);
 }
 
 if (ehEntradaPrincipal(import.meta.url)) {
