@@ -11,6 +11,7 @@ import {carregarConfiguracao, validarConfiguracao, VERSAO_CONFIGURACAO} from "..
 import {resolverCaminhosOpenapi} from "../integracao/contratos-openapi-caminhos.js";
 import {ADAPTADORES, PERFIS, principal as coletarFotografiaQualidade} from "../qualidade/coleta-execucao.js";
 import {resolverDiretoriosPadrao} from "../codigo/semgrep-auditar.js";
+import {executarAuditoria as executarAuditoriaCheiros} from "../codigo/cheiros-auditar.js";
 
 const DIRETORIO_RAIZ = path.resolve(import.meta.dirname, "..", "..");
 const CAMINHO_SGC = path.join(DIRETORIO_RAIZ, "toolkit", "sgc.js");
@@ -901,6 +902,31 @@ describe("CLI raiz do toolkit", () => {
             "servidor/java",
             "aplicacao/src"
         ]);
+    });
+
+    test("aplica filtros de cheiros aos diretorios de codigo configurados", async () => {
+        const base = await mkdtemp(path.join(os.tmpdir(), "sgc-cheiros-base-"));
+        await fs.outputJSON(path.join(base, "configuracao-toolkit.json"), {
+            versao: VERSAO_CONFIGURACAO,
+            diretorios: {
+                backendCodigo: "servidor/java",
+                frontendCodigo: "aplicacao/src"
+            }
+        });
+        await fs.outputFile(
+            path.join(base, "servidor", "java", "ExemploResponse.java"),
+            "class ExemploResponse { @Nullable String nome; }\n"
+        );
+        await fs.outputFile(
+            path.join(base, "aplicacao", "src", "Exemplo.ts"),
+            "export function exemplo(valor: any) { return valor || []; }\n"
+        );
+
+        const resultado = await executarAuditoriaCheiros({base, semGravar: true});
+
+        expect(resultado.snapshot.contagens.backend_nullable_dto).toBe(1);
+        expect(resultado.snapshot.contagens.frontend_any_producao).toBe(1);
+        expect(resultado.snapshot.contagens.frontend_fallback_or).toBe(1);
     });
 
     test("audita residuos do frontend em um recorte controlado", async () => {

@@ -16,8 +16,8 @@ const PADROES = [
         titulo: "Backend DTOs com @Nullable",
         peso: 5,
         escopo: "backend",
-        filtroArquivo: ({caminhoRelativo}) =>
-            caminhoRelativo.startsWith("backend/src/main/java/")
+        filtroArquivo: ({caminhoRelativo, diretorioBackendCodigo}) =>
+            ehArquivoDentroDiretorio(caminhoRelativo, diretorioBackendCodigo)
             && /(Dto|Request|Response|Command)\.java$/.test(caminhoRelativo),
         regexes: [/@Nullable\b/g]
     },
@@ -26,8 +26,8 @@ const PADROES = [
         titulo: "Backend checks explicitos de null",
         peso: 2,
         escopo: "backend",
-        filtroArquivo: ({caminhoRelativo}) =>
-            caminhoRelativo.startsWith("backend/src/main/java/"),
+        filtroArquivo: ({caminhoRelativo, diretorioBackendCodigo}) =>
+            ehArquivoDentroDiretorio(caminhoRelativo, diretorioBackendCodigo),
         regexes: [/(?:===|!==|==|!=)\s*null/g, /null\s*(?:===|!==|==|!=)/g]
     },
     {
@@ -35,8 +35,8 @@ const PADROES = [
         titulo: "Backend Objects.isNull/nonNull",
         peso: 2,
         escopo: "backend",
-        filtroArquivo: ({caminhoRelativo}) =>
-            caminhoRelativo.startsWith("backend/src/main/java/"),
+        filtroArquivo: ({caminhoRelativo, diretorioBackendCodigo}) =>
+            ehArquivoDentroDiretorio(caminhoRelativo, diretorioBackendCodigo),
         regexes: [/\bObjects\.(?:isNull|nonNull)\s*\(/g, /\bObjects::(?:isNull|nonNull)\b/g]
     },
     {
@@ -44,8 +44,8 @@ const PADROES = [
         titulo: "Frontend producao com any explicito",
         peso: 4,
         escopo: "frontend",
-        filtroArquivo: ({caminhoRelativo}) =>
-            caminhoRelativo.startsWith("frontend/src/")
+        filtroArquivo: ({caminhoRelativo, diretorioFrontendCodigo}) =>
+            ehArquivoDentroDiretorio(caminhoRelativo, diretorioFrontendCodigo)
             && !ehArquivoTesteOuStory(caminhoRelativo),
         regexes: [/\bas any\b/g, /:\s*any\b/g, /\bArray<any>\b/g, /\bPromise<any>\b/g, /\bref<any>\b/g, /\bRecord<[^>]+,\s*any>\b/g, /\[key:\s*string\]:\s*any\b/g]
     },
@@ -54,8 +54,8 @@ const PADROES = [
         titulo: "Frontend testes com any explicito",
         peso: 1,
         escopo: "frontend_testes",
-        filtroArquivo: ({caminhoRelativo}) =>
-            caminhoRelativo.startsWith("frontend/src/")
+        filtroArquivo: ({caminhoRelativo, diretorioFrontendCodigo}) =>
+            ehArquivoDentroDiretorio(caminhoRelativo, diretorioFrontendCodigo)
             && ehArquivoTesteOuStory(caminhoRelativo),
         regexes: [/\bas any\b/g, /:\s*any\b/g, /\bArray<any>\b/g, /\bPromise<any>\b/g, /\bref<any>\b/g]
     },
@@ -64,8 +64,8 @@ const PADROES = [
         titulo: "Frontend catch tipado como any",
         peso: 3,
         escopo: "frontend",
-        filtroArquivo: ({caminhoRelativo}) =>
-            caminhoRelativo.startsWith("frontend/src/"),
+        filtroArquivo: ({caminhoRelativo, diretorioFrontendCodigo}) =>
+            ehArquivoDentroDiretorio(caminhoRelativo, diretorioFrontendCodigo),
         regexes: [/catch\s*\(\s*[^):]+:\s*any\s*\)/g]
     },
     {
@@ -73,8 +73,8 @@ const PADROES = [
         titulo: "Frontend checks explicitos de null",
         peso: 2,
         escopo: "frontend",
-        filtroArquivo: ({caminhoRelativo}) =>
-            caminhoRelativo.startsWith("frontend/src/")
+        filtroArquivo: ({caminhoRelativo, diretorioFrontendCodigo}) =>
+            ehArquivoDentroDiretorio(caminhoRelativo, diretorioFrontendCodigo)
             && !ehArquivoTesteOuStory(caminhoRelativo),
         regexes: [/(?:===|!==|==|!=)\s*null/g, /null\s*(?:===|!==|==|!=)/g]
     },
@@ -83,8 +83,8 @@ const PADROES = [
         titulo: "Frontend fallbacks defensivos com ||",
         peso: 1,
         escopo: "frontend",
-        filtroArquivo: ({caminhoRelativo}) =>
-            caminhoRelativo.startsWith("frontend/src/")
+        filtroArquivo: ({caminhoRelativo, diretorioFrontendCodigo}) =>
+            ehArquivoDentroDiretorio(caminhoRelativo, diretorioFrontendCodigo)
             && !ehArquivoTesteOuStory(caminhoRelativo),
         regexes: [/\|\|\s*(?:\[]|\{}|["'`]{2}|false|true|0)(?![\w$])/g]
     }
@@ -94,6 +94,12 @@ function ehArquivoTesteOuStory(caminhoRelativo) {
     return caminhoRelativo.includes("/__tests__/")
         || caminhoRelativo.endsWith(".spec.ts")
         || caminhoRelativo.endsWith(".stories.ts") || caminhoRelativo.includes("/test-utils/");
+}
+
+function ehArquivoDentroDiretorio(caminhoRelativo, diretorio) {
+    const diretorioNormalizado = diretorio.replace(/\/$/, "");
+    return caminhoRelativo === diretorioNormalizado
+        || caminhoRelativo.startsWith(`${diretorioNormalizado}/`);
 }
 
 function criarEstruturaContagens() {
@@ -236,6 +242,14 @@ async function executarAuditoria({base = DIRETORIO_RAIZ, semGravar = false, dire
     const caminhoFotografia = path.join(saidaResolvida, "fotografia.json");
     const caminhoResumo = path.join(saidaResolvida, "resumo.md");
     const arquivos = await listarArquivosTexto(baseResolvida);
+    const diretorioBackendCodigo = normalizarSeparadores(path.relative(
+        baseResolvida,
+        resolverCaminhoConfigurado("backendCodigo", baseResolvida)
+    ));
+    const diretorioFrontendCodigo = normalizarSeparadores(path.relative(
+        baseResolvida,
+        resolverCaminhoConfigurado("frontendCodigo", baseResolvida)
+    ));
     const contagens = criarEstruturaContagens();
     const pontuacaoPorEscopo = {
         backend: 0,
@@ -254,7 +268,12 @@ async function executarAuditoria({base = DIRETORIO_RAIZ, semGravar = false, dire
         };
 
         for (const padrao of PADROES) {
-            if (!padrao.filtroArquivo({caminhoRelativo, conteudo})) {
+            if (!padrao.filtroArquivo({
+                caminhoRelativo,
+                conteudo,
+                diretorioBackendCodigo,
+                diretorioFrontendCodigo,
+            })) {
                 continue;
             }
 
