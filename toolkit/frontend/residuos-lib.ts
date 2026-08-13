@@ -28,29 +28,143 @@ const PESOS_SCORE = {
     exportacoesSuspeitas: 4,
 };
 
-function resolverCaminhoOrcamentoResiduos(base = DIRETORIO_RAIZ) {
+type Camada = "service" | "store" | "composable" | "view" | "component" | "router" | "utils" | "outro";
+type CategoriaArquivo = "producao" | "teste";
+type FaixaScore = "bom" | "atencao" | "critico";
+
+interface LimitesCamada {
+    meta: number;
+    limite: number;
+}
+
+interface ContagensSinais {
+    anyExplicito: number;
+    checksNull: number;
+    fallbacksDefensivos: number;
+    catchBlocks: number;
+    castsDuplos: number;
+    storageDireto: number;
+    exportacoesSuspeitas: number;
+}
+
+interface ContagensTotais extends ContagensSinais {
+    arquivosAcimaMeta: Record<string, number>;
+    arquivosAcimaLimite: Record<string, number>;
+}
+
+interface MetricasOrcamento {
+    maximosProducao?: Record<string, number | Record<string, number>>;
+}
+
+interface OrcamentoResiduos {
+    versaoSchema: string;
+    camadas: Record<string, LimitesCamada>;
+    metricas: MetricasOrcamento;
+}
+
+interface ViolacaoResiduo {
+    tipo: "acima_meta" | "acima_limite";
+    mensagem: string;
+}
+
+interface ArquivoResiduo {
+    arquivo: string;
+    camada: Camada;
+    categoriaArquivo: CategoriaArquivo;
+    linhas: number;
+    imports: number;
+    exportacoes: number;
+    exportacoesTempoExecucao: string[];
+    contagens: ContagensSinais;
+    limites: LimitesCamada;
+    score: number;
+    violacoes: ViolacaoResiduo[];
+}
+
+interface ExportacaoIndexada {
+    arquivo: string;
+    nome: string;
+    consumidoresProducao: number;
+    consumidoresTeste: number;
+}
+
+interface ExportacaoSuspeita {
+    arquivo: string;
+    nomeExportacao: string;
+    consumidoresTeste: number;
+}
+
+interface HotspotResiduo {
+    arquivo: string;
+    camada: Camada;
+    linhas: number;
+    score: number;
+    contagens: ContagensSinais;
+    violacoes: ViolacaoResiduo[];
+}
+
+interface ResumoResiduos {
+    arquivosFrontend: number;
+    arquivosProducao: number;
+    arquivosTeste: number;
+    scoreTotal: number;
+    faixa: FaixaScore;
+}
+
+interface FotografiaResiduos {
+    versaoSchema: string;
+    geradoEm: string;
+    base: string;
+    orcamento: OrcamentoResiduos;
+    resumo: ResumoResiduos;
+    contagens: {
+        producao: ContagensTotais;
+        testes: ContagensTotais;
+    };
+    exportacoesSuspeitas: ExportacaoSuspeita[];
+    hotspots: HotspotResiduo[];
+    arquivos: ArquivoResiduo[];
+}
+
+interface ExcecaoResiduo {
+    arquivo: string;
+    maxLinhas: number;
+    [chave: string]: unknown;
+}
+
+interface ResultadoExcecoesResiduos {
+    versaoSchema: string;
+    excecoes: ExcecaoResiduo[];
+}
+
+interface OpcoesAnaliseResiduos {
+    base?: string;
+    caminhoOrcamento?: string;
+}
+
+function resolverCaminhoOrcamentoResiduos(base: string = DIRETORIO_RAIZ): string {
     return resolverCaminhoConfigurado("orcamentoResiduosFrontend", base);
 }
 
-function resolverCaminhoExcecoesResiduos(base = DIRETORIO_RAIZ) {
+function resolverCaminhoExcecoesResiduos(base: string = DIRETORIO_RAIZ): string {
     return resolverCaminhoConfigurado("excecoesResiduosFrontend", base);
 }
 
-function resolverDiretorioSaidaResiduos(base = DIRETORIO_RAIZ) {
+function resolverDiretorioSaidaResiduos(base: string = DIRETORIO_RAIZ): string {
     return path.join(resolverCaminhoConfigurado("artefatosQualidade", base), "frontend-residuos", "mais-recente");
 }
 
-function normalizarCaminho(caminhoArquivo) {
+function normalizarCaminho(caminhoArquivo: string): string {
     return caminhoArquivo.split(path.sep).join("/");
 }
 
-function resolverPrefixoCodigo(base) {
+function resolverPrefixoCodigo(base: string): string {
     const diretorioCodigo = resolverCaminhoConfigurado("frontendCodigo", base);
     const relativo = normalizarCaminho(path.relative(base, diretorioCodigo));
     return relativo ? `${relativo}/` : "";
 }
 
-function ehArquivoTesteOuHistoria(caminhoRelativo) {
+function ehArquivoTesteOuHistoria(caminhoRelativo: string): boolean {
     return caminhoRelativo.includes("/__tests__/")
         || caminhoRelativo.includes("/__mocks__/")
         || caminhoRelativo.includes("/test/")
@@ -60,16 +174,16 @@ function ehArquivoTesteOuHistoria(caminhoRelativo) {
         || caminhoRelativo.endsWith(".stories.ts");
 }
 
-function ehArquivoFrontend(caminhoRelativo, prefixoCodigo) {
+function ehArquivoFrontend(caminhoRelativo: string, prefixoCodigo: string): boolean {
     return prefixoCodigo === "" || caminhoRelativo.startsWith(prefixoCodigo);
 }
 
-function ehArquivoProducaoFrontend(caminhoRelativo, prefixoCodigo) {
+function ehArquivoProducaoFrontend(caminhoRelativo: string, prefixoCodigo: string): boolean {
     return ehArquivoFrontend(caminhoRelativo, prefixoCodigo) && !ehArquivoTesteOuHistoria(caminhoRelativo);
 }
 
-function classificarCamada(caminhoRelativo, prefixoCodigo) {
-    const definicoesCamada = [
+function classificarCamada(caminhoRelativo: string, prefixoCodigo: string): Camada {
+    const definicoesCamada: Array<{camada: Camada; prefixo: string}> = [
         {camada: "service", prefixo: `${prefixoCodigo}services/`},
         {camada: "store", prefixo: `${prefixoCodigo}stores/`},
         {camada: "composable", prefixo: `${prefixoCodigo}composables/`},
@@ -82,11 +196,11 @@ function classificarCamada(caminhoRelativo, prefixoCodigo) {
     return definicao?.camada ?? "outro";
 }
 
-function contarOcorrencias(conteudo, regexes) {
+function contarOcorrencias(conteudo: string, regexes: RegExp[]): number {
     return regexes.reduce((total, regex) => total + (conteudo.match(regex)?.length ?? 0), 0);
 }
 
-function criarContagensZeradas() {
+function criarContagensZeradas(): ContagensTotais {
     return {
         anyExplicito: 0,
         checksNull: 0,
@@ -100,11 +214,11 @@ function criarContagensZeradas() {
     };
 }
 
-async function listarArquivosFrontend(base) {
+async function listarArquivosFrontend(base: string): Promise<string[]> {
     const diretorioFrontend = resolverCaminhoConfigurado("frontendCodigo", base);
-    const arquivos = [];
+    const arquivos: string[] = [];
 
-    async function percorrer(diretorioAtual) {
+    async function percorrer(diretorioAtual: string): Promise<void> {
         const entradas = await fs.readdir(diretorioAtual, {withFileTypes: true}).catch(() => []);
         for (const entrada of entradas) {
             const caminhoCompleto = path.join(diretorioAtual, entrada.name);
@@ -131,8 +245,8 @@ async function listarArquivosFrontend(base) {
     return arquivos;
 }
 
-function extrairExportacoesTempoExecucao(conteudo) {
-    const encontrados = new Set();
+function extrairExportacoesTempoExecucao(conteudo: string): string[] {
+    const encontrados = new Set<string>();
     const regexes = [
         /export\s+async\s+function\s+([A-Za-z_][A-Za-z0-9_]*)/g,
         /export\s+function\s+([A-Za-z_][A-Za-z0-9_]*)/g,
@@ -161,11 +275,11 @@ function extrairExportacoesTempoExecucao(conteudo) {
     return [...encontrados];
 }
 
-function somarCamada(mapa, camada) {
+function somarCamada(mapa: Record<string, number>, camada: string): void {
     mapa[camada] = (mapa[camada] ?? 0) + 1;
 }
 
-function calcularFaixa(score) {
+function calcularFaixa(score: number): FaixaScore {
     if (score <= 80) {
         return "bom";
     }
@@ -175,7 +289,7 @@ function calcularFaixa(score) {
     return "critico";
 }
 
-function calcularScoreArquivo(arquivo, limitesCamada) {
+function calcularScoreArquivo(arquivo: ArquivoResiduo, limitesCamada: LimitesCamada): number {
     const linhasAcimaMeta = Math.max(arquivo.linhas - limitesCamada.meta, 0);
     const linhasAcimaLimite = Math.max(arquivo.linhas - limitesCamada.limite, 0);
 
@@ -190,15 +304,16 @@ function calcularScoreArquivo(arquivo, limitesCamada) {
         + (arquivo.contagens.exportacoesSuspeitas * PESOS_SCORE.exportacoesSuspeitas);
 }
 
-async function lerJsonOpcional(caminhoArquivo, fallback) {
+async function lerJsonOpcional<T>(caminhoArquivo: string, fallback: T): Promise<T> {
     try {
-        return JSON.parse(await fs.readFile(caminhoArquivo, "utf8"));
+        const valor: unknown = JSON.parse(await fs.readFile(caminhoArquivo, "utf8"));
+        return valor as T;
     } catch {
         return fallback;
     }
 }
 
-async function carregarOrcamento(caminhoOrcamento) {
+async function carregarOrcamento(caminhoOrcamento: string): Promise<OrcamentoResiduos> {
     return lerJsonOpcional(caminhoOrcamento, {
         versaoSchema: VERSAO_SCHEMA,
         camadas: {},
@@ -208,19 +323,43 @@ async function carregarOrcamento(caminhoOrcamento) {
     });
 }
 
-async function carregarExcecoes(caminhoExcecoes) {
-    const conteudo = await lerJsonOpcional(caminhoExcecoes, {versaoSchema: VERSAO_SCHEMA, excecoes: []});
-    return Array.isArray(conteudo.excecoes) ? conteudo : {versaoSchema: VERSAO_SCHEMA, excecoes: []};
+function ehExcecaoResiduo(valor: unknown): valor is ExcecaoResiduo {
+    if (!valor || typeof valor !== "object") {
+        return false;
+    }
+
+    const registro = valor as Record<string, unknown>;
+    return typeof registro.arquivo === "string" && typeof registro.maxLinhas === "number";
 }
 
-async function analisarResiduosFrontend({base = DIRETORIO_RAIZ, caminhoOrcamento} = {}) {
+async function carregarExcecoes(caminhoExcecoes: string): Promise<ResultadoExcecoesResiduos> {
+    const conteudo: unknown = await lerJsonOpcional(caminhoExcecoes, {
+        versaoSchema: VERSAO_SCHEMA,
+        excecoes: [],
+    });
+    if (!conteudo || typeof conteudo !== "object") {
+        return {versaoSchema: VERSAO_SCHEMA, excecoes: []};
+    }
+
+    const registro = conteudo as {versaoSchema?: unknown; excecoes?: unknown};
+    if (!Array.isArray(registro.excecoes)) {
+        return {versaoSchema: VERSAO_SCHEMA, excecoes: []};
+    }
+
+    return {
+        versaoSchema: typeof registro.versaoSchema === "string" ? registro.versaoSchema : VERSAO_SCHEMA,
+        excecoes: registro.excecoes.filter(ehExcecaoResiduo),
+    };
+}
+
+async function analisarResiduosFrontend({base = DIRETORIO_RAIZ, caminhoOrcamento}: OpcoesAnaliseResiduos = {}): Promise<FotografiaResiduos> {
     const baseResolvida = path.resolve(base ?? DIRETORIO_RAIZ);
     const prefixoCodigo = resolverPrefixoCodigo(baseResolvida);
     const orcamento = await carregarOrcamento(caminhoOrcamento ?? resolverCaminhoOrcamentoResiduos(baseResolvida));
     const arquivos = await listarArquivosFrontend(baseResolvida);
-    const arquivosAnalisados = [];
-    const mapaExportacoes = new Map();
-    const conteudos = new Map();
+    const arquivosAnalisados: ArquivoResiduo[] = [];
+    const mapaExportacoes = new Map<string, ExportacaoIndexada>();
+    const conteudos = new Map<string, string>();
 
     for (const arquivo of arquivos) {
         const conteudo = await fs.readFile(arquivo, "utf8");
@@ -233,7 +372,7 @@ async function analisarResiduosFrontend({base = DIRETORIO_RAIZ, caminhoOrcamento
             meta: Number.POSITIVE_INFINITY,
             limite: Number.POSITIVE_INFINITY
         };
-        const contagens = {
+        const contagens: ContagensSinais = {
             anyExplicito: contarOcorrencias(conteudo, PADROES.anyExplicito),
             checksNull: contarOcorrencias(conteudo, PADROES.checksNull),
             fallbacksDefensivos: contarOcorrencias(conteudo, PADROES.fallbacksDefensivos),
@@ -247,7 +386,7 @@ async function analisarResiduosFrontend({base = DIRETORIO_RAIZ, caminhoOrcamento
             exportacoesSuspeitas: 0,
         };
 
-        const registro = {
+        const registro: ArquivoResiduo = {
             arquivo: caminhoRelativo,
             camada,
             categoriaArquivo: ehProducao ? "producao" : "teste",
@@ -293,7 +432,7 @@ async function analisarResiduosFrontend({base = DIRETORIO_RAIZ, caminhoOrcamento
 
     const contagensProducao = criarContagensZeradas();
     const contagensTeste = criarContagensZeradas();
-    const exportacoesSuspeitas = [];
+    const exportacoesSuspeitas: ExportacaoSuspeita[] = [];
 
     for (const arquivo of arquivosAnalisados) {
         if (arquivo.categoriaArquivo === "producao") {
@@ -345,7 +484,7 @@ async function analisarResiduosFrontend({base = DIRETORIO_RAIZ, caminhoOrcamento
     }
 
     const arquivosProducao = arquivosAnalisados.filter((item) => item.categoriaArquivo === "producao");
-    const hotspots = [...arquivosProducao]
+    const hotspots: HotspotResiduo[] = [...arquivosProducao]
         .filter((item) => item.score > 0)
         .toSorted((a, b) => b.score - a.score)
         .slice(0, 20)
@@ -387,8 +526,8 @@ async function analisarResiduosFrontend({base = DIRETORIO_RAIZ, caminhoOrcamento
     };
 }
 
-function gerarMarkdownAuditoria(fotografia) {
-    const linhas = [];
+function gerarMarkdownAuditoria(fotografia: FotografiaResiduos): string {
+    const linhas: string[] = [];
     linhas.push("# Auditoria de residuos do frontend");
     linhas.push("");
     linhas.push(`Gerado em: ${fotografia.geradoEm}`);
@@ -432,7 +571,10 @@ function gerarMarkdownAuditoria(fotografia) {
     return `${linhas.join("\n")}\n`;
 }
 
-async function gravarFotografiaAuditoria(fotografia, diretorioSaida = resolverDiretorioSaidaResiduos(fotografia.base)) {
+async function gravarFotografiaAuditoria(
+    fotografia: FotografiaResiduos,
+    diretorioSaida: string = resolverDiretorioSaidaResiduos(fotografia.base)
+): Promise<void> {
     await fs.mkdir(diretorioSaida, {recursive: true});
     await fs.writeFile(path.join(diretorioSaida, "fotografia.json"), JSON.stringify(fotografia, null, 2));
     await fs.writeFile(path.join(diretorioSaida, "resumo.md"), gerarMarkdownAuditoria(fotografia));
