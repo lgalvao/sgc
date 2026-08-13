@@ -342,8 +342,8 @@ const CATALOGO_COMANDOS = [
 const CATALOGO_COMANDOS_ESPECIAIS = [
     {
         caminho: ["qualidade", "coletar"],
-        descricao: "Coleta uma fotografia de qualidade do projeto.",
-        escopo: "adaptavel",
+        descricao: "Coleta uma fotografia de qualidade do SGC.",
+        escopo: "perfil-sgc",
         finalidade: "orquestrar",
         efeitos: criarEfeitosComando("intrinseca", {subprocessos: true}),
         argumentos: esquema(["--perfil", "--base"]),

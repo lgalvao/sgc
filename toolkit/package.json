@@ -1,13 +1,13 @@
 {
-  "name": "sgc-scripts",
+  "name": "ferramentas-projeto",
   "version": "0.1.0",
   "type": "module",
-  "description": "Toolkit unificado de scripts do SGC",
+  "description": "Toolkit TypeScript de auditoria e qualidade de projetos",
   "engines": {
     "node": ">=26.7.0"
   },
   "bin": {
-    "sgc": "./binarios/sgc.cjs"
+    "ferramentas": "./binarios/ferramentas.cjs"
   },
   "files": [
     "binarios",
@@ -32,7 +32,7 @@
     "./cobertura-web": "./biblioteca/dominios/cobertura-web.ts"
   },
   "scripts": {
-    "sgc": "tsx ./sgc.ts",
+    "ferramentas": "tsx ./sgc.ts",
     "deps:audit": "knip",
     "build": "tsc --project tsconfig.build.json",
     "test": "vitest run --exclude testes/pacote.test.ts",

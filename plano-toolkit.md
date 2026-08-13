@@ -33,7 +33,8 @@ quando houver contrato claro e uso horizontal plausível ou comprovado.
 ### Código e linguagem
 
 - Implementação, testes, símbolos, mensagens, comentários e documentação devem usar TypeScript e português brasileiro.
-- O entrypoint fonte é `toolkit/sgc.ts`, executado diretamente com `tsx`.
+- O entrypoint fonte é `toolkit/sgc.ts`, executado diretamente com `tsx`; a identidade publicada é o pacote
+  `ferramentas-projeto` e o binário `ferramentas`.
 - `dist/` é produto de verificação do build, não o caminho normal de execução.
 - Não manter implementação JavaScript paralela, wrappers de transição ou aliases legados sem finalidade atual, uso por
   humanos/agentes ou contrato público deliberado.
@@ -82,7 +83,8 @@ quando houver contrato claro e uso horizontal plausível ou comprovado.
 - APIs programáticas públicas devem ser deliberadas e cobertas por instalação isolada; essa validação comprova o contrato,
   não exige consumidor prévio no código; módulos internos permanecem privados.
 - A identidade pública do pacote e do binário deve ser neutra antes de o toolkit ser oferecido para reutilização em outro
-  projeto; o perfil SGC pode continuar sendo o default sem obrigar outros projetos a adotar os nomes `sgc-scripts` e `sgc`.
+  projeto; o pacote publicado agora se chama `ferramentas-projeto` e o binário `ferramentas`. O entrypoint fonte `sgc.ts`
+  permanece como integração interna do workspace SGC até uma rodada específica de renomeação de consumidores.
 
 ### Contratos de resultados
 
@@ -98,7 +100,8 @@ quando houver contrato claro e uso horizontal plausível ou comprovado.
 
 ### Fronteiras já esclarecidas
 
-- `qualidade coletar` produz uma fotografia consolidada; `qualidade tarefas executar` apenas orquestra tarefas configuradas.
+- `qualidade coletar` produz uma fotografia consolidada com perfis e adaptadores SGC; `qualidade tarefas executar` apenas
+  orquestra tarefas configuradas e é a entrada adaptável para outros projetos.
 - A auditoria de dependências combina Knip, versões desatualizadas, vulnerabilidades npm e atualizações Gradle. O Knip
   está na série 6 (`^6.32.2`); o comando Gradle já usa a série 0.61 do plugin, `--no-parallel` e `-Drevision=release`.
   O plugin relata dependências declaradas pelo projeto, plugins e plataformas do build; filtrar configurações específicas

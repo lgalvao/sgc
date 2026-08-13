@@ -79,7 +79,7 @@ describe("Execução e distribuição da CLI", () => {
             "exec",
             "--workspace",
             "toolkit",
-            "sgc",
+            "ferramentas",
             "--",
             "--help",
         ], {
@@ -88,7 +88,7 @@ describe("Execução e distribuição da CLI", () => {
         });
 
         expect(resultado.exitCode).toBe(0);
-        expect(resultado.stdout).toContain("Toolkit do SGC");
+        expect(resultado.stdout).toContain("Toolkit de ferramentas de projeto");
     });
 
     test("CLI compilada despacha scripts TypeScript pelo tsx", async () => {

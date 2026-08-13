@@ -34,7 +34,7 @@ describe("Superfície da CLI", () => {
     test("exibe a ajuda principal", async () => {
         const resultado = await executarSgc(["--help"]);
         expect(resultado.exitCode).toBe(0);
-        expect(resultado.stdout).toContain("Toolkit do SGC");
+        expect(resultado.stdout).toContain("Toolkit de ferramentas de projeto");
         expect(resultado.stdout).toContain("projeto ambiente");
     });
 

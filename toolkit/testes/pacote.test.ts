@@ -5,7 +5,7 @@ import {execa} from "execa";
 import {expect, test} from "vitest";
 
 const DIRETORIO_REPOSITORIO = path.resolve(import.meta.dirname, "..", "..");
-const NOME_EXECUTAVEL = process.platform === "win32" ? "sgc.cmd" : "sgc";
+const NOME_EXECUTAVEL = process.platform === "win32" ? "ferramentas.cmd" : "ferramentas";
 
 async function escreverArquivo(caminho: string, conteudo: string): Promise<void> {
     await mkdir(path.dirname(caminho), {recursive: true});
@@ -39,7 +39,7 @@ test("pacote fonte executa em um projeto consumidor isolado", async () => {
         cwd: DIRETORIO_REPOSITORIO
     });
     const nomePacote = empacotamento.stdout.trim().split(/\r?\n/).at(-1) ?? "";
-    expect(nomePacote).toMatch(/^sgc-scripts-\d+\.\d+\.\d+\.tgz$/);
+    expect(nomePacote).toMatch(/^ferramentas-projeto-\d+\.\d+\.\d+\.tgz$/);
     const caminhoPacote = path.join(diretorioPacote, nomePacote);
 
     await execa("npm", ["init", "-y"], {
@@ -70,7 +70,7 @@ test("pacote fonte executa em um projeto consumidor isolado", async () => {
         cwd: diretorioConsumidor
     });
 
-    expect(await existe(path.join(diretorioConsumidor, "node_modules", "sgc-scripts", "sgc.ts"))).toBe(true);
+    expect(await existe(path.join(diretorioConsumidor, "node_modules", "ferramentas-projeto", "sgc.ts"))).toBe(true);
     expect(JSON.parse(String(resultado.stdout))).toMatchObject({
         base: await realpath(diretorioConsumidor),
         pontuacao: {faixa: "bom"}
@@ -82,7 +82,7 @@ test("pacote fonte executa em um projeto consumidor isolado", async () => {
     await escreverArquivo(caminhoSemgrep, [
         "#!/bin/sh",
         "case \"$*\" in",
-        "  *sgc-scripts/qualidade/politicas/semgrep/sgc-qualidade.yml*) printf '{\"results\":[]}';;",
+        "  *ferramentas-projeto/qualidade/politicas/semgrep/sgc-qualidade.yml*) printf '{\"results\":[]}';;",
         "  *) exit 2;;",
         "esac",
         ""
@@ -141,7 +141,7 @@ test("pacote fonte expõe cobertura parametrizável para consumidor TypeScript",
         cwd: DIRETORIO_REPOSITORIO
     });
     const nomePacote = empacotamento.stdout.trim().split(/\r?\n/).at(-1) ?? "";
-    expect(nomePacote).toMatch(/^sgc-scripts-\d+\.\d+\.\d+\.tgz$/);
+    expect(nomePacote).toMatch(/^ferramentas-projeto-\d+\.\d+\.\d+\.tgz$/);
     const caminhoPacote = path.join(diretorioPacote, nomePacote);
 
     await execa("npm", [
@@ -192,8 +192,8 @@ test("pacote fonte expõe cobertura parametrizável para consumidor TypeScript",
     await escreverArquivo(
         caminhoConsumidor,
         [
-            'import {extrairCoberturaJacoco} from "sgc-scripts/cobertura-java";',
-            'import {extrairCoberturaCliente} from "sgc-scripts/cobertura-web";',
+            'import {extrairCoberturaJacoco} from "ferramentas-projeto/cobertura-java";',
+            'import {extrairCoberturaCliente} from "ferramentas-projeto/cobertura-web";',
             "",
             "const diretorioBase = process.argv[2];",
             "const jacoco = await extrairCoberturaJacoco(\"relatorios/jacoco.xml\", {diretorioBase});",

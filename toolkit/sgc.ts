@@ -67,8 +67,8 @@ function registrarComandosCatalogados(programa: Command): void {
 
 const program = new Command();
 program
-    .name("sgc")
-    .description("Toolkit do SGC para servidor, cliente, qualidade e automacoes de projeto.")
+    .name("ferramentas")
+    .description("Toolkit de ferramentas de projeto para servidor, cliente, qualidade e automacoes.")
     .showHelpAfterError()
     .showSuggestionAfterError();
 

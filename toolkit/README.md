@@ -1,4 +1,4 @@
-# Toolkit de scripts do SGC
+# Toolkit de ferramentas de projeto
 
 CLI TypeScript para auditoria, qualidade e manutenção de projetos Java/Spring Boot/Vue. O SGC é o perfil padrão, mas as
 capacidades horizontais podem ser usadas em outros projetos por configuração e composição.
@@ -150,8 +150,8 @@ npx tsx toolkit/sgc.ts projeto artefatos limpar
 npx tsx toolkit/sgc.ts projeto versao-sincronizar 1.2.3
 ```
 
-`qualidade coletar` executa adaptadores e produz uma fotografia consolidada. `qualidade tarefas executar` apenas executa
-o perfil configurado em `execucoes.qualidade`.
+`qualidade coletar` executa os adaptadores e perfis do SGC e produz uma fotografia consolidada. `qualidade tarefas executar`
+é a orquestração adaptável: apenas executa o perfil configurado em `execucoes.qualidade`.
 
 `projeto dependencias auditar` reúne uso e declarações pelo Knip, versões npm desatualizadas, vulnerabilidades npm e
 atualizações Gradle. Achados são diferenciados de falhas de execução. A verificação Gradle usa `dependencyUpdates`,
@@ -320,15 +320,15 @@ dependências acidentais do workspace.
 
 ```bash
 npm --prefix toolkit pack
-npm install --save-dev ./sgc-scripts-0.1.0.tgz
-npx sgc --help
+npm install --save-dev ./ferramentas-projeto-0.1.0.tgz
+npx ferramentas --help
 ```
 
 As APIs programáticas públicas atuais são deliberadamente pequenas:
 
 ```ts
-import {extrairCoberturaJacoco} from "sgc-scripts/cobertura-java";
-import {extrairCoberturaCliente} from "sgc-scripts/cobertura-web";
+import {extrairCoberturaJacoco} from "ferramentas-projeto/cobertura-java";
+import {extrairCoberturaCliente} from "ferramentas-projeto/cobertura-web";
 
 const coberturaServidor = await extrairCoberturaJacoco("relatorios/jacoco.xml", {diretorioBase});
 const coberturaCliente = await extrairCoberturaCliente("cliente/coverage/coverage-final.json", {diretorioBase});
