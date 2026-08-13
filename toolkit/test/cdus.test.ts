@@ -1,7 +1,6 @@
 import os from "node:os";
 import path from "node:path";
-import {mkdtemp} from "node:fs/promises";
-import fs from "fs-extra";
+import {mkdir, mkdtemp, writeFile} from "node:fs/promises";
 import {describe, expect, test} from "vitest";
 import {execa} from "execa";
 import {pathToFileURL} from "node:url";
@@ -22,16 +21,94 @@ const CAMINHOS_COMANDOS_CDU = [
     "cdus-inventariar-duplicacoes.ts"
 ].map(nome => path.join(DIRETORIO_RAIZ, "toolkit", "requisitos", nome));
 
-async function executarSgc(args, opcoes = {}) {
-    return execa(CAMINHO_TSX, [CAMINHO_SGC, ...args], {
-        cwd: DIRETORIO_RAIZ,
-        reject: false,
-        ...opcoes
-    });
+async function escreverArquivo(caminho: string, conteudo: string): Promise<void> {
+    await mkdir(path.dirname(caminho), {recursive: true});
+    await writeFile(caminho, conteudo, "utf8");
 }
 
-async function criarIntroSituacoes(dirSpecs) {
-    await fs.outputFile(
+interface ResultadoExecucao {
+    exitCode?: number;
+    stdout: string;
+    stderr: string;
+}
+
+interface ItemAuditoriaCdu {
+    arquivo: string;
+    achados: Array<{regra: string}>;
+}
+
+interface ResultadoAuditoriaCdu {
+    resumo: {
+        totalArquivos: number;
+        arquivosComErro?: number;
+        arquivosComAviso?: number;
+    };
+    relatorio: ItemAuditoriaCdu[];
+}
+
+interface ResultadoInventarioFormatos {
+    totalArquivos: number;
+    formatosAtor: Record<string, number>;
+    formatosPreCondicoes: Record<string, number>;
+    formatosFluxoPrincipal: Record<string, number>;
+    situacoesMaisFrequentes: Record<string, number>;
+    elementosUiMaisFrequentes: Record<string, number>;
+}
+
+interface ResultadoInventarioMensagens {
+    descricoes: Record<string, number>;
+    assuntos: Record<string, number>;
+    mensagens: Record<string, number>;
+    toasts: Record<string, number>;
+}
+
+interface ResultadoInventarioVocabulario {
+    perfis: Record<string, number>;
+    situacoes: Record<string, number>;
+    tiposProcesso: Record<string, number>;
+    elementosUi: Record<string, number>;
+}
+
+interface ItemMensagemCodigo {
+    tipo: string;
+    valor: string;
+    referenciasExatas: Array<{texto: string}>;
+    sugestoes: Array<{texto: string}>;
+}
+
+interface ResultadoMensagensCodigo {
+    resumo: {itensComReferenciaExata: number};
+    relatorio: ItemMensagemCodigo[];
+}
+
+interface ResultadoDensidade {
+    totalArquivos: number;
+    resumo: {mediaPalavras: number};
+    documentos: Array<{passos: number}>;
+}
+
+interface ResultadoDuplicacoes {
+    duplicacoes: unknown[];
+}
+
+function lerJson<T>(resultado: ResultadoExecucao): T {
+    return JSON.parse(resultado.stdout) as T;
+}
+
+async function executarSgc(args: string[]): Promise<ResultadoExecucao> {
+    const resultado = await execa(CAMINHO_TSX, [CAMINHO_SGC, ...args], {
+        cwd: DIRETORIO_RAIZ,
+        reject: false,
+    });
+    return {
+        exitCode: resultado.exitCode,
+        stdout: String(resultado.stdout),
+        stderr: String(resultado.stderr),
+    };
+}
+
+async function criarIntroSituacoes(dirSpecs: string): Promise<void> {
+    await escreverArquivo(
         path.join(dirSpecs, "intro_3_situacoes.md"),
         [
             "## Situações",
@@ -70,7 +147,7 @@ describe("Ferramentas de requisitos dos CDUs", () => {
         const base = await mkdtemp(path.join(os.tmpdir(), "sgc-cdus-inventario-"));
         const dirSpecs = path.join(base, "specs");
 
-        await fs.outputFile(
+        await escreverArquivo(
             path.join(dirSpecs, "cdu-01.md"),
             [
                 "# CDU-01 - Exemplo",
@@ -101,7 +178,7 @@ describe("Ferramentas de requisitos dos CDUs", () => {
         ]);
 
         expect(resultado.exitCode).toBe(0);
-        const conteudo = JSON.parse(resultado.stdout);
+        const conteudo = lerJson<ResultadoInventarioFormatos>(resultado);
         expect(conteudo.totalArquivos).toBe(1);
         expect(conteudo.formatosAtor["## Atores"]).toBe(1);
         expect(conteudo.formatosPreCondicoes["## Pré-condições"]).toBe(1);
@@ -114,7 +191,7 @@ describe("Ferramentas de requisitos dos CDUs", () => {
         const base = await mkdtemp(path.join(os.tmpdir(), "sgc-cdus-auditoria-"));
         const dirSpecs = path.join(base, "specs");
 
-        await fs.outputFile(
+        await escreverArquivo(
             path.join(dirSpecs, "cdu-01.md"),
             [
                 "# CDU-01 - Exemplo válido",
@@ -135,7 +212,7 @@ describe("Ferramentas de requisitos dos CDUs", () => {
         );
         await criarIntroSituacoes(dirSpecs);
 
-        await fs.outputFile(
+        await escreverArquivo(
             path.join(dirSpecs, "cdu-02.md"),
             [
                 "# CDU-99 - Exemplo inválido",
@@ -161,11 +238,11 @@ describe("Ferramentas de requisitos dos CDUs", () => {
         ]);
 
         expect(resultado.exitCode).toBe(0);
-        const conteudo = JSON.parse(resultado.stdout);
+        const conteudo = lerJson<ResultadoAuditoriaCdu>(resultado);
         expect(conteudo.resumo.totalArquivos).toBe(2);
         expect(conteudo.resumo.arquivosComErro).toBe(1);
 
-        const invalido = conteudo.relatorio.find(item => item.arquivo === "specs/cdu-02.md");
+        const invalido = conteudo.relatorio.find(item => item.arquivo === "specs/cdu-02.md")!;
         expect(invalido.achados.some(achado => achado.regra === "titulo_numero")).toBe(true);
         expect(invalido.achados.some(achado => achado.regra === "atores_canonicos")).toBe(true);
         expect(invalido.achados.some(achado => achado.regra === "pre_condicoes")).toBe(true);
@@ -176,7 +253,7 @@ describe("Ferramentas de requisitos dos CDUs", () => {
         const base = await mkdtemp(path.join(os.tmpdir(), "sgc-cdus-estilo-"));
         const dirSpecs = path.join(base, "specs");
 
-        await fs.outputFile(
+        await escreverArquivo(
             path.join(dirSpecs, "cdu-01.md"),
             [
                 "# CDU-01 - Exemplo",
@@ -206,11 +283,11 @@ describe("Ferramentas de requisitos dos CDUs", () => {
         ]);
 
         expect(resultado.exitCode).toBe(0);
-        const conteudo = JSON.parse(resultado.stdout);
+        const conteudo = lerJson<ResultadoAuditoriaCdu>(resultado);
         expect(conteudo.resumo.totalArquivos).toBe(1);
         expect(conteudo.resumo.arquivosComAviso).toBe(1);
 
-        const arquivo = conteudo.relatorio.find(item => item.arquivo === "specs/cdu-01.md");
+        const arquivo = conteudo.relatorio.find(item => item.arquivo === "specs/cdu-01.md")!;
         expect(arquivo.achados.some(achado => achado.regra === "perfil_em_aspas_simples")).toBe(true);
         expect(arquivo.achados.some(achado => achado.regra === "ui_em_aspas_duplas")).toBe(true);
         expect(arquivo.achados.some(achado => achado.regra === "placeholder_legado")).toBe(true);
@@ -220,7 +297,7 @@ describe("Ferramentas de requisitos dos CDUs", () => {
         const base = await mkdtemp(path.join(os.tmpdir(), "sgc-cdus-vocabulario-"));
         const dirSpecs = path.join(base, "specs");
 
-        await fs.outputFile(
+        await escreverArquivo(
             path.join(dirSpecs, "cdu-01.md"),
             [
                 "# CDU-01 - Exemplo",
@@ -251,7 +328,7 @@ describe("Ferramentas de requisitos dos CDUs", () => {
         ]);
 
         expect(resultado.exitCode).toBe(0);
-        const conteudo = JSON.parse(resultado.stdout);
+        const conteudo = lerJson<ResultadoInventarioVocabulario>(resultado);
         expect(conteudo.perfis.ADMIN).toBe(1);
         expect(conteudo.perfis.GESTOR).toBe(1);
         expect(conteudo.situacoes["Em andamento"]).toBe(1);
@@ -263,7 +340,7 @@ describe("Ferramentas de requisitos dos CDUs", () => {
         const base = await mkdtemp(path.join(os.tmpdir(), "sgc-cdus-vocabulario-auditar-"));
         const dirSpecs = path.join(base, "specs");
 
-        await fs.outputFile(
+        await escreverArquivo(
             path.join(dirSpecs, "cdu-01.md"),
             [
                 "# CDU-01 - Exemplo",
@@ -293,9 +370,9 @@ describe("Ferramentas de requisitos dos CDUs", () => {
         ]);
 
         expect(resultado.exitCode).toBe(0);
-        const conteudo = JSON.parse(resultado.stdout);
+        const conteudo = lerJson<ResultadoAuditoriaCdu>(resultado);
         expect(conteudo.resumo.arquivosComAviso).toBe(1);
-        const arquivo = conteudo.relatorio.find(item => item.arquivo === "specs/cdu-01.md");
+        const arquivo = conteudo.relatorio.find(item => item.arquivo === "specs/cdu-01.md")!;
         expect(arquivo.achados.some(achado => achado.regra === "perfil_fora_vocabulario")).toBe(true);
         expect(arquivo.achados.some(achado => achado.regra === "tipo_processo_variacao")).toBe(true);
         expect(arquivo.achados.some(achado => achado.regra === "situacao_variacao")).toBe(true);
@@ -306,7 +383,7 @@ describe("Ferramentas de requisitos dos CDUs", () => {
         const dirSpecs = path.join(base, "specs");
         await criarIntroSituacoes(dirSpecs);
 
-        await fs.outputFile(
+        await escreverArquivo(
             path.join(dirSpecs, "cdu-01.md"),
             [
                 "# CDU-01 - Exemplo",
@@ -344,7 +421,7 @@ describe("Ferramentas de requisitos dos CDUs", () => {
         ]);
 
         expect(resultado.exitCode).toBe(0);
-        const conteudo = JSON.parse(resultado.stdout);
+        const conteudo = lerJson<ResultadoInventarioMensagens>(resultado);
         expect(conteudo.descricoes["Cadastro aceito"]).toBe(1);
         expect(conteudo.assuntos["SGC: Cadastro aceito"]).toBe(1);
         expect(conteudo.mensagens["Aceite registrado"]).toBe(1);
@@ -356,7 +433,7 @@ describe("Ferramentas de requisitos dos CDUs", () => {
         const dirSpecs = path.join(base, "specs");
         await criarIntroSituacoes(dirSpecs);
 
-        await fs.outputFile(
+        await escreverArquivo(
             path.join(dirSpecs, "cdu-01.md"),
             [
                 "# CDU-01 - Exemplo",
@@ -390,9 +467,9 @@ describe("Ferramentas de requisitos dos CDUs", () => {
         ]);
 
         expect(resultado.exitCode).toBe(0);
-        const conteudo = JSON.parse(resultado.stdout);
+        const conteudo = lerJson<ResultadoAuditoriaCdu>(resultado);
         expect(conteudo.resumo.arquivosComAviso).toBe(1);
-        const arquivo = conteudo.relatorio.find(item => item.arquivo === "specs/cdu-01.md");
+        const arquivo = conteudo.relatorio.find(item => item.arquivo === "specs/cdu-01.md")!;
         expect(arquivo.achados.some(achado => achado.regra === "descricao_espacamento")).toBe(true);
         expect(arquivo.achados.some(achado => achado.regra === "assunto_fechamento_suspeito")).toBe(true);
     });
@@ -402,7 +479,7 @@ describe("Ferramentas de requisitos dos CDUs", () => {
         const dirSpecs = path.join(base, "specs");
         await criarIntroSituacoes(dirSpecs);
 
-        await fs.outputFile(
+        await escreverArquivo(
             path.join(dirSpecs, "cdu-01.md"),
             [
                 "# CDU-01 - Exemplo",
@@ -428,7 +505,7 @@ describe("Ferramentas de requisitos dos CDUs", () => {
             ].join("\n")
         );
 
-        await fs.outputFile(
+        await escreverArquivo(
             path.join(base, "backend", "src", "main", "java", "sgc", "comum", "Mensagens.java"),
             [
                 "package sgc.comum;",
@@ -440,7 +517,7 @@ describe("Ferramentas de requisitos dos CDUs", () => {
             ].join("\n")
         );
 
-        await fs.outputFile(
+        await escreverArquivo(
             path.join(base, "backend", "src", "main", "java", "sgc", "alerta", "AssuntosNotificacao.java"),
             [
                 "package sgc.alerta;",
@@ -452,23 +529,23 @@ describe("Ferramentas de requisitos dos CDUs", () => {
             ].join("\n")
         );
 
-        await fs.outputFile(
+        await escreverArquivo(
             path.join(base, "frontend", "src", "constants", "notificacoes.ts"),
             "export const TIPOS_NOTIFICACAO_LABELS = { DIAGNOSTICO_HOMOLOGADO: \"Diagnóstico homologado\" };\n"
         );
-        await fs.outputFile(
+        await escreverArquivo(
             path.join(base, "frontend", "src", "constants", "textos-subprocesso.ts"),
             "export const TEXTOS_SUCESSO_SUBPROCESSO = { HOMOLOGACAO_EFETIVADA: \"Homologação efetivada\" };\n"
         );
-        await fs.outputFile(
+        await escreverArquivo(
             path.join(base, "frontend", "src", "constants", "textos-mapa.ts"),
             "export const TEXTOS_SUCESSO_MAPA = { SUCESSO_HOMOLOGACAO: \"Mapa homologado\" };\n"
         );
-        await fs.outputFile(
+        await escreverArquivo(
             path.join(base, "frontend", "src", "constants", "textos-diagnostico.ts"),
             "export const TEXTOS_DIAGNOSTICO = { SUCESSO_DIAGNOSTICO_HOMOLOGADO: 'Diagnóstico homologado' };\n"
         );
-        await fs.outputFile(
+        await escreverArquivo(
             path.join(base, "frontend", "src", "constants", "textos-processo.ts"),
             "export const TEXTOS_SUCESSO_PROCESSO = { PROCESSO_INICIADO: \"Processo iniciado\" };\n"
         );
@@ -483,16 +560,16 @@ describe("Ferramentas de requisitos dos CDUs", () => {
         ]);
 
         expect(resultado.exitCode).toBe(0);
-        const conteudo = JSON.parse(resultado.stdout);
+        const conteudo = lerJson<ResultadoMensagensCodigo>(resultado);
         expect(conteudo.resumo.itensComReferenciaExata).toBeGreaterThan(0);
-        const descricao = conteudo.relatorio.find(item => item.tipo === "descricoes" && item.valor === "Início do processo");
+        const descricao = conteudo.relatorio.find(item => item.tipo === "descricoes" && item.valor === "Início do processo")!;
         expect(descricao.referenciasExatas).toHaveLength(0);
         expect(descricao.sugestoes.some(item => item.texto === "Processo iniciado")).toBe(true);
-        const mensagem = conteudo.relatorio.find(item => item.tipo === "mensagens" && item.valor === "Homologação efetivada");
+        const mensagem = conteudo.relatorio.find(item => item.tipo === "mensagens" && item.valor === "Homologação efetivada")!;
         expect(mensagem.referenciasExatas.some(item => item.texto === "Homologação efetivada")).toBe(true);
-        const assunto = conteudo.relatorio.find(item => item.tipo === "assuntos" && item.valor === "SGC: Cadastro de atividades e conhecimentos disponibilizado - :SIGLA_UNIDADE_SUBPROCESSO:");
+        const assunto = conteudo.relatorio.find(item => item.tipo === "assuntos" && item.valor === "SGC: Cadastro de atividades e conhecimentos disponibilizado - :SIGLA_UNIDADE_SUBPROCESSO:")!;
         expect(assunto.referenciasExatas.some(item => item.texto === "SGC: Cadastro de atividades e conhecimentos disponibilizado - :VALOR:")).toBe(true);
-        const toast = conteudo.relatorio.find(item => item.tipo === "toasts" && item.valor === "Diagnóstico homologado");
+        const toast = conteudo.relatorio.find(item => item.tipo === "toasts" && item.valor === "Diagnóstico homologado")!;
         expect(toast.referenciasExatas.some(item => item.texto === "Diagnóstico homologado")).toBe(true);
     });
 
@@ -501,7 +578,7 @@ describe("Ferramentas de requisitos dos CDUs", () => {
         const dirSpecs = path.join(base, "specs");
         await criarIntroSituacoes(dirSpecs);
 
-        await fs.outputFile(
+        await escreverArquivo(
             path.join(dirSpecs, "cdu-01.md"),
             [
                 "# CDU-01 - Exemplo",
@@ -533,7 +610,7 @@ describe("Ferramentas de requisitos dos CDUs", () => {
         ]);
 
         expect(resultado.exitCode).toBe(0);
-        const conteudo = JSON.parse(resultado.stdout);
+        const conteudo = lerJson<ResultadoDensidade>(resultado);
         expect(conteudo.totalArquivos).toBe(1);
         expect(conteudo.resumo.mediaPalavras).toBeGreaterThan(0);
         expect(conteudo.documentos[0].passos).toBe(2);
@@ -566,8 +643,8 @@ describe("Ferramentas de requisitos dos CDUs", () => {
             "```"
         ].join("\n");
 
-        await fs.outputFile(path.join(dirSpecs, "cdu-01.md"), conteudo);
-        await fs.outputFile(path.join(dirSpecs, "cdu-02.md"), conteudo.replace("CDU-01", "CDU-02"));
+        await escreverArquivo(path.join(dirSpecs, "cdu-01.md"), conteudo);
+        await escreverArquivo(path.join(dirSpecs, "cdu-02.md"), conteudo.replace("CDU-01", "CDU-02"));
 
         const resultado = await executarSgc([
             "requisitos",
@@ -579,7 +656,7 @@ describe("Ferramentas de requisitos dos CDUs", () => {
         ]);
 
         expect(resultado.exitCode).toBe(0);
-        const corpo = JSON.parse(resultado.stdout);
+        const corpo = lerJson<ResultadoDuplicacoes>(resultado);
         expect(corpo.duplicacoes.length).toBeGreaterThan(0);
     });
 });

@@ -167,8 +167,8 @@ frontend e para os caminhos OpenAPI.
 - `projeto/versao-sincronizar.ts` agora calcula pendências sem gravar por padrão, aceita `--base`, aplica alterações
   somente com `--gravar` e evita reescrita quando a versão já está sincronizada.
 - `garantirArquivo` resolve entradas `.ts` na fonte e o `.js` correspondente no build, sem aliases de comandos antigos.
-- Exports de `toolkit/package.json` já expõem a árvore TypeScript do toolkit; os testes ainda são JavaScript por decisão
-  de escopo, não por dependência de runtime.
+- Exports de `toolkit/package.json` já expõem a árvore TypeScript do toolkit; os testes agora são mistos: os cenários CDU
+  e o fixture externo estão em TypeScript estrito, enquanto a CLI grande e o smoke de pacote ainda estão em JavaScript.
 - O corretor de FQN possui teste de escrita, conteúdo esperado sem duplicação e idempotência; a implementação não foi
   alterada porque a suspeita de duplicação não se confirmou.
 - A auditoria de efeitos corrigiu um vazamento de gravação em `codigo nomes auditar-consistencia`: a geração automática do
@@ -380,8 +380,10 @@ Nas validações desta rodada, em 13 de agosto de 2026, executadas diretamente s
 
 - `npm --prefix toolkit run test`: 111 testes aprovados em 3 arquivos; o smoke de pacote é separado para não tornar a
   suíte unitária dependente de rede ou instalação;
-- `npm --prefix toolkit run test:coverage`: aprovado com baseline informativa de 40,8% de statements (524/1.284),
-  28,19% de branches (254/901), 48,2% de funções (121/251) e 41,12% de linhas (505/1.228); ainda sem threshold,
+- `npm --prefix toolkit run test:coverage`: aprovado com baseline informativa de 40,65% de statements (522/1.284),
+  27,96% de branches (252/901), 47,61% de funções (120/252) e 40,96% de linhas (503/1.228); a pequena variação
+  decorre da resolução lazy do `tsx`, ainda sem threshold porque os testes permanecem concentrados e a prioridade é
+  transformar os contratos críticos em cenários explícitos;
   porque os testes permanecem concentrados e a prioridade é transformar os contratos críticos em cenários explícitos;
 - `npm --prefix toolkit run test:pacote`: 1 teste aprovado, com `npm pack`, instalação isolada, auditoria no consumidor
   e verificação da política Semgrep empacotada;
@@ -422,8 +424,8 @@ Inventário dos arquivos rastreados do toolkit, excluindo `dist`, cobertura e ar
 
 - 73 arquivos TypeScript de implementação;
 - 0 arquivos JavaScript de implementação; o único CJS é o launcher mínimo do binário;
-- 3 arquivos JavaScript de teste (`test/sgc.test.js`, `test/cdus.test.js` e `test/pacote.test.js`) e 1 arquivo
-  TypeScript de teste (`test/externo.test.ts`);
+- 2 arquivos JavaScript de teste (`test/sgc.test.js` e `test/pacote.test.js`) e 2 arquivos TypeScript de teste
+  (`test/cdus.test.ts` e `test/externo.test.ts`);
 - 3 arquivos de teste concentrando 111 cenários, mais 1 smoke de distribuição isolada;
 - maior módulo atual: `frontend/arquitetura-lib.ts`, com aproximadamente 1.200 linhas;
 - outros hotspots: `codigo/nomes-simbolos-coletar.ts`, `frontend/residuos-lib.ts` e
@@ -743,7 +745,9 @@ SGC está ativo.
 
 ### Fase F — testes, documentação e distribuição
 
-1. Converter `test/sgc.test.js` e `test/cdus.test.js` para TypeScript após a estabilização das interfaces.
+1. **[parcial nesta rodada]** Converter `test/sgc.test.js` e `test/cdus.test.js` para TypeScript após a estabilização
+   das interfaces. `test/cdus.test.ts` já está convertido e passa em `tsconfig.testes.json`; o grande teste da CLI e o
+   smoke de pacote ainda permanecem em JavaScript.
 2. Dividir testes por domínio: runtime, configuração, saída, projeto, backend, frontend, integração e requisitos.
 3. Manter testes comportamentais sobre a API pública; não testar métodos privados por reflexão ou acoplamento à
    implementação.
@@ -758,9 +762,9 @@ SGC está ativo.
 8. **[parcial nesta rodada]** Atualizar `toolkit/README.md` e exemplos a partir de uma fonte única de comandos. Os 42
    despachadores de arquivos já usam `lib/catalogo-comandos.ts` e a ajuda da CLI é o inventário canônico; os comandos
    com ações e opções próprias ainda têm sua estrutura declarada em `sgc.ts` por exigirem lógica de registro específica.
-9. O modelo de distribuição fonte + `tsx` está fechado; decidir se os testes também serão convertidos para TypeScript. A
-   implementação não possui arquivos JS, aliases ou fallbacks de transição; o launcher CJS e os testes JS são exceções
-   deliberadas e documentadas.
+9. O modelo de distribuição fonte + `tsx` está fechado; continuar a conversão dos testes para TypeScript sem colocar
+   testes no artefato distribuído. A implementação não possui arquivos JS, aliases ou fallbacks de transição; o launcher
+   CJS e os dois testes JS restantes são exceções deliberadas e documentadas.
 
 ## 7. Validação obrigatória por rodada
 
@@ -770,14 +774,14 @@ SGC está ativo.
 node --version
 cd toolkit
 npm run typecheck
-npx vitest run test/sgc.test.js test/cdus.test.js --reporter=dot --no-color
+npx vitest run test/sgc.test.js test/cdus.test.ts test/externo.test.ts --reporter=dot --no-color
 npm run build
 cd ..
 git diff --check
 ```
 
-O comando focado deve apontar para os testes do módulo alterado assim que a suíte for dividida. Enquanto os dois arquivos
-monolíticos existirem, a rodada acima é o mínimo seguro.
+O comando focado deve apontar para os testes do módulo alterado assim que a suíte for dividida. Enquanto
+`test/sgc.test.js` continuar monolítico, a rodada acima é o mínimo seguro.
 
 ### Rodada completa do toolkit
 

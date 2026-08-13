@@ -1,7 +1,7 @@
 import os from "node:os";
 import path from "node:path";
 import {access, mkdtemp, mkdir, writeFile} from "node:fs/promises";
-import {execa, type Result} from "execa";
+import {execa} from "execa";
 import {describe, expect, test} from "vitest";
 
 const DIRETORIO_RAIZ = path.resolve(import.meta.dirname, "..", "..");
@@ -13,16 +13,27 @@ const CAMINHO_TSX = path.join(
     process.platform === "win32" ? "tsx.cmd" : "tsx"
 );
 
+interface ResultadoExecucao {
+    exitCode?: number;
+    stdout: string;
+    stderr: string;
+}
+
 async function escreverArquivo(caminho: string, conteudo: string): Promise<void> {
     await mkdir(path.dirname(caminho), {recursive: true});
     await writeFile(caminho, conteudo, "utf8");
 }
 
-async function executarSgc(diretorioBase: string, argumentos: string[]): Promise<Result> {
-    return execa(CAMINHO_TSX, [CAMINHO_SGC, ...argumentos], {
+async function executarSgc(diretorioBase: string, argumentos: string[]): Promise<ResultadoExecucao> {
+    const resultado = await execa(CAMINHO_TSX, [CAMINHO_SGC, ...argumentos], {
         cwd: diretorioBase,
         reject: false,
     });
+    return {
+        exitCode: resultado.exitCode,
+        stdout: String(resultado.stdout),
+        stderr: String(resultado.stderr),
+    };
 }
 
 describe("reuso do toolkit em projeto externo", () => {
