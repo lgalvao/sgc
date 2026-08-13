@@ -912,7 +912,6 @@ describe("CLI raiz do toolkit", () => {
             "cheiros",
             "auditar",
             "--json",
-            "--sem-gravar",
             "--base",
             base
         ]);
@@ -924,6 +923,12 @@ describe("CLI raiz do toolkit", () => {
         expect(conteudo.contagens.frontend_any_producao).toBe(2);
         expect(conteudo.contagens.frontend_null_checks).toBe(1);
         expect(conteudo.contagens.frontend_fallback_or).toBe(1);
+        expect(await fs.pathExists(path.join(base, "toolkit", "qualidade", "artefatos", "codigo-cheiros"))).toBe(false);
+
+        const diretorioSaida = path.join(base, "artefatos", "cheiros");
+        await executarAuditoriaCheiros({base, gravar: true, diretorioSaida});
+        expect(await fs.pathExists(path.join(diretorioSaida, "fotografia.json"))).toBe(true);
+        expect(await fs.pathExists(path.join(diretorioSaida, "resumo.md"))).toBe(true);
     });
 
     test("auditores backend usam caminhos de codigo definidos pela configuracao do projeto", async () => {
@@ -1284,7 +1289,7 @@ describe("CLI raiz do toolkit", () => {
             "export function exemplo(valor: any) { return valor || []; }\n"
         );
 
-        const resultado = await executarAuditoriaCheiros({base, semGravar: true});
+        const resultado = await executarAuditoriaCheiros({base});
 
         expect(resultado.snapshot.contagens.backend_nullable_dto).toBe(1);
         expect(resultado.snapshot.contagens.frontend_any_producao).toBe(1);

@@ -68,7 +68,7 @@ interface ResultadoAuditoriaCheiros {
 
 interface OpcoesAuditoriaCheiros {
     base?: string;
-    semGravar?: boolean;
+    gravar?: boolean;
     diretorioSaida?: string;
 }
 
@@ -303,7 +303,7 @@ function gerarMarkdown(snapshot: SnapshotCheiros): string {
 
 async function executarAuditoria({
     base = DIRETORIO_RAIZ,
-    semGravar = false,
+    gravar = false,
     diretorioSaida
 }: OpcoesAuditoriaCheiros = {}): Promise<ResultadoAuditoriaCheiros> {
     const baseResolvida = path.resolve(base);
@@ -348,7 +348,7 @@ async function executarAuditoria({
         }
     }
 
-    const anterior = semGravar ? null : await lerFotografiaAnterior(caminhoFotografia);
+    const anterior = await lerFotografiaAnterior(caminhoFotografia);
     const pontuacaoTotal = PADROES.reduce((soma, padrao) => soma + (contagens[padrao.chave] * padrao.peso), 0);
     const snapshot: SnapshotCheiros = {
         geradoEm: new Date().toISOString(),
@@ -361,7 +361,7 @@ async function executarAuditoria({
             .slice(0, 15)
     };
 
-    if (!semGravar) {
+    if (gravar) {
         await fs.mkdir(saidaResolvida, {recursive: true});
         await fs.writeFile(caminhoFotografia, JSON.stringify(snapshot, null, 2));
         await fs.writeFile(caminhoResumo, gerarMarkdown(snapshot));
@@ -379,7 +379,7 @@ async function principal(argumentos: string[] = process.argv.slice(2)): Promise<
             descricao: "Gera uma fotografia com contagens e pontuacao de cheiros de codigo.",
             opcoes: [
                 "--json               Emite a fotografia em JSON.",
-                "--sem-gravar         Nao atualiza os artefatos.",
+                "--gravar             Atualiza os artefatos de fotografia e resumo.",
                 "--base <diretorio>   Sobrescreve a base da auditoria."
             ]
         });
@@ -387,7 +387,7 @@ async function principal(argumentos: string[] = process.argv.slice(2)): Promise<
     }
 
     const base = path.resolve(lerOpcao(argumentos, "--base", DIRETORIO_RAIZ) ?? DIRETORIO_RAIZ);
-    const execucao = await executarAuditoria({base, semGravar: argumentos.includes("--sem-gravar")});
+    const execucao = await executarAuditoria({base, gravar: argumentos.includes("--gravar")});
     const {snapshot} = execucao;
     if (emitirJson) {
         imprimirJson(snapshot);
@@ -405,7 +405,7 @@ async function principal(argumentos: string[] = process.argv.slice(2)): Promise<
     for (const hotspot of snapshot.hotspots.slice(0, 10)) {
         escreverLinha(`- ${hotspot.arquivo}: ${hotspot.pontuacao} ponto(s)`);
     }
-    if (!argumentos.includes("--sem-gravar")) {
+    if (argumentos.includes("--gravar")) {
         escreverLinha("");
         escreverLinha(`Fotografia salva em ${execucao.caminhoFotografia}`);
         escreverLinha(`Resumo salvo em ${execucao.caminhoResumo}`);

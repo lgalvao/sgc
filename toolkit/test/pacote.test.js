@@ -52,8 +52,7 @@ test("pacote fonte executa em um projeto consumidor isolado", async () => {
         "codigo",
         "cheiros",
         "auditar",
-        "--json",
-        "--sem-gravar"
+        "--json"
     ], {
         cwd: diretorioConsumidor
     });

@@ -95,6 +95,14 @@ npx tsx toolkit/sgc.ts codigo nomes coletar-simbolos
 npx tsx toolkit/sgc.ts codigo nomes auditar-consistencia
 ```
 
+As auditorias de cheiros são somente leitura por padrão e emitem a fotografia em JSON no stdout. Para atualizar os
+artefatos `fotografia.json` e `resumo.md`, use a ação explícita `--gravar`:
+
+```bash
+npx tsx toolkit/sgc.ts codigo cheiros auditar --json
+npx tsx toolkit/sgc.ts codigo cheiros auditar --gravar
+```
+
 ### Requisitos
 
 ```bash

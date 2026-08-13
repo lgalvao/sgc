@@ -226,6 +226,9 @@ frontend e para os caminhos OpenAPI.
 - `frontend/residuos-lib.ts` foi convertido para TypeScript com tipos para orçamento, camadas, contagens, arquivos,
   hotspots, fotografia e exceções; os pesos e classificações do perfil SGC foram preservados, a política de orçamento
   passou a ser neutra quando não há override e o carregamento JSON passou a rejeitar arquivos configurados inválidos.
+- `codigo/cheiros-auditar.ts` agora calcula e exibe a auditoria sem gravar por padrão; a persistência da fotografia e do
+  resumo exige `--gravar` na CLI ou `gravar: true` na API, e a leitura de fotografia anterior continua disponível para
+  calcular deltas sem mutação.
 - `frontend/arquitetura-lib.ts` foi convertido para TypeScript com tipos para análise AST, imports por camada, sinais,
   métricas, hotspots, famílias, exceções documentadas e fotografia; os hubs e heurísticas arquiteturais continuam
   explícitos no perfil SGC.
@@ -406,7 +409,7 @@ O núcleo TypeScript de implementação foi concluído: 100% dos arquivos de imp
 | Resolvido nesta rodada | Semgrep acoplado ao ambiente local | A política padrão vinha da raiz do consumidor e o executável era fixado em `~/.local/bin/semgrep`; ambos agora usam a instalação do toolkit e o `PATH`, com testes de override e consumidor isolado. |
 | Resolvido | Configuração permissiva do Knip | A configuração anterior tratava praticamente todos os arquivos como entrypoints. A nova lista os comandos reais, inclui JS/TS e, nesta rodada, encontrou e removeu oito exports internos não consumidos. |
 | Resolvido parcialmente | Base externa é parcialmente ignorada | Arquitetura, resíduos, OpenAPI, coleta, Semgrep, cheiros e assuntos de notificação agora respeitam a base/configuração; outros comandos ainda precisam da mesma correção. |
-| Alta | Auditores gravam por padrão | Arquitetura, resíduos, cobertura, nomenclatura, Semgrep e diff OpenAPI têm escrita automática ou defaults distintos. A diretriz read-only ainda é meta, não realidade. |
+| Alta | Auditores gravam por padrão | Arquitetura, resíduos, cobertura, nomenclatura, Semgrep e diff OpenAPI ainda têm escrita automática ou defaults distintos. `codigo cheiros auditar` já exige `--gravar`; a diretriz read-only ainda precisa ser aplicada às demais famílias. |
 | Resolvido | Cobertura insuficiente de mutação | O corretor `backend/java-corrigir-fqn.ts` agora tem fixture de escrita, verificação de conteúdo sem duplicação e segunda execução idempotente. |
 | Resolvido | Efeito colateral oculto de `--sem-gravar` | `codigo nomes auditar-consistencia` gerava o inventário auxiliar com gravação habilitada e contaminava `--json`; a opção agora é propagada e a coleta interna é silenciosa. |
 | Resolvido | Configuração sem validação | `configuracao-toolkit.json` agora exige a versão `1` e valida estrutura, chaves conhecidas e caminhos textuais antes da combinação com defaults. |
@@ -439,7 +442,7 @@ o comportamento atual; não transforma automaticamente todo comando que gera rel
 | Classe atual | Comandos ou famílias | Efeito observado e controle existente |
 |---|---|---|
 | Auditoria read-only | `requisitos cdus *`, `backend cobertura ramificacoes`, `frontend cobertura ramificacoes`, `frontend arquitetura validar`, `frontend modais validar`, `frontend views templates-validar`, `frontend identificadores-teste *`, `projeto diagnostico` | Leem código/relatórios e escrevem somente stdout/JSON; não criam artefatos próprios. Dependências externas podem fazer leitura adicional. |
-| Auditoria com geração por padrão | `backend arquitetura/coesao/contratos auditar`, `frontend arquitetura auditar`, `frontend residuos auditar/validar`, `codigo cheiros auditar`, `codigo nomes coletar-simbolos/auditar-consistencia/auditar-idioma`, `codigo semgrep auditar` | Gravem fotografias ou relatórios em caminhos padrão. A maioria oferece `--sem-gravar`, mas a ausência da opção ainda permite mutação de artefatos. |
+| Auditoria com geração por padrão | `backend arquitetura/coesao/contratos auditar`, `frontend arquitetura auditar`, `frontend residuos auditar/validar`, `codigo nomes coletar-simbolos/auditar-consistencia/auditar-idioma`, `codigo semgrep auditar` | Gravem fotografias ou relatórios em caminhos padrão. A maioria oferece `--sem-gravar`, mas a ausência da opção ainda permite mutação de artefatos. `codigo cheiros auditar` foi retirado desta classe e só grava com `--gravar`. |
 | Geração de relatório indicado | `backend cobertura auditoria`, `frontend cobertura auditoria`, `backend testes analisar/priorizar`, `frontend acessibilidade processar` | Criam arquivos Markdown/JSON definidos por `--output`, `--output-json` ou defaults. São geradores explícitos, não auditores read-only. |
 | Artefato de contrato | `integracao contratos exportar-openapi`, `integracao contratos diff` | Exportação grava OpenAPI; diff grava resumo Markdown por padrão. `--sem-gravar` existe no diff, mas não é o default. |
 | Mutação de fonte ou baseline | `backend java corrigir-fqn`, `projeto versao-sincronizar`, `integracao contratos fixar-baseline` | Alteram código/configuração ou promovem arquivo. FQN usa `--dry-run` opt-in; versão não possui prévia; baseline copia diretamente para o destino. |
