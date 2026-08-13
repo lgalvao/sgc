@@ -1,7 +1,28 @@
 import type {EsquemaArgumentos} from "./cli-opcoes.js";
 
 type EscopoComando = "nucleo" | "adaptavel" | "perfil-sgc";
-type EfeitoComando = "auditoria" | "geracao" | "mutacao" | "orquestracao";
+type FinalidadeComando = "auditar" | "inventariar" | "gerar" | "transformar" | "orquestrar";
+type PersistenciaComando = "nenhuma" | "opcional" | "intrinseca";
+
+interface EfeitosComando {
+    persistencia: PersistenciaComando;
+    remocao: boolean;
+    subprocessos: boolean;
+    rede: boolean;
+}
+
+function criarEfeitosComando(
+    persistencia: PersistenciaComando,
+    ajustes: Partial<Omit<EfeitosComando, "persistencia">> = {}
+): EfeitosComando {
+    return {
+        persistencia,
+        remocao: false,
+        subprocessos: false,
+        rede: false,
+        ...ajustes
+    };
+}
 
 function esquema(
     opcoesComValor: readonly string[] = [],
@@ -16,7 +37,8 @@ type DefinicaoComando = Readonly<{
     caminho: readonly [string, ...string[]];
     descricao: string;
     escopo: EscopoComando;
-    efeito: EfeitoComando;
+    finalidade: FinalidadeComando;
+    efeitos: EfeitosComando;
     argumentos: EsquemaArgumentos;
 }>;
 
@@ -31,7 +53,8 @@ const CATALOGO_COMANDOS = [
         caminho: ["backend", "cobertura", "auditoria"],
         descricao: "Auditoria unificada de cobertura e risco (Backend).",
         escopo: "adaptavel",
-        efeito: "auditoria",
+        finalidade: "auditar",
+        efeitos: criarEfeitosComando("opcional"),
         argumentos: esquema(["--base", "--arquivo", "--saida", "--minimo"], ["--json", "--gravar"]),
         arquivo: "backend/cobertura-auditoria.ts"
     },
@@ -39,7 +62,8 @@ const CATALOGO_COMANDOS = [
         caminho: ["backend", "cobertura", "ramificacoes"],
         descricao: "Lista classes com lacunas de ramificacoes no backend.",
         escopo: "adaptavel",
-        efeito: "auditoria",
+        finalidade: "auditar",
+        efeitos: criarEfeitosComando("nenhuma"),
         argumentos: esquema(["--base", "--arquivo", "--limite", "--filtro"], ["--json"]),
         arquivo: "backend/cobertura-ramificacoes.ts"
     },
@@ -47,7 +71,8 @@ const CATALOGO_COMANDOS = [
         caminho: ["backend", "arquitetura", "auditar"],
         descricao: "Audita god objects (Services, Facades, Controllers) por linhas, metodos e dependencias.",
         escopo: "adaptavel",
-        efeito: "auditoria",
+        finalidade: "auditar",
+        efeitos: criarEfeitosComando("nenhuma"),
         argumentos: esquema(["--base"], ["--json", "--gravar"]),
         arquivo: "backend/arquitetura-auditar.ts"
     },
@@ -55,7 +80,8 @@ const CATALOGO_COMANDOS = [
         caminho: ["backend", "coesao", "auditar"],
         descricao: "Audita Services com responsabilidades misturadas (consulta, mutacao, workflow, notificacao).",
         escopo: "perfil-sgc",
-        efeito: "auditoria",
+        finalidade: "auditar",
+        efeitos: criarEfeitosComando("nenhuma"),
         argumentos: esquema(["--base"], ["--json", "--gravar"]),
         arquivo: "backend/coesao-auditar.ts"
     },
@@ -63,7 +89,8 @@ const CATALOGO_COMANDOS = [
         caminho: ["backend", "contratos", "auditar"],
         descricao: "Audita vazamentos de model.* em DTOs expostos por controllers.",
         escopo: "adaptavel",
-        efeito: "auditoria",
+        finalidade: "auditar",
+        efeitos: criarEfeitosComando("nenhuma"),
         argumentos: esquema(["--base"], ["--json", "--gravar"]),
         arquivo: "backend/contratos-auditar.ts"
     },
@@ -71,7 +98,8 @@ const CATALOGO_COMANDOS = [
         caminho: ["backend", "testes", "analisar"],
         descricao: "Detecta classes sem testes e gera Markdown/JSON.",
         escopo: "adaptavel",
-        efeito: "geracao",
+        finalidade: "inventariar",
+        efeitos: criarEfeitosComando("opcional"),
         argumentos: esquema(["--base", "--diretorio", "--saida", "--saida-json", "--arquivo-jacoco"], ["--json", "--gravar"]),
         arquivo: "backend/testes-analisar.ts"
     },
@@ -79,7 +107,8 @@ const CATALOGO_COMANDOS = [
         caminho: ["backend", "testes", "priorizar"],
         descricao: "Prioriza backlog de testes do backend.",
         escopo: "adaptavel",
-        efeito: "geracao",
+        finalidade: "gerar",
+        efeitos: criarEfeitosComando("opcional"),
         argumentos: esquema(["--entrada", "--saida"], ["--json", "--gravar"]),
         arquivo: "backend/testes-priorizar.ts"
     },
@@ -87,7 +116,8 @@ const CATALOGO_COMANDOS = [
         caminho: ["backend", "java", "corrigir-fqn"],
         descricao: "Substitui FQNs por imports em arquivos Java.",
         escopo: "adaptavel",
-        efeito: "mutacao",
+        finalidade: "transformar",
+        efeitos: criarEfeitosComando("opcional"),
         argumentos: esquema(["--base"], ["--gravar"]),
         arquivo: "backend/java-corrigir-fqn.ts"
     },
@@ -95,7 +125,8 @@ const CATALOGO_COMANDOS = [
         caminho: ["backend", "notificacoes", "auditar-assuntos"],
         descricao: "Audita literais de assunto de notificacao fora de AssuntosNotificacao.",
         escopo: "perfil-sgc",
-        efeito: "auditoria",
+        finalidade: "auditar",
+        efeitos: criarEfeitosComando("nenhuma"),
         argumentos: esquema(["--base"], ["--json"]),
         arquivo: "backend/notificacoes-assuntos-auditar.ts"
     },
@@ -103,7 +134,8 @@ const CATALOGO_COMANDOS = [
         caminho: ["frontend", "cobertura", "auditoria"],
         descricao: "Auditoria unificada de cobertura e risco (Frontend).",
         escopo: "adaptavel",
-        efeito: "auditoria",
+        finalidade: "auditar",
+        efeitos: criarEfeitosComando("opcional"),
         argumentos: esquema(["--base", "--arquivo", "--saida", "--minimo"], ["--json", "--gravar"]),
         arquivo: "frontend/cobertura-auditoria.ts"
     },
@@ -111,7 +143,8 @@ const CATALOGO_COMANDOS = [
         caminho: ["frontend", "cobertura", "ramificacoes"],
         descricao: "Lista arquivos com lacunas de ramificacoes no frontend.",
         escopo: "adaptavel",
-        efeito: "auditoria",
+        finalidade: "auditar",
+        efeitos: criarEfeitosComando("nenhuma"),
         argumentos: esquema(["--base", "--arquivo", "--limite"], ["--json"]),
         arquivo: "frontend/cobertura-ramificacoes.ts"
     },
@@ -119,7 +152,8 @@ const CATALOGO_COMANDOS = [
         caminho: ["frontend", "cobertura", "ramificacoes-erros"],
         descricao: "Cruza lacunas de ramificacoes com sinais de tratamento de erro suspeito no frontend.",
         escopo: "perfil-sgc",
-        efeito: "auditoria",
+        finalidade: "auditar",
+        efeitos: criarEfeitosComando("nenhuma"),
         argumentos: esquema(["--base", "--arquivo", "--limite"], ["--json"]),
         arquivo: "frontend/cobertura-ramificacoes-erros.ts"
     },
@@ -127,7 +161,8 @@ const CATALOGO_COMANDOS = [
         caminho: ["frontend", "residuos", "auditar"],
         descricao: "Audita residuos estruturais do frontend.",
         escopo: "adaptavel",
-        efeito: "auditoria",
+        finalidade: "auditar",
+        efeitos: criarEfeitosComando("opcional"),
         argumentos: esquema(["--base", "--orcamento", "--saida"], ["--json", "--gravar"]),
         arquivo: "frontend/residuos-auditar.ts"
     },
@@ -135,7 +170,8 @@ const CATALOGO_COMANDOS = [
         caminho: ["frontend", "residuos", "validar"],
         descricao: "Valida orcamentos e excecoes dos residuos do frontend.",
         escopo: "adaptavel",
-        efeito: "auditoria",
+        finalidade: "auditar",
+        efeitos: criarEfeitosComando("opcional"),
         argumentos: esquema(["--base", "--orcamento", "--excecoes", "--saida"], ["--json", "--json-resumido", "--gravar"]),
         arquivo: "frontend/residuos-validar.ts"
     },
@@ -143,7 +179,8 @@ const CATALOGO_COMANDOS = [
         caminho: ["frontend", "arquitetura", "auditar"],
         descricao: "Audita vazamentos arquiteturais e estrategia de cache exposta no frontend.",
         escopo: "adaptavel",
-        efeito: "auditoria",
+        finalidade: "auditar",
+        efeitos: criarEfeitosComando("opcional"),
         argumentos: esquema(["--base", "--saida"], ["--json", "--gravar"]),
         arquivo: "frontend/arquitetura-auditar.ts"
     },
@@ -151,7 +188,8 @@ const CATALOGO_COMANDOS = [
         caminho: ["frontend", "arquitetura", "validar"],
         descricao: "Valida regras arquiteturais do frontend (gate duro).",
         escopo: "adaptavel",
-        efeito: "auditoria",
+        finalidade: "auditar",
+        efeitos: criarEfeitosComando("nenhuma"),
         argumentos: esquema(["--base"], ["--json"]),
         arquivo: "frontend/arquitetura-validar.ts"
     },
@@ -159,7 +197,8 @@ const CATALOGO_COMANDOS = [
         caminho: ["frontend", "views", "templates-validar"],
         descricao: "Valida previsibilidade estrutural de templates das views.",
         escopo: "perfil-sgc",
-        efeito: "auditoria",
+        finalidade: "auditar",
+        efeitos: criarEfeitosComando("nenhuma"),
         argumentos: esquema(["--base"], ["--json"]),
         arquivo: "frontend/views-templates-validar.ts"
     },
@@ -167,7 +206,8 @@ const CATALOGO_COMANDOS = [
         caminho: ["frontend", "modais", "validar"],
         descricao: "Valida o uso padronizado de ModalPadrao e proibe BModal cru fora do componente-base.",
         escopo: "perfil-sgc",
-        efeito: "auditoria",
+        finalidade: "auditar",
+        efeitos: criarEfeitosComando("nenhuma"),
         argumentos: esquema(["--base"], ["--json"]),
         arquivo: "frontend/modais-validar.ts"
     },
@@ -175,7 +215,8 @@ const CATALOGO_COMANDOS = [
         caminho: ["frontend", "identificadores-teste", "listar"],
         descricao: "Lista identificadores de teste do frontend.",
         escopo: "adaptavel",
-        efeito: "auditoria",
+        finalidade: "auditar",
+        efeitos: criarEfeitosComando("nenhuma"),
         argumentos: esquema(["--base", "--diretorio"], ["--json"]),
         arquivo: "frontend/identificadores-teste-listar.ts"
     },
@@ -183,7 +224,8 @@ const CATALOGO_COMANDOS = [
         caminho: ["frontend", "identificadores-teste", "listar-duplicados"],
         descricao: "Lista identificadores de teste duplicados.",
         escopo: "adaptavel",
-        efeito: "auditoria",
+        finalidade: "auditar",
+        efeitos: criarEfeitosComando("nenhuma"),
         argumentos: esquema(["--base", "--diretorio"], ["--json"]),
         arquivo: "frontend/identificadores-teste-listar-duplicados.ts"
     },
@@ -191,7 +233,8 @@ const CATALOGO_COMANDOS = [
         caminho: ["codigo", "cheiros", "auditar"],
         descricao: "Gera fotografia de sinais de complexidade acidental e codigo defensivo.",
         escopo: "adaptavel",
-        efeito: "auditoria",
+        finalidade: "auditar",
+        efeitos: criarEfeitosComando("opcional"),
         argumentos: esquema(["--base"], ["--json", "--gravar"]),
         arquivo: "codigo/cheiros-auditar.ts"
     },
@@ -199,7 +242,8 @@ const CATALOGO_COMANDOS = [
         caminho: ["codigo", "semgrep", "auditar"],
         descricao: "Executa regras locais de Semgrep para backend, frontend e integração.",
         escopo: "adaptavel",
-        efeito: "auditoria",
+        finalidade: "auditar",
+        efeitos: criarEfeitosComando("opcional", {subprocessos: true}),
         argumentos: esquema(["--base", "--regra", "--diretorio"], ["--auto", "--json", "--gravar"]),
         arquivo: "codigo/semgrep-auditar.ts"
     },
@@ -207,7 +251,8 @@ const CATALOGO_COMANDOS = [
         caminho: ["codigo", "nomes", "coletar-simbolos"],
         descricao: "Gera inventario de pacotes, arquivos, tipos e membros.",
         escopo: "adaptavel",
-        efeito: "geracao",
+        finalidade: "inventariar",
+        efeitos: criarEfeitosComando("opcional"),
         argumentos: esquema(["--base", "--saida"], ["--json", "--gravar"]),
         arquivo: "codigo/nomes-simbolos-coletar.ts"
     },
@@ -215,7 +260,8 @@ const CATALOGO_COMANDOS = [
         caminho: ["codigo", "nomes", "auditar-consistencia"],
         descricao: "Audita padroes e divergencias de nomenclatura.",
         escopo: "adaptavel",
-        efeito: "auditoria",
+        finalidade: "auditar",
+        efeitos: criarEfeitosComando("opcional"),
         argumentos: esquema(["--base", "--inventario", "--saida"], ["--json", "--gravar"]),
         arquivo: "codigo/nomes-consistencia-auditar.ts"
     },
@@ -223,7 +269,8 @@ const CATALOGO_COMANDOS = [
         caminho: ["codigo", "nomes", "auditar-idioma"],
         descricao: "Detecta nomes em inglês e campos com 'id' que deveriam usar 'codigo'.",
         escopo: "perfil-sgc",
-        efeito: "auditoria",
+        finalidade: "auditar",
+        efeitos: criarEfeitosComando("opcional"),
         argumentos: esquema(["--base", "--inventario", "--saida"], ["--json", "--gravar"]),
         arquivo: "codigo/idioma-consistencia-auditar.ts"
     },
@@ -231,7 +278,8 @@ const CATALOGO_COMANDOS = [
         caminho: ["integracao", "contratos", "exportar-openapi"],
         descricao: "Exporta o OpenAPI atual da aplicação para arquivo local.",
         escopo: "adaptavel",
-        efeito: "geracao",
+        finalidade: "gerar",
+        efeitos: criarEfeitosComando("intrinseca", {rede: true}),
         argumentos: esquema(["--base", "--url", "--saida"], ["--json"]),
         arquivo: "integracao/contratos-exportar-openapi.ts"
     },
@@ -239,7 +287,8 @@ const CATALOGO_COMANDOS = [
         caminho: ["integracao", "contratos", "diff"],
         descricao: "Compara duas versões do OpenAPI e resume mudanças de contrato.",
         escopo: "adaptavel",
-        efeito: "auditoria",
+        finalidade: "auditar",
+        efeitos: criarEfeitosComando("opcional", {subprocessos: true}),
         argumentos: esquema(["--base", "--anterior", "--atual"], ["--json", "--gravar"]),
         arquivo: "integracao/contratos-diff.ts"
     },
@@ -247,7 +296,8 @@ const CATALOGO_COMANDOS = [
         caminho: ["integracao", "contratos", "fixar-baseline"],
         descricao: "Promove o OpenAPI mais recente como baseline de comparação.",
         escopo: "adaptavel",
-        efeito: "mutacao",
+        finalidade: "transformar",
+        efeitos: criarEfeitosComando("intrinseca"),
         argumentos: esquema(["--base", "--origem", "--destino"], ["--json"]),
         arquivo: "integracao/contratos-fixar-baseline.ts"
     },
@@ -255,7 +305,8 @@ const CATALOGO_COMANDOS = [
         caminho: ["requisitos", "cdus", "inventariar"],
         descricao: "Consolida formatos, vocabulário, mensagens, densidade e duplicações do corpus CDU.",
         escopo: "adaptavel",
-        efeito: "geracao",
+        finalidade: "inventariar",
+        efeitos: criarEfeitosComando("nenhuma"),
         argumentos: esquema(["--base", "--secoes"], ["--json"]),
         arquivo: "requisitos/cdus-inventariar.ts"
     },
@@ -263,7 +314,8 @@ const CATALOGO_COMANDOS = [
         caminho: ["requisitos", "cdus", "auditar"],
         descricao: "Audita estrutura, estilo, vocabulário, mensagens e referências do corpus CDU.",
         escopo: "adaptavel",
-        efeito: "auditoria",
+        finalidade: "auditar",
+        efeitos: criarEfeitosComando("nenhuma"),
         argumentos: esquema(["--base", "--secoes"], ["--json"]),
         arquivo: "requisitos/cdus-auditar.ts"
     },
@@ -271,7 +323,8 @@ const CATALOGO_COMANDOS = [
         caminho: ["projeto", "arvore-linhas"],
         descricao: "Gera arvore agregada de linhas do repositório.",
         escopo: "nucleo",
-        efeito: "geracao",
+        finalidade: "inventariar",
+        efeitos: criarEfeitosComando("nenhuma", {subprocessos: true}),
         argumentos: esquema(["--base", "--profundidade", "--minimo-linhas"], ["--excluir-testes"]),
         arquivo: "projeto/arvore-linhas.ts"
     },
@@ -279,7 +332,8 @@ const CATALOGO_COMANDOS = [
         caminho: ["projeto", "versao-sincronizar"],
         descricao: "Sincroniza a versao entre gradle.properties e frontend/package.json.",
         escopo: "adaptavel",
-        efeito: "mutacao",
+        finalidade: "transformar",
+        efeitos: criarEfeitosComando("opcional"),
         argumentos: esquema(["--base"], ["--gravar"], 1),
         arquivo: "projeto/versao-sincronizar.ts"
     }
@@ -290,7 +344,8 @@ const CATALOGO_COMANDOS_ESPECIAIS = [
         caminho: ["qualidade", "coletar"],
         descricao: "Coleta uma fotografia de qualidade do projeto.",
         escopo: "adaptavel",
-        efeito: "orquestracao",
+        finalidade: "orquestrar",
+        efeitos: criarEfeitosComando("intrinseca", {subprocessos: true}),
         argumentos: esquema(["--perfil", "--base"]),
         arquivo: "qualidade/coleta.ts"
     },
@@ -298,35 +353,40 @@ const CATALOGO_COMANDOS_ESPECIAIS = [
         caminho: ["qualidade", "tarefas", "executar"],
         descricao: "Executa tarefas de qualidade configuradas para o projeto.",
         escopo: "adaptavel",
-        efeito: "orquestracao",
+        finalidade: "orquestrar",
+        efeitos: criarEfeitosComando("nenhuma", {subprocessos: true}),
         argumentos: esquema(["--base"], [], 0, 1)
     },
     {
         caminho: ["qualidade", "resumo"],
         descricao: "Resume a fotografia de qualidade mais recente.",
         escopo: "nucleo",
-        efeito: "auditoria",
+        finalidade: "auditar",
+        efeitos: criarEfeitosComando("nenhuma"),
         argumentos: esquema(["--arquivo", "--base", "--limite-pontos-criticos"], ["--json"])
     },
     {
         caminho: ["projeto", "dependencias", "auditar"],
         descricao: "Audita uso, atualizacao e vulnerabilidades de dependencias npm e Gradle.",
         escopo: "adaptavel",
-        efeito: "orquestracao",
+        finalidade: "orquestrar",
+        efeitos: criarEfeitosComando("nenhuma", {subprocessos: true, rede: true}),
         argumentos: esquema(["--base"])
     },
     {
         caminho: ["projeto", "ambiente", "verificar"],
         descricao: "Verifica pre-requisitos, comandos e arquivos essenciais do projeto auditado.",
         escopo: "adaptavel",
-        efeito: "auditoria",
+        finalidade: "auditar",
+        efeitos: criarEfeitosComando("nenhuma", {subprocessos: true}),
         argumentos: esquema(["--base"], ["--json"])
     },
     {
         caminho: ["projeto", "artefatos", "limpar"],
         descricao: "Lista ou remove artefatos gerados pelo toolkit e pelas ferramentas de qualidade.",
         escopo: "adaptavel",
-        efeito: "mutacao",
+        finalidade: "transformar",
+        efeitos: criarEfeitosComando("nenhuma", {remocao: true}),
         argumentos: esquema(["--base"], ["--json", "--confirmar"])
     }
 ] as const satisfies readonly (DefinicaoComando | DefinicaoComandoArquivo)[];

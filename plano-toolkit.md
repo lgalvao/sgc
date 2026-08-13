@@ -55,10 +55,10 @@ quando houver contrato claro e uso horizontal plausível ou comprovado.
 - Ações cujo próprio nome expressa geração ou promoção, como exportar OpenAPI ou fixar baseline, podem gravar diretamente.
 - Saída JSON deve permanecer limpa em stdout; diagnóstico operacional e falhas devem ir para stderr.
 - Comandos mutáveis precisam de teste de prévia, efeito e idempotência quando aplicável.
-- O catálogo deve distinguir a finalidade do comando de seu efeito no sistema: inventariar não significa necessariamente
-  gravar, e orquestrar não informa se subprocessos produzem artefatos.
-- Metadados de efeito devem declarar separadamente leitura, persistência opcional, persistência intrínseca, mutação,
-  remoção, rede e execução de subprocessos.
+- O catálogo distingue a finalidade do comando de seus efeitos observáveis: inventariar não significa necessariamente
+  gravar, e orquestrar não informa por si só se há rede ou subprocessos.
+- Metadados declaram separadamente persistência direta, remoção, rede e execução de subprocessos; efeitos internos de
+  ferramentas externas não são atribuídos ao toolkit sem evidência.
 - Funções de domínio devem retornar resultados ou lançar erros; somente a borda CLI pode alterar `process.exitCode`.
 
 ### Disciplina da CLI
@@ -149,7 +149,8 @@ isolado funciona, mas as fronteiras ainda não estão concluídas:
   já aparecem no mesmo catálogo de opções da CLI principal;
 - o roteador e os entrypoints diretos publicados validam opções, valores e posicionais pelo mesmo preflight, inclusive a
   forma `--opcao=valor`; os scripts internos não publicados continuam fora desse contrato deliberado;
-- `efeito` no catálogo mistura intenção funcional e efeitos reais no sistema;
+- o catálogo já separa finalidade (`auditar`, `inventariar`, `gerar`, `transformar`, `orquestrar`) dos efeitos diretos de
+  persistência, remoção, subprocessos e rede;
 - muitos módulos interpretam argumentos manualmente e controlam `process.exitCode` dentro da implementação;
 - resultados próprios ainda misturam português, inglês, `camelCase` e `snake_case`, especialmente na análise de testes;
 - apenas cobertura Java e web está publicada como API programática horizontal;
@@ -168,7 +169,8 @@ Prioridade imediata, porque corrige comportamento surpreendente antes de ampliar
   comandos encaminhados pelo roteador;
 - avaliar apenas entrypoints internos não publicados que continuarem sendo chamados diretamente por agentes; comandos
   públicos de arquivo e `qualidade/coleta.ts` já compartilham o preflight da CLI;
-- substituir o campo genérico `efeito` por metadados separados de finalidade e efeitos observáveis;
+- refinar metadados de efeitos quando novas integrações forem adicionadas, mantendo a distinção entre escrita direta e
+  efeitos de subprocessos externos;
 - retirar `process.exitCode` das funções de domínio e concentrar a tradução de resultados em códigos de saída na borda;
 - definir códigos compartilhados para invocação inválida, falha operacional e achados, sem aplicar código não zero a
   inventários meramente informativos;

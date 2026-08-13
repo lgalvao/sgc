@@ -135,6 +135,10 @@ altera arquivos com `--gravar`.
 - Caminhos relativos são resolvidos contra `--base` quando a opção estiver disponível.
 - `--help` e `-h` mostram a ajuda sem exigir argumentos posicionais obrigatórios.
 
+O catálogo interno separa a `finalidade` (`auditar`, `inventariar`, `gerar`, `transformar` ou `orquestrar`) dos efeitos
+observáveis: persistência `nenhuma`, `opcional` ou `intrínseca`, remoção, subprocessos e rede. Persistência descreve o que
+o toolkit grava diretamente; subprocessos podem ter efeitos próprios definidos pela ferramenta externa.
+
 A acessibilidade Playwright/Axe do SGC não pertence ao toolkit. Ela é executada diretamente pelo workspace `e2e/`.
 
 ## Configuração por projeto

@@ -39,6 +39,25 @@ describe("Execução e distribuição da CLI", () => {
         }
     });
 
+    test("declara finalidade e efeitos observáveis para cada comando", () => {
+        for (const definicao of CATALOGO_COMANDOS_COMPLETO) {
+            expect(["auditar", "inventariar", "gerar", "transformar", "orquestrar"])
+                .toContain(definicao.finalidade);
+            expect(definicao.efeitos).toEqual({
+                persistencia: expect.stringMatching(/^(nenhuma|opcional|intrinseca)$/),
+                remocao: expect.any(Boolean),
+                subprocessos: expect.any(Boolean),
+                rede: expect.any(Boolean),
+            });
+        }
+
+        const exportarOpenapi = CATALOGO_COMANDOS_COMPLETO.find(item => item.caminho.join(" ") === "integracao contratos exportar-openapi");
+        expect(exportarOpenapi?.efeitos).toMatchObject({persistencia: "intrinseca", rede: true});
+
+        const limparArtefatos = CATALOGO_COMANDOS_COMPLETO.find(item => item.caminho.join(" ") === "projeto artefatos limpar");
+        expect(limparArtefatos?.efeitos.remocao).toBe(true);
+    });
+
     test("pode ser importada sem executar a CLI", async () => {
         const caminhoSgc = pathToFileURL(CAMINHO_SGC).href;
         const resultado = await execa(process.execPath, [
