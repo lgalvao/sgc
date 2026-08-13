@@ -144,6 +144,7 @@ Corrigir apenas violações encontradas no recorte 1:
 - reclassificar como perfil SGC o que não justificar parametrização;
 - separar CLI, persistência ou formatação de um motor apenas quando isso impedir reuso ou teste isolado;
 - garantir que os dois comandos CDU e o analisador Java continuem funcionando com configuração externa;
+- substituir testes que apenas reproduzem a implementação por testes semânticos das decisões aprovadas;
 - atualizar contratos públicos deliberados sem aliases de compatibilidade.
 
 Critério de saída: nenhuma capacidade classificada como núcleo ou adaptador depende de vocabulário, caminho ou regra de
@@ -153,6 +154,7 @@ negócio SGC; capacidades locais continuam executáveis contra o workspace do SG
 
 - confrontar ajuda, catálogo, README, exports e arquivos empacotados;
 - executar a instalação isolada e todas as validações do toolkit;
+- repetir a amostra contra o SGC e confrontar manualmente os principais achados com o código apontado;
 - remover artefatos, fixtures e documentação que tenham perdido a finalidade;
 - registrar melhorias opcionais em uma seção curta de backlog, sem tratá-las como bloqueadoras;
 - encerrar com worktree limpo, commit e push.
@@ -172,6 +174,7 @@ A modernização termina quando todos estes itens forem verdadeiros:
 - [ ] CDU e análise de testes Java funcionam com fixture externa sem editar o toolkit;
 - [ ] uma execução representativa contra o SGC não produz severidade contraditória, ambiguidade sistemática ou destaque
   sem violação correspondente;
+- [ ] cada auditor mantido possui testes que demonstram acerto semântico, e não apenas execução, schema ou snapshot;
 - [ ] ajuda, parser, catálogo e README concordam sobre a superfície pública;
 - [ ] o tarball instalado isoladamente executa o binário e as APIs públicas suportadas;
 - [ ] testes, typechecks, lint, Knip, build e `git diff --check` passam;
@@ -201,6 +204,29 @@ Caso contrário, o achado vai para backlog e não amplia o recorte ativo. Em par
 
 Cada recorte deve caber em uma decisão funcional coesa, terminar validado e receber commit/push. Se surgir trabalho maior,
 ele substitui um recorte futuro ou vai para backlog; não vira uma cadeia ilimitada de sub-recortes.
+
+## Testes de utilidade e correção semântica
+
+Todo auditor mantido deve ter uma especificação comportamental curta que diga o que constitui achado, não achado e
+severidade. Os testes devem partir dessa especificação, sem calcular o resultado esperado repetindo a fórmula interna.
+
+Para cada regra relevante, exigir:
+
+- exemplo positivo mínimo, no qual o problema existe e é localizado com motivo compreensível;
+- exemplo negativo próximo, no qual uma construção legítima não é marcada;
+- caso limítrofe para thresholds ou classificações;
+- teste de invariantes do relatório, como “ponto crítico possui severidade crítica”, “violação destacada contém ao menos
+  um motivo” e “teste no pacote correspondente não é ambíguo”;
+- fixture com vários arquivos para detectar efeitos proporcionais ao tamanho, duplicações e falsos positivos sistêmicos;
+- teste da saída humana, verificando que ela informa arquivo, motivo e próxima decisão sem exigir leitura do JSON completo;
+- regressão focada derivada de cada erro descoberto no reality check.
+
+Snapshots e validações de schema continuam úteis, mas apenas como testes de contrato. Não substituem assertions sobre o
+significado do resultado. Cobertura de linhas também não comprova qualidade da heurística.
+
+Além das fixtures sintéticas, o encerramento exige uma amostra de caracterização contra o SGC real. Os principais achados
+devem ser confrontados com os arquivos apontados; resultados incorretos geram uma regressão mínima antes da correção. O
+corpus real não deve ser copiado integralmente para os testes nem congelado em snapshots gigantes.
 
 ## Validação
 
