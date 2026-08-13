@@ -13,7 +13,26 @@ const CAMINHOS_PERMITIDOS_BMODAL = new Set([
     "components/comum/ModalPadrao.vue",
 ]);
 
-function listarArquivosVue(diretorio) {
+interface ViolacaoModal {
+    arquivo: string;
+    linha: number;
+    regra: "componente-com-bmodal-cru";
+    motivo: string;
+}
+
+interface ResultadoValidacaoModais {
+    resumo: {
+        totalArquivos: number;
+        totalViolacoes: number;
+    };
+    violacoes: ViolacaoModal[];
+}
+
+interface OpcoesValidacaoModais {
+    base?: string;
+}
+
+function listarArquivosVue(diretorio: string): string[] {
     const entradas = fs.readdirSync(diretorio, {withFileTypes: true});
     return entradas.flatMap((entrada) => {
         const caminhoEntrada = path.join(diretorio, entrada.name);
@@ -24,7 +43,7 @@ function listarArquivosVue(diretorio) {
     });
 }
 
-function localizarLinha(conteudo, trecho) {
+function localizarLinha(conteudo: string, trecho: string): number | null {
     const indice = conteudo.indexOf(trecho);
     if (indice === -1) {
         return null;
@@ -32,7 +51,7 @@ function localizarLinha(conteudo, trecho) {
     return conteudo.slice(0, indice).split(/\r?\n/u).length;
 }
 
-function auditarArquivo(caminhoArquivo, diretorioBase, diretorioCodigo) {
+function auditarArquivo(caminhoArquivo: string, diretorioBase: string, diretorioCodigo: string): ViolacaoModal[] {
     const caminhoRelativo = path.relative(diretorioBase, caminhoArquivo).replaceAll("\\", "/");
     const caminhoRelativoCodigo = path.relative(diretorioCodigo, caminhoArquivo).replaceAll("\\", "/");
     if (CAMINHOS_PERMITIDOS_BMODAL.has(caminhoRelativoCodigo)) {
@@ -52,7 +71,7 @@ function auditarArquivo(caminhoArquivo, diretorioBase, diretorioCodigo) {
     }];
 }
 
-async function executarValidacaoModais(opcoes = {}) {
+async function executarValidacaoModais(opcoes: OpcoesValidacaoModais = {}): Promise<ResultadoValidacaoModais> {
     const diretorioBase = path.resolve(opcoes.base ?? DIRETORIO_RAIZ);
     const diretorioCodigo = resolverCaminhoConfigurado("frontendCodigo", diretorioBase);
     const diretorioComponentes = path.join(diretorioCodigo, "components");
@@ -67,7 +86,7 @@ async function executarValidacaoModais(opcoes = {}) {
     };
 }
 
-function imprimirResultado(resultado) {
+function imprimirResultado(resultado: ResultadoValidacaoModais): void {
     if (resultado.violacoes.length === 0) {
         escreverLinha(`${pc.green("✓")} Modais padronizados. Nenhum BModal cru encontrado fora de ModalPadrao.`);
         return;
@@ -80,14 +99,14 @@ function imprimirResultado(resultado) {
     });
 }
 
-async function principal(argumentos = process.argv.slice(2)) {
+async function principal(argumentos: string[] = process.argv.slice(2)): Promise<void> {
     const emitirJson = argumentos.includes("--json");
     const exibirAjuda = argumentos.includes("--help") || argumentos.includes("-h");
 
     if (exibirAjuda) {
         exibirAjudaComando({
             comandoSgc: "frontend modais validar",
-            scriptDireto: "frontend/modais-validar.js",
+            scriptDireto: "frontend/modais-validar.ts",
             descricao: "Valida que apenas ModalPadrao abre BModal diretamente no frontend.",
             opcoes: [
                 "--json               Emite o resultado bruto em JSON.",

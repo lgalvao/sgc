@@ -71,12 +71,12 @@ const CAMINHOS_COMANDOS_CONSISTENCIA = [
 const CAMINHOS_COMANDOS_ESTRUTURA_FRONTEND = [
     "arquitetura-auditar.js",
     "arquitetura-validar.js",
-    "modais-validar.js",
+    "modais-validar.ts",
     "residuos-auditar.ts",
     "residuos-validar.ts",
     "identificadores-teste-listar.ts",
     "identificadores-teste-listar-duplicados.ts",
-    "views-templates-validar.js"
+    "views-templates-validar.ts"
 ].map(nome => path.join(DIRETORIO_RAIZ, "toolkit", "frontend", nome));
 const CAMINHOS_COMANDOS_COBERTURA_FRONTEND = [
     "cobertura-auditoria.ts",

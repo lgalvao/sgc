@@ -22,14 +22,34 @@ const MARCADORES_CABECALHO = [
     "<ProcessoAcoes",
 ];
 
-function listarViews(diretorioViews) {
+interface ViolacaoView {
+    arquivo: string;
+    linha: number;
+    regra: "view-sem-layout-padrao" | "view-sem-cabecalho-padrao" | "view-com-bmodal-cru";
+    motivo: string;
+}
+
+interface ResultadoValidacaoViews {
+    resumo: {
+        totalViews: number;
+        totalViolacoes: number;
+        porRegra: Record<string, number>;
+    };
+    violacoes: ViolacaoView[];
+}
+
+interface OpcoesValidacaoViews {
+    base?: string;
+}
+
+function listarViews(diretorioViews: string): string[] {
     return fs.readdirSync(diretorioViews)
         .filter((nome) => nome.endsWith(".vue"))
         .map((nome) => path.join(diretorioViews, nome))
         .toSorted();
 }
 
-function localizarLinha(conteudo, trecho) {
+function localizarLinha(conteudo: string, trecho: string): number | null {
     const indice = conteudo.indexOf(trecho);
     if (indice === -1) {
         return null;
@@ -37,11 +57,11 @@ function localizarLinha(conteudo, trecho) {
     return conteudo.slice(0, indice).split(/\r?\n/u).length;
 }
 
-function auditarView(caminhoArquivo, diretorioBase) {
+function auditarView(caminhoArquivo: string, diretorioBase: string): ViolacaoView[] {
     const conteudo = fs.readFileSync(caminhoArquivo, "utf8");
     const nomeArquivo = path.basename(caminhoArquivo);
     const caminhoRelativo = path.relative(diretorioBase, caminhoArquivo).replaceAll("\\", "/");
-    const violacoes = [];
+    const violacoes: ViolacaoView[] = [];
 
     const usaLayoutPadrao = conteudo.includes("<LayoutPadrao");
     const usaCabecalhoEsperado = MARCADORES_CABECALHO.some((marcador) => conteudo.includes(marcador));
@@ -77,18 +97,18 @@ function auditarView(caminhoArquivo, diretorioBase) {
     return violacoes;
 }
 
-function resumir(violacoes, totalViews) {
+function resumir(violacoes: ViolacaoView[], totalViews: number): ResultadoValidacaoViews["resumo"] {
     return {
         totalViews,
         totalViolacoes: violacoes.length,
-        porRegra: violacoes.reduce((acc, violacao) => {
+        porRegra: violacoes.reduce<Record<string, number>>((acc, violacao) => {
             acc[violacao.regra] = (acc[violacao.regra] ?? 0) + 1;
             return acc;
         }, {}),
     };
 }
 
-async function executarValidacaoTemplatesViews(opcoes = {}) {
+async function executarValidacaoTemplatesViews(opcoes: OpcoesValidacaoViews = {}): Promise<ResultadoValidacaoViews> {
     const diretorioBase = path.resolve(opcoes.base ?? DIRETORIO_RAIZ);
     const diretorioViews = path.join(resolverCaminhoConfigurado("frontendCodigo", diretorioBase), "views");
     const views = listarViews(diretorioViews);
@@ -99,7 +119,7 @@ async function executarValidacaoTemplatesViews(opcoes = {}) {
     };
 }
 
-function imprimirResultado(resultado) {
+function imprimirResultado(resultado: ResultadoValidacaoViews): void {
     if (resultado.violacoes.length === 0) {
         escreverLinha(`${pc.green("✓")} Templates de views padronizados. Nenhum BModal cru encontrado em views.`);
         return;
@@ -112,14 +132,14 @@ function imprimirResultado(resultado) {
     });
 }
 
-async function principal(argumentos = process.argv.slice(2)) {
+async function principal(argumentos: string[] = process.argv.slice(2)): Promise<void> {
     const emitirJson = argumentos.includes("--json");
     const exibirAjuda = argumentos.includes("--help") || argumentos.includes("-h");
 
     if (exibirAjuda) {
         exibirAjudaComando({
             comandoSgc: "frontend views templates-validar",
-            scriptDireto: "frontend/views-templates-validar.js",
+            scriptDireto: "frontend/views-templates-validar.ts",
             descricao: "Valida previsibilidade estrutural das views do frontend (shell, header e proibicao de BModal cru).",
             opcoes: [
                 "--json               Emite o resultado bruto em JSON.",
