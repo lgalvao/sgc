@@ -2,6 +2,7 @@ import path from "node:path";
 import {resolverNaRaiz} from "../lib/caminhos.js";
 import {resolverFotografiaQualidade} from "../lib/qualidade.js";
 import {escreverLinha, imprimirCabecalho, imprimirJson} from "../lib/saida.js";
+import {VERSAO_SCHEMA_FOTOGRAFIA} from "./coleta-fotografia.js";
 
 interface VerificacaoQualidade {
     codigo: string;
@@ -10,13 +11,12 @@ interface VerificacaoQualidade {
 }
 
 interface FotografiaResumo {
+    versaoSchema: typeof VERSAO_SCHEMA_FOTOGRAFIA;
     resumo?: {
         statusGeral?: string;
-        indiceSaude?: number | string;
         totais?: {verificacoes?: number};
     };
     verificacoes?: VerificacaoQualidade[];
-    confiabilidade?: {suitesLentas?: unknown[]};
     hotspots?: Array<{nome: string; risco: number}>;
 }
 
@@ -28,10 +28,10 @@ interface OpcoesResumo {
 }
 
 interface ResultadoResumo {
+    versaoSchema: typeof VERSAO_SCHEMA_FOTOGRAFIA;
     caminho: string;
     resumo: FotografiaResumo["resumo"];
     verificacoes: VerificacaoQualidade[];
-    confiabilidade: NonNullable<FotografiaResumo["confiabilidade"]>;
     hotspots: NonNullable<FotografiaResumo["hotspots"]>;
 }
 
@@ -43,9 +43,7 @@ function imprimirHumano(caminho: string, fotografia: FotografiaResumo, limitePon
     imprimirCabecalho("Resumo da qualidade", `Fotografia: ${caminho}`);
     escreverLinha("");
     escreverLinha(`- Status geral: ${fotografia.resumo?.statusGeral ?? "-"}`);
-    escreverLinha(`- Indice de saude: ${fotografia.resumo?.indiceSaude ?? "-"}`);
     escreverLinha(`- Verificacoes: ${fotografia.resumo?.totais?.verificacoes ?? fotografia.verificacoes?.length ?? 0}`);
-    escreverLinha(`- Suites lentas: ${(fotografia.confiabilidade?.suitesLentas ?? []).length}`);
     escreverLinha("");
     escreverLinha("Verificacoes:");
     for (const verificacao of fotografia.verificacoes ?? []) {
@@ -68,11 +66,14 @@ async function executarResumoQualidade(opcoes: OpcoesResumo = {}): Promise<Resul
     const diretorioBase = path.resolve(opcoes.base ?? resolverNaRaiz());
     const resolvido = await resolverFotografiaQualidade<FotografiaResumo>(opcoes.arquivo ?? null, diretorioBase);
     const fotografia = resolvido.fotografia;
+    if (fotografia.versaoSchema !== VERSAO_SCHEMA_FOTOGRAFIA) {
+        throw new Error(`Fotografia de qualidade possui versao ausente ou incompativel: esperado ${VERSAO_SCHEMA_FOTOGRAFIA}.`);
+    }
     const saida: ResultadoResumo = {
+        versaoSchema: fotografia.versaoSchema,
         caminho: path.relative(diretorioBase, resolvido.caminho).replaceAll("\\", "/"),
         resumo: fotografia.resumo,
         verificacoes: fotografia.verificacoes ?? [],
-        confiabilidade: fotografia.confiabilidade ?? {},
         hotspots: fotografia.hotspots ?? []
     };
 

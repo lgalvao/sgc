@@ -1,4 +1,4 @@
-import {executarNode} from "../lib/execucao.js";
+import {executarTsx} from "../lib/execucao.js";
 import {ehEntradaPrincipal, validarArgumentosEntradaDireta} from "../lib/execucao.js";
 import logger from "../lib/logger.js";
 import {exibirAjudaComando} from "../lib/cli-ajuda.js";
@@ -74,7 +74,7 @@ async function executarColetaQualidade(argumentosInformados: string[] = process.
     }
 
     const argumentosNormalizados = normalizarArgumentosColeta(argumentos);
-    await executarNode("toolkit/qualidade/coleta-execucao.ts", argumentosNormalizados);
+    await executarTsx("toolkit/qualidade/coleta-execucao.ts", argumentosNormalizados);
 }
 
 if (ehEntradaPrincipal(import.meta.url)) {

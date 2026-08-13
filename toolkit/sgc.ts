@@ -3,7 +3,7 @@ import {Command} from "commander";
 import pc from "picocolors";
 import {CATALOGO_COMANDOS, CATALOGO_COMANDOS_COMPLETO} from "./lib/catalogo-comandos.js";
 import {validarArgumentos, type EsquemaArgumentos} from "./lib/cli-opcoes.js";
-import {executarNode} from "./lib/execucao.js";
+import {executarTsx} from "./lib/execucao.js";
 import logger from "./lib/logger.js";
 
 function criarGrupoComando(pai: Command, nome: string, descricao: string): Command {
@@ -26,7 +26,7 @@ function criarComandoArquivo(
         .action(async (...valores: unknown[]) => {
             const comando = valores.at(-1) as Command;
             const argumentos = validarArgumentos(comando.args ?? [], esquema);
-            await executarNode(relativo, argumentos);
+            await executarTsx(relativo, argumentos);
         });
 }
 

@@ -38,7 +38,7 @@ function validarArgumentosEntradaDireta(urlModulo: string, argumentos: readonly 
     return definicao ? validarArgumentos(argumentos, definicao.argumentos) : [...argumentos];
 }
 
-async function executarNode(relativo: string, argumentos: string[] = []) {
+async function executarTsx(relativo: string, argumentos: string[] = []) {
     const script = garantirArquivo(relativo);
     return execa(resolverCaminhoTsx(), [script, ...argumentos], {
         cwd: DIRETORIO_RAIZ,
@@ -48,7 +48,7 @@ async function executarNode(relativo: string, argumentos: string[] = []) {
 
 export {
     ehEntradaPrincipal,
-    executarNode,
+    executarTsx,
     resolverCaminhoTsx,
     validarArgumentosEntradaDireta
 };

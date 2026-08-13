@@ -2,7 +2,6 @@
   "versaoSchema": "1.0.0",
   "resumo": {
     "statusGeral": "verde",
-    "indiceSaude": 92.5,
     "totais": {
       "verificacoes": 3,
       "sucesso": 3,
@@ -28,14 +27,6 @@
       "sumario": "Lint sem erros."
     }
   ],
-  "confiabilidade": {
-    "suitesLentas": [
-      {
-        "codigo": "e2e-playwright",
-        "duracaoMs": 31000
-      }
-    ]
-  },
   "hotspots": [
     {
       "nome": "sgc.processo.ProcessoService",

@@ -31,6 +31,7 @@ describe("Qualidade do toolkit", () => {
         expect(resultado.exitCode).toBe(0);
 
         const json = JSON.parse(resultado.stdout);
+        expect(json.versaoSchema).toBe("1.0.0");
         expect(json.resumo.statusGeral).toBe("verde");
         expect(json.hotspots).toHaveLength(2);
     });
@@ -40,9 +41,9 @@ describe("Qualidade do toolkit", () => {
         const caminhoFotografia = path.join(diretorioBase, "toolkit", "qualidade", "artefatos", "mais-recente", "fotografia.json");
         await criarDiretorio(path.dirname(caminhoFotografia));
         await escreverJson(caminhoFotografia, {
+            versaoSchema: "1.0.0",
             resumo: {
                 statusGeral: "verde",
-                indiceSaude: 98,
                 totais: {verificacoes: 1}
             },
             verificacoes: [],
@@ -53,9 +54,29 @@ describe("Qualidade do toolkit", () => {
 
         expect(resultado.exitCode).toBe(0);
         const json = JSON.parse(resultado.stdout);
+        expect(json.versaoSchema).toBe("1.0.0");
         expect(json.resumo.statusGeral).toBe("verde");
-        expect(json.resumo.indiceSaude).toBe(98);
         expect(json.caminho).toBe("toolkit/qualidade/artefatos/mais-recente/fotografia.json");
+    });
+
+    test("rejeita fotografia de qualidade com versao incompativel", async () => {
+        const diretorioBase = await mkdtemp(path.join(os.tmpdir(), "sgc-qualidade-versao-invalida-"));
+        const caminhoFotografia = path.join(diretorioBase, "fotografia.json");
+        await escreverJson(caminhoFotografia, {versaoSchema: "99.0.0", resumo: {}, verificacoes: [], hotspots: []});
+
+        const resultado = await executarSgc([
+            "qualidade",
+            "resumo",
+            "--json",
+            "--base",
+            diretorioBase,
+            "--arquivo",
+            caminhoFotografia
+        ]);
+
+        expect(resultado.exitCode).toBe(1);
+        expect(resultado.stdout).toBe("");
+        expect(resultado.stderr).toContain("versao ausente ou incompativel");
     });
 
     test("exibe ajuda de coleta de fotografia com opcao de perfil", async () => {
