@@ -2,7 +2,7 @@ import {execa} from "execa";
 import path from "node:path";
 import {carregarConfiguracao, type EscopoComandoConfigurado} from "../lib/configuracao.js";
 import {resolverNaRaiz} from "../lib/caminhos.js";
-import {imprimirCabecalho} from "../lib/saida.js";
+import {escreverLinha, imprimirCabecalho} from "../lib/saida.js";
 
 type DefinicaoEscopoAuditoria = EscopoComandoConfigurado;
 
@@ -87,7 +87,8 @@ async function executarAuditoriaDependencias(
 
     const resultados: ResultadoEscopoAuditoria[] = [];
     for (const escopo of escopos) {
-        process.stdout.write(`\n${escopo.titulo}\n`);
+        escreverLinha();
+        escreverLinha(escopo.titulo);
         const resultado = await executarComando(escopo.comando, escopo.argumentos, escopo.diretorio);
         resultados.push({escopo: escopo.titulo, codigoSaida: resultado.exitCode ?? 0});
     }
