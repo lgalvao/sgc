@@ -17,7 +17,7 @@
     "frontend/acessibilidade-crawler.ts",
     "frontend/acessibilidade-processar-resultados.ts",
     "frontend/arquitetura-auditar.js",
-    "frontend/arquitetura-validar.js",
+    "frontend/arquitetura-validar.ts",
     "frontend/cobertura-auditoria.ts",
     "frontend/cobertura-ramificacoes-erros.ts",
     "frontend/cobertura-ramificacoes.ts",

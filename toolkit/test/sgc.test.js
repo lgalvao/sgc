@@ -70,7 +70,7 @@ const CAMINHOS_COMANDOS_CONSISTENCIA = [
 ].map(nome => path.join(DIRETORIO_RAIZ, "toolkit", "codigo", nome));
 const CAMINHOS_COMANDOS_ESTRUTURA_FRONTEND = [
     "arquitetura-auditar.js",
-    "arquitetura-validar.js",
+    "arquitetura-validar.ts",
     "modais-validar.ts",
     "residuos-auditar.ts",
     "residuos-validar.ts",
