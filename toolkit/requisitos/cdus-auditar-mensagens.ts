@@ -6,19 +6,53 @@ import {escreverLinha, imprimirJson} from "../lib/saida.js";
 import {lerArquivo, listarArquivosCdu, obterLinhas, obterOpcoesCdu} from "./cdus-lib.js";
 import {extrairAssuntos, extrairDescricoes, extrairMensagens, extrairToasts} from "./cdus-mensagens-lib.js";
 
-function adicionarAchado(achados, severidade, regra, mensagem, linha = null) {
+type Severidade = "aviso";
+type RegraMensagens =
+    | "descricao_espacamento"
+    | "descricao_placeholder_legado"
+    | "assunto_fechamento_suspeito"
+    | "assunto_placeholder_legado"
+    | "mensagem_placeholder_legado"
+    | "toast_placeholder_legado";
+
+interface AchadoMensagem {
+    severidade: Severidade;
+    regra: RegraMensagens;
+    mensagem: string;
+    linha: number | null;
+}
+
+interface RelatorioArquivoMensagens {
+    arquivo: string;
+    achados: AchadoMensagem[];
+}
+
+interface ResumoMensagens {
+    base: string;
+    totalArquivos: number;
+    arquivosComAviso: number;
+    avisos: number;
+}
+
+function adicionarAchado(
+    achados: AchadoMensagem[],
+    severidade: Severidade,
+    regra: RegraMensagens,
+    mensagem: string,
+    linha: number | null = null
+): void {
     achados.push({severidade, regra, mensagem, linha});
 }
 
-function localizarLinha(linhas, trecho) {
+function localizarLinha(linhas: string[], trecho: string): number | null {
     const indice = linhas.findIndex(linha => linha.includes(trecho));
     return indice >= 0 ? indice + 1 : null;
 }
 
-function auditarArquivo(caminhoArquivo) {
+function auditarArquivo(caminhoArquivo: string): AchadoMensagem[] {
     const texto = lerArquivo(caminhoArquivo);
     const linhas = obterLinhas(texto);
-    const achados = [];
+    const achados: AchadoMensagem[] = [];
 
     for (const descricao of extrairDescricoes(texto)) {
         if (/\s{2,}/.test(descricao)) {
@@ -42,7 +76,7 @@ function auditarArquivo(caminhoArquivo) {
     }
 
     for (const assunto of extrairAssuntos(texto)) {
-        if (assunto.endsWith(']')) {
+        if (assunto.endsWith("]")) {
             adicionarAchado(
                 achados,
                 "aviso",
@@ -89,16 +123,16 @@ function auditarArquivo(caminhoArquivo) {
     return achados;
 }
 
-async function principal(argumentos = process.argv.slice(2)) {
+async function principal(argumentos: string[] = process.argv.slice(2)): Promise<void> {
     const {emitirJson, base} = obterOpcoesCdu(argumentos);
 
     const arquivos = await listarArquivosCdu(base);
-    const relatorio = arquivos.map(caminhoArquivo => ({
+    const relatorio: RelatorioArquivoMensagens[] = arquivos.map(caminhoArquivo => ({
         arquivo: path.relative(base, caminhoArquivo).replaceAll("\\", "/"),
         achados: auditarArquivo(caminhoArquivo)
     }));
 
-    const resumo = {
+    const resumo: ResumoMensagens = {
         base,
         totalArquivos: relatorio.length,
         arquivosComAviso: relatorio.filter(item => item.achados.length > 0).length,
