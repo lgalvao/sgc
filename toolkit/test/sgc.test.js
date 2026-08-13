@@ -1059,6 +1059,34 @@ describe("CLI raiz do toolkit", () => {
         ))).toBe(true);
     });
 
+    test("classifica residuos usando frontendCodigo configurado", async () => {
+        const base = await mkdtemp(path.join(os.tmpdir(), "sgc-residuos-codigo-configurado-"));
+        await fs.outputJSON(path.join(base, "configuracao-toolkit.json"), {
+            versao: VERSAO_CONFIGURACAO,
+            diretorios: {frontendCodigo: "cliente/codigo"},
+        });
+        await fs.outputFile(
+            path.join(base, "cliente", "codigo", "services", "exemploService.ts"),
+            "export function carregarExemplo(codigo: string) { return codigo; }\n"
+        );
+
+        const resultado = await executarSgc([
+            "frontend",
+            "residuos",
+            "auditar",
+            "--json",
+            "--sem-gravar",
+            "--base",
+            base,
+        ]);
+
+        expect(resultado.exitCode).toBe(0);
+        const fotografia = JSON.parse(resultado.stdout);
+        expect(fotografia.resumo.arquivosProducao).toBe(1);
+        expect(fotografia.arquivos[0].arquivo).toBe("cliente/codigo/services/exemploService.ts");
+        expect(fotografia.arquivos[0].camada).toBe("service");
+    });
+
     test("audita vazamentos arquiteturais do frontend em um recorte controlado", async () => {
         const base = await mkdtemp(path.join(os.tmpdir(), "sgc-arquitetura-auditar-"));
         const frontendDir = path.join(base, "frontend", "src");

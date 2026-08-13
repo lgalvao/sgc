@@ -7,16 +7,6 @@ const VERSAO_SCHEMA = "1.0.0";
 
 const EXTENSOES_SUPORTADAS = new Set([".ts", ".vue"]);
 
-const DEFINICOES_CAMADA = [
-    {camada: "service", prefixo: "frontend/src/services/"},
-    {camada: "store", prefixo: "frontend/src/stores/"},
-    {camada: "composable", prefixo: "frontend/src/composables/"},
-    {camada: "view", prefixo: "frontend/src/views/"},
-    {camada: "component", prefixo: "frontend/src/components/"},
-    {camada: "router", prefixo: "frontend/src/router/"},
-    {camada: "utils", prefixo: "frontend/src/utils/"},
-];
-
 const PADROES = {
     anyExplicito: [/\bas any\b/g, /:\s*any\b/g, /\bArray<any>\b/g, /\bPromise<any>\b/g, /\bref<any>\b/g, /\bRecord<[^>]+,\s*any>\b/g, /\[key:\s*string\]:\s*any\b/g],
     checksNull: [/(?:===|!==|==|!=)\s*null/g, /null\s*(?:===|!==|==|!=)/g],
@@ -54,26 +44,41 @@ function normalizarCaminho(caminhoArquivo) {
     return caminhoArquivo.split(path.sep).join("/");
 }
 
+function resolverPrefixoCodigo(base) {
+    const diretorioCodigo = resolverCaminhoConfigurado("frontendCodigo", base);
+    const relativo = normalizarCaminho(path.relative(base, diretorioCodigo));
+    return relativo ? `${relativo}/` : "";
+}
+
 function ehArquivoTesteOuHistoria(caminhoRelativo) {
     return caminhoRelativo.includes("/__tests__/")
         || caminhoRelativo.includes("/__mocks__/")
-        || caminhoRelativo.includes("/src/test/")
+        || caminhoRelativo.includes("/test/")
         || caminhoRelativo.includes("/test-utils/")
         || caminhoRelativo.endsWith(".spec.ts")
         || caminhoRelativo.endsWith(".test.ts")
         || caminhoRelativo.endsWith(".stories.ts");
 }
 
-function ehArquivoFrontend(caminhoRelativo) {
-    return caminhoRelativo.startsWith("frontend/src/");
+function ehArquivoFrontend(caminhoRelativo, prefixoCodigo) {
+    return prefixoCodigo === "" || caminhoRelativo.startsWith(prefixoCodigo);
 }
 
-function ehArquivoProducaoFrontend(caminhoRelativo) {
-    return ehArquivoFrontend(caminhoRelativo) && !ehArquivoTesteOuHistoria(caminhoRelativo);
+function ehArquivoProducaoFrontend(caminhoRelativo, prefixoCodigo) {
+    return ehArquivoFrontend(caminhoRelativo, prefixoCodigo) && !ehArquivoTesteOuHistoria(caminhoRelativo);
 }
 
-function classificarCamada(caminhoRelativo) {
-    const definicao = DEFINICOES_CAMADA.find((item) => caminhoRelativo.startsWith(item.prefixo));
+function classificarCamada(caminhoRelativo, prefixoCodigo) {
+    const definicoesCamada = [
+        {camada: "service", prefixo: `${prefixoCodigo}services/`},
+        {camada: "store", prefixo: `${prefixoCodigo}stores/`},
+        {camada: "composable", prefixo: `${prefixoCodigo}composables/`},
+        {camada: "view", prefixo: `${prefixoCodigo}views/`},
+        {camada: "component", prefixo: `${prefixoCodigo}components/`},
+        {camada: "router", prefixo: `${prefixoCodigo}router/`},
+        {camada: "utils", prefixo: `${prefixoCodigo}utils/`},
+    ];
+    const definicao = definicoesCamada.find((item) => caminhoRelativo.startsWith(item.prefixo));
     return definicao?.camada ?? "outro";
 }
 
@@ -96,7 +101,7 @@ function criarContagensZeradas() {
 }
 
 async function listarArquivosFrontend(base) {
-    const diretorioFrontend = path.join(base, "frontend", "src");
+    const diretorioFrontend = resolverCaminhoConfigurado("frontendCodigo", base);
     const arquivos = [];
 
     async function percorrer(diretorioAtual) {
@@ -210,6 +215,7 @@ async function carregarExcecoes(caminhoExcecoes) {
 
 async function analisarResiduosFrontend({base = DIRETORIO_RAIZ, caminhoOrcamento} = {}) {
     const baseResolvida = path.resolve(base ?? DIRETORIO_RAIZ);
+    const prefixoCodigo = resolverPrefixoCodigo(baseResolvida);
     const orcamento = await carregarOrcamento(caminhoOrcamento ?? resolverCaminhoOrcamentoResiduos(baseResolvida));
     const arquivos = await listarArquivosFrontend(baseResolvida);
     const arquivosAnalisados = [];
@@ -221,8 +227,8 @@ async function analisarResiduosFrontend({base = DIRETORIO_RAIZ, caminhoOrcamento
         const caminhoRelativo = normalizarCaminho(path.relative(baseResolvida, arquivo));
         conteudos.set(caminhoRelativo, conteudo);
 
-        const ehProducao = ehArquivoProducaoFrontend(caminhoRelativo);
-        const camada = classificarCamada(caminhoRelativo);
+        const ehProducao = ehArquivoProducaoFrontend(caminhoRelativo, prefixoCodigo);
+        const camada = classificarCamada(caminhoRelativo, prefixoCodigo);
         const limitesCamada = orcamento.camadas?.[camada] ?? orcamento.camadas?.outro ?? {
             meta: Number.POSITIVE_INFINITY,
             limite: Number.POSITIVE_INFINITY
@@ -277,7 +283,7 @@ async function analisarResiduosFrontend({base = DIRETORIO_RAIZ, caminhoOrcamento
             if (arquivo === exportacao.arquivo || !regexUso.test(conteudo)) {
                 continue;
             }
-            if (ehArquivoProducaoFrontend(arquivo)) {
+            if (ehArquivoProducaoFrontend(arquivo, prefixoCodigo)) {
                 exportacao.consumidoresProducao += 1;
             } else if (ehArquivoTesteOuHistoria(arquivo)) {
                 exportacao.consumidoresTeste += 1;
