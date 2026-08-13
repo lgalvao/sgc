@@ -365,8 +365,8 @@ const ADAPTADORES: Record<NomeAdaptador, (contexto: ContextoColeta) => Promise<E
         return execucao;
     },
     async arquiteturaFrontend(contexto: ContextoColeta): Promise<ExecucaoQualidade> {
-        const execucao = criarExecucao("frontend-arquitetura", "Frontend arquitetura", "qualidade", "npx tsx toolkit/sgc.ts frontend arquitetura auditar --json", ".");
-        const saida = await executarComandoSgc(contexto, ["frontend", "arquitetura", "auditar", "--json"]);
+        const execucao = criarExecucao("frontend-arquitetura", "Frontend arquitetura", "qualidade", "npx tsx toolkit/sgc.ts frontend arquitetura auditar --json --gravar", ".");
+        const saida = await executarComandoSgc(contexto, ["frontend", "arquitetura", "auditar", "--json", "--gravar"]);
         const resultado = parseJsonSeguro<ResultadoArquitetura>(saida.saida, {});
         execucao.status = saida.codigoSaida === 0 ? "sucesso" : "falha";
         registrarResultadoExecucao(execucao, saida);

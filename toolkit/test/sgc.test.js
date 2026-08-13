@@ -1490,7 +1490,6 @@ describe("CLI raiz do toolkit", () => {
             "arquitetura",
             "auditar",
             "--json",
-            "--sem-gravar",
             "--base",
             base
         ]);
@@ -1511,6 +1510,15 @@ describe("CLI raiz do toolkit", () => {
         expect(conteudo.hotspots[0].arquivo).toBe("frontend/src/views/UnidadeView.vue");
         expect(conteudo.hotspots[0].sinaisAtivos).toContain("serverStateCaseiro");
         expect(conteudo.hotspots.some((hotspot) => hotspot.hubCentral && hotspot.sinaisAtivos.includes("superficieAmpla"))).toBe(false);
+        expect(await fs.pathExists(path.join(base, "toolkit", "qualidade", "artefatos", "frontend-arquitetura"))).toBe(false);
+
+        const diretorioSaida = path.join(base, "artefatos", "arquitetura");
+        const gravacao = await executarSgc([
+            "frontend", "arquitetura", "auditar", "--json", "--gravar", "--saida", diretorioSaida, "--base", base
+        ]);
+        expect(gravacao.exitCode).toBe(0);
+        expect(await fs.pathExists(path.join(diretorioSaida, "fotografia.json"))).toBe(true);
+        expect(await fs.pathExists(path.join(diretorioSaida, "resumo.md"))).toBe(true);
     });
 
     test("calcula a saida padrao de arquitetura a partir da base externa", async () => {
@@ -1525,6 +1533,7 @@ describe("CLI raiz do toolkit", () => {
             "arquitetura",
             "auditar",
             "--json",
+            "--gravar",
             "--base",
             base
         ]);
@@ -1564,7 +1573,6 @@ describe("CLI raiz do toolkit", () => {
             "arquitetura",
             "auditar",
             "--json",
-            "--sem-gravar",
             "--base",
             base,
         ]);
@@ -1593,7 +1601,7 @@ describe("CLI raiz do toolkit", () => {
                 mensagemProcessoUnidade: () => string;
             };`
         );
-        const resultado = await executarSgc(["frontend", "arquitetura", "auditar", "--json", "--sem-gravar", "--base", base]);
+        const resultado = await executarSgc(["frontend", "arquitetura", "auditar", "--json", "--base", base]);
         expect(resultado.exitCode).toBe(0);
         const conteudo = JSON.parse(resultado.stdout);
         expect(conteudo.resumo.metricas.arquivosComBolsaDependenciasLarga).toBe(0);
@@ -1627,7 +1635,7 @@ describe("CLI raiz do toolkit", () => {
             ].join("\n")
         );
 
-        const resultado = await executarSgc(["frontend", "arquitetura", "auditar", "--json", "--sem-gravar", "--base", base]);
+        const resultado = await executarSgc(["frontend", "arquitetura", "auditar", "--json", "--base", base]);
 
         expect(resultado.exitCode).toBe(0);
         const conteudo = JSON.parse(resultado.stdout);
@@ -1841,7 +1849,7 @@ describe("CLI raiz do toolkit", () => {
         );
 
         const resultado = await executarSgc([
-            "frontend", "arquitetura", "auditar", "--json", "--sem-gravar", "--base", base,
+            "frontend", "arquitetura", "auditar", "--json", "--base", base,
         ]);
 
         expect(resultado.exitCode).toBe(0);
@@ -1872,7 +1880,7 @@ describe("CLI raiz do toolkit", () => {
         );
 
         const resultado = await executarSgc([
-            "frontend", "arquitetura", "auditar", "--json", "--sem-gravar", "--base", base,
+            "frontend", "arquitetura", "auditar", "--json", "--base", base,
         ]);
 
         expect(resultado.exitCode).toBe(0);
@@ -1907,7 +1915,7 @@ describe("CLI raiz do toolkit", () => {
         );
 
         const resultado = await executarSgc([
-            "frontend", "arquitetura", "auditar", "--json", "--sem-gravar", "--base", base,
+            "frontend", "arquitetura", "auditar", "--json", "--base", base,
         ]);
 
         expect(resultado.exitCode).toBe(0);

@@ -10,7 +10,7 @@ import {escreverLinha, imprimirCabecalho, imprimirJson} from "../lib/saida.js";
 interface OpcoesAuditoriaArquiteturaFrontend {
     base?: string;
     saida?: string;
-    semGravar?: boolean;
+    gravar?: boolean;
 }
 
 async function executarAuditoriaArquiteturaFrontend(
@@ -18,7 +18,7 @@ async function executarAuditoriaArquiteturaFrontend(
 ): Promise<FotografiaArquitetura> {
     const snapshot = await analisarArquiteturaFrontend({base: opcoes.base});
 
-    if (!opcoes.semGravar) {
+    if (opcoes.gravar) {
         await gravarFotografiaArquitetura(snapshot, opcoes.saida);
     }
 
@@ -36,14 +36,14 @@ async function principal(argumentos: string[] = process.argv.slice(2)): Promise<
             descricao: "Audita vazamentos arquiteturais do frontend, incluindo estrategia de cache exposta nas views, hubs centrais sobrecarregados e server state caseiro.",
             opcoes: [
                 "--json               Emite a fotografia em JSON.",
-                "--sem-gravar         Nao grava fotografia/resumo em disco.",
+                "--gravar             Atualiza fotografia e resumo em disco.",
                 "--base <diretorio>   Sobrescreve o diretorio base da auditoria.",
                 "--saida <diretorio>  Sobrescreve o diretorio de saida da fotografia."
             ],
             exemplos: [
                 "npx tsx toolkit/sgc.ts frontend arquitetura auditar",
                 "npx tsx toolkit/sgc.ts frontend arquitetura auditar --json",
-                "npx tsx toolkit/sgc.ts frontend arquitetura auditar --sem-gravar --base /tmp/sgc"
+                "npx tsx toolkit/sgc.ts frontend arquitetura auditar --gravar --base /tmp/sgc"
             ]
         });
         return;
@@ -54,7 +54,7 @@ async function principal(argumentos: string[] = process.argv.slice(2)): Promise<
     const snapshot = await executarAuditoriaArquiteturaFrontend({
         base,
         saida: lerOpcao(argumentos, "--saida", saidaPadrao),
-        semGravar: argumentos.includes("--sem-gravar"),
+        gravar: argumentos.includes("--gravar"),
     });
 
     if (emitirJson) {
@@ -89,7 +89,7 @@ async function principal(argumentos: string[] = process.argv.slice(2)): Promise<
         escreverLinha(`   Fan-out: ${hotspot.metricasAst.categoriasAcoplamento} categorias / ${hotspot.metricasAst.importacoesArquiteturais} imports`);
     });
 
-    if (!argumentos.includes("--sem-gravar")) {
+    if (argumentos.includes("--gravar")) {
         const diretorio = lerOpcao(argumentos, "--saida", resolverDiretorioSaidaArquitetura(snapshot.base)) ?? resolverDiretorioSaidaArquitetura(snapshot.base);
         escreverLinha("");
         escreverLinha(`${pc.green("✓")} Fotografia salva em ${path.relative(process.cwd(), diretorio).replaceAll("\\", "/")}`);

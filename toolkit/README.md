@@ -103,6 +103,10 @@ npx tsx toolkit/sgc.ts codigo cheiros auditar --json
 npx tsx toolkit/sgc.ts codigo cheiros auditar --gravar
 ```
 
+`frontend arquitetura auditar` segue a mesma regra: a fotografia sai no stdout sem gravação; use `--gravar` para
+persistir os artefatos. O coletor consolidado de qualidade já informa essa opção quando precisa manter o artefato
+intermediário do perfil SGC.
+
 ### Requisitos
 
 ```bash
