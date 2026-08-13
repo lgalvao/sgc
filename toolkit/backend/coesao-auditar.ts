@@ -11,7 +11,7 @@ import {exibirAjudaComando} from "../lib/cli-ajuda.js";
 import {ehEntradaPrincipal, validarArgumentosEntradaDireta} from "../lib/execucao.js";
 import {escreverLinha, imprimirCabecalho, imprimirJson} from "../lib/saida.js";
 
-const VERSAO_RELATORIO = 1 as const;
+const VERSAO_RELATORIO = 2 as const;
 
 // Agrupamento por responsabilidade a partir de prefixos de método
 const CATEGORIAS = {
@@ -69,7 +69,7 @@ interface RelatorioCoesao {
         alertas: number;
         ok: number;
     };
-    hotspots: ResultadoCoesao[];
+    pontosCriticos: ResultadoCoesao[];
     todos: ResultadoCoesao[];
 }
 
@@ -174,7 +174,7 @@ async function auditarCoesao(diretorioCodigo: string, diretorioBase: string): Pr
             alertas: alertas.length,
             ok: resultados.filter((r) => r.severidade === "ok").length
         },
-        hotspots: resultados.filter((r) => r.severidade !== "ok"),
+        pontosCriticos: resultados.filter((r) => r.severidade !== "ok"),
         todos: resultados
     };
 }
@@ -190,23 +190,23 @@ function gerarMarkdown(relatorio: RelatorioCoesao): string {
     linhas.push(`- Alertas (3 categorias): ${relatorio.resumo.alertas}`);
     linhas.push(`- OK: ${relatorio.resumo.ok}`, "");
 
-    if (relatorio.hotspots.length === 0) {
+    if (relatorio.pontosCriticos.length === 0) {
         linhas.push("Nenhum service com responsabilidades misturadas encontrado.");
         return linhas.join("\n");
     }
 
-    linhas.push("## Hotspots", "");
+    linhas.push("## Pontos criticos", "");
     linhas.push("| Arquivo | Métodos | Categorias | Distribuição | Severidade |");
     linhas.push("|---------|---------|------------|-------------|-----------|");
 
-    for (const item of relatorio.hotspots) {
+    for (const item of relatorio.pontosCriticos) {
         const sev = item.severidade === "critico" ? "🔴 crítico" : "🟡 alerta";
         const distribuicao = item.motivos.join(", ");
         linhas.push(`| \`${item.nomeArquivo}\` | ${item.totalMetodos} | ${item.quantidadeCategorias} | ${distribuicao} | ${sev} |`);
     }
 
-    linhas.push("", "## Detalhes dos hotspots", "");
-    for (const item of relatorio.hotspots) {
+    linhas.push("", "## Detalhes dos pontos criticos", "");
+    for (const item of relatorio.pontosCriticos) {
         linhas.push(`### ${item.nomeArquivo}`, "");
         linhas.push(`- Pacote: \`${item.pacote}\``);
         linhas.push(`- Total de métodos públicos: ${item.totalMetodos}`);
@@ -232,8 +232,8 @@ function gerarMarkdown(relatorio: RelatorioCoesao): string {
     linhas.push("- aumenta o risco de efeito colateral entre fluxos distintos;");
     linhas.push("- dificulta fatiamento futuro por caso de uso.", "");
     linhas.push("## Primeiro corte sugerido", "");
-    if (relatorio.hotspots.length > 0) {
-        const top = relatorio.hotspots[0];
+    if (relatorio.pontosCriticos.length > 0) {
+        const top = relatorio.pontosCriticos[0];
         linhas.push(`Começar por \`${top.nomeArquivo}\`.`);
         linhas.push("Separar os métodos por categoria e verificar quais dependências cada grupo realmente precisa.");
         linhas.push("Extrair apenas quando a fronteira representar um conceito real — não por contagem de linhas.");
@@ -305,10 +305,10 @@ async function principal(argumentosInformados: string[] = process.argv.slice(2))
     if (!emitirJson) {
         escreverLinha(`Analisados: ${relatorio.resumo.totalAnalisados} — Críticos: ${pc.red(String(relatorio.resumo.criticos))} — Alertas: ${pc.yellow(String(relatorio.resumo.alertas))} — OK: ${pc.green(String(relatorio.resumo.ok))}`);
 
-        if (relatorio.hotspots.length > 0) {
+        if (relatorio.pontosCriticos.length > 0) {
             escreverLinha("");
-            escreverLinha(pc.bold("Hotspots:"));
-            for (const item of relatorio.hotspots.slice(0, 10)) {
+            escreverLinha(pc.bold("Pontos criticos:"));
+            for (const item of relatorio.pontosCriticos.slice(0, 10)) {
                 const cor = item.severidade === "critico" ? pc.red : pc.yellow;
                 escreverLinha(`  ${cor("●")} ${item.nomeArquivo} — ${item.motivos.join(", ")}`);
             }

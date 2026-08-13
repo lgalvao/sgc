@@ -167,7 +167,8 @@ isolado funciona, mas as fronteiras ainda não estão concluídas:
 - a fotografia persistida de `codigo cheiros auditar` agora usa `versao: 2`, `pontosCriticos` e chaves próprias em
   camelCase; o arquivo anterior é validado antes de calcular deltas e versões antigas são rejeitadas;
 - os relatórios próprios persistidos de `backend arquitetura auditar` e `backend coesao auditar` agora carregam
-  `versao: 1`; o JSON persistido pelo Semgrep permanece externo e não recebe envelope do toolkit;
+  `versao: 2` e usam `pontosCriticos`; o JSON persistido pelo Semgrep permanece externo e não recebe envelope do
+  toolkit;
 - a política de orçamento e exceções de `frontend resíduos` foi extraída para um módulo próprio, com validação estrita
   de versão e estrutura, sem misturar carregamento de configuração ao motor de análise;
 - identificadores próprios que ainda estavam em inglês (`snapshot`, `STOPWORDS` e `Status`) foram padronizados em

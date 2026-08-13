@@ -72,9 +72,9 @@ npx tsx toolkit/sgc.ts frontend identificadores-teste listar-duplicados
 `backend testes analisar` e `backend testes priorizar` também são somente leitura por padrão. Use `--json` para alimentar
 agentes e scripts pelo stdout; use `--gravar` para persistir relatórios.
 
-Os relatórios próprios persistidos de `backend arquitetura auditar` e `backend coesao auditar` também carregam
-`versao: 1`. O JSON persistido pelo Semgrep continua sendo o formato externo da ferramenta e, por isso, não recebe um
-envelope do toolkit.
+Os relatórios próprios persistidos de `backend arquitetura auditar` e `backend coesao auditar` carregam `versao: 2` e
+usam `pontosCriticos`. O JSON persistido pelo Semgrep continua sendo o formato externo da ferramenta e, por isso, não
+recebe um envelope do toolkit.
 
 O JSON persistido por `backend testes analisar` usa `versao: 1`, campos em português/camelCase e categorias com os grupos
 `comTeste` e `semTeste`. `backend testes priorizar --json` emite outro contrato versionado, com `versao: 1` e a chave
