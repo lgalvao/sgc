@@ -105,6 +105,16 @@ function normalizarResultadoSemgrep(valor: unknown): ResultadoSemgrep {
     return {...valor, results: resultados};
 }
 
+function normalizarCaminhoAchado(caminho: string, diretorioBase: string): string {
+    if (!caminho) {
+        return "";
+    }
+    const caminhoAbsoluto = path.isAbsolute(caminho)
+        ? caminho
+        : path.resolve(diretorioBase, caminho);
+    return path.relative(diretorioBase, caminhoAbsoluto).replaceAll("\\", "/");
+}
+
 function criarResumo(resultadoJson: ResultadoSemgrep, regra: string, diretorioBase: string): string {
     const achados = resultadoJson.results;
     const porRegra = new Map<string, AchadoSemgrep[]>();
@@ -131,7 +141,7 @@ function criarResumo(resultadoJson: ResultadoSemgrep, regra: string, diretorioBa
 
     linhas.push("", "## Primeiros achados", "");
     for (const achado of achados.slice(0, 20)) {
-        const caminho = path.relative(diretorioBase, achado.path ?? "");
+        const caminho = normalizarCaminhoAchado(achado.path ?? "", diretorioBase);
         linhas.push(`- \`${achado.check_id ?? "sem-id"}\` em \`${caminho}:${achado.start?.line ?? "?"}\` - ${achado.extra?.message ?? ""}`);
     }
 
@@ -242,7 +252,7 @@ async function principal(argumentos: string[] = process.argv.slice(2)): Promise<
         escreverLinha(`Achados: ${achados.length}`);
         if (achados.length > 0) {
             for (const achado of achados.slice(0, 10)) {
-                const caminho = path.relative(diretorioBase, achado.path ?? "");
+                const caminho = normalizarCaminhoAchado(achado.path ?? "", diretorioBase);
                 escreverLinha(`- ${achado.check_id ?? "sem-id"} em ${caminho}:${achado.start?.line ?? "?"}`);
             }
         } else {
@@ -271,6 +281,7 @@ if (ehEntradaPrincipal(import.meta.url)) {
 export {
     executarSemgrep,
     obterComandoSemgrep,
+    normalizarCaminhoAchado,
     principal,
     resolverDiretoriosPadrao
 };

@@ -142,6 +142,9 @@ mais recente da validação só são atualizados com `--gravar`; sem essa opçã
 `codigo semgrep auditar` também só grava `resultado.json` e `resumo.md` com `--gravar`; a política padrão continua
 vindo do pacote e políticas locais podem ser informadas por `--regra` ou pela configuração.
 
+Os caminhos dos achados Semgrep são normalizados em relação a `--base`, independentemente de a ferramenta externa
+retornar caminhos relativos ou absolutos.
+
 `codigo nomes coletar-simbolos`, `codigo nomes auditar-consistencia` e `codigo nomes auditar-idioma` também são
 somente leitura por padrão. Use `--gravar` para persistir o inventário ou os relatórios de nomenclatura; quando uma
 auditoria precisar criar o inventário auxiliar, a mesma opção é propagada explicitamente para essa coleta interna.

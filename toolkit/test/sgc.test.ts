@@ -8,7 +8,7 @@ import {pathToFileURL} from "node:url";
 import {DIRETORIO_RAIZ, CAMINHO_SGC, CAMINHO_TSX, executarSgc, type ResultadoExecucao} from "./apoio.js";
 import {resolverCaminhoConfigurado, VERSAO_CONFIGURACAO} from "../lib/configuracao.js";
 import {ADAPTADORES, PERFIS, principal as coletarFotografiaQualidade} from "../qualidade/coleta-execucao.js";
-import {obterComandoSemgrep, resolverDiretoriosPadrao} from "../codigo/semgrep-auditar.js";
+import {normalizarCaminhoAchado, obterComandoSemgrep, resolverDiretoriosPadrao} from "../codigo/semgrep-auditar.js";
 import {executarAuditoria as executarAuditoriaCheiros} from "../codigo/cheiros-auditar.js";
 import {executarCrawler, normalizarArgumentosPlaywright} from "../frontend/acessibilidade-crawler.js";
 import {normalizarResultados} from "../frontend/acessibilidade-processar-resultados.js";
@@ -1420,6 +1420,15 @@ describe("CLI raiz do toolkit", () => {
             "servidor/java",
             "aplicacao/src"
         ]);
+    });
+
+    test("normaliza caminhos relativos e absolutos dos achados Semgrep", async () => {
+        const base = await mkdtemp(path.join(os.tmpdir(), "sgc-semgrep-caminhos-"));
+        const caminhoRelativo = "servidor/java/ExemploService.java";
+        const caminhoAbsoluto = path.join(base, caminhoRelativo);
+
+        expect(normalizarCaminhoAchado(caminhoRelativo, base)).toBe(caminhoRelativo);
+        expect(normalizarCaminhoAchado(caminhoAbsoluto, base)).toBe(caminhoRelativo);
     });
 
     test("aplica filtros de cheiros aos diretorios de codigo configurados", async () => {

@@ -322,6 +322,8 @@ frontend e para os caminhos OpenAPI.
 - `codigo/semgrep-auditar.ts` foi convertido para TypeScript com contratos para achados, posições, resultados,
   execução e relatórios; a entrada JSON externa é normalizada como `unknown`, mantendo regras, alvos configuráveis,
   modo automático e o schema de saída do Semgrep.
+- `codigo/semgrep-auditar.ts` agora normaliza caminhos de achados relativos ou absolutos antes de gerar stdout e
+  resumo Markdown, evitando que relatórios de bases externas exibam caminhos calculados contra o diretório do toolkit.
 - O despachador agora resolve exclusivamente os caminhos TypeScript registrados; o artefato compilado possui uma
   resolução explícita para os `.js` correspondentes em `dist`.
 - Foi criado `tsconfig.estrito.json`, cobrindo toda a implementação TypeScript com `strict` e `noImplicitOverride`; o
@@ -393,10 +395,10 @@ frontend e para os caminhos OpenAPI.
 
 Nas validações desta rodada, em 13 de agosto de 2026, executadas diretamente sob Node `26.7.0`:
 
-- `npm --prefix toolkit run test`: 119 testes aprovados em 7 arquivos; o smoke de pacote é separado para não tornar a
+- `npm --prefix toolkit run test`: 120 testes aprovados em 7 arquivos; o smoke de pacote é separado para não tornar a
   suíte unitária dependente de rede ou instalação;
-- `npm --prefix toolkit run test:coverage`: aprovado com baseline informativa de 45,27% de statements (594/1.312),
-  33,29% de branches (304/913), 51,90% de funções (136/262) e 45,49% de linhas (571/1.255); o script exclui
+- `npm --prefix toolkit run test:coverage`: aprovado com baseline informativa de 45,36% de statements (597/1.316),
+  33,47% de branches (307/917), 52,09% de funções (137/263) e 45,59% de linhas (574/1.259); o script exclui
   `test/**` para não contar o apoio de testes como implementação e ainda não aplica threshold, porque a prioridade é
   transformar os contratos críticos em cenários explícitos;
 - `npm --prefix toolkit run test:pacote`: 1 teste aprovado, com `npm pack`, instalação isolada, auditoria no consumidor
@@ -456,6 +458,8 @@ os relatórios backend passaram a usar os nomes portugueses `analise-testes.md/j
 passou a derivar backend, frontend e artefatos da configuração e a suíte chega a 118 cenários regulares, com
 `test/projeto.test.ts` em 17. Na rodada seguinte, `backend testes analisar` passou a resolver `--diretorio` relativo a
 `--base`, com regressão em uma base externa; a suíte chega a 119 cenários regulares e `test/sgc.test.ts` passa a ter 80.
+Na rodada seguinte, o Semgrep passou a normalizar caminhos de achados relativos e absolutos em relação à base auditada;
+a suíte chega a 120 cenários regulares.
 
 ### 3.3 Tamanho e composição atual
 
@@ -466,7 +470,7 @@ Inventário dos arquivos rastreados do toolkit, excluindo `dist`, cobertura e ar
 - 0 arquivos JavaScript de teste e 8 arquivos TypeScript de teste (`test/sgc.test.ts`, `test/projeto.test.ts`,
   `test/configuracao.test.ts`, `test/integracao.test.ts`, `test/qualidade.test.ts`, `test/cdus.test.ts`,
   `test/externo.test.ts` e `test/pacote.test.ts`);
-- 7 arquivos de teste TypeScript concentram 119 cenários regulares, mais 1 smoke de distribuição isolada;
+- 7 arquivos de teste TypeScript concentram 120 cenários regulares, mais 1 smoke de distribuição isolada;
 - `test/apoio.ts` centraliza a raiz do toolkit, o launcher `tsx`, o contrato de execução e `executarSgc`, evitando
   cópias divergentes nos testes de projeto, integração, qualidade e CLI;
 - maior módulo atual: `frontend/arquitetura-lib.ts`, com aproximadamente 1.200 linhas;
@@ -489,6 +493,7 @@ O núcleo TypeScript de implementação foi concluído: 100% dos arquivos de imp
 | Resolvido | Cobertura insuficiente de mutação | O corretor `backend/java-corrigir-fqn.ts` agora tem fixture de escrita, verificação de conteúdo sem duplicação e segunda execução idempotente. |
 | Resolvido nesta rodada | Corretor FQN ignorava raízes Java configuradas | `backend/java-corrigir-fqn` agora usa `diretorios.backendCodigo` e `diretorios.backendTestes` quando a base possui configuração; a heurística anterior continua para uma base backend isolada sem configuração. |
 | Resolvido nesta rodada | Análise de testes ignorava a base para diretório explícito | `backend testes analisar --diretorio servidor --base <base>` agora procura `servidor` dentro da base informada; caminhos absolutos continuam inalterados. |
+| Resolvido nesta rodada | Relatório Semgrep calculava caminhos contra a raiz errada | Achados devolvidos com caminho relativo ou absoluto agora são normalizados contra a base auditada antes da exibição em stdout e Markdown. |
 | Resolvido | Efeito colateral oculto de gravação | `codigo nomes auditar-consistencia` gerava o inventário auxiliar com gravação habilitada e contaminava `--json`; a opção `--gravar` agora é propagada e a coleta interna é silenciosa. |
 | Resolvido | Configuração sem validação | `configuracao-toolkit.json` agora exige a versão `1` e valida estrutura, chaves conhecidas e caminhos textuais antes da combinação com defaults. |
 | Resolvido nesta rodada | Políticas de resíduos apontando para legado ausente | Os defaults de orçamento e exceções frontend foram removidos; overrides continuam aceitos, a ausência usa política neutra explícita e arquivo configurado ausente ou inválido falha visivelmente. |
@@ -523,7 +528,7 @@ O núcleo TypeScript de implementação foi concluído: 100% dos arquivos de imp
 - Parametrização parcial não significa generalização concluída.
 - Build aprovado prova que a árvore pode ser emitida; não prova que o pacote emitido contém assets, configuração e
   resolução de raiz adequados para distribuição.
-- Knip aprovado, 119 testes unitários verdes e o smoke de pacote aprovado são gates úteis, mas ainda insuficientes para afirmar ausência de código morto fora
+- Knip aprovado, 120 testes unitários verdes e o smoke de pacote aprovado são gates úteis, mas ainda insuficientes para afirmar ausência de código morto fora
   do grafo declarado, segurança de todos os comandos mutáveis ou portabilidade. O grafo do Knip agora é uma evidência
   útil de exports não consumidos; não substitui testes de pacote externo.
 
