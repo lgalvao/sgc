@@ -244,6 +244,9 @@ frontend e para os caminhos OpenAPI.
   vazamento de modelo mantém a regra SGC e cobre ausência e persistência do relatório.
 - `frontend/residuos-auditar.ts` e `frontend/residuos-validar.ts` adotaram a mesma fronteira read-only, com `--gravar`
   como ação positiva; o coletor consolidado informa a opção para manter a fotografia mais recente do perfil SGC.
+- `frontend/arquitetura-auditar.ts`, `frontend/residuos-auditar.ts`, `frontend/residuos-validar.ts` e
+  `frontend/cobertura-auditoria.ts` agora resolvem entradas e saídas relativas contra a base efetiva e exibem caminhos
+  relativos à mesma base, sem depender do `cwd` do processo.
 - `codigo/semgrep-auditar.ts` adotou a mesma fronteira read-only, com `--gravar` como ação positiva; o smoke do pacote
   cobre execução sem gravação e persistência explícita junto com a resolução da política empacotada. O motor não exibe
   mais `SGC` fixo no relatório ou na ajuda; a política padrão continua sendo a do perfil SGC e pode ser substituída.
@@ -461,7 +464,8 @@ passou a derivar backend, frontend e artefatos da configuração e a suíte cheg
 `--base`, com regressão em uma base externa; a suíte chega a 119 cenários regulares e `test/sgc.test.ts` passa a ter 80.
 Na rodada seguinte, o Semgrep passou a normalizar caminhos de achados relativos e absolutos em relação à base auditada;
 a suíte chega a 120 cenários regulares. Na rodada seguinte, `qualidade resumo` passou a exibir o caminho da fotografia
-relativo à base auditada, inclusive em consumidores externos.
+relativo à base auditada, inclusive em consumidores externos. Na rodada seguinte, a família de auditorias frontend passou
+a alinhar entradas, saídas e mensagens de artefatos à base efetiva; a contagem permanece em 120 cenários.
 
 ### 3.3 Tamanho e composição atual
 
@@ -497,6 +501,7 @@ O núcleo TypeScript de implementação foi concluído: 100% dos arquivos de imp
 | Resolvido nesta rodada | Análise de testes ignorava a base para diretório explícito | `backend testes analisar --diretorio servidor --base <base>` agora procura `servidor` dentro da base informada; caminhos absolutos continuam inalterados. |
 | Resolvido nesta rodada | Relatório Semgrep calculava caminhos contra a raiz errada | Achados devolvidos com caminho relativo ou absoluto agora são normalizados contra a base auditada antes da exibição em stdout e Markdown. |
 | Resolvido nesta rodada | Resumo de qualidade calculava caminho contra o `cwd` | `qualidade resumo` agora informa a fotografia relativa à base efetiva, preservando a mesma referência em JSON e saída humana para bases externas. |
+| Resolvido nesta rodada | Auditorias frontend misturavam `cwd` e base auditada | Arquitetura, resíduos e cobertura frontend agora resolvem caminhos relativos contra `--base` e exibem artefatos relativos à mesma raiz. |
 | Resolvido | Efeito colateral oculto de gravação | `codigo nomes auditar-consistencia` gerava o inventário auxiliar com gravação habilitada e contaminava `--json`; a opção `--gravar` agora é propagada e a coleta interna é silenciosa. |
 | Resolvido | Configuração sem validação | `configuracao-toolkit.json` agora exige a versão `1` e valida estrutura, chaves conhecidas e caminhos textuais antes da combinação com defaults. |
 | Resolvido nesta rodada | Políticas de resíduos apontando para legado ausente | Os defaults de orçamento e exceções frontend foram removidos; overrides continuam aceitos, a ausência usa política neutra explícita e arquivo configurado ausente ou inválido falha visivelmente. |

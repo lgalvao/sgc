@@ -163,7 +163,7 @@ async function principal(argumentos: string[] = process.argv.slice(2)): Promise<
         });
 
         if (gravar) {
-            escreverLinha(`\n${pc.green("✓")} Relatório detalhado gerado em: ${pc.dim(path.relative(process.cwd(), caminhoSaida).replaceAll("\\", "/"))}`);
+            escreverLinha(`\n${pc.green("✓")} Relatório detalhado gerado em: ${pc.dim(path.relative(diretorioBase, caminhoSaida).replaceAll("\\", "/"))}`);
         }
 
         if (metaMinima > 0 && coleta.lines.percentual < metaMinima) {

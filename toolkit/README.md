@@ -306,6 +306,9 @@ A regra Semgrep padrão é a política do perfil SGC fornecida pelo próprio pac
 Nos comandos de inspeção de frontend, `--base` representa a raiz do projeto e resolve `frontendCodigo`; use `--diretorio`
 quando a intenção for apontar diretamente para outro diretório de código.
 
+Nos comandos frontend que geram fotografias ou relatórios, caminhos relativos de `--saida`, `--orcamento` e `--excecoes`
+também são resolvidos contra `--base`; os caminhos exibidos no resumo permanecem relativos à base auditada.
+
 O toolkit executa a árvore-fonte com `tsx`; toda a implementação e todos os testes estão em TypeScript estrito. Os
 testes não participam da implementação distribuída.
 

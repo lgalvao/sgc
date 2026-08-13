@@ -1343,8 +1343,8 @@ describe("CLI raiz do toolkit", () => {
         ]);
         expect(resultado.exitCode).toBe(0);
         const conteudo = JSON.parse(resultado.stdout);
-        expect(conteudo.orcamento).toBe(path.relative(DIRETORIO_RAIZ, caminhoOrcamento));
-        expect(conteudo.excecoes).toBe(path.relative(DIRETORIO_RAIZ, caminhoExcecoes));
+        expect(conteudo.orcamento).toBe(path.relative(base, caminhoOrcamento));
+        expect(conteudo.excecoes).toBe(path.relative(base, caminhoExcecoes));
         const gravacao = await executarSgc([
             "frontend", "residuos", "validar", "--json", "--gravar", "--base", base
         ]);
@@ -1515,7 +1515,7 @@ describe("CLI raiz do toolkit", () => {
             "--base",
             base,
             "--orcamento",
-            orcamento
+            "orcamento.json"
         ]);
 
         expect(resultado.exitCode).toBe(0);
@@ -1526,6 +1526,22 @@ describe("CLI raiz do toolkit", () => {
         expect(conteudo.contagens.producao.storageDireto).toBe(1);
         expect(conteudo.contagens.producao.exportacoesSuspeitas).toBe(1);
         expect(conteudo.contagens.producao.arquivosAcimaMeta.service).toBe(1);
+
+        const gravacao = await executarSgc([
+            "frontend",
+            "residuos",
+            "auditar",
+            "--json",
+            "--gravar",
+            "--base",
+            base,
+            "--orcamento",
+            "orcamento.json",
+            "--saida",
+            "artefatos/residuos"
+        ]);
+        expect(gravacao.exitCode).toBe(0);
+        expect(await fs.pathExists(path.join(base, "artefatos", "residuos", "fotografia.json"))).toBe(true);
     });
 
     test("calcula a saida padrao de residuos a partir da base externa", async () => {
@@ -1671,13 +1687,13 @@ describe("CLI raiz do toolkit", () => {
         expect(conteudo.hotspots.some((hotspot: PontoArquiteturalJson) => hotspot.hubCentral && hotspot.sinaisAtivos.includes("superficieAmpla"))).toBe(false);
         expect(await fs.pathExists(path.join(base, "toolkit", "qualidade", "artefatos", "frontend-arquitetura"))).toBe(false);
 
-        const diretorioSaida = path.join(base, "artefatos", "arquitetura");
+        const diretorioSaida = path.join("artefatos", "arquitetura");
         const gravacao = await executarSgc([
             "frontend", "arquitetura", "auditar", "--json", "--gravar", "--saida", diretorioSaida, "--base", base
         ]);
         expect(gravacao.exitCode).toBe(0);
-        expect(await fs.pathExists(path.join(diretorioSaida, "fotografia.json"))).toBe(true);
-        expect(await fs.pathExists(path.join(diretorioSaida, "resumo.md"))).toBe(true);
+        expect(await fs.pathExists(path.join(base, diretorioSaida, "fotografia.json"))).toBe(true);
+        expect(await fs.pathExists(path.join(base, diretorioSaida, "resumo.md"))).toBe(true);
     });
 
     test("calcula a saida padrao de arquitetura a partir da base externa", async () => {
@@ -2147,9 +2163,9 @@ describe("CLI raiz do toolkit", () => {
             "--base",
             base,
             "--orcamento",
-            orcamento,
+            "orcamento.json",
             "--excecoes",
-            excecoes
+            "excecoes.json"
         ]);
 
         expect(resultado.exitCode).toBe(0);
@@ -2166,9 +2182,9 @@ describe("CLI raiz do toolkit", () => {
             "--base",
             base,
             "--orcamento",
-            orcamento,
+            "orcamento.json",
             "--excecoes",
-            excecoes
+            "excecoes.json"
         ]);
         expect(gravacao.exitCode).toBe(0);
         expect(await fs.pathExists(path.join(base, "toolkit", "qualidade", "artefatos", "frontend-residuos", "mais-recente", "fotografia.json"))).toBe(true);

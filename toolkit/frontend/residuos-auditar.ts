@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 import path from "node:path";
 import pc from "picocolors";
+import {DIRETORIO_RAIZ} from "../lib/caminhos.js";
 import {
     analisarResiduosFrontend,
     gravarFotografiaAuditoria,
@@ -21,13 +22,15 @@ interface OpcoesAuditoriaFrontendResiduos {
 }
 
 async function executarAuditoriaFrontendResiduos(opcoes: OpcoesAuditoriaFrontendResiduos = {}): Promise<FotografiaResiduos> {
+    const base = path.resolve(opcoes.base ?? DIRETORIO_RAIZ);
     const fotografia = await analisarResiduosFrontend({
-        base: opcoes.base,
-        caminhoOrcamento: opcoes.orcamento,
+        base,
+        caminhoOrcamento: opcoes.orcamento ? path.resolve(base, opcoes.orcamento) : undefined,
     });
 
     if (opcoes.gravar) {
-        await gravarFotografiaAuditoria(fotografia, opcoes.saida);
+        const diretorioSaida = opcoes.saida ? path.resolve(fotografia.base, opcoes.saida) : undefined;
+        await gravarFotografiaAuditoria(fotografia, diretorioSaida);
     }
 
     return fotografia;
@@ -60,10 +63,11 @@ async function principal(argumentos: string[] = process.argv.slice(2)): Promise<
 
     const base = lerOpcao(argumentos, "--base", undefined);
     const baseResolvida = path.resolve(base ?? process.cwd());
+    const saida = lerOpcao(argumentos, "--saida", resolverDiretorioSaidaResiduos(baseResolvida));
     const fotografia = await executarAuditoriaFrontendResiduos({
         base: baseResolvida,
         orcamento: lerOpcao(argumentos, "--orcamento", resolverCaminhoOrcamentoResiduos(baseResolvida)),
-        saida: lerOpcao(argumentos, "--saida", resolverDiretorioSaidaResiduos(baseResolvida)),
+        saida,
         gravar: argumentos.includes("--gravar"),
     });
 
@@ -93,9 +97,9 @@ async function principal(argumentos: string[] = process.argv.slice(2)): Promise<
     });
 
     if (argumentos.includes("--gravar")) {
-        const diretorio = lerOpcao(argumentos, "--saida", resolverDiretorioSaidaResiduos(fotografia.base)) ?? resolverDiretorioSaidaResiduos(fotografia.base);
+        const diretorio = path.resolve(fotografia.base, saida ?? resolverDiretorioSaidaResiduos(fotografia.base));
         escreverLinha("");
-        escreverLinha(`${pc.green("✓")} Fotografia salva em ${path.relative(process.cwd(), diretorio).replaceAll("\\", "/")}`);
+        escreverLinha(`${pc.green("✓")} Fotografia salva em ${path.relative(fotografia.base, diretorio).replaceAll("\\", "/")}`);
     }
 }
 

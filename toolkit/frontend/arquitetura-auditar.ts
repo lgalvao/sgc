@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 import path from "node:path";
 import pc from "picocolors";
+import {DIRETORIO_RAIZ} from "../lib/caminhos.js";
 import {analisarArquiteturaFrontend, gravarFotografiaArquitetura, resolverDiretorioSaidaArquitetura, type FotografiaArquitetura} from "./arquitetura-lib.js";
 import {exibirAjudaComando} from "../lib/cli-ajuda.js";
 import {lerOpcao} from "../lib/cli-opcoes.js";
@@ -19,7 +20,8 @@ async function executarAuditoriaArquiteturaFrontend(
     const snapshot = await analisarArquiteturaFrontend({base: opcoes.base});
 
     if (opcoes.gravar) {
-        await gravarFotografiaArquitetura(snapshot, opcoes.saida);
+        const diretorioSaida = opcoes.saida ? path.resolve(snapshot.base, opcoes.saida) : undefined;
+        await gravarFotografiaArquitetura(snapshot, diretorioSaida);
     }
 
     return snapshot;
@@ -50,10 +52,12 @@ async function principal(argumentos: string[] = process.argv.slice(2)): Promise<
     }
 
     const base = lerOpcao(argumentos, "--base", undefined);
-    const saidaPadrao = resolverDiretorioSaidaArquitetura(base);
+    const baseResolvida = path.resolve(base ?? DIRETORIO_RAIZ);
+    const saidaPadrao = resolverDiretorioSaidaArquitetura(baseResolvida);
+    const saida = lerOpcao(argumentos, "--saida", saidaPadrao);
     const snapshot = await executarAuditoriaArquiteturaFrontend({
-        base,
-        saida: lerOpcao(argumentos, "--saida", saidaPadrao),
+        base: baseResolvida,
+        saida,
         gravar: argumentos.includes("--gravar"),
     });
 
@@ -90,9 +94,9 @@ async function principal(argumentos: string[] = process.argv.slice(2)): Promise<
     });
 
     if (argumentos.includes("--gravar")) {
-        const diretorio = lerOpcao(argumentos, "--saida", resolverDiretorioSaidaArquitetura(snapshot.base)) ?? resolverDiretorioSaidaArquitetura(snapshot.base);
+        const diretorio = path.resolve(snapshot.base, saida ?? resolverDiretorioSaidaArquitetura(snapshot.base));
         escreverLinha("");
-        escreverLinha(`${pc.green("✓")} Fotografia salva em ${path.relative(process.cwd(), diretorio).replaceAll("\\", "/")}`);
+        escreverLinha(`${pc.green("✓")} Fotografia salva em ${path.relative(snapshot.base, diretorio).replaceAll("\\", "/")}`);
     }
 }
 

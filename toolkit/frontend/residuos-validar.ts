@@ -79,10 +79,12 @@ async function executarValidacaoFrontendResiduos(
     opcoes: OpcoesValidacaoFrontendResiduos = {}
 ): Promise<ResultadoValidacaoResiduos> {
     const base = path.resolve(opcoes.base ?? DIRETORIO_RAIZ);
+    const resolverCaminho = (caminho: string): string => path.resolve(base, caminho);
     const caminhoOrcamentoConfigurado = opcoes.orcamento ?? resolverCaminhoOrcamentoResiduos(base);
     const caminhoExcecoesConfigurado = opcoes.excecoes ?? resolverCaminhoExcecoesResiduos(base);
-    const caminhoOrcamento = caminhoOrcamentoConfigurado ? path.resolve(caminhoOrcamentoConfigurado) : undefined;
-    const caminhoExcecoes = caminhoExcecoesConfigurado ? path.resolve(caminhoExcecoesConfigurado) : undefined;
+    const caminhoOrcamento = caminhoOrcamentoConfigurado ? resolverCaminho(caminhoOrcamentoConfigurado) : undefined;
+    const caminhoExcecoes = caminhoExcecoesConfigurado ? resolverCaminho(caminhoExcecoesConfigurado) : undefined;
+    const caminhoSaida = opcoes.saida ? resolverCaminho(opcoes.saida) : resolverDiretorioSaidaResiduos(base);
     const fotografia = await analisarResiduosFrontend({
         base,
         caminhoOrcamento,
@@ -159,7 +161,7 @@ async function executarValidacaoFrontendResiduos(
     }
 
     if (opcoes.gravar) {
-        await gravarFotografiaAuditoria(fotografia, opcoes.saida ?? resolverDiretorioSaidaResiduos(base));
+        await gravarFotografiaAuditoria(fotografia, caminhoSaida);
     }
 
     const resultado: ResultadoValidacaoResiduos = {
@@ -171,8 +173,8 @@ async function executarValidacaoFrontendResiduos(
             violacoes: violacoes.length,
             avisos: avisos.length,
         },
-        orcamento: caminhoOrcamento ? path.relative(process.cwd(), caminhoOrcamento).replaceAll("\\", "/") : "padrao-do-toolkit",
-        excecoes: caminhoExcecoes ? path.relative(process.cwd(), caminhoExcecoes).replaceAll("\\", "/") : "padrao-do-toolkit",
+        orcamento: caminhoOrcamento ? path.relative(base, caminhoOrcamento).replaceAll("\\", "/") : "padrao-do-toolkit",
+        excecoes: caminhoExcecoes ? path.relative(base, caminhoExcecoes).replaceAll("\\", "/") : "padrao-do-toolkit",
         fotografia,
         violacoes,
         avisos,
@@ -213,13 +215,12 @@ async function principal(argumentos: string[] = process.argv.slice(2)): Promise<
     const baseResolvida = path.resolve(base ?? DIRETORIO_RAIZ);
     const orcamentoInformado = lerOpcao(argumentos, "--orcamento", resolverCaminhoOrcamentoResiduos(baseResolvida));
     const excecoesInformadas = lerOpcao(argumentos, "--excecoes", resolverCaminhoExcecoesResiduos(baseResolvida));
-    const orcamento = orcamentoInformado ? path.resolve(orcamentoInformado) : undefined;
-    const excecoes = excecoesInformadas ? path.resolve(excecoesInformadas) : undefined;
+    const saida = lerOpcao(argumentos, "--saida", resolverDiretorioSaidaResiduos(baseResolvida));
     const resultado = await executarValidacaoFrontendResiduos({
         base: baseResolvida,
-        orcamento,
-        excecoes,
-        saida: path.resolve(lerOpcao(argumentos, "--saida", resolverDiretorioSaidaResiduos(baseResolvida)) ?? resolverDiretorioSaidaResiduos(baseResolvida)),
+        orcamento: orcamentoInformado,
+        excecoes: excecoesInformadas,
+        saida,
         gravar: argumentos.includes("--gravar"),
     });
 
@@ -262,7 +263,7 @@ async function principal(argumentos: string[] = process.argv.slice(2)): Promise<
     escreverLinha("");
     escreverLinha(`Orcamento: ${resultado.orcamento}`);
     escreverLinha(`Excecoes: ${resultado.excecoes}`);
-    escreverLinha(`Fotografia mais recente: ${path.relative(process.cwd(), path.resolve(lerOpcao(argumentos, "--saida", resolverDiretorioSaidaResiduos(baseResolvida)) ?? resolverDiretorioSaidaResiduos(baseResolvida))).replaceAll("\\", "/")}`);
+    escreverLinha(`Fotografia mais recente: ${path.relative(baseResolvida, path.resolve(baseResolvida, saida ?? resolverDiretorioSaidaResiduos(baseResolvida))).replaceAll("\\", "/")}`);
 
     if (resultado.status !== "ok") process.exitCode = 1;
 }
