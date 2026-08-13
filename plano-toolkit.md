@@ -328,7 +328,9 @@ frontend e para os caminhos OpenAPI.
   local do Node é a major 26 (`26.7.0`).
 - `qualidade/coleta-execucao.ts` foi convertido para TypeScript com contratos de contexto, adaptadores, execução de
   subprocessos, JUnit, métricas heterogêneas e fotografia; hotspots vindos de JSON são filtrados como `unknown`, e os
-  perfis Gradle/npm/Playwright continuam declarados como orquestração específica do SGC.
+  perfis Gradle/npm/Playwright continuam declarados como orquestração específica do SGC. A montagem do comando
+  Playwright agora é uma função pura e resolve `diretorios.testesIntegracao`, compartilhando a mesma convenção do
+  crawler de acessibilidade.
 - `qualidade/coleta.ts` foi convertido para TypeScript; a validação de perfis/opções e o wrapper que delega ao coletor
   agora compartilham a fronteira tipada do runtime.
 - `qualidade/resumo.ts` foi convertido para TypeScript; o carregador de fotografias passou a aceitar um tipo genérico e
@@ -386,10 +388,10 @@ frontend e para os caminhos OpenAPI.
 
 Nas validações desta rodada, em 13 de agosto de 2026, executadas diretamente sob Node `26.7.0`:
 
-- `npm --prefix toolkit run test`: 114 testes aprovados em 7 arquivos; o smoke de pacote é separado para não tornar a
+- `npm --prefix toolkit run test`: 115 testes aprovados em 7 arquivos; o smoke de pacote é separado para não tornar a
   suíte unitária dependente de rede ou instalação;
-- `npm --prefix toolkit run test:coverage`: aprovado com baseline informativa de 42,07% de statements (544/1.293),
-  29,49% de branches (266/902), 49,01% de funções (125/255) e 42,31% de linhas (523/1.236); o script exclui
+- `npm --prefix toolkit run test:coverage`: aprovado com baseline informativa de 42,17% de statements (547/1.297),
+  29,49% de branches (266/902), 49,21% de funções (126/256) e 42,41% de linhas (526/1.240); o script exclui
   `test/**` para não contar o apoio de testes como implementação e ainda não aplica threshold, porque a prioridade é
   transformar os contratos críticos em cenários explícitos;
 - `npm --prefix toolkit run test:pacote`: 1 teste aprovado, com `npm pack`, instalação isolada, auditoria no consumidor
@@ -439,6 +441,8 @@ Nesta rodada, o projeto externo ganhou um cenário de sincronização de versão
 113 cenários regulares e 78 cenários restantes no teste principal.
 Nesta rodada, o crawler de acessibilidade passou a derivar seus defaults de `diretorios.testesIntegracao`, com regressão
 para uma base externa configurada; a suíte chega a 114 cenários regulares e o teste principal permanece com 78.
+Na rodada seguinte, a coleta consolidada passou a montar o comando Playwright pela mesma configuração, com teste focado
+na função pura de opções; a suíte chega a 115 cenários regulares e `test/qualidade.test.ts` passa a ter 5 cenários.
 
 ### 3.3 Tamanho e composição atual
 
@@ -449,7 +453,7 @@ Inventário dos arquivos rastreados do toolkit, excluindo `dist`, cobertura e ar
 - 0 arquivos JavaScript de teste e 8 arquivos TypeScript de teste (`test/sgc.test.ts`, `test/projeto.test.ts`,
   `test/configuracao.test.ts`, `test/integracao.test.ts`, `test/qualidade.test.ts`, `test/cdus.test.ts`,
   `test/externo.test.ts` e `test/pacote.test.ts`);
-- 7 arquivos de teste TypeScript concentram 114 cenários regulares, mais 1 smoke de distribuição isolada;
+- 7 arquivos de teste TypeScript concentram 115 cenários regulares, mais 1 smoke de distribuição isolada;
 - `test/apoio.ts` centraliza a raiz do toolkit, o launcher `tsx`, o contrato de execução e `executarSgc`, evitando
   cópias divergentes nos testes de projeto, integração, qualidade e CLI;
 - maior módulo atual: `frontend/arquitetura-lib.ts`, com aproximadamente 1.200 linhas;
@@ -479,11 +483,12 @@ O núcleo TypeScript de implementação foi concluído: 100% dos arquivos de imp
 | Resolvido nesta rodada | Testes de projeto misturados ao teste da CLI | Os 15 cenários de versão, árvore, diagnóstico, limpeza, preparação, qualidade e dependências agora estão em `test/projeto.test.ts`; o teste principal concentra 78 cenários e a suíte permite execução focada por domínio. |
 | Resolvido nesta rodada | Configuração misturada à validação da CLI | Os 3 cenários de carregamento, validação e execução parametrizada agora estão em `test/configuracao.test.ts`; o teste principal caiu para 83 cenários e a configuração pode ser validada sem importar o roteador. |
 | Resolvido nesta rodada | Integração OpenAPI misturada à validação da CLI | Os 2 cenários de importação e artefatos OpenAPI agora estão em `test/integracao.test.ts`; o teste principal caiu para 81 cenários e a persistência de diff continua coberta com `--gravar`. |
-| Resolvido nesta rodada | Qualidade misturada à validação da CLI | Os 4 cenários de resumo e coleta agora estão em `test/qualidade.test.ts`; o teste principal caiu para 77 cenários e continua cobrindo perfis válidos e inválidos. |
+| Resolvido nesta rodada | Qualidade misturada à validação da CLI | Os 4 cenários iniciais de resumo e coleta foram extraídos para `test/qualidade.test.ts`; o teste principal caiu para 77 cenários e o arquivo agora cobre também a montagem configurada do Playwright. |
 | Resolvido nesta rodada | Apoio de execução duplicado entre testes | `test/apoio.ts` passou a ser a fonte única da raiz do toolkit, do `tsx` e do contrato `ResultadoExecucao`; os quatro testes que executam a CLI não mantêm cópias locais desse mecanismo. |
 | Resolvido nesta rodada | Apoio de testes contaminava a cobertura | `test:coverage` agora exclui `test/**`; a baseline permanece focada na implementação e não conta `test/apoio.ts` como código produtivo. |
 | Resolvido nesta rodada | Sincronização de versão fixava o frontend do SGC | `projeto/versao-sincronizar` agora resolve `diretorios.frontend` pela configuração da base; o fallback continua sendo `frontend` e o teste externo cobre `cliente/package.json`. |
 | Resolvido nesta rodada | Crawler fixava a raiz de integração do SGC | `frontend/acessibilidade-crawler` agora deriva os defaults de `diretorios.testesIntegracao`; opções explícitas continuam substituindo a convenção e o teste externo cobre a base configurada. |
+| Resolvido nesta rodada | Coleta Playwright divergia do crawler | `qualidade/coleta-execucao` agora centraliza a montagem de descrição e argumentos Playwright em função pura que resolve `diretorios.testesIntegracao`; o contrato tem teste de base externa. |
 | Resolvido nesta rodada | Resumo de análise bypassava a saída comum | `backend/testes-analisar.ts` agora usa `escreverLinha` em todas as linhas humanas; stdout continua igual e não há mistura com o JSON gravado. |
 | Resolvido nesta rodada | Auditoria de dependências bypassava a saída comum | `projeto/dependencias-auditar.ts` agora usa `escreverLinha` para a separação dos escopos; o fluxo mantém títulos, quebras e códigos de falha. |
 | Resolvido nesta rodada | Roteador monolítico e inventário duplicado | Os 42 comandos que apenas despacham scripts agora vêm de `lib/catalogo-comandos.ts`, com teste de unicidade, descrição, rota e arquivo existente. A documentação passou a tratar `sgc --help` como catálogo canônico e mantém apenas exemplos; comandos com ações/opções próprias continuam explícitos em `sgc.ts`. |
@@ -501,7 +506,7 @@ O núcleo TypeScript de implementação foi concluído: 100% dos arquivos de imp
 - Parametrização parcial não significa generalização concluída.
 - Build aprovado prova que a árvore pode ser emitida; não prova que o pacote emitido contém assets, configuração e
   resolução de raiz adequados para distribuição.
-- Knip aprovado, 114 testes unitários verdes e o smoke de pacote aprovado são gates úteis, mas ainda insuficientes para afirmar ausência de código morto fora
+- Knip aprovado, 115 testes unitários verdes e o smoke de pacote aprovado são gates úteis, mas ainda insuficientes para afirmar ausência de código morto fora
   do grafo declarado, segurança de todos os comandos mutáveis ou portabilidade. O grafo do Knip agora é uma evidência
   útil de exports não consumidos; não substitui testes de pacote externo.
 
@@ -724,7 +729,8 @@ Lotes sugeridos:
 2. **Backend**: cobertura, análise, priorização de testes, contratos e FQN já convertidos; falta parametrizar raiz Java, tarefas Gradle e
    categorias.
 3. **[parcial nesta rodada]** Frontend: cobertura V8, resíduos, acessibilidade e identificadores de teste já
-   convertidos; faltam parametrizar completamente raiz Vue, globs e convenções de componentes.
+   convertidos; o crawler e a coleta Playwright respeitam `testesIntegracao`, mas faltam parametrizar completamente raiz
+   Vue, globs e convenções de componentes.
 4. **[concluído nesta rodada]** Integração: exportação, diff e baseline OpenAPI; o módulo permanece independente do
    gerador de tipos removido.
 5. **[concluído nesta rodada]** Requisitos: o motor Markdown, as bibliotecas de mensagens e os dez comandos CDU foram

@@ -291,7 +291,7 @@ Os comandos de requisitos/CDUs e de contratos OpenAPI são módulos importáveis
 pela CLI. Isso permite reutilizar suas funções `principal(argumentos)` em outras automações sem iniciar auditorias ou
 integrações durante o carregamento.
 `npm run typecheck` executa `tsconfig.estrito.json` com `strict` e `noImplicitOverride` sobre todos os módulos de
-implementação TypeScript. `npm run typecheck:testes` aplica o mesmo rigor aos seis arquivos de teste TypeScript; a
+implementação TypeScript. `npm run typecheck:testes` aplica o mesmo rigor aos oito arquivos de teste TypeScript; a
 divisão por domínio ainda pode avançar dentro do teste principal, mas não há mais testes JavaScript ou uma migração
 parcial de linguagem.
 
@@ -301,7 +301,9 @@ atual por padrão.
 
 Na camada de qualidade, `coleta.ts` e `resumo.ts` têm fronteira reutilizável e não executam trabalho durante o `import`.
 Já `coleta-execucao.ts` permanece específico do SGC por coordenar Gradle, npm, Playwright e os auditores locais; ele não
-deve ser promovido a abstração horizontal antes de existir um contrato de adaptadores para outro projeto.
+deve ser promovido a abstração horizontal antes de existir um contrato de adaptadores para outro projeto. Mesmo nesse
+perfil, a montagem dos argumentos Playwright usa `diretorios.testesIntegracao`, a mesma convenção do crawler de
+acessibilidade.
 
 Os comandos `codigo nomes` também resolvem `simbolos.json`, `consistencia.json` e `idioma.json` relativos ao `--base`
 informado. Assim, a auditoria de outro projeto não lê nem grava silenciosamente no diretório de artefatos do SGC.

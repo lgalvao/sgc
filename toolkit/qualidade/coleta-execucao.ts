@@ -157,6 +157,15 @@ function caminhoRelativo(caminhoAbsoluto: string, base: string): string {
     return path.relative(base, caminhoAbsoluto).replace(/\\/g, "/");
 }
 
+function obterOpcoesPlaywright(diretorioBase: string): {descricao: string; argumentos: string[]} {
+    const diretorioTestesIntegracao = resolverCaminhoConfigurado("testesIntegracao", diretorioBase);
+    const configuracao = caminhoRelativo(path.join(diretorioTestesIntegracao, "playwright.config.ts"), diretorioBase);
+    return {
+        descricao: `npx playwright test --config=${configuracao}`,
+        argumentos: ["playwright", "test", `--config=${configuracao}`, "--reporter=json"]
+    };
+}
+
 function formatarTimestampArquivo(data: Date = new Date()): string {
     return data.toISOString().replaceAll(":", "-").replace(/\.\d{3}Z$/, "Z");
 }
@@ -405,10 +414,11 @@ const ADAPTADORES: Record<NomeAdaptador, (contexto: ContextoColeta) => Promise<E
         return execucao;
     },
     async testesIntegracaoPlaywright(contexto: ContextoColeta): Promise<ExecucaoQualidade> {
-        const execucao = criarExecucao("e2e-playwright", "E2E Playwright", "teste", "npx playwright test --config=e2e/playwright.config.ts", ".");
+        const opcoesPlaywright = obterOpcoesPlaywright(contexto.base);
+        const execucao = criarExecucao("e2e-playwright", "E2E Playwright", "teste", opcoesPlaywright.descricao, ".");
         const saida = await executarComando({
             comando: "npx",
-            args: ["playwright", "test", "--config=e2e/playwright.config.ts", "--reporter=json"],
+            args: opcoesPlaywright.argumentos,
 
             cwd: contexto.base,
             env: {CI: "1"}
@@ -502,5 +512,6 @@ if (ehEntradaPrincipal(import.meta.url)) {
 export {
     ADAPTADORES,
     PERFIS,
+    obterOpcoesPlaywright,
     principal
 };

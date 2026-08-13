@@ -4,6 +4,8 @@ import {mkdtemp} from "node:fs/promises";
 import fs from "fs-extra";
 import {describe, expect, test} from "vitest";
 import {DIRETORIO_RAIZ, executarSgc} from "./apoio.js";
+import {VERSAO_CONFIGURACAO} from "../lib/configuracao.js";
+import {obterOpcoesPlaywright} from "../qualidade/coleta-execucao.js";
 
 const FIXTURE_FOTOGRAFIA = path.join(DIRETORIO_RAIZ, "toolkit", "test", "fixtures", "qualidade", "fotografia.json");
 
@@ -50,5 +52,25 @@ describe("Qualidade do toolkit", () => {
         const resultado = await executarSgc(["qualidade", "coletar", "--perfil", "inexistente"]);
         expect(resultado.exitCode).toBe(1);
         expect(resultado.stderr).toContain("Perfil invalido");
+    });
+
+    test("resolve a configuracao Playwright a partir dos testes de integracao da base", async () => {
+        const diretorioBase = await mkdtemp(path.join(os.tmpdir(), "sgc-qualidade-playwright-configurado-"));
+        await fs.outputJSON(path.join(diretorioBase, "configuracao-toolkit.json"), {
+            versao: VERSAO_CONFIGURACAO,
+            diretorios: {
+                testesIntegracao: "testes-e2e"
+            }
+        });
+
+        expect(obterOpcoesPlaywright(diretorioBase)).toEqual({
+            descricao: "npx playwright test --config=testes-e2e/playwright.config.ts",
+            argumentos: [
+                "playwright",
+                "test",
+                "--config=testes-e2e/playwright.config.ts",
+                "--reporter=json"
+            ]
+        });
     });
 }, 30000);
