@@ -7,10 +7,10 @@
     "node": ">=26.7.0"
   },
   "bin": {
-    "sgc": "./sgc.js"
+    "sgc": "./bin/sgc.cjs"
   },
   "exports": {
-    ".": "./sgc.js",
+    ".": "./sgc.ts",
     "./lib/caminhos": "./lib/caminhos.ts",
     "./lib/cli-ajuda": "./lib/cli-ajuda.ts",
     "./lib/cli-opcoes": "./lib/cli-opcoes.ts",
@@ -22,7 +22,7 @@
     "./lib/*": "./lib/*.js"
   },
   "scripts": {
-    "sgc": "tsx ./sgc.js",
+    "sgc": "tsx ./sgc.ts",
     "deps:audit": "knip",
     "build": "tsc --project tsconfig.build.json",
     "test": "vitest run",
@@ -42,6 +42,7 @@
     "listr2": "^11.0.0",
     "picocolors": "^1.1.1",
     "ts-morph": "^28.0.0",
+    "tsx": "^4.23.12",
     "which": "^7.0.0",
     "xml2js": "^0.6.2"
   },
@@ -50,7 +51,6 @@
     "@vitest/coverage-v8": "^4.1.10",
     "knip": "^6.32.2",
     "oxlint": "^1.78.0",
-    "tsx": "^4.23.12",
     "typescript": "^6.0.3",
     "vitest": "^4.1.10"
   }

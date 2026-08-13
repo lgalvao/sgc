@@ -341,9 +341,9 @@ function exibirAjuda() {
             "--help, -h          Exibe esta ajuda."
         ],
         exemplos: [
-            "npx tsx toolkit/sgc.js backend contratos auditar",
-            "npx tsx toolkit/sgc.js backend contratos auditar --json",
-            "npx tsx toolkit/sgc.js backend contratos auditar --sem-gravar"
+            "npx tsx toolkit/sgc.ts backend contratos auditar",
+            "npx tsx toolkit/sgc.ts backend contratos auditar --json",
+            "npx tsx toolkit/sgc.ts backend contratos auditar --sem-gravar"
         ]
     });
 }

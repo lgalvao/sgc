@@ -126,8 +126,8 @@ async function principal(argumentos = process.argv.slice(2)) {
                 "--base <diretorio>   Sobrescreve o diretorio base da validacao.",
             ],
             exemplos: [
-                "npx tsx toolkit/sgc.js frontend views templates-validar",
-                "npx tsx toolkit/sgc.js frontend views templates-validar --json",
+                "npx tsx toolkit/sgc.ts frontend views templates-validar",
+                "npx tsx toolkit/sgc.ts frontend views templates-validar --json",
             ],
         });
         return;

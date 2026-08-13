@@ -5,14 +5,14 @@ import pc from "picocolors";
 import {executarNode} from "./lib/execucao.js";
 import logger from "./lib/logger.js";
 
-function criarComandoScript(pai, nome, descricao, relativo) {
+function criarComandoScript(pai: Command, nome: string, descricao: string, relativo: string): void {
     pai
         .command(nome)
         .description(descricao)
         .allowUnknownOption(true)
         .allowExcessArguments(true)
-        .action(async (...valores) => {
-            const comando = valores.at(-1);
+        .action(async (...valores: unknown[]) => {
+            const comando = valores.at(-1) as Command;
             const argumentos = comando.args ?? [];
             await executarNode(relativo, argumentos);
         });
@@ -130,7 +130,7 @@ qualidade
     .option("--limite-pontos-criticos <n>", "Limita a quantidade de pontos criticos exibidos.", Number.parseInt)
     .action(async (opcoes) => {
         const {executarResumoQualidade} = await import("./qualidade/resumo.js");
-        const resultado = await executarResumoQualidade(opcoes);
+        const resultado = await executarResumoQualidade(opcoes) as {resumo?: {statusGeral?: string}};
         if (resultado.resumo?.statusGeral === "vermelho") {
             process.exitCode = 1;
         }
@@ -194,7 +194,7 @@ criarComandoScript(projeto, "versao-sincronizar", "Sincroniza a versao entre gra
 
 program.addHelpText(
     "after",
-    `\nExemplos:\n  ${pc.dim("npx tsx toolkit/sgc.js backend cobertura auditoria")}\n  ${pc.dim("npx tsx toolkit/sgc.js frontend cobertura auditoria")}\n  ${pc.dim("npx tsx toolkit/sgc.js qualidade coletar --perfil rapido")}\n  ${pc.dim("npx tsx toolkit/sgc.js qualidade resumo")}\n  ${pc.dim("npx tsx toolkit/sgc.js projeto diagnostico --json")}\n  ${pc.dim("npx tsx toolkit/sgc.js codigo cheiros auditar --json")}`
+    `\nExemplos:\n  ${pc.dim("npx tsx toolkit/sgc.ts backend cobertura auditoria")}\n  ${pc.dim("npx tsx toolkit/sgc.ts frontend cobertura auditoria")}\n  ${pc.dim("npx tsx toolkit/sgc.ts qualidade coletar --perfil rapido")}\n  ${pc.dim("npx tsx toolkit/sgc.ts qualidade resumo")}\n  ${pc.dim("npx tsx toolkit/sgc.ts projeto diagnostico --json")}\n  ${pc.dim("npx tsx toolkit/sgc.ts codigo cheiros auditar --json")}`
 );
 
 async function executar(argumentos = process.argv) {

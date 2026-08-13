@@ -14,7 +14,7 @@ import {resolverDiretoriosPadrao} from "../codigo/semgrep-auditar.js";
 import {executarAuditoria as executarAuditoriaCheiros} from "../codigo/cheiros-auditar.js";
 
 const DIRETORIO_RAIZ = path.resolve(import.meta.dirname, "..", "..");
-const CAMINHO_SGC = path.join(DIRETORIO_RAIZ, "toolkit", "sgc.js");
+const CAMINHO_SGC = path.join(DIRETORIO_RAIZ, "toolkit", "sgc.ts");
 const CAMINHO_TSX = path.join(DIRETORIO_RAIZ, "node_modules", ".bin", process.platform === "win32" ? "tsx.cmd" : "tsx");
 const CAMINHO_SGC_COMPILADO = path.join(DIRETORIO_RAIZ, "toolkit", "dist", "sgc.js");
 const CAMINHO_TESTES_PRIORIZAR = path.join(DIRETORIO_RAIZ, "toolkit", "backend", "testes-priorizar.js");
@@ -118,6 +118,23 @@ describe("CLI raiz do toolkit", () => {
 
         expect(resultado.exitCode).toBe(0);
         expect(resultado.stdout).toBe("importacao-ok");
+    });
+
+    test("binario npm executa a entrada TypeScript pelo tsx", async () => {
+        const resultado = await execa("npm", [
+            "exec",
+            "--workspace",
+            "toolkit",
+            "sgc",
+            "--",
+            "--help",
+        ], {
+            cwd: DIRETORIO_RAIZ,
+            reject: false,
+        });
+
+        expect(resultado.exitCode).toBe(0);
+        expect(resultado.stdout).toContain("Toolkit do SGC");
     });
 
     test("CLI compilada despacha scripts compilados", async () => {

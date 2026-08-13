@@ -32,8 +32,8 @@ async function executarCrawler(argumentos = []) {
                 "--lista             Lista os testes sem executa-los."
             ],
             exemplos: [
-                "npx tsx toolkit/sgc.js frontend acessibilidade crawler",
-                "npx tsx toolkit/sgc.js frontend acessibilidade crawler --projeto chromium"
+                "npx tsx toolkit/sgc.ts frontend acessibilidade crawler",
+                "npx tsx toolkit/sgc.ts frontend acessibilidade crawler --projeto chromium"
             ]
         });
         return;

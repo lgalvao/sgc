@@ -11,7 +11,7 @@ import {extrairCoberturaJacoco} from "../lib/dominios/cobertura-java.js";
 import {extrairCoberturaFrontend} from "../lib/dominios/cobertura-web.js";
 import {escreverLinha} from "../lib/saida.js";
 
-const CAMINHO_SGC = resolverNaRaiz("toolkit", "sgc.js");
+const CAMINHO_SGC = resolverNaRaiz("toolkit", "sgc.ts");
 const VERSAO_SCHEMA = "1.0.0";
 
 const PERFIS = {
@@ -208,7 +208,7 @@ const ADAPTADORES = {
         return execucao;
     },
     async residuosFrontend(contexto) {
-        const execucao = criarExecucao("frontend-residuos", "Residuos do frontend", "qualidade", "npx tsx toolkit/sgc.js frontend residuos validar --json-resumido", ".");
+        const execucao = criarExecucao("frontend-residuos", "Residuos do frontend", "qualidade", "npx tsx toolkit/sgc.ts frontend residuos validar --json-resumido", ".");
         const saida = await executarComandoSgc(contexto, ["frontend", "residuos", "validar", "--json-resumido"]);
         const resultado = parseJsonSeguro(saida.saida, {});
         execucao.status = saida.codigoSaida === 0 && resultado.status === "ok" ? "sucesso" : "falha";
@@ -226,7 +226,7 @@ const ADAPTADORES = {
         return execucao;
     },
     async arquiteturaFrontend(contexto) {
-        const execucao = criarExecucao("frontend-arquitetura", "Frontend arquitetura", "qualidade", "npx tsx toolkit/sgc.js frontend arquitetura auditar --json", ".");
+        const execucao = criarExecucao("frontend-arquitetura", "Frontend arquitetura", "qualidade", "npx tsx toolkit/sgc.ts frontend arquitetura auditar --json", ".");
         const saida = await executarComandoSgc(contexto, ["frontend", "arquitetura", "auditar", "--json"]);
         const resultado = parseJsonSeguro(saida.saida, {});
         execucao.status = saida.codigoSaida === 0 ? "sucesso" : "falha";
@@ -252,7 +252,7 @@ const ADAPTADORES = {
         return execucao;
     },
     async identificadoresTesteFrontend(contexto) {
-        const execucao = criarExecucao("frontend-identificadores-teste", "Identificadores de teste do frontend", "qualidade", "npx tsx toolkit/sgc.js frontend identificadores-teste listar-duplicados", ".");
+        const execucao = criarExecucao("frontend-identificadores-teste", "Identificadores de teste do frontend", "qualidade", "npx tsx toolkit/sgc.ts frontend identificadores-teste listar-duplicados", ".");
         const saida = await executarComandoSgc(contexto, [
             "frontend",
             "identificadores-teste",

@@ -178,7 +178,7 @@ function atendeVersaoMinima(textoVersao, textoMinimo) {
 
 async function verificarComandosRegistrados(diretorioBase) {
     const comandos = [
-        ["toolkit/sgc.js", "toolkit"],
+        ["toolkit/sgc.ts", "toolkit"],
         ["toolkit/package.json", "toolkit"]
     ];
     return Promise.all(comandos.map(async ([caminho, nome]) => ({

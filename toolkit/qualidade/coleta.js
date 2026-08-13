@@ -66,7 +66,7 @@ async function executarColetaQualidade(argumentos = []) {
                 "--base <diretorio>  Sobrescreve o diretorio base do projeto auditado."
             ],
             exemplos: [
-                "npx tsx toolkit/sgc.js qualidade coletar --perfil rapido",
+                "npx tsx toolkit/sgc.ts qualidade coletar --perfil rapido",
                 "npx tsx toolkit/qualidade/coleta.js --perfil frontend"
             ]
         });

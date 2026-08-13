@@ -153,7 +153,7 @@ function lerOpcoes(argumentos: string[] = process.argv.slice(2)): OpcoesArvore {
 
     if (argumentos.includes("--help") || argumentos.includes("-h")) {
         escrever(`
-Uso recomendado: npx tsx toolkit/sgc.js projeto arvore-linhas [opções]
+Uso recomendado: npx tsx toolkit/sgc.ts projeto arvore-linhas [opções]
 Execução direta: npx tsx toolkit/projeto/arvore-linhas.ts [opções]
 
 Opções:

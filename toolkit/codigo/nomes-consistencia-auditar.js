@@ -335,7 +335,7 @@ function lerOpcoes(argv) {
 
 async function principal(argumentos = process.argv.slice(2)) {
     if (argumentos.includes("--help") || argumentos.includes("-h")) {
-        escreverLinha("Uso: npx tsx toolkit/sgc.js codigo nomes auditar-consistencia [--json] [--sem-gravar] [--base <diretorio>] [--inventario <arquivo.json>] [--saida <arquivo.json>]");
+        escreverLinha("Uso: npx tsx toolkit/sgc.ts codigo nomes auditar-consistencia [--json] [--sem-gravar] [--base <diretorio>] [--inventario <arquivo.json>] [--saida <arquivo.json>]");
         escreverLinha("");
         escreverLinha("Audita consistencia de nomenclatura com base no inventario de simbolos.");
         return;

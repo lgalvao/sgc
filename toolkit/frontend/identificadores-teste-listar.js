@@ -39,8 +39,8 @@ async function principal(argumentos = process.argv.slice(2)) {
                 "--dir <diretorio>    Sobrescreve o diretório configurado de código.",
             ],
             exemplos: [
-                "npx tsx toolkit/sgc.js frontend identificadores-teste listar",
-                "npx tsx toolkit/sgc.js frontend identificadores-teste listar --dir /tmp/frontend",
+                "npx tsx toolkit/sgc.ts frontend identificadores-teste listar",
+                "npx tsx toolkit/sgc.ts frontend identificadores-teste listar --dir /tmp/frontend",
             ],
         });
         return;

@@ -42,7 +42,7 @@ function sincronizarVersao(novaVersao: string | undefined, diretorioBase = resol
 function principal(argumentos: string[] = process.argv.slice(2)): ResultadoSincronizacao | undefined {
     const novaVersao = argumentos[0];
     if (!novaVersao) {
-        process.stderr.write("Uso recomendado: npx tsx toolkit/sgc.js projeto versao-sincronizar <versao>\n");
+        process.stderr.write("Uso recomendado: npx tsx toolkit/sgc.ts projeto versao-sincronizar <versao>\n");
         process.stderr.write("Execução direta: npx tsx toolkit/projeto/versao-sincronizar.ts <versao>\n");
         process.exitCode = 1;
         return;

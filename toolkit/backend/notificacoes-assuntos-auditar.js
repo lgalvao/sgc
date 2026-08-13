@@ -106,8 +106,8 @@ function exibirAjuda() {
             "--help, -h          Exibe esta ajuda."
         ],
         exemplos: [
-            "npx tsx toolkit/sgc.js backend notificacoes auditar-assuntos",
-            "npx tsx toolkit/sgc.js backend notificacoes auditar-assuntos --json"
+            "npx tsx toolkit/sgc.ts backend notificacoes auditar-assuntos",
+            "npx tsx toolkit/sgc.ts backend notificacoes auditar-assuntos --json"
         ]
     });
 }

@@ -46,7 +46,7 @@ Padronizar o frontend em torno de poucos arquetipos e proibir `BModal` cru em vi
 
 ## Enforcement
 
-- gate CLI: `npx tsx toolkit/sgc.js frontend views templates-validar`
+- gate CLI: `npx tsx toolkit/sgc.ts frontend views templates-validar`
 - script do frontend: `npm --prefix frontend run templates:check`
 - `qualidade:completa` do frontend passa a incluir esse gate
 

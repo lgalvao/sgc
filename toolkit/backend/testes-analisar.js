@@ -57,7 +57,7 @@ function imprimirAjuda() {
             '--help, -h              Exibe esta ajuda'
         ],
         exemplos: [
-            "npx tsx toolkit/sgc.js backend testes analisar --dir backend --output analise-testes.md --output-json analise-testes.json"
+            "npx tsx toolkit/sgc.ts backend testes analisar --dir backend --output analise-testes.md --output-json analise-testes.json"
         ]
     });
 }

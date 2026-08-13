@@ -32,9 +32,9 @@ async function principal(argumentos = process.argv.slice(2)) {
                 "--json               Emite o resultado em JSON."
             ],
             exemplos: [
-                "npx tsx toolkit/sgc.js integracao contratos fixar-baseline",
-                "npx tsx toolkit/sgc.js integracao contratos fixar-baseline --origem /tmp/novo.json",
-                "npx tsx toolkit/sgc.js integracao contratos fixar-baseline --json"
+                "npx tsx toolkit/sgc.ts integracao contratos fixar-baseline",
+                "npx tsx toolkit/sgc.ts integracao contratos fixar-baseline --origem /tmp/novo.json",
+                "npx tsx toolkit/sgc.ts integracao contratos fixar-baseline --json"
             ]
         });
         return;

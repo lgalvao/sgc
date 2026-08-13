@@ -3,7 +3,7 @@
  * Audita inconsistências de idioma (inglês vs português) e uso de `id` vs `codigo`
  * em nomes de membros, campos e parâmetros no código-fonte do SGC.
  *
- * Uso: npx tsx toolkit/sgc.js codigo nomes auditar-idioma [--json] [--sem-gravar]
+ * Uso: npx tsx toolkit/sgc.ts codigo nomes auditar-idioma [--json] [--sem-gravar]
  */
 import fs from "node:fs/promises";
 import path from "node:path";
@@ -305,7 +305,7 @@ function lerOpcoes(argv) {
 
 async function principal(argumentos = process.argv.slice(2)) {
     if (argumentos.includes("--help") || argumentos.includes("-h")) {
-        escreverLinha("Uso: npx tsx toolkit/sgc.js codigo nomes auditar-idioma [--json] [--sem-gravar] [--base <diretorio>] [--inventario <arquivo.json>] [--saida <arquivo.json>]");
+        escreverLinha("Uso: npx tsx toolkit/sgc.ts codigo nomes auditar-idioma [--json] [--sem-gravar] [--base <diretorio>] [--inventario <arquivo.json>] [--saida <arquivo.json>]");
         escreverLinha("");
         escreverLinha("Detecta membros com nomes em inglês e campos com 'id' que deveriam usar 'codigo'.");
         return;

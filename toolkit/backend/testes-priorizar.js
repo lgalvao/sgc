@@ -58,7 +58,7 @@ function imprimirAjuda() {
             '--help, -h          Exibe esta ajuda'
         ],
         exemplos: [
-            "npx tsx toolkit/sgc.js backend testes priorizar --input analise-testes.json --output priorizacao-testes.md"
+            "npx tsx toolkit/sgc.ts backend testes priorizar --input analise-testes.json --output priorizacao-testes.md"
         ]
     });
 }

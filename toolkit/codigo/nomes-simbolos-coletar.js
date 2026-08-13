@@ -551,7 +551,7 @@ function lerOpcoes(argv) {
 
 async function principal(argumentos = process.argv.slice(2)) {
     if (argumentos.includes("--help") || argumentos.includes("-h")) {
-        escreverLinha("Uso: npx tsx toolkit/sgc.js codigo nomes coletar-simbolos [--json] [--sem-gravar] [--base <diretorio>] [--saida <arquivo.json>]");
+        escreverLinha("Uso: npx tsx toolkit/sgc.ts codigo nomes coletar-simbolos [--json] [--sem-gravar] [--base <diretorio>] [--saida <arquivo.json>]");
         escreverLinha("");
         escreverLinha("Gera inventario completo de pacotes, arquivos, tipos e membros.");
         return;
