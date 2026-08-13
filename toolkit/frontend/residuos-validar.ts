@@ -3,13 +3,16 @@ import pc from "picocolors";
 import {DIRETORIO_RAIZ} from "../lib/caminhos.js";
 import {
     analisarResiduosFrontend,
-    carregarExcecoes,
     gravarFotografiaAuditoria,
-    resolverCaminhoExcecoesResiduos,
-    resolverCaminhoOrcamentoResiduos,
     resolverDiretorioSaidaResiduos
 } from "./residuos-lib.js";
-import type {ExcecaoResiduo, FotografiaResiduos} from "./residuos-lib.js";
+import {
+    carregarExcecoes,
+    resolverCaminhoExcecoesResiduos,
+    resolverCaminhoOrcamentoResiduos,
+    type ExcecaoResiduo,
+} from "./residuos-politicas.js";
+import type {FotografiaResiduos} from "./residuos-lib.js";
 import {escreverLinha, imprimirCabecalho, imprimirJson} from "../lib/saida.js";
 import {exibirAjudaComando} from "../lib/cli-ajuda.js";
 import {lerOpcao} from "../lib/cli-opcoes.js";

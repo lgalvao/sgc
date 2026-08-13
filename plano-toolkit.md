@@ -168,6 +168,8 @@ isolado funciona, mas as fronteiras ainda não estão concluídas:
   arquivo anterior antes de calcular deltas;
 - os relatórios próprios persistidos de `backend arquitetura auditar` e `backend coesao auditar` agora carregam
   `versao: 1`; o JSON persistido pelo Semgrep permanece externo e não recebe envelope do toolkit;
+- a política de orçamento e exceções de `frontend resíduos` foi extraída para um módulo próprio, com validação estrita
+  de versão e estrutura, sem misturar carregamento de configuração ao motor de análise;
 - `qualidade resumo` agora valida `versaoSchema: "1.0.0"` e deixou de carregar campos históricos (`indiceSaude` e
   `confiabilidade`) que não são produzidos pela fotografia atual;
 - apenas cobertura Java e web está publicada como API programática horizontal;

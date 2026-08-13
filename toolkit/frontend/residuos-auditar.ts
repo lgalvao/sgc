@@ -4,9 +4,9 @@ import {DIRETORIO_RAIZ} from "../lib/caminhos.js";
 import {
     analisarResiduosFrontend,
     gravarFotografiaAuditoria,
-    resolverCaminhoOrcamentoResiduos,
     resolverDiretorioSaidaResiduos
 } from "./residuos-lib.js";
+import {resolverCaminhoOrcamentoResiduos} from "./residuos-politicas.js";
 import type {FotografiaResiduos} from "./residuos-lib.js";
 import {escreverLinha, imprimirCabecalho, imprimirJson} from "../lib/saida.js";
 import {exibirAjudaComando} from "../lib/cli-ajuda.js";

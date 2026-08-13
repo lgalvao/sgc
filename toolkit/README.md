@@ -262,7 +262,9 @@ Opções explícitas da API ou CLI têm precedência sobre o arquivo. Categorias
 SGC. A configuração é considerada confiável e não funciona como sandbox.
 
 A política Semgrep padrão vem do pacote; um override em `diretorios.regrasSemgrep` é resolvido contra a raiz auditada.
-Orçamentos e exceções de resíduos são opcionais; quando configurados, os arquivos precisam existir e conter JSON válido.
+Orçamentos e exceções de resíduos são opcionais; quando configurados, os arquivos precisam existir, usar
+`versaoSchema: "1.0.0"` e respeitar a estrutura da política. O carregamento e a validação dessas políticas ficam
+separados do motor de análise.
 
 ## Uso como pacote
 
