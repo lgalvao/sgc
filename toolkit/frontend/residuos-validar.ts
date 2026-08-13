@@ -79,8 +79,10 @@ async function executarValidacaoFrontendResiduos(
     opcoes: OpcoesValidacaoFrontendResiduos = {}
 ): Promise<ResultadoValidacaoResiduos> {
     const base = path.resolve(opcoes.base ?? DIRETORIO_RAIZ);
-    const caminhoOrcamento = path.resolve(opcoes.orcamento ?? resolverCaminhoOrcamentoResiduos(base));
-    const caminhoExcecoes = path.resolve(opcoes.excecoes ?? resolverCaminhoExcecoesResiduos(base));
+    const caminhoOrcamentoConfigurado = opcoes.orcamento ?? resolverCaminhoOrcamentoResiduos(base);
+    const caminhoExcecoesConfigurado = opcoes.excecoes ?? resolverCaminhoExcecoesResiduos(base);
+    const caminhoOrcamento = caminhoOrcamentoConfigurado ? path.resolve(caminhoOrcamentoConfigurado) : undefined;
+    const caminhoExcecoes = caminhoExcecoesConfigurado ? path.resolve(caminhoExcecoesConfigurado) : undefined;
     const fotografia = await analisarResiduosFrontend({
         base,
         caminhoOrcamento,
@@ -169,8 +171,8 @@ async function executarValidacaoFrontendResiduos(
             violacoes: violacoes.length,
             avisos: avisos.length,
         },
-        orcamento: path.relative(process.cwd(), caminhoOrcamento).replaceAll("\\", "/"),
-        excecoes: path.relative(process.cwd(), caminhoExcecoes).replaceAll("\\", "/"),
+        orcamento: caminhoOrcamento ? path.relative(process.cwd(), caminhoOrcamento).replaceAll("\\", "/") : "padrao-do-toolkit",
+        excecoes: caminhoExcecoes ? path.relative(process.cwd(), caminhoExcecoes).replaceAll("\\", "/") : "padrao-do-toolkit",
         fotografia,
         violacoes,
         avisos,
@@ -209,8 +211,10 @@ async function principal(argumentos: string[] = process.argv.slice(2)): Promise<
 
     const base = lerOpcao(argumentos, "--base", undefined);
     const baseResolvida = path.resolve(base ?? DIRETORIO_RAIZ);
-    const orcamento = path.resolve(lerOpcao(argumentos, "--orcamento", resolverCaminhoOrcamentoResiduos(baseResolvida)) ?? resolverCaminhoOrcamentoResiduos(baseResolvida));
-    const excecoes = path.resolve(lerOpcao(argumentos, "--excecoes", resolverCaminhoExcecoesResiduos(baseResolvida)) ?? resolverCaminhoExcecoesResiduos(baseResolvida));
+    const orcamentoInformado = lerOpcao(argumentos, "--orcamento", resolverCaminhoOrcamentoResiduos(baseResolvida));
+    const excecoesInformadas = lerOpcao(argumentos, "--excecoes", resolverCaminhoExcecoesResiduos(baseResolvida));
+    const orcamento = orcamentoInformado ? path.resolve(orcamentoInformado) : undefined;
+    const excecoes = excecoesInformadas ? path.resolve(excecoesInformadas) : undefined;
     const resultado = await executarValidacaoFrontendResiduos({
         base: baseResolvida,
         orcamento,

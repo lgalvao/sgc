@@ -1,7 +1,7 @@
 import fs from "node:fs/promises";
 import path from "node:path";
 import {DIRETORIO_RAIZ} from "../lib/caminhos.js";
-import {resolverCaminhoConfigurado} from "../lib/configuracao.js";
+import {tentarResolverCaminhoConfigurado, resolverCaminhoConfigurado} from "../lib/configuracao.js";
 
 const VERSAO_SCHEMA = "1.0.0";
 
@@ -142,12 +142,25 @@ interface OpcoesAnaliseResiduos {
     caminhoOrcamento?: string;
 }
 
-function resolverCaminhoOrcamentoResiduos(base: string = DIRETORIO_RAIZ): string {
-    return resolverCaminhoConfigurado("orcamentoResiduosFrontend", base);
+const ORCAMENTO_RESIDUOS_PADRAO: OrcamentoResiduos = {
+    versaoSchema: VERSAO_SCHEMA,
+    camadas: {},
+    metricas: {
+        maximosProducao: {},
+    },
+};
+
+const EXCECOES_RESIDUOS_PADRAO: ResultadoExcecoesResiduos = {
+    versaoSchema: VERSAO_SCHEMA,
+    excecoes: [],
+};
+
+function resolverCaminhoOrcamentoResiduos(base: string = DIRETORIO_RAIZ): string | undefined {
+    return tentarResolverCaminhoConfigurado("orcamentoResiduosFrontend", base);
 }
 
-function resolverCaminhoExcecoesResiduos(base: string = DIRETORIO_RAIZ): string {
-    return resolverCaminhoConfigurado("excecoesResiduosFrontend", base);
+function resolverCaminhoExcecoesResiduos(base: string = DIRETORIO_RAIZ): string | undefined {
+    return tentarResolverCaminhoConfigurado("excecoesResiduosFrontend", base);
 }
 
 function resolverDiretorioSaidaResiduos(base: string = DIRETORIO_RAIZ): string {
@@ -304,23 +317,22 @@ function calcularScoreArquivo(arquivo: ArquivoResiduo, limitesCamada: LimitesCam
         + (arquivo.contagens.exportacoesSuspeitas * PESOS_SCORE.exportacoesSuspeitas);
 }
 
-async function lerJsonOpcional<T>(caminhoArquivo: string, fallback: T): Promise<T> {
+async function lerJsonConfigurado<T>(caminhoArquivo: string | undefined, fallback: T): Promise<T> {
+    if (!caminhoArquivo) {
+        return fallback;
+    }
+
     try {
         const valor: unknown = JSON.parse(await fs.readFile(caminhoArquivo, "utf8"));
         return valor as T;
-    } catch {
-        return fallback;
+    } catch (erro: unknown) {
+        const mensagem = erro instanceof Error ? erro.message : String(erro);
+        throw new Error(`Nao foi possivel ler a politica de residuos ${caminhoArquivo}: ${mensagem}`, {cause: erro});
     }
 }
 
-async function carregarOrcamento(caminhoOrcamento: string): Promise<OrcamentoResiduos> {
-    return lerJsonOpcional(caminhoOrcamento, {
-        versaoSchema: VERSAO_SCHEMA,
-        camadas: {},
-        metricas: {
-            maximosProducao: {},
-        }
-    });
+async function carregarOrcamento(caminhoOrcamento?: string): Promise<OrcamentoResiduos> {
+    return lerJsonConfigurado(caminhoOrcamento, ORCAMENTO_RESIDUOS_PADRAO);
 }
 
 function ehExcecaoResiduo(valor: unknown): valor is ExcecaoResiduo {
@@ -332,11 +344,8 @@ function ehExcecaoResiduo(valor: unknown): valor is ExcecaoResiduo {
     return typeof registro.arquivo === "string" && typeof registro.maxLinhas === "number";
 }
 
-async function carregarExcecoes(caminhoExcecoes: string): Promise<ResultadoExcecoesResiduos> {
-    const conteudo: unknown = await lerJsonOpcional(caminhoExcecoes, {
-        versaoSchema: VERSAO_SCHEMA,
-        excecoes: [],
-    });
+async function carregarExcecoes(caminhoExcecoes?: string): Promise<ResultadoExcecoesResiduos> {
+    const conteudo: unknown = await lerJsonConfigurado(caminhoExcecoes, EXCECOES_RESIDUOS_PADRAO);
     if (!conteudo || typeof conteudo !== "object") {
         return {versaoSchema: VERSAO_SCHEMA, excecoes: []};
     }

@@ -59,10 +59,11 @@ async function principal(argumentos: string[] = process.argv.slice(2)): Promise<
     }
 
     const base = lerOpcao(argumentos, "--base", undefined);
+    const baseResolvida = path.resolve(base ?? process.cwd());
     const fotografia = await executarAuditoriaFrontendResiduos({
-        base,
-        orcamento: lerOpcao(argumentos, "--orcamento", resolverCaminhoOrcamentoResiduos(base)),
-        saida: lerOpcao(argumentos, "--saida", resolverDiretorioSaidaResiduos(base)),
+        base: baseResolvida,
+        orcamento: lerOpcao(argumentos, "--orcamento", resolverCaminhoOrcamentoResiduos(baseResolvida)),
+        saida: lerOpcao(argumentos, "--saida", resolverDiretorioSaidaResiduos(baseResolvida)),
         semGravar: argumentos.includes("--sem-gravar"),
     });
 

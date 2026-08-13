@@ -211,6 +211,11 @@ defaults SGC para dependências e instalação. Opções explícitas da API ou d
 quando nenhuma delas existe, os defaults SGC preservam o comportamento atual. Os comandos são configuração confiável
 do projeto e não formam uma camada de segurança ou de sandbox.
 
+Os orçamentos e exceções de resíduos frontend não têm política padrão empacotada. Sem `diretorios.orcamentoResiduosFrontend`
+ou `diretorios.excecoesResiduosFrontend`, o toolkit usa uma política neutra identificada como `padrao-do-toolkit`. Ao
+declarar um desses caminhos, o arquivo passa a ser obrigatório e precisa conter JSON válido; arquivo ausente ou inválido
+interrompe a validação.
+
 A regra Semgrep padrão é a política do perfil SGC fornecida pelo próprio pacote. Em outro projeto, informe
 `diretorios.regrasSemgrep` para usar uma política local; o toolkit resolve o override relativo à raiz auditada.
 

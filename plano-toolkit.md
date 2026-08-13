@@ -99,10 +99,13 @@ um contrato versionado, com validação e defaults explícitos. Os caminhos atua
 - `artefatosQualidade`;
 - `coberturaBackend`;
 - `coberturaFrontend`;
-- `orcamentoResiduosFrontend`;
-- `excecoesResiduosFrontend`;
 - `regrasSemgrep`;
 - `contratosOpenapi`.
+
+`orcamentoResiduosFrontend` e `excecoesResiduosFrontend` são nomes opcionais de override para políticas de resíduos;
+não possuem default SGC nem arquivo empacotado. Na ausência de override, o analisador usa uma política neutra explícita.
+Se um override for declarado, arquivo ausente ou JSON inválido interrompe a execução em vez de ser tratado como política
+vazia.
 
 Novos comandos devem preferir esses pontos de configuração ou opções explícitas. Caminhos fixos só são aceitáveis dentro
 de um adaptador de perfil, nunca no núcleo horizontal.
@@ -172,6 +175,9 @@ frontend e para os caminhos OpenAPI.
 - A configuração externa também aceita a seção opcional `execucoes`, com perfis de qualidade, escopos de auditoria de
   dependências e escopos de instalação; cada categoria pode ser substituída separadamente, enquanto categorias ausentes
   continuam usando os defaults do perfil SGC. Opções explícitas da API/CLI têm precedência sobre o arquivo.
+- Os defaults obsoletos de orçamento e exceções de resíduos frontend foram removidos: os dois nomes continuam aceitos
+  somente como overrides opcionais da configuração. Sem override, a política neutra fica explícita no resultado; com
+  override, arquivo ausente ou inválido gera erro visível.
 - Os defaults de saída de `frontend arquitetura auditar` e `frontend residuos auditar/validar` agora são resolvidos
   depois da base efetiva; uma base externa não volta a gravar esses artefatos na raiz do SGC.
 - Os caminhos de exportação, diff e baseline OpenAPI agora são resolvidos depois da base efetiva, com `--base` nos três
@@ -218,8 +224,8 @@ frontend e para os caminhos OpenAPI.
   resultado da auditoria; o núcleo usa APIs `node:fs` diretamente e valida o JSON de exceções como `unknown`, enquanto
   as heurísticas de domínio continuam explicitamente específicas do SGC.
 - `frontend/residuos-lib.ts` foi convertido para TypeScript com tipos para orçamento, camadas, contagens, arquivos,
-  hotspots, fotografia e exceções; os budgets, pesos e classificações atuais foram preservados como política do perfil
-  SGC, e o carregamento JSON passou a filtrar entradas de exceção inválidas.
+  hotspots, fotografia e exceções; os pesos e classificações do perfil SGC foram preservados, a política de orçamento
+  passou a ser neutra quando não há override e o carregamento JSON passou a rejeitar arquivos configurados inválidos.
 - `frontend/arquitetura-lib.ts` foi convertido para TypeScript com tipos para análise AST, imports por camada, sinais,
   métricas, hotspots, famílias, exceções documentadas e fotografia; os hubs e heurísticas arquiteturais continuam
   explícitos no perfil SGC.
@@ -344,7 +350,7 @@ frontend e para os caminhos OpenAPI.
 
 Nas validações desta rodada, em 13 de agosto de 2026, executadas diretamente sob Node `26.7.0`:
 
-- `npm --prefix toolkit run test`: 104 testes aprovados em 2 arquivos; o smoke de pacote é separado para não tornar a
+- `npm --prefix toolkit run test`: 106 testes aprovados em 2 arquivos; o smoke de pacote é separado para não tornar a
   suíte unitária dependente de rede ou instalação;
 - `npm --prefix toolkit run test:pacote`: 1 teste aprovado, com `npm pack`, instalação isolada, auditoria no consumidor
   e verificação da política Semgrep empacotada;
@@ -373,7 +379,8 @@ outra chegou a 92 com o núcleo AST de arquitetura dependente de `frontendCodigo
 de caminhos dos relatórios V8 frontend; esta chega a 96 com o launcher `tsx` do binário npm. Nenhuma dessas mudanças
 reintroduz o wrapper obsoleto; as rodadas posteriores de limpeza, preparação, qualidade, dependências e acessibilidade
 elevam a cobertura para 101 cenários; uma rodada chega a 102 com o teste comportamental do auditor de contratos backend;
-esta rodada adiciona a resolução portável do Semgrep e o smoke de pacote isolado; a suíte unitária chega a 104 cenários.
+esta rodada adiciona a resolução portável do Semgrep e o smoke de pacote isolado; a suíte unitária chega a 104 cenários;
+a parametrização de execuções externas chega a 105; esta rodada explicita as políticas de resíduos e chega a 106.
 
 ### 3.3 Tamanho e composição atual
 
@@ -382,7 +389,7 @@ Inventário dos arquivos rastreados do toolkit, excluindo `dist`, cobertura e ar
 - 72 arquivos TypeScript de implementação;
 - 0 arquivos JavaScript de implementação; o único CJS é o launcher mínimo do binário;
 - 3 arquivos JavaScript de teste (`test/sgc.test.js`, `test/cdus.test.js` e `test/pacote.test.js`);
-- 2 arquivos de teste concentrando 104 cenários, mais 1 smoke de distribuição isolada;
+- 2 arquivos de teste concentrando 106 cenários, mais 1 smoke de distribuição isolada;
 - maior módulo atual: `frontend/arquitetura-lib.ts`, com aproximadamente 1.200 linhas;
 - outros hotspots: `codigo/nomes-simbolos-coletar.ts`, `frontend/residuos-lib.ts` e
   `qualidade/coleta-execucao.ts`.
@@ -403,6 +410,7 @@ O núcleo TypeScript de implementação foi concluído: 100% dos arquivos de imp
 | Resolvido | Cobertura insuficiente de mutação | O corretor `backend/java-corrigir-fqn.ts` agora tem fixture de escrita, verificação de conteúdo sem duplicação e segunda execução idempotente. |
 | Resolvido | Efeito colateral oculto de `--sem-gravar` | `codigo nomes auditar-consistencia` gerava o inventário auxiliar com gravação habilitada e contaminava `--json`; a opção agora é propagada e a coleta interna é silenciosa. |
 | Resolvido | Configuração sem validação | `configuracao-toolkit.json` agora exige a versão `1` e valida estrutura, chaves conhecidas e caminhos textuais antes da combinação com defaults. |
+| Resolvido nesta rodada | Políticas de resíduos apontando para legado ausente | Os defaults de orçamento e exceções frontend foram removidos; overrides continuam aceitos, a ausência usa política neutra explícita e arquivo configurado ausente ou inválido falha visivelmente. |
 | Média | Opções e efeitos divergentes | Há `--input`/`--output` e `--entrada`/`--saida`, `--dry-run` e `--sem-gravar`, além de comandos mutáveis sem modo de prévia uniforme. |
 | Resolvido nesta rodada | Testes não representam pacote externo | A suíte interna continua separada do smoke de distribuição, e `npm run test:pacote` empacota, instala em diretório isolado e executa o binário sem dependências hoisted do monorepo. |
 | Média | Cobertura funcional não medida | `@vitest/coverage-v8` está instalado, mas não há script, threshold ou relatório de cobertura do próprio toolkit. Quantidade de testes não mede contratos não exercitados. |
@@ -419,7 +427,7 @@ O núcleo TypeScript de implementação foi concluído: 100% dos arquivos de imp
 - Parametrização parcial não significa generalização concluída.
 - Build aprovado prova que a árvore pode ser emitida; não prova que o pacote emitido contém assets, configuração e
   resolução de raiz adequados para distribuição.
-- Knip aprovado, 104 testes unitários verdes e o smoke de pacote aprovado são gates úteis, mas ainda insuficientes para afirmar ausência de código morto fora
+- Knip aprovado, 106 testes unitários verdes e o smoke de pacote aprovado são gates úteis, mas ainda insuficientes para afirmar ausência de código morto fora
   do grafo declarado, segurança de todos os comandos mutáveis ou portabilidade. O grafo do Knip agora é uma evidência
   útil de exports não consumidos; não substitui testes de pacote externo.
 

@@ -44,6 +44,7 @@ interface ConfiguracaoSobreposta {
 
 const NOME_ARQUIVO_CONFIGURACAO = "configuracao-toolkit.json";
 const VERSAO_CONFIGURACAO = 1 as const;
+const DIRETORIOS_OPCIONAIS = new Set(["orcamentoResiduosFrontend", "excecoesResiduosFrontend"]);
 const DIRETORIOS_FORNECIDOS_PELO_TOOLKIT = new Set(["regrasSemgrep"]);
 
 const CONFIGURACAO_PADRAO: ConfiguracaoToolkit = {
@@ -58,8 +59,6 @@ const CONFIGURACAO_PADRAO: ConfiguracaoToolkit = {
         artefatosQualidade: "toolkit/qualidade/artefatos",
         coberturaBackend: "backend/build/reports/jacoco/test/jacocoTestReport.xml",
         coberturaFrontend: "frontend/coverage/coverage-final.json",
-        orcamentoResiduosFrontend: "toolkit/qualidade/politicas/frontend-residuos/orcamento.json",
-        excecoesResiduosFrontend: "toolkit/qualidade/politicas/frontend-residuos/excecoes.json",
         regrasSemgrep: "toolkit/qualidade/politicas/semgrep/sgc-qualidade.yml",
         contratosOpenapi: "toolkit/qualidade/artefatos/openapi"
     }
@@ -214,7 +213,10 @@ function validarConfiguracao(valor: unknown): ConfiguracaoSobreposta {
         throw new Error(`${NOME_ARQUIVO_CONFIGURACAO}.diretorios deve ser um objeto JSON.`);
     }
 
-    const nomesPermitidos = new Set(Object.keys(CONFIGURACAO_PADRAO.diretorios));
+    const nomesPermitidos = new Set([
+        ...Object.keys(CONFIGURACAO_PADRAO.diretorios),
+        ...DIRETORIOS_OPCIONAIS,
+    ]);
     const nomesDesconhecidos = Object.keys(diretorios).filter(nome => !nomesPermitidos.has(nome));
     if (nomesDesconhecidos.length > 0) {
         throw new Error(`${NOME_ARQUIVO_CONFIGURACAO}.diretorios possui nome(s) desconhecido(s): ${nomesDesconhecidos.join(", ")}.`);
@@ -280,10 +282,18 @@ function carregarConfiguracao(diretorioBase = DIRETORIO_RAIZ): ConfiguracaoToolk
 }
 
 function resolverCaminhoConfigurado(nomeDiretorio: string, diretorioBase = DIRETORIO_RAIZ): string {
+    const caminho = tentarResolverCaminhoConfigurado(nomeDiretorio, diretorioBase);
+    if (!caminho) {
+        throw new Error(`Diretorio configurado desconhecido ou ausente: ${nomeDiretorio}`);
+    }
+    return caminho;
+}
+
+function tentarResolverCaminhoConfigurado(nomeDiretorio: string, diretorioBase = DIRETORIO_RAIZ): string | undefined {
     const configuracao = carregarConfiguracao(diretorioBase);
     const caminhoRelativo = configuracao.diretorios[nomeDiretorio];
     if (!caminhoRelativo) {
-        throw new Error(`Diretorio configurado desconhecido: ${nomeDiretorio}`);
+        return undefined;
     }
 
     const caminhoPadrao = CONFIGURACAO_PADRAO.diretorios[nomeDiretorio];
@@ -306,6 +316,7 @@ export {
     VERSAO_CONFIGURACAO,
     carregarConfiguracao,
     resolverCaminhoConfigurado,
+    tentarResolverCaminhoConfigurado,
     validarConfiguracao,
     type ConfiguracaoSobreposta,
     type ConfiguracaoToolkit,

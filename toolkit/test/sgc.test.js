@@ -1177,6 +1177,40 @@ describe("CLI raiz do toolkit", () => {
         expect(obterComandoSemgrep(path.join(diretorioBinario, "inexistente"))).toBe("semgrep");
     });
 
+    test("trata politicas de residuos como overrides opcionais e explicita arquivos invalidos", async () => {
+        const base = await mkdtemp(path.join(os.tmpdir(), "sgc-residuos-politicas-opcionais-"));
+        const caminhoOrcamento = path.join(base, "politicas", "orcamento.json");
+        const caminhoExcecoes = path.join(base, "politicas", "excecoes.json");
+        await fs.outputJSON(path.join(base, "configuracao-toolkit.json"), {
+            versao: VERSAO_CONFIGURACAO,
+            diretorios: {
+                orcamentoResiduosFrontend: "politicas/orcamento.json",
+                excecoesResiduosFrontend: "politicas/excecoes.json"
+            }
+        });
+        await fs.outputJSON(caminhoOrcamento, {
+            versaoSchema: "1.0.0",
+            camadas: {},
+            metricas: {maximosProducao: {}}
+        });
+        await fs.outputJSON(caminhoExcecoes, {versaoSchema: "1.0.0", excecoes: []});
+
+        const resultado = await executarSgc([
+            "frontend", "residuos", "validar", "--json", "--sem-gravar", "--base", base
+        ]);
+        expect(resultado.exitCode).toBe(0);
+        const conteudo = JSON.parse(resultado.stdout);
+        expect(conteudo.orcamento).toBe(path.relative(DIRETORIO_RAIZ, caminhoOrcamento));
+        expect(conteudo.excecoes).toBe(path.relative(DIRETORIO_RAIZ, caminhoExcecoes));
+
+        await fs.outputFile(caminhoOrcamento, "{");
+        const falha = await executarSgc([
+            "frontend", "residuos", "validar", "--json", "--sem-gravar", "--base", base
+        ]);
+        expect(falha.exitCode).toBe(1);
+        expect(`${falha.stdout}\n${falha.stderr}`).toContain("Nao foi possivel ler a politica de residuos");
+    });
+
     test("grava fotografia de qualidade na base externa", async () => {
         const base = await mkdtemp(path.join(os.tmpdir(), "sgc-qualidade-base-"));
         const adaptadores = [...PERFIS.backend];
