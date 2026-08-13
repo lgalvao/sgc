@@ -184,7 +184,8 @@ npx tsx toolkit/sgc.ts projeto versao-sincronizar 1.2.3 --gravar
 de testes reconhece padrões comuns de JavaScript, Vue, Playwright e Java, incluindo qualquer caminho `src/test`.
 
 `projeto versao-sincronizar` apenas simula por padrão. Use `--base` para outra raiz e `--gravar` para atualizar
-`gradle.properties` e `frontend/package.json`.
+`gradle.properties` e o `package.json` do diretório definido por `diretorios.frontend` em
+`configuracao-toolkit.json` (o padrão do SGC é `frontend`).
 
 ## Casos de uso típicos
 

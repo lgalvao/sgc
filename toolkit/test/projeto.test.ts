@@ -12,6 +12,7 @@ import {executarLimpeza} from "../projeto/limpar.js";
 import {resolverEscoposInstalacao} from "../projeto/preparar.js";
 import {executarPerfilQualidade} from "../projeto/qualidade.js";
 import {executarAuditoriaDependencias} from "../projeto/dependencias-auditar.js";
+import {VERSAO_CONFIGURACAO} from "../lib/configuracao.js";
 
 type ChamadaComando = {
     comando: string;
@@ -30,7 +31,7 @@ describe("Comandos de projeto do toolkit", () => {
     test("exibe ajuda do comando de sincronizacao de versao do projeto", async () => {
         const resultado = await executarSgc(["projeto", "versao-sincronizar", "--help"]);
         expect(resultado.exitCode).toBe(0);
-        expect(resultado.stdout).toContain("Atualiza gradle.properties e frontend/package.json");
+        expect(resultado.stdout).toContain("Atualiza gradle.properties e o package.json do frontend configurado");
     });
 
     test("simula e aplica sincronizacao de versao em um diretorio informado", async () => {
@@ -83,6 +84,21 @@ describe("Comandos de projeto do toolkit", () => {
         expect(aplicacao.exitCode).toBe(0);
         expect(aplicacao.stdout).toContain("[v]");
         expect(await fs.readFile(path.join(diretorioBase, "gradle.properties"), "utf8")).toContain("version=2.3.4");
+    });
+
+    test("sincroniza versao no frontend configurado", async () => {
+        const diretorioBase = await mkdtemp(path.join(os.tmpdir(), "sgc-versao-frontend-configurado-"));
+        await fs.outputJSON(path.join(diretorioBase, "configuracao-toolkit.json"), {
+            versao: VERSAO_CONFIGURACAO,
+            diretorios: {frontend: "cliente"}
+        });
+        await fs.outputFile(path.join(diretorioBase, "gradle.properties"), "version=1.0.0\n");
+        await fs.outputJSON(path.join(diretorioBase, "cliente", "package.json"), {name: "cliente", version: "1.0.0"});
+
+        const resultado = sincronizarVersao("2.4.0", diretorioBase, true);
+
+        expect(resultado.arquivosAtualizados).toEqual(["gradle.properties", "cliente/package.json"]);
+        expect((await fs.readJSON(path.join(diretorioBase, "cliente", "package.json"))).version).toBe("2.4.0");
     });
 
     test("calcula arvore de linhas usando o diretorio base informado", async () => {

@@ -3,6 +3,7 @@ import path from "node:path";
 import {ehEntradaPrincipal} from "../lib/execucao.js";
 import {resolverNaRaiz} from "../lib/caminhos.js";
 import {lerOpcao} from "../lib/cli-opcoes.js";
+import {resolverCaminhoConfigurado} from "../lib/configuracao.js";
 import {escreverErro, escreverLinha} from "../lib/saida.js";
 
 interface ResultadoSincronizacao {
@@ -25,30 +26,33 @@ function sincronizarVersao(
     const arquivosPendentes: string[] = [];
 
     const resolver = (caminho: string): string => path.resolve(diretorioBase, caminho);
+    const caminhoRelativo = (caminho: string): string => path.relative(diretorioBase, caminho).replaceAll(path.sep, "/");
     const caminhoGradle = resolver("gradle.properties");
+    const nomeGradle = caminhoRelativo(caminhoGradle);
     if (existsSync(caminhoGradle)) {
         const conteudo = readFileSync(caminhoGradle, "utf-8");
         if (/^version=.*$/m.test(conteudo)) {
             const conteudoAtualizado = conteudo.replace(/^version=.*$/m, `version=${novaVersao}`);
             if (conteudoAtualizado !== conteudo) {
-                arquivosPendentes.push("gradle.properties");
+                arquivosPendentes.push(nomeGradle);
                 if (gravar) {
                     writeFileSync(caminhoGradle, conteudoAtualizado, "utf-8");
-                    arquivosAtualizados.push("gradle.properties");
+                    arquivosAtualizados.push(nomeGradle);
                 }
             }
         }
     }
 
-    const caminhoFrontend = resolver("frontend/package.json");
+    const caminhoFrontend = path.join(resolverCaminhoConfigurado("frontend", diretorioBase), "package.json");
+    const nomeFrontend = caminhoRelativo(caminhoFrontend);
     if (existsSync(caminhoFrontend)) {
         const pacote = JSON.parse(readFileSync(caminhoFrontend, "utf-8")) as Record<string, unknown>;
         if (pacote.version !== novaVersao) {
-            arquivosPendentes.push("frontend/package.json");
+            arquivosPendentes.push(nomeFrontend);
             if (gravar) {
                 pacote.version = novaVersao;
                 writeFileSync(caminhoFrontend, `${JSON.stringify(pacote, null, 2)}\n`, "utf-8");
-                arquivosAtualizados.push("frontend/package.json");
+                arquivosAtualizados.push(nomeFrontend);
             }
         }
     }
@@ -65,7 +69,7 @@ function principal(argumentos: string[] = process.argv.slice(2)): ResultadoSincr
     if (argumentos.includes("--help") || argumentos.includes("-h")) {
         escreverLinha("Uso recomendado: npx tsx toolkit/sgc.ts projeto versao-sincronizar <versao> [--base <diretorio>] [--gravar]");
         escreverLinha("");
-        escreverLinha("Atualiza gradle.properties e frontend/package.json; por padrão, apenas simula a alteração.");
+        escreverLinha("Atualiza gradle.properties e o package.json do frontend configurado; por padrão, apenas simula a alteração.");
         escreverLinha("--gravar             Persiste a versão nos arquivos encontrados.");
         escreverLinha("--base <diretorio>   Resolve os arquivos a partir de outra raiz.");
         return;
