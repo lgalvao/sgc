@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+// Auditoria tipográfica dos casos de uso CDU.
 
 import path from "node:path";
 import {ehEntradaPrincipal} from "../lib/execucao.js";
@@ -8,13 +9,33 @@ import {lerArquivo, listarArquivosCdu, obterLinhas, obterOpcoesCdu} from "./cdus
 const REGEX_ASPAS_SIMPLES = /'([^'\n]+)'/g;
 const REGEX_TITULO_UI_EM_ASPAS = /(?:título|titulo|subtítulo|subtitulo)\s*:?\s*"([^"\n]+)"/gi;
 const REGEX_PLACEHOLDER_LEGADO = /\[[A-Z0-9_]+\]/g;
-const PERFIS = new Set(["ADMIN", "GESTOR", "CHEFE", "SERVIDOR", "TODOS"]);
+const PERFIS = new Set<string>(["ADMIN", "GESTOR", "CHEFE", "SERVIDOR", "TODOS"]);
 
-function adicionarAchado(achados, severidade, regra, mensagem, linha = null) {
+type RegraEstilo = "perfil_em_aspas_simples" | "ui_em_aspas_duplas" | "placeholder_legado";
+
+interface AchadoEstilo {
+    severidade: "aviso";
+    regra: RegraEstilo;
+    mensagem: string;
+    linha: number | null;
+}
+
+interface ResultadoArquivoEstilo {
+    arquivo: string;
+    achados: AchadoEstilo[];
+}
+
+function adicionarAchado(
+    achados: AchadoEstilo[],
+    severidade: "aviso",
+    regra: RegraEstilo,
+    mensagem: string,
+    linha: number | null = null
+): void {
     achados.push({severidade, regra, mensagem, linha});
 }
 
-function encontrarAspasSimplesSuspeitas(linhas, achados) {
+function encontrarAspasSimplesSuspeitas(linhas: string[], achados: AchadoEstilo[]): void {
     linhas.forEach((linha, indice) => {
         for (const correspondencia of linha.matchAll(REGEX_ASPAS_SIMPLES)) {
             const valor = correspondencia[1].trim();
@@ -31,7 +52,7 @@ function encontrarAspasSimplesSuspeitas(linhas, achados) {
     });
 }
 
-function encontrarUiEmAspasDuplas(linhas, achados) {
+function encontrarUiEmAspasDuplas(linhas: string[], achados: AchadoEstilo[]): void {
     linhas.forEach((linha, indice) => {
         for (const correspondencia of linha.matchAll(REGEX_TITULO_UI_EM_ASPAS)) {
             const valor = correspondencia[1].trim();
@@ -51,7 +72,7 @@ function encontrarUiEmAspasDuplas(linhas, achados) {
     });
 }
 
-function encontrarPlaceholdersLegados(linhas, achados) {
+function encontrarPlaceholdersLegados(linhas: string[], achados: AchadoEstilo[]): void {
     linhas.forEach((linha, indice) => {
         for (const correspondencia of linha.matchAll(REGEX_PLACEHOLDER_LEGADO)) {
             const valor = correspondencia[0];
@@ -66,10 +87,10 @@ function encontrarPlaceholdersLegados(linhas, achados) {
     });
 }
 
-function auditarArquivo(caminhoArquivo) {
+function auditarArquivo(caminhoArquivo: string): ResultadoArquivoEstilo {
     const texto = lerArquivo(caminhoArquivo);
     const linhas = obterLinhas(texto);
-    const achados = [];
+    const achados: AchadoEstilo[] = [];
 
     encontrarAspasSimplesSuspeitas(linhas, achados);
     encontrarUiEmAspasDuplas(linhas, achados);
@@ -81,11 +102,11 @@ function auditarArquivo(caminhoArquivo) {
     };
 }
 
-async function principal(argumentos = process.argv.slice(2)) {
+async function principal(argumentos: string[] = process.argv.slice(2)): Promise<void> {
     const {emitirJson, base} = obterOpcoesCdu(argumentos);
 
     const arquivos = await listarArquivosCdu(base);
-    const relatorio = arquivos.map(caminhoArquivo => {
+    const relatorio: ResultadoArquivoEstilo[] = arquivos.map(caminhoArquivo => {
         const resultado = auditarArquivo(caminhoArquivo);
         return {
             arquivo: path.relative(base, resultado.arquivo).replaceAll("\\", "/"),

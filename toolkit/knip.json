@@ -40,7 +40,7 @@
     "qualidade/coleta-execucao.ts",
     "qualidade/coleta.ts",
     "qualidade/resumo.ts",
-    "requisitos/cdus-auditar-estilo.js",
+    "requisitos/cdus-auditar-estilo.ts",
     "requisitos/cdus-auditar-mensagens-codigo.js",
     "requisitos/cdus-auditar-mensagens.js",
     "requisitos/cdus-auditar-vocabulario.js",

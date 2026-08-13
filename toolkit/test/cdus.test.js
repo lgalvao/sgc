@@ -12,7 +12,7 @@ const CAMINHO_TSX = path.join(DIRETORIO_RAIZ, "node_modules", ".bin", process.pl
 const CAMINHOS_COMANDOS_CDU = [
     "cdus-inventariar.js",
     "cdus-auditar.ts",
-    "cdus-auditar-estilo.js",
+    "cdus-auditar-estilo.ts",
     "cdus-inventariar-vocabulario.js",
     "cdus-auditar-vocabulario.js",
     "cdus-inventariar-mensagens.js",
