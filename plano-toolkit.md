@@ -124,7 +124,7 @@ frontend e para os caminhos OpenAPI.
 - Não atualizar dependências major sem uma matriz mínima de validação. A linha de TypeScript fica em TS6 por decisão
   explícita do projeto.
 
-## 3. Situação atual — 12 de agosto de 2026
+## 3. Situação atual — 13 de agosto de 2026
 
 ### 3.1 O que já foi feito
 
@@ -169,6 +169,9 @@ frontend e para os caminhos OpenAPI.
   automática do inventário auxiliar agora não grava nem polui o JSON final quando executada internamente.
 - A configuração externa agora exige schema versão `1`, valida estrutura, nomes de diretório e caminhos não vazios na
   borda, antes de qualquer auditoria.
+- A configuração externa também aceita a seção opcional `execucoes`, com perfis de qualidade, escopos de auditoria de
+  dependências e escopos de instalação; cada categoria pode ser substituída separadamente, enquanto categorias ausentes
+  continuam usando os defaults do perfil SGC. Opções explícitas da API/CLI têm precedência sobre o arquivo.
 - Os defaults de saída de `frontend arquitetura auditar` e `frontend residuos auditar/validar` agora são resolvidos
   depois da base efetiva; uma base externa não volta a gravar esses artefatos na raiz do SGC.
 - Os caminhos de exportação, diff e baseline OpenAPI agora são resolvidos depois da base efetiva, com `--base` nos três
@@ -297,9 +300,13 @@ frontend e para os caminhos OpenAPI.
   os escopos de instalação de dependências podem ser fornecidos por projeto e a opção obsoleta `showTimer` do Listr2
   foi removida.
 - `projeto/qualidade.ts` foi convertido para TypeScript; o catálogo Gradle do SGC continua como default, mas a base,
-  o catálogo de perfis e o executor de comandos podem ser fornecidos por projeto externo ou teste.
+  o catálogo de perfis e o executor de comandos podem ser fornecidos por projeto externo ou teste. O catálogo também
+  pode ser declarado em `execucoes.qualidade`.
 - `projeto/dependencias-auditar.ts` foi convertido para TypeScript; os escopos de auditoria, comandos e argumentos
-  agora podem ser definidos por projeto, enquanto raiz, frontend e toolkit continuam no catálogo padrão do SGC.
+  agora podem ser definidos por projeto, enquanto raiz, frontend e toolkit continuam no catálogo padrão do SGC quando
+  não há configuração.
+- `projeto/preparar.ts` foi convertido para TypeScript; os escopos de instalação podem ser definidos em
+  `execucoes.instalacao`, preservando raiz, frontend e toolkit como defaults do SGC.
 - `backend/cobertura-ramificacoes.ts` e `backend/cobertura-auditoria.ts` foram convertidos para TypeScript com
   resultados, hotspots, métricas e geração de relatório tipados; a leitura JaCoCo continua delegada ao domínio comum.
 - `frontend/cobertura-ramificacoes.ts`, `frontend/cobertura-ramificacoes-erros.ts` e
@@ -624,8 +631,9 @@ mesmos fixtures e resultados JSON.
 
 Lotes sugeridos:
 
-1. **[concluído nesta rodada]** Projeto: diagnóstico, limpeza, preparação e perfil de qualidade convertidos. O
-   catálogo padrão continua sendo o perfil SGC, com base e execução parametrizáveis para reuso externo.
+1. **[concluído nesta rodada]** Projeto: diagnóstico, limpeza, preparação, perfil de qualidade e auditoria de
+   dependências convertidos. O catálogo padrão continua sendo o perfil SGC, com base e execução parametrizáveis para
+   reuso externo; `configuracao-toolkit.json` pode substituir separadamente qualidade, dependências e instalação.
 2. **Backend**: cobertura, análise, priorização de testes, contratos e FQN já convertidos; falta parametrizar raiz Java, tarefas Gradle e
    categorias.
 3. **[parcial nesta rodada]** Frontend: cobertura V8, resíduos, acessibilidade e identificadores de teste já
@@ -651,7 +659,9 @@ Para cada comando convertido:
 
 ### Fase D — separar núcleo horizontal e perfil SGC
 
-1. Definir uma configuração de projeto versionada, mantendo JSON como formato oficial de entrada e validando-a na borda.
+1. **[concluído nesta rodada]** Definir uma configuração de projeto versionada, mantendo JSON como formato oficial de
+   entrada, validando-o na borda e incluindo execuções substituíveis por categoria. O catálogo SGC continua sendo o
+   fallback quando a categoria não é declarada.
 2. Criar uma camada de adaptadores para:
    - layout de backend Java/Spring/Gradle;
    - layout de frontend Vue;

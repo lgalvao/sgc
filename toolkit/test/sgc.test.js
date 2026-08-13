@@ -11,7 +11,7 @@ import {executarDiagnostico} from "../projeto/diagnostico.ts";
 import {executarLimpeza} from "../projeto/limpar.ts";
 import {resolverEscoposInstalacao} from "../projeto/preparar.ts";
 import {executarPerfilQualidade} from "../projeto/qualidade.ts";
-import {executarAuditoriaDependencias} from "../projeto/dependencias-auditar.ts";
+import {executarAuditoriaDependencias, resolverEscoposAuditoria} from "../projeto/dependencias-auditar.ts";
 import {carregarConfiguracao, resolverCaminhoConfigurado, validarConfiguracao, VERSAO_CONFIGURACAO} from "../lib/configuracao.ts";
 import {resolverCaminhosOpenapi} from "../integracao/contratos-openapi-caminhos.ts";
 import {ADAPTADORES, PERFIS, principal as coletarFotografiaQualidade} from "../qualidade/coleta-execucao.ts";
@@ -1092,6 +1092,60 @@ describe("CLI raiz do toolkit", () => {
         expect(() => validarConfiguracao({versao: VERSAO_CONFIGURACAO, diretorios: {backendCodigoo: "servidor/java"}})).toThrow("backendCodigoo");
         expect(() => validarConfiguracao({versao: VERSAO_CONFIGURACAO, diretorios: {backendCodigo: 42}})).toThrow("backendCodigo");
         expect(() => validarConfiguracao({versao: VERSAO_CONFIGURACAO, diretorios: {backendCodigo: "   "}})).toThrow("não vazio");
+        expect(() => validarConfiguracao({
+            versao: VERSAO_CONFIGURACAO,
+            execucoes: {qualidade: {rapido: {descricao: "", tarefas: []}}}
+        })).toThrow("execucoes.qualidade.rapido.descricao");
+        expect(() => validarConfiguracao({
+            versao: VERSAO_CONFIGURACAO,
+            execucoes: {dependencias: [{titulo: "auditoria", segmento: ".", comando: "npm", argumentos: [42]}]}
+        })).toThrow("execucoes.dependencias[0].argumentos");
+    });
+
+    test("configura execucoes de projeto sem substituir os defaults do SGC", async () => {
+        const base = await mkdtemp(path.join(os.tmpdir(), "sgc-configuracao-execucoes-"));
+        await fs.outputJSON(path.join(base, "configuracao-toolkit.json"), {
+            versao: VERSAO_CONFIGURACAO,
+            execucoes: {
+                dependencias: [{
+                    titulo: "Auditar cliente",
+                    segmento: "cliente",
+                    comando: "npm",
+                    argumentos: ["run", "auditar-dependencias"]
+                }],
+                qualidade: {
+                    rapido: {
+                        descricao: "Qualidade externa",
+                        tarefas: [{titulo: "Verificar cliente", comando: "node", argumentos: ["--version"]}]
+                    }
+                },
+                instalacao: [{titulo: "Instalar cliente", segmento: "cliente"}]
+            }
+        });
+
+        expect(resolverEscoposAuditoria(base)).toMatchObject([{
+            titulo: "Auditar cliente",
+            segmento: "cliente",
+            diretorio: path.join(base, "cliente")
+        }]);
+        expect(resolverEscoposInstalacao(base)).toEqual([{
+            titulo: "Instalar cliente",
+            segmento: "cliente",
+            caminho: path.join(base, "cliente")
+        }]);
+
+        const chamadas = [];
+        await executarPerfilQualidade("rapido", {
+            base,
+            executarComando: async (comando, argumentos, diretorio) => {
+                chamadas.push({comando, argumentos, diretorio});
+            }
+        });
+        expect(chamadas).toEqual([{
+            comando: "node",
+            argumentos: ["--version"],
+            diretorio: base
+        }]);
     });
 
     test("resolve politica Semgrep padrao a partir da instalacao do toolkit", async () => {

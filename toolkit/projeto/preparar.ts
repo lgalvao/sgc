@@ -1,13 +1,11 @@
 import path from "node:path";
 import {execa} from "execa";
 import {Listr, type ListrTask} from "listr2";
+import {carregarConfiguracao, type EscopoInstalacaoConfigurado} from "../lib/configuracao.js";
 import {resolverNaRaiz} from "../lib/caminhos.js";
 import {executarDiagnostico, type Recurso, type RecursoArquivo, type ResultadoDiagnostico} from "./diagnostico.js";
 
-interface DefinicaoEscopoInstalacao {
-    titulo: string;
-    segmento: string;
-}
+type DefinicaoEscopoInstalacao = EscopoInstalacaoConfigurado;
 
 interface EscopoInstalacao extends DefinicaoEscopoInstalacao {
     caminho: string;
@@ -39,9 +37,12 @@ const ESCOPOS_INSTALACAO_SGC: readonly DefinicaoEscopoInstalacao[] = [
 
 function resolverEscoposInstalacao(
     diretorioBase: string,
-    definicoes: readonly DefinicaoEscopoInstalacao[] = ESCOPOS_INSTALACAO_SGC
+    definicoes?: readonly DefinicaoEscopoInstalacao[]
 ): EscopoInstalacao[] {
-    return definicoes.map(definicao => ({
+    const definicoesResolvidas = definicoes
+        ?? carregarConfiguracao(diretorioBase).execucoes?.instalacao
+        ?? ESCOPOS_INSTALACAO_SGC;
+    return definicoesResolvidas.map(definicao => ({
         ...definicao,
         caminho: path.resolve(diretorioBase, definicao.segmento)
     }));

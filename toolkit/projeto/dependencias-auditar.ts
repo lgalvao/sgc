@@ -1,14 +1,10 @@
 import {execa} from "execa";
 import path from "node:path";
+import {carregarConfiguracao, type EscopoComandoConfigurado} from "../lib/configuracao.js";
 import {resolverNaRaiz} from "../lib/caminhos.js";
 import {imprimirCabecalho} from "../lib/saida.js";
 
-interface DefinicaoEscopoAuditoria {
-    titulo: string;
-    segmento: string;
-    comando: string;
-    argumentos: string[];
-}
+type DefinicaoEscopoAuditoria = EscopoComandoConfigurado;
 
 interface EscopoAuditoria extends DefinicaoEscopoAuditoria {
     diretorio: string;
@@ -59,9 +55,12 @@ const ESCOPOS_AUDITORIA_SGC: readonly DefinicaoEscopoAuditoria[] = [
 
 function resolverEscoposAuditoria(
     diretorioBase: string,
-    definicoes: readonly DefinicaoEscopoAuditoria[] = ESCOPOS_AUDITORIA_SGC
+    definicoes?: readonly DefinicaoEscopoAuditoria[]
 ): EscopoAuditoria[] {
-    return definicoes.map(definicao => ({
+    const definicoesResolvidas = definicoes
+        ?? carregarConfiguracao(diretorioBase).execucoes?.dependencias
+        ?? ESCOPOS_AUDITORIA_SGC;
+    return definicoesResolvidas.map(definicao => ({
         ...definicao,
         diretorio: path.resolve(diretorioBase, definicao.segmento)
     }));

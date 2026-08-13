@@ -171,6 +171,46 @@ O arquivo exige a versão `1` e aceita uma seção `diretorios` com nomes conhec
 Chaves desconhecidas, versões não suportadas e caminhos vazios falham na borda de configuração, antes de um auditor
 iniciar.
 
+Além dos diretórios, um projeto pode declarar as execuções que substituem os catálogos padrão do perfil SGC. A seção
+`execucoes` aceita escopos de auditoria de dependências, escopos de instalação e perfis de qualidade. Cada comando é
+executado na base do projeto ou no segmento informado; `argumentos` deve ser sempre uma lista de textos:
+
+```json
+{
+  "versao": 1,
+  "execucoes": {
+    "dependencias": [
+      {
+        "titulo": "Auditar cliente",
+        "segmento": "cliente",
+        "comando": "npm",
+        "argumentos": ["run", "auditar-dependencias"]
+      }
+    ],
+    "qualidade": {
+      "rapido": {
+        "descricao": "Verificações rápidas do projeto",
+        "tarefas": [
+          {
+            "titulo": "Verificar projeto",
+            "comando": "npm",
+            "argumentos": ["run", "qualidade"]
+          }
+        ]
+      }
+    },
+    "instalacao": [
+      {"titulo": "Instalar cliente", "segmento": "cliente"}
+    ]
+  }
+}
+```
+
+As três listas são independentes: uma configuração que declara somente um perfil de qualidade continua usando os
+defaults SGC para dependências e instalação. Opções explícitas da API ou da CLI têm precedência sobre a configuração;
+quando nenhuma delas existe, os defaults SGC preservam o comportamento atual. Os comandos são configuração confiável
+do projeto e não formam uma camada de segurança ou de sandbox.
+
 A regra Semgrep padrão é a política do perfil SGC fornecida pelo próprio pacote. Em outro projeto, informe
 `diretorios.regrasSemgrep` para usar uma política local; o toolkit resolve o override relativo à raiz auditada.
 

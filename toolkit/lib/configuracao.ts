@@ -4,14 +4,42 @@ import {DIRETORIO_RAIZ, DIRETORIO_TOOLKIT} from "./caminhos.js";
 
 type DiretoriosConfigurados = Record<string, string>;
 
+interface TarefaConfigurada {
+    titulo: string;
+    comando: string;
+    argumentos: string[];
+}
+
+interface EscopoComandoConfigurado extends TarefaConfigurada {
+    segmento: string;
+}
+
+interface PerfilQualidadeConfigurado {
+    descricao: string;
+    tarefas: TarefaConfigurada[];
+}
+
+interface EscopoInstalacaoConfigurado {
+    titulo: string;
+    segmento: string;
+}
+
+interface ExecucoesConfiguradas {
+    dependencias?: EscopoComandoConfigurado[];
+    qualidade?: Record<string, PerfilQualidadeConfigurado>;
+    instalacao?: EscopoInstalacaoConfigurado[];
+}
+
 interface ConfiguracaoToolkit {
     versao: 1;
     diretorios: DiretoriosConfigurados;
+    execucoes?: ExecucoesConfiguradas;
 }
 
 interface ConfiguracaoSobreposta {
     versao: 1;
     diretorios?: DiretoriosConfigurados;
+    execucoes?: ExecucoesConfiguradas;
 }
 
 const NOME_ARQUIVO_CONFIGURACAO = "configuracao-toolkit.json";
@@ -41,12 +69,126 @@ function ehObjeto(valor: unknown): valor is Record<string, unknown> {
     return typeof valor === "object" && valor !== null && !Array.isArray(valor);
 }
 
+function validarTexto(valor: unknown, caminho: string): string {
+    if (typeof valor !== "string" || valor.trim() === "") {
+        throw new Error(`${NOME_ARQUIVO_CONFIGURACAO}.${caminho} deve ser um texto não vazio.`);
+    }
+    return valor;
+}
+
+function validarArgumentos(valor: unknown, caminho: string): string[] {
+    if (!Array.isArray(valor) || valor.some(argumento => typeof argumento !== "string")) {
+        throw new Error(`${NOME_ARQUIVO_CONFIGURACAO}.${caminho} deve ser uma lista de textos.`);
+    }
+    return [...valor];
+}
+
+function validarTarefa(valor: unknown, caminho: string, permitirSegmento = false): TarefaConfigurada {
+    if (!ehObjeto(valor)) {
+        throw new Error(`${NOME_ARQUIVO_CONFIGURACAO}.${caminho} deve ser um objeto.`);
+    }
+    const chavesPermitidas = new Set(["titulo", "comando", "argumentos", ...(permitirSegmento ? ["segmento"] : [])]);
+    const chavesDesconhecidas = Object.keys(valor).filter(chave => !chavesPermitidas.has(chave));
+    if (chavesDesconhecidas.length > 0) {
+        throw new Error(`${NOME_ARQUIVO_CONFIGURACAO}.${caminho} possui chave(s) desconhecida(s): ${chavesDesconhecidas.join(", ")}.`);
+    }
+    return {
+        titulo: validarTexto(valor.titulo, `${caminho}.titulo`),
+        comando: validarTexto(valor.comando, `${caminho}.comando`),
+        argumentos: validarArgumentos(valor.argumentos, `${caminho}.argumentos`),
+    };
+}
+
+function validarEscoposComando(valor: unknown, caminho: string): EscopoComandoConfigurado[] {
+    if (!Array.isArray(valor)) {
+        throw new Error(`${NOME_ARQUIVO_CONFIGURACAO}.${caminho} deve ser uma lista.`);
+    }
+    return valor.map((item, indice) => {
+        const tarefa = validarTarefa(item, `${caminho}[${indice}]`, true);
+        if (!ehObjeto(item)) {
+            throw new Error(`${NOME_ARQUIVO_CONFIGURACAO}.${caminho}[${indice}] deve ser um objeto.`);
+        }
+        return {
+            ...tarefa,
+            segmento: validarTexto(item.segmento, `${caminho}[${indice}].segmento`),
+        };
+    });
+}
+
+function validarEscoposInstalacao(valor: unknown, caminho: string): EscopoInstalacaoConfigurado[] {
+    if (!Array.isArray(valor)) {
+        throw new Error(`${NOME_ARQUIVO_CONFIGURACAO}.${caminho} deve ser uma lista.`);
+    }
+    return valor.map((item, indice) => {
+        if (!ehObjeto(item)) {
+            throw new Error(`${NOME_ARQUIVO_CONFIGURACAO}.${caminho}[${indice}] deve ser um objeto.`);
+        }
+        const chavesPermitidas = new Set(["titulo", "segmento"]);
+        const chavesDesconhecidas = Object.keys(item).filter(chave => !chavesPermitidas.has(chave));
+        if (chavesDesconhecidas.length > 0) {
+            throw new Error(`${NOME_ARQUIVO_CONFIGURACAO}.${caminho}[${indice}] possui chave(s) desconhecida(s): ${chavesDesconhecidas.join(", ")}.`);
+        }
+        return {
+            titulo: validarTexto(item.titulo, `${caminho}[${indice}].titulo`),
+            segmento: validarTexto(item.segmento, `${caminho}[${indice}].segmento`),
+        };
+    });
+}
+
+function validarExecucoes(valor: unknown): ExecucoesConfiguradas {
+    if (!ehObjeto(valor)) {
+        throw new Error(`${NOME_ARQUIVO_CONFIGURACAO}.execucoes deve ser um objeto JSON.`);
+    }
+    const chavesPermitidas = new Set(["dependencias", "qualidade", "instalacao"]);
+    const chavesDesconhecidas = Object.keys(valor).filter(chave => !chavesPermitidas.has(chave));
+    if (chavesDesconhecidas.length > 0) {
+        throw new Error(`${NOME_ARQUIVO_CONFIGURACAO}.execucoes possui chave(s) desconhecida(s): ${chavesDesconhecidas.join(", ")}.`);
+    }
+
+    const resultado: ExecucoesConfiguradas = {};
+    if (valor.dependencias !== undefined) {
+        resultado.dependencias = validarEscoposComando(valor.dependencias, "execucoes.dependencias");
+    }
+    if (valor.instalacao !== undefined) {
+        resultado.instalacao = validarEscoposInstalacao(valor.instalacao, "execucoes.instalacao");
+    }
+    if (valor.qualidade !== undefined) {
+        if (!ehObjeto(valor.qualidade)) {
+            throw new Error(`${NOME_ARQUIVO_CONFIGURACAO}.execucoes.qualidade deve ser um objeto.`);
+        }
+        const qualidade: Record<string, PerfilQualidadeConfigurado> = Object.create(null) as Record<string, PerfilQualidadeConfigurado>;
+        for (const [nome, definicao] of Object.entries(valor.qualidade)) {
+            if (nome.trim() === "") {
+                throw new Error(`${NOME_ARQUIVO_CONFIGURACAO}.execucoes.qualidade deve usar nomes de perfil não vazios.`);
+            }
+            if (!ehObjeto(definicao)) {
+                throw new Error(`${NOME_ARQUIVO_CONFIGURACAO}.execucoes.qualidade.${nome} deve ser um objeto.`);
+            }
+            const chavesPermitidasPerfil = new Set(["descricao", "tarefas"]);
+            const chavesDesconhecidasPerfil = Object.keys(definicao).filter(chave => !chavesPermitidasPerfil.has(chave));
+            if (chavesDesconhecidasPerfil.length > 0) {
+                throw new Error(`${NOME_ARQUIVO_CONFIGURACAO}.execucoes.qualidade.${nome} possui chave(s) desconhecida(s): ${chavesDesconhecidasPerfil.join(", ")}.`);
+            }
+            if (!Array.isArray(definicao.tarefas)) {
+                throw new Error(`${NOME_ARQUIVO_CONFIGURACAO}.execucoes.qualidade.${nome}.tarefas deve ser uma lista.`);
+            }
+            qualidade[nome] = {
+                descricao: validarTexto(definicao.descricao, `execucoes.qualidade.${nome}.descricao`),
+                tarefas: definicao.tarefas.map((tarefa, indice) => validarTarefa(tarefa, `execucoes.qualidade.${nome}.tarefas[${indice}]`)),
+            };
+        }
+        resultado.qualidade = qualidade;
+    }
+
+    return resultado;
+}
+
 function validarConfiguracao(valor: unknown): ConfiguracaoSobreposta {
     if (!ehObjeto(valor)) {
         throw new Error(`${NOME_ARQUIVO_CONFIGURACAO} deve conter um objeto JSON.`);
     }
 
-    const chavesPermitidas = new Set(["versao", "diretorios"]);
+    const chavesPermitidas = new Set(["versao", "diretorios", "execucoes"]);
     const chavesDesconhecidas = Object.keys(valor).filter(chave => !chavesPermitidas.has(chave));
     if (chavesDesconhecidas.length > 0) {
         throw new Error(`${NOME_ARQUIVO_CONFIGURACAO} possui chave(s) desconhecida(s): ${chavesDesconhecidas.join(", ")}.`);
@@ -60,9 +202,13 @@ function validarConfiguracao(valor: unknown): ConfiguracaoSobreposta {
         throw new Error(`${NOME_ARQUIVO_CONFIGURACAO} possui versão ${String(versao)}; a versão suportada é ${VERSAO_CONFIGURACAO}.`);
     }
 
+    const execucoes = valor.execucoes === undefined ? undefined : validarExecucoes(valor.execucoes);
     const diretorios = valor.diretorios;
     if (diretorios === undefined) {
-        return {versao};
+        return {
+            versao,
+            ...(execucoes === undefined ? {} : {execucoes})
+        };
     }
     if (!ehObjeto(diretorios)) {
         throw new Error(`${NOME_ARQUIVO_CONFIGURACAO}.diretorios deve ser um objeto JSON.`);
@@ -84,7 +230,8 @@ function validarConfiguracao(valor: unknown): ConfiguracaoSobreposta {
 
     return {
         versao: VERSAO_CONFIGURACAO,
-        diretorios: diretoriosValidados
+        diretorios: diretoriosValidados,
+        ...(execucoes === undefined ? {} : {execucoes})
     };
 }
 
@@ -92,13 +239,26 @@ function combinarConfiguracoes(
     configuracaoBase: ConfiguracaoToolkit,
     configuracaoSobreposta: ConfiguracaoSobreposta
 ): ConfiguracaoToolkit {
+    const execucoesBase = configuracaoBase.execucoes ?? {};
+    const execucoesSobrepostas = configuracaoSobreposta.execucoes ?? {};
+    const execucoes = {
+        ...execucoesBase,
+        ...execucoesSobrepostas,
+        qualidade: {
+            ...execucoesBase.qualidade,
+            ...execucoesSobrepostas.qualidade,
+        },
+    };
     return {
         ...configuracaoBase,
         ...configuracaoSobreposta,
         diretorios: {
             ...configuracaoBase.diretorios,
             ...configuracaoSobreposta.diretorios ?? {}
-        }
+        },
+        ...(Object.keys(execucoes).some(chave => chave !== "qualidade") || Object.keys(execucoes.qualidade ?? {}).length > 0
+            ? {execucoes}
+            : {})
     };
 }
 
@@ -146,5 +306,12 @@ export {
     VERSAO_CONFIGURACAO,
     carregarConfiguracao,
     resolverCaminhoConfigurado,
-    validarConfiguracao
+    validarConfiguracao,
+    type ConfiguracaoSobreposta,
+    type ConfiguracaoToolkit,
+    type EscopoComandoConfigurado,
+    type EscopoInstalacaoConfigurado,
+    type ExecucoesConfiguradas,
+    type PerfilQualidadeConfigurado,
+    type TarefaConfigurada
 };

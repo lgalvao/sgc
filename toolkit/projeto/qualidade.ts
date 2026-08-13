@@ -1,19 +1,13 @@
 import path from "node:path";
 import {execa} from "execa";
 import {Listr} from "listr2";
+import {carregarConfiguracao, type PerfilQualidadeConfigurado, type TarefaConfigurada} from "../lib/configuracao.js";
 import {resolverNaRaiz} from "../lib/caminhos.js";
 import {imprimirCabecalho} from "../lib/saida.js";
 
-interface TarefaQualidade {
-    titulo: string;
-    comando: string;
-    argumentos: string[];
-}
+type TarefaQualidade = TarefaConfigurada;
 
-interface DefinicaoPerfilQualidade {
-    descricao: string;
-    tarefas: readonly TarefaQualidade[];
-}
+type DefinicaoPerfilQualidade = Omit<PerfilQualidadeConfigurado, "tarefas"> & {tarefas: readonly TarefaQualidade[]};
 
 type CatalogoPerfisQualidade = Record<string, DefinicaoPerfilQualidade>;
 
@@ -99,7 +93,10 @@ async function executarPerfilQualidade(
     opcoes: OpcoesExecucaoPerfil = {}
 ): Promise<ResultadoPerfilQualidade> {
     const diretorioBase = path.resolve(opcoes.base ?? resolverNaRaiz());
-    const definicao = resolverPerfilQualidade(perfil, opcoes.perfis);
+    const perfis = opcoes.perfis
+        ?? carregarConfiguracao(diretorioBase).execucoes?.qualidade
+        ?? PERFIS_QUALIDADE_SGC;
+    const definicao = resolverPerfilQualidade(perfil, perfis);
     const executarComando = opcoes.executarComando ?? executarComandoPadrao;
 
     imprimirCabecalho("Qualidade do projeto", definicao.descricao);

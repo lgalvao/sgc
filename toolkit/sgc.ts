@@ -176,9 +176,10 @@ projeto
 projeto
     .command("qualidade [perfil]")
     .description("Executa os perfis consolidados de qualidade do projeto.")
-    .action(async (perfil = "rapido") => {
+    .option("--base <diretorio>", "Sobrescreve o diretorio base do projeto.")
+    .action(async (perfil = "rapido", opcoes) => {
         const {executarPerfilQualidade} = await import("./projeto/qualidade.js");
-        await executarPerfilQualidade(perfil);
+        await executarPerfilQualidade(perfil, opcoes);
     });
 
 projeto
