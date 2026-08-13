@@ -232,6 +232,9 @@ frontend e para os caminhos OpenAPI.
   agora podem ser definidos por projeto, enquanto raiz, frontend e toolkit continuam no catálogo padrão do SGC.
 - `backend/cobertura-ramificacoes.ts` e `backend/cobertura-auditoria.ts` foram convertidos para TypeScript com
   resultados, hotspots, métricas e geração de relatório tipados; a leitura JaCoCo continua delegada ao domínio comum.
+- `frontend/cobertura-ramificacoes.ts`, `frontend/cobertura-ramificacoes-erros.ts` e
+  `frontend/cobertura-auditoria.ts` foram convertidos para TypeScript com tipos para métricas V8, hotspots, linhas
+  suspeitas e relatórios; os filtros de arquivos e heurísticas de erro do perfil SGC foram preservados.
 - `integracao/contratos-openapi-caminhos.ts` foi convertido para TypeScript com o contrato explícito dos caminhos
   atual, de referência e de relatório; ele permanece independente do gerador de tipos removido.
 - `integracao/contratos-exportar-openapi.ts`, `integracao/contratos-diff.ts` e
@@ -281,15 +284,15 @@ para 100 cenários.
 
 Inventário dos arquivos rastreados do toolkit, excluindo `dist`, cobertura e artefatos ignorados:
 
-- 34 arquivos TypeScript de implementação;
-- 38 arquivos JavaScript de implementação ainda pendentes;
+- 39 arquivos TypeScript de implementação;
+- 33 arquivos JavaScript de implementação ainda pendentes;
 - 2 arquivos JavaScript de teste (`test/sgc.test.js` e `test/cdus.test.js`);
 - 2 arquivos de teste concentrando 100 cenários;
 - maior módulo atual: `frontend/arquitetura-lib.ts`, com aproximadamente 1.200 linhas;
 - outros hotspots: `codigo/nomes-simbolos-coletar.js`, `backend/testes-analisar.js`,
   `frontend/residuos-lib.ts`, `backend/contratos-auditar.js` e `qualidade/coleta-execucao.ts`.
 
-O núcleo TypeScript está adiantado, mas a migração do toolkit como um todo ainda não terminou: aproximadamente 47% dos
+O núcleo TypeScript está adiantado, mas a migração do toolkit como um todo ainda não terminou: aproximadamente 54% dos
 arquivos de implementação rastreados são TypeScript.
 
 ### 3.4 Achados da auditoria crítica
@@ -506,7 +509,8 @@ roteador fonte/compilado possuir testes de smoke equivalentes.
 1. **[concluído nesta rodada]** Migrar `lib/dominios/cobertura-java.ts` e `lib/dominios/cobertura-web.ts`, mantendo os
    contratos de métricas, os caminhos relativos à base auditada e os fixtures existentes.
 2. **[parcial nesta rodada]** Migrar `backend/lib/testes-analisar-regras.ts`, `backend/cobertura-ramificacoes.ts`,
-   `backend/cobertura-auditoria.ts`, `requisitos/cdus-mensagens-lib.ts`,
+   `backend/cobertura-auditoria.ts`, `frontend/cobertura-ramificacoes.ts`, `frontend/cobertura-ramificacoes-erros.ts`,
+   `frontend/cobertura-auditoria.ts`, `requisitos/cdus-mensagens-lib.ts`,
    `frontend/identificadores-teste-lib.ts`, `requisitos/cdus-lib.ts`, `requisitos/cdus-vocabulario-lib.ts`,
    `requisitos/cdus-mensagens-codigo-lib.ts`, `frontend/acoes-backend-lib.ts`, `frontend/residuos-lib.ts`,
    `frontend/arquitetura-lib.ts`, `projeto/diagnostico.ts`, `projeto/limpar.ts`, `projeto/preparar.ts`,
@@ -514,8 +518,8 @@ roteador fonte/compilado possuir testes de smoke equivalentes.
    `qualidade/resumo.ts` e os três comandos de contratos OpenAPI; ainda faltam achados de auditoria e comandos
    transversais maiores.
 3. **[parcial nesta rodada]** Introduzir tipos para JaCoCo, V8, regras da análise de testes backend, mensagens CDU,
-   violações de ações, resíduos, arquitetura AST, execução e resumo de qualidade, diagnóstico, fotografias, exceções e
-   contratos OpenAPI; ainda faltam achados de auditoria e diagnósticos dos comandos restantes.
+   cobertura frontend, violações de ações, resíduos, arquitetura AST, execução e resumo de qualidade, diagnóstico,
+   fotografias, exceções e contratos OpenAPI; ainda faltam achados de auditoria e diagnósticos dos comandos restantes.
 4. Substituir `any` implícito por `unknown` na entrada JSON e validar apenas o que o consumidor realmente exige.
 5. Criar `tsconfig.toolkit-estrito.json` ou equivalente com `strict`, aplicando-o aos módulos já convertidos e aos
    próximos lotes.
@@ -533,8 +537,8 @@ Lotes sugeridos:
    catálogo padrão continua sendo o perfil SGC, com base e execução parametrizáveis para reuso externo.
 2. **Backend**: cobertura, análise/priorização de testes, contratos e FQN; parametrizar raiz Java, tarefas Gradle e
    categorias.
-3. **Frontend**: cobertura V8, resíduos, acessibilidade e identificadores de teste; parametrizar raiz Vue, globs e
-   convenções de componentes.
+3. **[parcial nesta rodada]** Frontend: cobertura V8 já convertida; faltam resíduos, acessibilidade e identificadores
+   de teste. Parametrizar raiz Vue, globs e convenções de componentes.
 4. **[concluído nesta rodada]** Integração: exportação, diff e baseline OpenAPI; o módulo permanece independente do
    gerador de tipos removido.
 5. **Requisitos**: converter o motor de Markdown e depois isolar o perfil CDU do SGC.

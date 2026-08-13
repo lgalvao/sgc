@@ -5,13 +5,35 @@ import pc from "picocolors";
 import {DIRETORIO_RAIZ} from "../lib/caminhos.js";
 import {lerOpcao} from "../lib/cli-opcoes.js";
 import {ehEntradaPrincipal} from "../lib/execucao.js";
-import {extrairCoberturaFrontend} from "../lib/dominios/cobertura-web.js";
+import {extrairCoberturaFrontend, type ArquivoCobertura, type ResultadoCoberturaFrontend} from "../lib/dominios/cobertura-web.js";
 import {escreverLinha, imprimirCabecalho, imprimirJson} from "../lib/saida.js";
 import {exibirAjudaComando} from "../lib/cli-ajuda.js";
 
 const CAMINHO_PADRAO_OUTPUT = "frontend-coverage-auditoria.md";
 
-function calcularScoreImpacto(arquivo) {
+interface ResumoMetricasFrontend {
+    lines: ResultadoCoberturaFrontend["lines"];
+    statements: ResultadoCoberturaFrontend["statements"];
+    branches: ResultadoCoberturaFrontend["branches"];
+    functions: ResultadoCoberturaFrontend["functions"];
+}
+
+interface HotspotRelatorioFrontend {
+    arquivo: string;
+    scoreImpacto: number;
+    coberturaLinhas: number;
+    statementsTotal: number;
+    statementsCobertos: number;
+}
+
+interface ResultadoAuditoriaFrontend {
+    status: "ok";
+    timestamp: string;
+    totais: ResumoMetricasFrontend;
+    hotspots: HotspotRelatorioFrontend[];
+}
+
+function calcularScoreImpacto(arquivo: ArquivoCobertura): number {
     // No frontend, focamos em statements e branches.
     // Arquivos com muitos statements descobertos e muitos branches são prioridade.
     const pesoStatements = 1.0;
@@ -23,13 +45,13 @@ function calcularScoreImpacto(arquivo) {
     return (statementsDescobertos * pesoStatements) + (branchesDescobertos * pesoBranches);
 }
 
-function obterPrioridade(score) {
+function obterPrioridade(score: number): string {
     if (score > 100) return pc.red("P1 (Crítico)");
     if (score > 40) return pc.yellow("P2 (Alto)");
     return pc.cyan("P3 (Médio)");
 }
 
-async function gerarRelatorioMarkdown(dados, caminho) {
+async function gerarRelatorioMarkdown(dados: ResultadoAuditoriaFrontend, caminho: string): Promise<string> {
     const {totais, hotspots} = dados;
     let md = "# Auditoria de Cobertura Frontend - SGC\n\n";
 
@@ -56,14 +78,14 @@ async function gerarRelatorioMarkdown(dados, caminho) {
     return caminho;
 }
 
-async function principal(argumentos = process.argv.slice(2)) {
+async function principal(argumentos: string[] = process.argv.slice(2)): Promise<void> {
     const emitirJson = argumentos.includes("--json");
     const exibirAjuda = argumentos.includes("--help") || argumentos.includes("-h");
 
     if (exibirAjuda) {
         exibirAjudaComando({
             comandoSgc: 'frontend cobertura auditoria',
-            scriptDireto: 'frontend/cobertura-auditoria.js',
+            scriptDireto: 'frontend/cobertura-auditoria.ts',
             descricao: 'Auditoria unificada de cobertura e risco (Frontend).',
             opcoes: [
                 '--json     Saída em formato JSON para integração com outras ferramentas.',
@@ -76,10 +98,10 @@ async function principal(argumentos = process.argv.slice(2)) {
         return;
     }
 
-    const diretorioBase = path.resolve(lerOpcao(argumentos, "--base", DIRETORIO_RAIZ));
+    const diretorioBase = path.resolve(lerOpcao(argumentos, "--base", DIRETORIO_RAIZ) ?? DIRETORIO_RAIZ);
     const arquivo = lerOpcao(argumentos, "--arquivo", undefined);
-    const caminhoSaida = path.resolve(diretorioBase, lerOpcao(argumentos, "--output", CAMINHO_PADRAO_OUTPUT));
-    const metaMinima = Number(lerOpcao(argumentos, "--min", "0"));
+    const caminhoSaida = path.resolve(diretorioBase, lerOpcao(argumentos, "--output", CAMINHO_PADRAO_OUTPUT) ?? CAMINHO_PADRAO_OUTPUT);
+    const metaMinima = Number(lerOpcao(argumentos, "--min", "0") ?? "0");
 
     if (!emitirJson) {
         imprimirCabecalho("AUDITORIA DE COBERTURA FRONTEND");
@@ -97,7 +119,7 @@ async function principal(argumentos = process.argv.slice(2)) {
             .toSorted((a, b) => b.scoreImpacto - a.scoreImpacto)
             .slice(0, 20);
 
-        const resultado = {
+        const resultado: ResultadoAuditoriaFrontend = {
             status: "ok",
             timestamp: new Date().toISOString(),
             totais: {

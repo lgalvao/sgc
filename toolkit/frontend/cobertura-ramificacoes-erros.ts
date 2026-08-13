@@ -7,9 +7,26 @@ import {lerOpcao} from "../lib/cli-opcoes.js";
 import {ehEntradaPrincipal} from "../lib/execucao.js";
 import {exibirAjudaComando} from "../lib/cli-ajuda.js";
 import {escreverLinha, imprimirCabecalho, imprimirJson} from "../lib/saida.js";
-import {extrairCoberturaFrontend} from "../lib/dominios/cobertura-web.js";
+import {extrairCoberturaFrontend, type ArquivoCobertura, type ResultadoCoberturaFrontend} from "../lib/dominios/cobertura-web.js";
 
-const PADROES_SUSPEITOS = [
+interface LinhaSuspeita {
+    numero: number;
+    texto: string;
+}
+
+interface ArquivoRamificacoesErros extends Pick<ArquivoCobertura, "arquivo" | "branchesTotal" | "branchesPercentual"> {
+    branchesPerdidos: number;
+    linhasSuspeitas: LinhaSuspeita[];
+}
+
+interface ResultadoRamificacoesErros {
+    status: "ok";
+    timestamp: string;
+    totais: ResultadoCoberturaFrontend["branches"];
+    arquivos: ArquivoRamificacoesErros[];
+}
+
+const PADROES_SUSPEITOS: RegExp[] = [
     /\bcatch\s*\(/,
     /\bnormalizarErro\s*\(/,
     /\bnotify\s*\(/,
@@ -20,28 +37,28 @@ const PADROES_SUSPEITOS = [
     /\bPromise\.reject\b/,
 ];
 
-function calcularBranchesPerdidos(arquivo) {
+function calcularBranchesPerdidos(arquivo: ArquivoCobertura): number {
     return Math.max(0, arquivo.branchesTotal - Math.round((arquivo.branchesPercentual / 100) * arquivo.branchesTotal));
 }
 
-async function coletarLinhasSuspeitas(caminhoRelativo, diretorioBase) {
+async function coletarLinhasSuspeitas(caminhoRelativo: string, diretorioBase: string): Promise<LinhaSuspeita[]> {
     const caminhoAbsoluto = path.resolve(diretorioBase, caminhoRelativo);
     const conteudo = await fs.readFile(caminhoAbsoluto, "utf8");
     const linhas = conteudo.split(/\r?\n/);
     return linhas
-        .map((linha, indice) => ({numero: indice + 1, texto: linha.trim()}))
+        .map((linha, indice): LinhaSuspeita => ({numero: indice + 1, texto: linha.trim()}))
         .filter(({texto}) => PADROES_SUSPEITOS.some((padrao) => padrao.test(texto)))
         .slice(0, 12);
 }
 
-async function principal(argumentos = process.argv.slice(2)) {
+async function principal(argumentos: string[] = process.argv.slice(2)): Promise<void> {
     const emitirJson = argumentos.includes("--json");
     const exibirAjuda = argumentos.includes("--help") || argumentos.includes("-h");
 
     if (exibirAjuda) {
         exibirAjudaComando({
             comandoSgc: "frontend cobertura ramificacoes-erros",
-            scriptDireto: "frontend/cobertura-ramificacoes-erros.js",
+            scriptDireto: "frontend/cobertura-ramificacoes-erros.ts",
             descricao: "Cruza lacunas de ramificacoes do frontend com sinais de tratamento de erro suspeito.",
             opcoes: [
                 "--json          Saída estruturada em JSON.",
@@ -53,9 +70,9 @@ async function principal(argumentos = process.argv.slice(2)) {
         return;
     }
 
-    const diretorioBase = path.resolve(lerOpcao(argumentos, "--base", DIRETORIO_RAIZ));
+    const diretorioBase = path.resolve(lerOpcao(argumentos, "--base", DIRETORIO_RAIZ) ?? DIRETORIO_RAIZ);
     const caminhoRelatorio = lerOpcao(argumentos, "--arquivo", undefined);
-    const limite = Number.parseInt(lerOpcao(argumentos, "--limite", "15"), 10);
+    const limite = Number.parseInt(lerOpcao(argumentos, "--limite", "15") ?? "15", 10);
     const coleta = await extrairCoberturaFrontend(caminhoRelatorio, {diretorioBase});
     const candidatos = coleta.arquivos
         .map((arquivo) => ({
@@ -66,7 +83,7 @@ async function principal(argumentos = process.argv.slice(2)) {
         .toSorted((a, b) => b.branchesPerdidos - a.branchesPerdidos || a.branchesPercentual - b.branchesPercentual)
         .slice(0, limite);
 
-    const arquivos = [];
+    const arquivos: ArquivoRamificacoesErros[] = [];
     for (const candidato of candidatos) {
         const linhasSuspeitas = await coletarLinhasSuspeitas(candidato.arquivo, diretorioBase);
         if (linhasSuspeitas.length === 0) {
@@ -81,7 +98,7 @@ async function principal(argumentos = process.argv.slice(2)) {
         });
     }
 
-    const resultado = {
+    const resultado: ResultadoRamificacoesErros = {
         status: "ok",
         timestamp: new Date().toISOString(),
         totais: coleta.branches,

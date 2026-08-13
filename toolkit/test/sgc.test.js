@@ -28,7 +28,7 @@ const CAMINHOS_COMANDOS_TESTES_BACKEND = [
     "testes-priorizar.js"
 ].map(nome => path.join(DIRETORIO_RAIZ, "toolkit", "backend", nome));
 const FIXTURE_FOTOGRAFIA = path.join(DIRETORIO_RAIZ, "toolkit", "test", "fixtures", "qualidade", "fotografia.json");
-const CAMINHO_FRONTEND_COBERTURA_AUDITORIA = path.join(DIRETORIO_RAIZ, "toolkit", "frontend", "cobertura-auditoria.js");
+const CAMINHO_FRONTEND_COBERTURA_AUDITORIA = path.join(DIRETORIO_RAIZ, "toolkit", "frontend", "cobertura-auditoria.ts");
 const CAMINHOS_COMANDOS_COBERTURA_BACKEND = [
     "cobertura-ramificacoes.ts",
     "cobertura-auditoria.ts"
@@ -77,9 +77,9 @@ const CAMINHOS_COMANDOS_ESTRUTURA_FRONTEND = [
     "views-templates-validar.js"
 ].map(nome => path.join(DIRETORIO_RAIZ, "toolkit", "frontend", nome));
 const CAMINHOS_COMANDOS_COBERTURA_FRONTEND = [
-    "cobertura-auditoria.js",
-    "cobertura-ramificacoes.js",
-    "cobertura-ramificacoes-erros.js"
+    "cobertura-auditoria.ts",
+    "cobertura-ramificacoes.ts",
+    "cobertura-ramificacoes-erros.ts"
 ].map(nome => path.join(DIRETORIO_RAIZ, "toolkit", "frontend", nome));
 const CAMINHOS_COMANDOS_ACESSIBILIDADE_FRONTEND = [
     "acessibilidade-crawler.js",

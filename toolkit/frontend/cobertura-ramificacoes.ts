@@ -4,22 +4,36 @@ import path from "node:path";
 import {DIRETORIO_RAIZ} from "../lib/caminhos.js";
 import {lerOpcao} from "../lib/cli-opcoes.js";
 import {ehEntradaPrincipal} from "../lib/execucao.js";
-import {extrairCoberturaFrontend} from "../lib/dominios/cobertura-web.js";
+import {extrairCoberturaFrontend, type ArquivoCobertura, type ResultadoCoberturaFrontend} from "../lib/dominios/cobertura-web.js";
 import {escreverLinha, imprimirCabecalho, imprimirJson} from "../lib/saida.js";
 import {exibirAjudaComando} from "../lib/cli-ajuda.js";
 
-function calcularBranchesPerdidos(arquivo) {
+interface ArquivoRamificacoes {
+    arquivo: string;
+    branchesTotal: number;
+    branchesPercentual: number;
+    branchesPerdidos: number;
+}
+
+interface ResultadoRamificacoes {
+    status: "ok";
+    timestamp: string;
+    totais: ResultadoCoberturaFrontend["branches"];
+    arquivos: ArquivoRamificacoes[];
+}
+
+function calcularBranchesPerdidos(arquivo: ArquivoCobertura): number {
     return Math.max(0, arquivo.branchesTotal - Math.round((arquivo.branchesPercentual / 100) * arquivo.branchesTotal));
 }
 
-async function principal(argumentos = process.argv.slice(2)) {
+async function principal(argumentos: string[] = process.argv.slice(2)): Promise<void> {
     const emitirJson = argumentos.includes("--json");
     const exibirAjuda = argumentos.includes("--help") || argumentos.includes("-h");
 
     if (exibirAjuda) {
         exibirAjudaComando({
             comandoSgc: "frontend cobertura ramificacoes",
-            scriptDireto: "frontend/cobertura-ramificacoes.js",
+            scriptDireto: "frontend/cobertura-ramificacoes.ts",
             descricao: "Lista lacunas de cobertura de ramificacoes no frontend por arquivo.",
             opcoes: [
                 "--json          Saída estruturada em JSON.",
@@ -31,11 +45,11 @@ async function principal(argumentos = process.argv.slice(2)) {
         return;
     }
 
-    const diretorioBase = path.resolve(lerOpcao(argumentos, "--base", DIRETORIO_RAIZ));
+    const diretorioBase = path.resolve(lerOpcao(argumentos, "--base", DIRETORIO_RAIZ) ?? DIRETORIO_RAIZ);
     const caminhoRelatorio = lerOpcao(argumentos, "--arquivo", undefined);
-    const limite = Number.parseInt(lerOpcao(argumentos, "--limite", "20"), 10);
+    const limite = Number.parseInt(lerOpcao(argumentos, "--limite", "20") ?? "20", 10);
     const coleta = await extrairCoberturaFrontend(caminhoRelatorio, {diretorioBase});
-    const arquivos = coleta.arquivos
+    const arquivos: ArquivoRamificacoes[] = coleta.arquivos
         .map((arquivo) => ({
             arquivo: arquivo.arquivo,
             branchesTotal: arquivo.branchesTotal,
@@ -46,7 +60,7 @@ async function principal(argumentos = process.argv.slice(2)) {
         .toSorted((a, b) => b.branchesPerdidos - a.branchesPerdidos || a.branchesPercentual - b.branchesPercentual)
         .slice(0, limite);
 
-    const resultado = {
+    const resultado: ResultadoRamificacoes = {
         status: "ok",
         timestamp: new Date().toISOString(),
         totais: coleta.branches,
