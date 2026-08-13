@@ -115,7 +115,9 @@ quando houver contrato claro e uso horizontal plausível ou comprovado.
 - Cheiros internos e Semgrep são análises complementares, não duplicadas.
 - Auditorias consolidadas de cobertura e listagens focadas de ramificações têm resultados diferentes e podem coexistir.
 - O corretor FQN é um utilitário ocasional mutável, não um gate permanente.
-- Views, modais, notificações, coesão e heurísticas de erro permanecem políticas do perfil SGC enquanto forem desejadas.
+- Views, modais, notificações, coesão, heurísticas de erro e o gate de ações cliente-servidor permanecem políticas do
+  perfil SGC enquanto forem desejadas; `cliente arquitetura auditar` continua adaptável, mas `cliente arquitetura validar`
+  é explicitamente SGC por depender dessa política e do `.dependency-cruiser.cjs` local.
 
 ### Casos de uso CDU
 

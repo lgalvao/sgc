@@ -104,6 +104,9 @@ de ser tratada como se não existisse.
 `cliente arquitetura auditar` produz uma fotografia `versaoSchema: "4.0.0"`; seus resultados próprios usam
 `pontosCriticos`, `pontuacao` e `pontuacaoTotal`. O formato anterior não é carregado nem traduzido.
 
+`cliente arquitetura validar` é um gate do perfil SGC: além das regras locais do Dependency Cruiser, verifica a política
+SGC que impede cálculos locais de ações baseados em estado de domínio. Ele não é uma auditoria horizontal sem adaptação.
+
 `servidor cobertura auditoria` e `cliente cobertura auditoria` emitem resultados `versaoSchema: "1.0.0"` com
 `pontosCriticos` e `pontuacaoImpacto`; os campos de cobertura dentro de `totais` continuam seguindo os formatos JaCoCo e
 V8 lidos na fronteira.

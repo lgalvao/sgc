@@ -187,7 +187,7 @@ const CATALOGO_COMANDOS = [
     {
         caminho: ["cliente", "arquitetura", "validar"],
         descricao: "Valida regras arquiteturais do cliente (gate duro).",
-        escopo: "adaptavel",
+        escopo: "perfil-sgc",
         finalidade: "auditar",
         efeitos: criarEfeitosComando("nenhuma"),
         argumentos: esquema(["--base"], ["--json"]),
