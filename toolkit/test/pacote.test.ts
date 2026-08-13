@@ -122,3 +122,102 @@ test("pacote fonte executa em um projeto consumidor isolado", async () => {
     expect(await existe(path.join(diretorioConsumidor, "toolkit", "qualidade", "artefatos", "semgrep", "mais-recente", "resultado.json"))).toBe(true);
     expect(await readFile(caminhoResumoSemgrep, "utf8")).toContain("# Auditoria Semgrep\n");
 }, 60000);
+
+test("pacote fonte expõe cobertura parametrizável para consumidor TypeScript", async () => {
+    const diretorioTemporario = await mkdtemp(path.join(os.tmpdir(), "sgc-pacote-api-"));
+    const diretorioPacote = path.join(diretorioTemporario, "pacote");
+    const diretorioConsumidor = path.join(diretorioTemporario, "consumidor");
+    await mkdir(diretorioPacote, {recursive: true});
+    await mkdir(diretorioConsumidor, {recursive: true});
+
+    const empacotamento = await execa("npm", [
+        "pack",
+        "--workspace",
+        "toolkit",
+        "--pack-destination",
+        diretorioPacote,
+        "--silent"
+    ], {
+        cwd: DIRETORIO_REPOSITORIO
+    });
+    const nomePacote = empacotamento.stdout.trim().split(/\r?\n/).at(-1) ?? "";
+    expect(nomePacote).toMatch(/^sgc-scripts-\d+\.\d+\.\d+\.tgz$/);
+    const caminhoPacote = path.join(diretorioPacote, nomePacote);
+
+    await execa("npm", [
+        "init",
+        "-y"
+    ], {
+        cwd: diretorioConsumidor
+    });
+    await execa("npm", [
+        "install",
+        caminhoPacote,
+        "--ignore-scripts",
+        "--no-audit",
+        "--no-fund"
+    ], {
+        cwd: diretorioConsumidor,
+        timeout: 60000
+    });
+
+    const caminhoRelatorioJacoco = path.join(diretorioConsumidor, "relatorios", "jacoco.xml");
+    await escreverArquivo(
+        caminhoRelatorioJacoco,
+        [
+            "<report>",
+            "  <counter type=\"LINE\" missed=\"1\" covered=\"2\"/>",
+            "  <counter type=\"BRANCH\" missed=\"0\" covered=\"1\"/>",
+            "  <package name=\"exemplo/controle\">",
+            "    <sourcefile name=\"Exemplo.java\">",
+            "      <line nr=\"10\" ci=\"1\" mb=\"0\" cb=\"0\"/>",
+            "      <line nr=\"11\" ci=\"0\" mb=\"0\" cb=\"0\"/>",
+            "    </sourcefile>",
+            "  </package>",
+            "</report>"
+        ].join("\n")
+    );
+    await escreverArquivo(
+        path.join(diretorioConsumidor, "cliente", "coverage", "coverage-final.json"),
+        JSON.stringify({
+            [path.join(diretorioConsumidor, "cliente", "src", "Exemplo.ts")]: {
+                s: {"1": 1, "2": 0},
+                f: {"1": 1},
+                b: {"1": [1, 0]},
+                statementMap: {"1": {}, "2": {}}
+            }
+        })
+    );
+    const caminhoConsumidor = path.join(diretorioConsumidor, "consumidor.mts");
+    await escreverArquivo(
+        caminhoConsumidor,
+        [
+            'import {extrairCoberturaJacoco} from "sgc-scripts/cobertura-java";',
+            'import {extrairCoberturaFrontend} from "sgc-scripts/cobertura-web";',
+            "",
+            "const diretorioBase = process.argv[2];",
+            "const jacoco = await extrairCoberturaJacoco(\"relatorios/jacoco.xml\", {diretorioBase});",
+            "const frontend = await extrairCoberturaFrontend(\"cliente/coverage/coverage-final.json\", {diretorioBase});",
+            "console.log(JSON.stringify({",
+            "    jacoco: {linhas: jacoco.linhas.percentual, arquivos: jacoco.totais.totalArquivos},",
+            "    frontend: {linhas: frontend.linhas.percentual, arquivos: frontend.arquivos.length}",
+            "}));",
+            ""
+        ].join("\n")
+    );
+
+    const caminhoTsx = path.join(
+        diretorioConsumidor,
+        "node_modules",
+        ".bin",
+        process.platform === "win32" ? "tsx.cmd" : "tsx"
+    );
+    const resultado = await execa(caminhoTsx, [caminhoConsumidor, diretorioConsumidor], {
+        cwd: diretorioConsumidor
+    });
+
+    expect(JSON.parse(String(resultado.stdout))).toEqual({
+        jacoco: {linhas: 66.67, arquivos: 1},
+        frontend: {linhas: 50, arquivos: 1}
+    });
+}, 60000);

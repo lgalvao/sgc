@@ -385,6 +385,21 @@ npm install --save-dev ./sgc-scripts-0.1.0.tgz
 npx sgc --help
 ```
 
+As primitivas horizontais de leitura de cobertura também podem ser consumidas programaticamente. Elas recebem a base e
+o arquivo explicitamente, portanto não dependem do layout do SGC:
+
+```ts
+import {extrairCoberturaJacoco} from "sgc-scripts/cobertura-java";
+import {extrairCoberturaFrontend} from "sgc-scripts/cobertura-web";
+
+const jacoco = await extrairCoberturaJacoco("relatorios/jacoco.xml", {diretorioBase});
+const frontend = await extrairCoberturaFrontend("cliente/coverage/coverage-final.json", {diretorioBase});
+```
+
+Os subpaths públicos são deliberados; módulos internos em `lib/` não fazem parte da API programática. Os formatos
+externos continuam com os nomes próprios do JaCoCo e do V8, enquanto os resultados entregues pelo toolkit usam os
+contratos em português.
+
 Por padrão, a raiz auditada é o diretório de trabalho do processo. Use `--base` ou `configuracao-toolkit.json` quando
 o projeto auditado estiver em outro caminho; o local de instalação do toolkit não é usado como raiz do consumidor.
 

@@ -358,10 +358,5 @@ const CATALOGO_COMANDOS_COMPLETO = [...CATALOGO_COMANDOS, ...CATALOGO_COMANDOS_E
 
 export {
     CATALOGO_COMANDOS,
-    CATALOGO_COMANDOS_COMPLETO,
-    CATALOGO_COMANDOS_ESPECIAIS,
-    type DefinicaoComando,
-    type DefinicaoComandoArquivo,
-    type EfeitoComando,
-    type EscopoComando
+    CATALOGO_COMANDOS_COMPLETO
 };

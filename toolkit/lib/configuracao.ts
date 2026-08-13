@@ -326,19 +326,15 @@ function tentarResolverCaminhoConfigurado(nomeDiretorio: NomeDiretorioConfigurad
 }
 
 export {
-    CONFIGURACAO_PADRAO,
     NOME_ARQUIVO_CONFIGURACAO,
     VERSAO_CONFIGURACAO,
     carregarConfiguracao,
     resolverCaminhoConfigurado,
     tentarResolverCaminhoConfigurado,
     validarConfiguracao,
-    type ConfiguracaoSobreposta,
-    type ConfiguracaoToolkit,
     type NomeDiretorioConfigurado,
     type EscopoComandoConfigurado,
     type EscopoInstalacaoConfigurado,
-    type ExecucoesConfiguradas,
     type PerfilQualidadeConfigurado,
     type TarefaConfigurada
 };

@@ -167,8 +167,8 @@ provam utilidade funcional.
   puro para comandos fonte.
 - Build TypeScript criado e mantido como verificação opcional em `toolkit/dist/`.
 - A configuração do Knip agora lista os entrypoints CLI reais do toolkit, inclui JavaScript e TypeScript como projetos e
-  permite que o grafo encontre exports órfãos; a execução passou sem achados depois da remoção de oito exports internos
-  não consumidos.
+  permite que o grafo encontre exports órfãos; a execução passou sem achados depois da remoção de 13 exports internos
+  não consumidos em rodadas sucessivas.
 - O núcleo compartilhado foi convertido para TypeScript:
   - `lib/caminhos.ts`;
   - `lib/cli-ajuda.ts`;
@@ -184,6 +184,9 @@ provam utilidade funcional.
   contrato sem transformar o launcher em uma segunda implementação.
 - O pacote `sgc-scripts@0.1.0` agora declara `files`, `exports`, o binário e os assets de política necessários ao modelo
   fonte + `tsx`; `npm pack` e a instalação do tarball em consumidor isolado passaram.
+- A família horizontal de cobertura foi externalizada por dois subpaths estáveis, `sgc-scripts/cobertura-java` e
+  `sgc-scripts/cobertura-web`; o wildcard `lib/*` deixou de expor módulos internos acidentalmente. O smoke do pacote
+  agora importa esses subpaths em um consumidor TypeScript externo com fixture JaCoCo/V8 fora do layout do SGC.
 - `lib/caminhos.ts` separa o diretório físico de instalação (`DIRETORIO_TOOLKIT`) da raiz padrão (`process.cwd()`),
   enquanto `--base` continua sendo a forma explícita de auditar outra raiz.
 - `fs-extra` foi removida completamente do toolkit: o código distribuído e os testes usam APIs nativas do Node, com
@@ -198,8 +201,8 @@ provam utilidade funcional.
   está sincronizada; o teste externo confirma o layout `cliente/package.json`.
 - `garantirArquivo` resolve somente entradas `.ts` na árvore-fonte física do toolkit; o despachador não mantém fallback
   para `.js` compilado nem aliases de comandos antigos.
-- Exports de `toolkit/package.json` já expõem a árvore TypeScript do toolkit; todos os testes agora são TypeScript
-  estrito, incluindo a CLI grande e o smoke de pacote.
+- `toolkit/package.json` expõe somente a raiz CLI e os subpaths horizontais comprovados; módulos internos em `lib/` são
+  privados no contrato de pacote. Todos os testes agora são TypeScript estrito, incluindo a CLI grande e o smoke de pacote.
 - O corretor de FQN possui teste de escrita, conteúdo esperado sem duplicação e idempotência; agora resolve
   `backendCodigo` e `backendTestes` quando a base possui configuração, preservando a descoberta convencional para uma
   base backend isolada.
@@ -446,8 +449,8 @@ Nas validações desta rodada, em 13 de agosto de 2026, executadas diretamente s
   47,27% de ramificações (443/937), 66,29% de funções (179/270) e 59,34% de linhas (759/1.279); o script exclui
   `test/**` para não contar o apoio de testes como implementação e ainda não aplica threshold, porque a prioridade é
   transformar os contratos críticos em cenários explícitos;
-- `npm --prefix toolkit run test:pacote`: 1 teste aprovado, com `npm pack`, instalação isolada, auditoria no consumidor
-  e verificação da política Semgrep empacotada;
+- `npm --prefix toolkit run test:pacote`: 2 testes aprovados, com `npm pack`, instalação isolada, auditoria no consumidor,
+  verificação da política Semgrep empacotada e importação programática da cobertura parametrizável;
 - `npm --prefix toolkit run build`: aprovado;
 - `npm --prefix toolkit run typecheck`: aprovado;
 - `npm --prefix toolkit run typecheck:testes`: aprovado sobre os oito arquivos de teste TypeScript e o apoio comum
@@ -550,6 +553,10 @@ uma quarentena temporária recuperável, enquanto o único destino produzido con
 Nesta rodada, `test/qualidade.test.ts` ganhou três cenários comportamentais para leitores, executor e adaptadores SGC.
 O executor passou a preservar a mensagem de erro de spawn do Execa quando um comando não inicia; a suíte completa chegou
 a 125 cenários e a cobertura direta da coleta confirmou 100% nos adaptadores SGC, 96,29% nos leitores e 71,42% no executor.
+Nesta rodada, a leitura de cobertura JaCoCo/V8 foi comprovada como família horizontal em consumidor TypeScript externo:
+`package.json` passou a publicar `cobertura-java` e `cobertura-web`, o wildcard interno `lib/*` foi removido e o smoke
+do tarball passou a ter dois cenários. O Knip revelou cinco exports adicionais sem consumidor no catálogo, removidos sem
+alterar o catálogo completo usado pela CLI.
 
 ### 3.3 Tamanho e composição atual
 
@@ -560,7 +567,8 @@ Inventário dos arquivos rastreados do toolkit, excluindo `dist`, cobertura e ar
 - 0 arquivos JavaScript de teste e 8 arquivos TypeScript de teste (`test/sgc.test.ts`, `test/projeto.test.ts`,
   `test/configuracao.test.ts`, `test/integracao.test.ts`, `test/qualidade.test.ts`, `test/cdus.test.ts`,
   `test/externo.test.ts` e `test/pacote.test.ts`);
-- 7 arquivos de teste TypeScript concentram 125 cenários regulares, mais 1 smoke de distribuição isolada;
+- 7 arquivos de teste TypeScript concentram 125 cenários regulares; `test/pacote.test.ts` contém 2 cenários de distribuição
+  isolada;
 - `test/apoio.ts` centraliza a raiz do toolkit, o launcher `tsx`, o contrato de execução, `executarSgc` e helpers nativos
   de arquivo, evitando cópias divergentes nos testes de projeto, integração, qualidade e CLI;
 - maior módulo atual: `frontend/arquitetura-lib.ts`, com aproximadamente 1.200 linhas;
@@ -579,7 +587,7 @@ O núcleo TypeScript de implementação foi concluído: 100% dos arquivos de imp
 | Resolvido nesta rodada | Pacote não distribuível | `sgc-scripts@0.1.0` declara `version`, `files`, `exports`, `bin` e dependências de runtime; `npm pack` e `npm run test:pacote` passaram. A política de publicação ainda não foi escolhida. |
 | Resolvido nesta rodada | Raiz acoplada à posição física | `lib/caminhos.ts` usa `process.cwd()` como raiz padrão e mantém `DIRETORIO_TOOLKIT` para recursos do próprio pacote; o smoke isolado confirmou que o consumidor é a base auditada. |
 | Resolvido nesta rodada | Semgrep acoplado ao ambiente local | A política padrão vinha da raiz do consumidor e o executável era fixado em `~/.local/bin/semgrep`; ambos agora usam a instalação do toolkit e o `PATH`, com testes de override e consumidor isolado. |
-| Resolvido | Configuração permissiva do Knip | A configuração anterior tratava praticamente todos os arquivos como entrypoints. A nova lista os comandos reais, inclui JS/TS e, nesta rodada, encontrou e removeu oito exports internos não consumidos. |
+| Resolvido | Configuração permissiva do Knip | A configuração anterior tratava praticamente todos os arquivos como entrypoints. A nova lista os comandos reais, inclui JS/TS e encontrou e removeu 13 exports internos não consumidos em rodadas sucessivas. |
 | Resolvido parcialmente | Base externa é parcialmente ignorada | Arquitetura, resíduos, OpenAPI, coleta, Semgrep, cheiros, assuntos de notificação, sincronização de versão, crawler de acessibilidade e diagnóstico agora respeitam a base/configuração; outros comandos ainda precisam da mesma correção. |
 | Resolvido nesta rodada | Auditores gravam por padrão | `codigo cheiros auditar`, `frontend arquitetura auditar`, `backend arquitetura auditar`, `backend coesao auditar`, `backend contratos auditar`, `frontend residuos auditar/validar`, `codigo semgrep auditar`, toda a família `codigo nomes`, `integracao contratos diff` e as duas auditorias unificadas de cobertura agora só persistem com `--gravar`. Geração de relatórios, coleta e mutações continuam classificadas separadamente. |
 | Resolvido | Cobertura insuficiente de mutação | O corretor `backend/java-corrigir-fqn.ts` agora tem fixture de escrita, verificação de conteúdo sem duplicação e segunda execução idempotente. |
@@ -607,6 +615,7 @@ O núcleo TypeScript de implementação foi concluído: 100% dos arquivos de imp
 | Resolvido nesta rodada | Políticas de resíduos apontando para legado ausente | Os defaults de orçamento e exceções frontend foram removidos; overrides continuam aceitos, a ausência usa política neutra explícita e arquivo configurado ausente ou inválido falha visivelmente. |
 | Média | Opções e efeitos divergentes | Os comandos principais já usam opções em português; ainda há defaults de nomes de artefatos e alguns contratos de geração que precisam ser uniformizados, além de mutações sem prévia uniforme. |
 | Resolvido nesta rodada | Testes não representam pacote externo | A suíte interna continua separada do smoke de distribuição, e `npm run test:pacote` empacota, instala em diretório isolado e executa o binário sem dependências hoisted do monorepo. |
+| Resolvido nesta rodada | API programática não comprovada | `package.json` agora expõe a raiz CLI e somente os subpaths horizontais `cobertura-java` e `cobertura-web`; o wildcard e os exports internos `lib/*` foram removidos e um consumidor TypeScript instalado pelo tarball importa e executa ambos. |
 | Resolvido nesta rodada | Cobertura funcional não medida | `npm run test:coverage` agora gera a baseline informativa do próprio toolkit com `@vitest/coverage-v8`; threshold fica para depois da divisão dos testes por domínio e da análise dos contratos críticos. |
 | Resolvido nesta rodada | Testes de projeto misturados ao teste da CLI | Os 17 cenários de versão, árvore, diagnóstico, limpeza, preparação, qualidade e dependências agora estão em `test/projeto.test.ts`; o teste principal concentra 81 cenários e a suíte permite execução focada por domínio. |
 | Resolvido nesta rodada | Nomenclatura e limpeza de relatórios divergentes | O pipeline backend agora usa `analise-testes.md/json` -> `priorizacao-testes.md`; `projeto/limpar` deriva diretórios configurados e remove apenas padrões ainda produzidos, descartando caminhos legados sem referências. |
@@ -631,12 +640,14 @@ O núcleo TypeScript de implementação foi concluído: 100% dos arquivos de imp
 - O toolkit funciona como ferramenta interna executada pelo script npm ou por `npx tsx` dentro deste workspace.
 - O toolkit também funciona como pacote CLI externo fonte + `tsx`: o tarball foi instalado em consumidor isolado e o
   binário executou uma auditoria contra a raiz do consumidor.
+- A API programática horizontal comprovada pelo tarball é formada pelos subpaths `cobertura-java` e `cobertura-web`, que
+  recebem base e arquivo explicitamente e foram executados contra fixture externa.
 - `exports` aponta alguns subpaths diretamente para `.ts`; esse contrato serve ao workspace e ao pacote fonte com `tsx`,
   mas não é um contrato consumível por Node puro sem um loader TypeScript.
 - Parametrização parcial não significa generalização concluída.
 - Build aprovado prova que a árvore pode ser emitida; não prova que o pacote emitido contém assets, configuração e
   resolução de raiz adequados para distribuição.
-- Knip aprovado, 122 testes unitários verdes e o smoke de pacote aprovado são gates úteis, mas ainda insuficientes para afirmar ausência de código morto fora
+- Knip aprovado, 125 testes unitários verdes e os 2 cenários de pacote aprovados são gates úteis, mas ainda insuficientes para afirmar ausência de código morto fora
   do grafo declarado, segurança de todos os comandos mutáveis ou portabilidade. O grafo do Knip agora é uma evidência
   útil de exports não consumidos; não substitui testes de pacote externo.
 
@@ -664,13 +675,13 @@ interna `silencioso` preservam o contrato de leitura e mantêm o stdout JSON vá
 Esta revisão confrontou o plano com a árvore rastreada, o manifesto do pacote, o catálogo da CLI e os testes atuais.
 Conclusões confirmadas:
 
-- a árvore possui 79 arquivos TypeScript de implementação, 8 arquivos `*.test.ts`, 125 cenários regulares e 1 smoke
+- a árvore possui 79 arquivos TypeScript de implementação, 8 arquivos `*.test.ts`, 125 cenários regulares e 2 cenários
   de pacote; `test/sgc.test.ts` ainda concentra 81 cenários e aproximadamente 2.800 linhas;
 - o catálogo declarativo contém 42 comandos que apenas despacham módulos; comandos com opções e ações próprias ainda
   são registrados diretamente em `sgc.ts`, portanto o catálogo não é ainda a fonte única de toda a superfície CLI;
-- a instalação externa comprova o binário, a raiz do consumidor e os assets Semgrep, mas não comprova uma API
-  programática horizontal: `package.json` exporta a raiz e `lib/*`, porém não exporta os módulos componíveis de
-  `qualidade/*`;
+- a instalação externa comprova o binário, a raiz do consumidor, os assets Semgrep e uma API programática horizontal de
+  cobertura: `package.json` expõe a raiz CLI e os subpaths `cobertura-java` e `cobertura-web`; módulos internos em
+  `lib/` não fazem parte do contrato de pacote;
 - a coleta de qualidade está de fato separada em orquestração, contexto, executor, leitores, fotografia, metadados e
   adaptadores SGC. Não faz sentido continuar fatiando arquivos apenas para reduzir tamanho; os próximos recortes devem
   ser guiados por contrato público, cobertura e um consumidor externo representativo;
@@ -831,9 +842,10 @@ do perfil.
 
 ### Prioridade média
 
-6. **Superfície pública de reuso não fechada**: o tarball prova a CLI externa, mas `package.json` não exporta a API de
-   qualidade recém-composta. Só definir subpaths programáticos depois de a auditoria confirmar quais capacidades são
-   horizontais e atuais; não publicar como API código que ainda pode ser removido.
+6. **[resolvido nesta rodada] Superfície pública de reuso não fechada**: a auditoria confirmou cobertura JaCoCo/V8 como
+   família horizontal parametrizável; `package.json` agora publica a raiz CLI e somente `cobertura-java` e `cobertura-web`,
+   remove os exports internos e testa a importação em consumidor TypeScript instalado pelo tarball. A coleta de qualidade continua
+   composta por adaptadores e não foi publicada como API genérica sem outro consumidor representativo.
 7. **Schema de resultados parcial**: a fotografia de qualidade tem `VERSAO_SCHEMA_FOTOGRAFIA`
    centralizada (`1.0.0`) e contrato TypeScript restrito; auditorias, cobertura, diagnósticos e relatórios ainda usam
    objetos com versionamento incompleto. Priorizar formatos realmente consumidos por CI ou por outro comando, com
@@ -879,10 +891,11 @@ As fases históricas abaixo continuam úteis como registro, mas a execução dev
    encontrados no inventário.
 5. **[concluído nesta rodada] Caracterizar áreas que serão alteradas**: executor, leitores e adaptadores SGC agora têm
    cenários comportamentais diretos; a correção do diagnóstico de spawn foi registrada como regressão.
-6. **Externalizar o próximo recorte horizontal real**: escolher uma família com consumidor plausível — inicialmente
-   cobertura Java/V8 ou OpenAPI — e provar configuração em fixture externo antes de criar novos adaptadores genéricos.
-7. **Fechar a API pública do pacote**: somente após o mapa de utilidade, exportar os subpaths horizontais confirmados e
-   importar essa API em consumidor TypeScript instalado por tarball. O smoke atual cobre apenas a CLI.
+6. **[concluído nesta rodada] Externalizar o próximo recorte horizontal real**: cobertura Java/V8 recebeu subpaths
+   públicos estáveis, parâmetros explícitos de base/arquivo e fixture externa; não foi criado adaptador genérico novo.
+7. **[concluído nesta rodada] Fechar a API pública do pacote**: o wildcard e os exports internos `lib/*` foram removidos,
+   os dois subpaths horizontais confirmados foram publicados e um consumidor TypeScript instalado pelo tarball importou
+   e executou a API.
 8. **Dividir `test/sgc.test.ts` por risco**: extrair runtime/distribuição primeiro, depois backend e frontend, mantendo
    testes comportamentais e sem reorganização puramente estética.
 9. **Formalizar resultados consumidos**: começar pelos JSON usados por coleta, resumo ou CI; acrescentar versão e

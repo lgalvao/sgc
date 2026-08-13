@@ -75,7 +75,6 @@ async function resolverFotografiaQualidade<TFotografia = FotografiaQualidade>(
 
 export {
     NOME_ARQUIVO_FOTOGRAFIA,
-    obterCaminhoUltimaFotografia,
     obterDiretorioArtefatos,
     resolverFotografiaQualidade
 };

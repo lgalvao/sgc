@@ -28,15 +28,8 @@
   ],
   "exports": {
     ".": "./sgc.ts",
-    "./lib/caminhos": "./lib/caminhos.ts",
-    "./lib/cli-ajuda": "./lib/cli-ajuda.ts",
-    "./lib/cli-opcoes": "./lib/cli-opcoes.ts",
-    "./lib/configuracao": "./lib/configuracao.ts",
-    "./lib/execucao": "./lib/execucao.ts",
-    "./lib/logger": "./lib/logger.ts",
-    "./lib/qualidade": "./lib/qualidade.ts",
-    "./lib/saida": "./lib/saida.ts",
-    "./lib/*": "./lib/*.ts"
+    "./cobertura-java": "./lib/dominios/cobertura-java.ts",
+    "./cobertura-web": "./lib/dominios/cobertura-web.ts"
   },
   "scripts": {
     "sgc": "tsx ./sgc.ts",
