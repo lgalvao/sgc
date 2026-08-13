@@ -221,6 +221,8 @@ frontend e para os caminhos OpenAPI.
   agora compartilham a fronteira tipada do runtime.
 - `qualidade/resumo.ts` foi convertido para TypeScript; o carregador de fotografias passou a aceitar um tipo genérico e
   o comando `qualidade resumo` agora resolve a fotografia mais recente pela opção `--base`.
+- `integracao/contratos-openapi-caminhos.ts` foi convertido para TypeScript com o contrato explícito dos caminhos
+  atual, de referência e de relatório; ele permanece independente do gerador de tipos removido.
 - A configuração já aceita alguns caminhos diferentes do layout do SGC; auditores de cobertura, arquitetura, coesão,
   contratos, resíduos e coleta possuem parametrização parcial por `--base`, `--arquivo`, `--saida` ou configuração.
   Arquitetura, resíduos, OpenAPI e coleta já resolvem seus defaults após a base; outros comandos ainda têm defaults
@@ -265,7 +267,7 @@ reintroduz o wrapper obsoleto.
 Inventário dos arquivos rastreados do toolkit, excluindo `dist`, cobertura e artefatos ignorados:
 
 - 10 arquivos TypeScript de implementação;
-- 59 arquivos JavaScript de implementação ainda pendentes;
+- 58 arquivos JavaScript de implementação ainda pendentes;
 - 2 arquivos JavaScript de teste (`test/sgc.test.js` e `test/cdus.test.js`);
 - 2 arquivos de teste concentrando 96 cenários;
 - maior módulo atual: `frontend/arquitetura-lib.js`, com aproximadamente 1.000 linhas;

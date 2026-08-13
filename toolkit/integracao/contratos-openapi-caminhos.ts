@@ -4,7 +4,15 @@ import {resolverCaminhoConfigurado} from "../lib/configuracao.js";
 
 const URL_OPENAPI_PADRAO = "http://127.0.0.1:10000/api-docs";
 
-function resolverCaminhosOpenapi(base = DIRETORIO_RAIZ) {
+interface CaminhosOpenapi {
+    base: string;
+    diretorioOpenapi: string;
+    caminhoAtual: string;
+    caminhoReferencia: string;
+    caminhoRelatorio: string;
+}
+
+function resolverCaminhosOpenapi(base: string = DIRETORIO_RAIZ): CaminhosOpenapi {
     const baseResolvida = path.resolve(base ?? DIRETORIO_RAIZ);
     const diretorioOpenapi = resolverCaminhoConfigurado("contratosOpenapi", baseResolvida);
 

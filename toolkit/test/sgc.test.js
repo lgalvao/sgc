@@ -9,7 +9,7 @@ import {calcularTotais, construirArvore, listarArquivosGit} from "../projeto/arv
 import {sincronizarVersao} from "../projeto/versao-sincronizar.ts";
 import {executarDiagnostico} from "../projeto/diagnostico.ts";
 import {carregarConfiguracao, validarConfiguracao, VERSAO_CONFIGURACAO} from "../lib/configuracao.ts";
-import {resolverCaminhosOpenapi} from "../integracao/contratos-openapi-caminhos.js";
+import {resolverCaminhosOpenapi} from "../integracao/contratos-openapi-caminhos.ts";
 import {ADAPTADORES, PERFIS, principal as coletarFotografiaQualidade} from "../qualidade/coleta-execucao.ts";
 import {resolverDiretoriosPadrao} from "../codigo/semgrep-auditar.js";
 import {executarAuditoria as executarAuditoriaCheiros} from "../codigo/cheiros-auditar.js";
