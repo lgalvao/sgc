@@ -117,12 +117,10 @@ frontend e para os caminhos OpenAPI.
   aliases, formatos de configuração ou opções legadas; mudanças podem ser breaking quando todos os consumidores internos,
   testes e documentação forem atualizados no mesmo recorte.
 - Uma mudança de pacote não é suficiente: executar testes unitários, typecheck, lint, Knip e os smoke tests do toolkit.
-- `tsx` é runtime, não apenas ferramenta de desenvolvimento, enquanto a execução de fonte for o caminho oficial. A
-  posição dele em `dependencies`/`devDependencies` deve ser corrigida quando o pacote do toolkit for tornado instalável
-  fora do workspace.
+- `tsx` é runtime, não apenas ferramenta de desenvolvimento, enquanto a execução de fonte for o caminho oficial. Ele já
+  está em `dependencies` do pacote do toolkit.
 - O binário declarado em `toolkit/package.json` usa um launcher mínimo que chama o CLI do `tsx` para executar `sgc.ts`;
-  `tsx` agora é dependência de runtime do toolkit. A distribuição externa completa ainda depende de versão, `files` e
-  separação da raiz do consumidor.
+  a distribuição externa usa fonte + `tsx`, com `version`, `files` e separação da raiz do consumidor validados por smoke.
 - Não atualizar dependências major sem uma matriz mínima de validação. A linha de TypeScript fica em TS6 por decisão
   explícita do projeto.
 
@@ -130,7 +128,10 @@ frontend e para os caminhos OpenAPI.
 
 ### 3.1 O que já foi feito
 
-- Node atualizado para `26.7.0` com `.nvmrc` e `engines` no projeto raiz e no toolkit.
+- A política do projeto declara Node `26.7.0` em `.nvmrc` e `engines` no projeto raiz e no toolkit; a validação desta
+  rodada foi executada diretamente em Node `26.5.1`, que está abaixo do mínimo declarado e emite `EBADENGINE` no smoke de
+  instalação. O alinhamento do runtime local continua uma pendência operacional, não uma justificativa para alterar a
+  política do toolkit.
 - Execução de fonte padronizada em `tsx`; scripts npm, documentação, `release-it` e ADR relevante já não usam `node`
   puro para comandos fonte.
 - Build TypeScript criado e mantido como verificação opcional em `toolkit/dist/`.
@@ -150,6 +151,12 @@ frontend e para os caminhos OpenAPI.
   qualidade foram atualizados para executá-lo por `tsx`.
 - O `bin` do toolkit agora usa `bin/sgc.cjs` apenas como launcher para o CLI do `tsx`; o smoke do `npm exec` cobre o
   contrato sem transformar o launcher em uma segunda implementação.
+- O pacote `sgc-scripts@0.1.0` agora declara `files`, `exports`, o binário e os assets de política necessários ao modelo
+  fonte + `tsx`; `npm pack` e a instalação do tarball em consumidor isolado passaram.
+- `lib/caminhos.ts` separa o diretório físico de instalação (`DIRETORIO_TOOLKIT`) da raiz padrão (`process.cwd()`),
+  enquanto `--base` continua sendo a forma explícita de auditar outra raiz.
+- `fs-extra` deixou de ser dependência de runtime: o código distribuído usa APIs nativas do Node, e a biblioteca ficou
+  somente em `devDependencies` para os testes JavaScript ainda não convertidos.
 - Dois comandos de projeto já foram convertidos:
   - `projeto/arvore-linhas.ts`;
   - `projeto/versao-sincronizar.ts`.
@@ -275,8 +282,8 @@ frontend e para os caminhos OpenAPI.
 - Foi criado `tsconfig.estrito.json`, cobrindo toda a implementação TypeScript com `strict` e `noImplicitOverride`; o
   gate passou e tornou-se o `typecheck` oficial.
 - `projeto/diagnostico.ts` foi convertido para TypeScript, deixou de depender de `fs-extra` e aceita catálogos
-  configuráveis de recursos e comandos registrados; o catálogo padrão continua sendo o perfil SGC e o mínimo local do
-  Node foi alinhado à major 26 (`26.0.0`).
+  configuráveis de recursos e comandos registrados; o catálogo padrão continua sendo o perfil SGC e a política mínima
+  local do Node é a major 26 (`26.7.0`).
 - `qualidade/coleta-execucao.ts` foi convertido para TypeScript com contratos de contexto, adaptadores, execução de
   subprocessos, JUnit, métricas heterogêneas e fotografia; hotspots vindos de JSON são filtrados como `unknown`, e os
   perfis Gradle/npm/Playwright continuam declarados como orquestração específica do SGC.
@@ -323,14 +330,17 @@ frontend e para os caminhos OpenAPI.
   globais ou caminhos `backend/src`/`frontend/src` fixos. Isso ainda não equivale a portabilidade.
 - O gerador de tipos OpenAPI foi removido. O toolkit mantém somente exportação, comparação e fixação de fotografias de
   contrato; o Springdoc permanece no backend porque o ciclo E2E usa Swagger/OpenAPI para aguardar a aplicação.
-- O histórico recente relevante está publicado na `main`; esta rodada amplia a migração TypeScript do módulo de
-  contratos OpenAPI.
+- O histórico recente relevante está publicado na `main`; esta rodada fecha a fronteira de distribuição fonte + `tsx`
+  e separa a raiz do consumidor da instalação física do toolkit.
 
 ### 3.2 Evidência de validação atual
 
-Nas validações desta rodada, executadas diretamente sob Node `26.5.1` (Node 26 disponível no ambiente):
+Nas validações desta rodada, em 13 de agosto de 2026, executadas diretamente sob Node `26.5.1` (Node 26 disponível no
+ambiente):
 
-- `npm --prefix toolkit run test`: 103 testes aprovados em 2 arquivos;
+- `npm --prefix toolkit run test`: 103 testes aprovados em 2 arquivos; o smoke de pacote é separado para não tornar a
+  suíte unitária dependente de rede ou instalação;
+- `npm --prefix toolkit run test:pacote`: 1 teste aprovado, com `npm pack`, instalação isolada e auditoria no consumidor;
 - `npm --prefix toolkit run build`: aprovado;
 - `npm --prefix toolkit run typecheck`: aprovado;
 - `npm --prefix toolkit run lint`: aprovado;
@@ -339,8 +349,8 @@ Nas validações desta rodada, executadas diretamente sob Node `26.5.1` (Node 26
 - `git diff --check`: aprovado;
 - importação dos comandos sem execução acidental: coberta pelos testes;
 - execução fonte pelo script npm e smoke do artefato compilado: aprovados nas rodadas de migração;
-- binário do workspace: aprovado. `npm exec --workspace toolkit sgc -- --help` usa `toolkit/bin/sgc.cjs`, chama `tsx` e
-  executa `sgc.ts`; o mesmo contrato agora tem teste de integração no toolkit.
+- binário do workspace e do pacote: aprovados. `npm exec --workspace toolkit sgc -- --help` usa `toolkit/bin/sgc.cjs`,
+  chama `tsx` e executa `sgc.ts`; o smoke de pacote repete o contrato sem o hoisting do workspace.
 
 A contagem anterior caiu de 76 para 75 quando o teste do wrapper experimental `sgc-ts.js` foi removido junto com o
 wrapper. Uma rodada voltou a 76 com escrita e idempotência do corretor FQN; outra chegou a 77 com o contrato
@@ -356,30 +366,29 @@ outra chegou a 92 com o núcleo AST de arquitetura dependente de `frontendCodigo
 de caminhos dos relatórios V8 frontend; esta chega a 96 com o launcher `tsx` do binário npm. Nenhuma dessas mudanças
 reintroduz o wrapper obsoleto; as rodadas posteriores de limpeza, preparação, qualidade, dependências e acessibilidade
 elevam a cobertura para 101 cenários; uma rodada chega a 102 com o teste comportamental do auditor de contratos backend;
-esta rodada chega a 103 com o teste comportamental do auditor de arquitetura backend.
+esta rodada adiciona o smoke de pacote isolado, sem alterar a contagem da suíte unitária de 103 cenários.
 
 ### 3.3 Tamanho e composição atual
 
 Inventário dos arquivos rastreados do toolkit, excluindo `dist`, cobertura e artefatos ignorados:
 
 - 72 arquivos TypeScript de implementação;
-- 0 arquivos JavaScript de implementação ainda pendentes;
-- 2 arquivos JavaScript de teste (`test/sgc.test.js` e `test/cdus.test.js`);
-- 2 arquivos de teste concentrando 103 cenários;
+- 0 arquivos JavaScript de implementação; o único CJS é o launcher mínimo do binário;
+- 3 arquivos JavaScript de teste (`test/sgc.test.js`, `test/cdus.test.js` e `test/pacote.test.js`);
+- 2 arquivos de teste concentrando 103 cenários, mais 1 smoke de distribuição isolada;
 - maior módulo atual: `frontend/arquitetura-lib.ts`, com aproximadamente 1.200 linhas;
-- outros hotspots: `codigo/nomes-simbolos-coletar.js`, `frontend/residuos-lib.ts` e
+- outros hotspots: `codigo/nomes-simbolos-coletar.ts`, `frontend/residuos-lib.ts` e
   `qualidade/coleta-execucao.ts`.
 
 O núcleo TypeScript de implementação foi concluído: 100% dos arquivos de implementação rastreados são TypeScript.
-arquivos de implementação rastreados são TypeScript.
 
 ### 3.4 Achados da auditoria crítica
 
 | Severidade | Achado | Evidência e impacto |
 |---|---|---|
-| Resolvido nesta rodada | Binário npm quebrado | `bin.sgc` agora aponta para `bin/sgc.cjs`, que chama o CLI do `tsx`; `npm exec --workspace toolkit sgc -- --help` passou. A distribuição externa completa continua pendente. |
-| Bloqueador | Pacote não pode ser empacotado | `npm pack --workspace toolkit --dry-run` falha porque `toolkit/package.json` não possui `version`. `private: true`, nome específico e ausência de `files` também mostram que a distribuição externa ainda não foi desenhada. |
-| Alta | Raiz acoplada à posição física | `lib/caminhos.ts` deriva a raiz como pai de `toolkit/`. Ao instalar o pacote em `node_modules`, a raiz calculada deixa de ser o projeto consumidor. |
+| Resolvido nesta rodada | Binário npm quebrado | `bin.sgc` aponta para `bin/sgc.cjs`, que chama o CLI do `tsx`; o workspace e o tarball instalado em consumidor isolado executam `sgc --help` e uma auditoria real. |
+| Resolvido nesta rodada | Pacote não distribuível | `sgc-scripts@0.1.0` declara `version`, `files`, `exports`, `bin` e dependências de runtime; `npm pack` e `npm run test:pacote` passaram. A política de publicação ainda não foi escolhida. |
+| Resolvido nesta rodada | Raiz acoplada à posição física | `lib/caminhos.ts` usa `process.cwd()` como raiz padrão e mantém `DIRETORIO_TOOLKIT` para recursos do próprio pacote; o smoke isolado confirmou que o consumidor é a base auditada. |
 | Resolvido | Configuração permissiva do Knip | A configuração anterior tratava praticamente todos os arquivos como entrypoints. A nova lista os comandos reais, inclui JS/TS e, nesta rodada, encontrou e removeu oito exports internos não consumidos. |
 | Resolvido parcialmente | Base externa é parcialmente ignorada | Arquitetura, resíduos, OpenAPI, coleta, Semgrep, cheiros e assuntos de notificação agora respeitam a base/configuração; outros comandos ainda precisam da mesma correção. |
 | Alta | Auditores gravam por padrão | Arquitetura, resíduos, cobertura, nomenclatura, Semgrep e diff OpenAPI têm escrita automática ou defaults distintos. A diretriz read-only ainda é meta, não realidade. |
@@ -387,22 +396,22 @@ arquivos de implementação rastreados são TypeScript.
 | Resolvido | Efeito colateral oculto de `--sem-gravar` | `codigo nomes auditar-consistencia` gerava o inventário auxiliar com gravação habilitada e contaminava `--json`; a opção agora é propagada e a coleta interna é silenciosa. |
 | Resolvido | Configuração sem validação | `configuracao-toolkit.json` agora exige a versão `1` e valida estrutura, chaves conhecidas e caminhos textuais antes da combinação com defaults. |
 | Média | Opções e efeitos divergentes | Há `--input`/`--output` e `--entrada`/`--saida`, `--dry-run` e `--sem-gravar`, além de comandos mutáveis sem modo de prévia uniforme. |
-| Média | Testes não representam pacote externo | Os 103 testes rodam dentro do monorepo e encontram dependências hoisted. Não existe instalação em diretório isolado nem teste de raiz do consumidor. |
+| Resolvido nesta rodada | Testes não representam pacote externo | A suíte interna continua separada do smoke de distribuição, e `npm run test:pacote` empacota, instala em diretório isolado e executa o binário sem dependências hoisted do monorepo. |
 | Média | Cobertura funcional não medida | `@vitest/coverage-v8` está instalado, mas não há script, threshold ou relatório de cobertura do próprio toolkit. Quantidade de testes não mede contratos não exercitados. |
 | Média | Roteador monolítico e inventário duplicado | `sgc.ts` registra todos os comandos e a documentação repete a lista manualmente; é fácil haver deriva de nomes, extensões e ajuda. |
-| Baixa | APIs nativas e dependências se sobrepõem | Parte do núcleo já substituiu `fs-extra` por Node nativo; a migração deve reavaliar dependências por uso real, sem remoção antecipada. |
+| Baixa | APIs nativas e dependências se sobrepõem | `fs-extra` já foi removido do runtime e ficou restrito aos testes; a auditoria de dependências restantes deve continuar por uso real, sem remoção antecipada. |
 
 ### 3.5 Interpretação correta do estado
 
 - O toolkit funciona como ferramenta interna executada pelo script npm ou por `npx tsx` dentro deste workspace.
-- O toolkit ainda **não** funciona como pacote CLI externo completo, apesar de declarar `bin` e `exports`: não possui
-  `version`, continua `private` e ainda não tem teste de `npm pack` em instalação isolada.
+- O toolkit também funciona como pacote CLI externo fonte + `tsx`: o tarball foi instalado em consumidor isolado e o
+  binário executou uma auditoria contra a raiz do consumidor.
 - `exports` aponta alguns subpaths diretamente para `.ts`; esse contrato serve ao workspace com loader, mas não é um
   contrato consumível por Node puro e precisa acompanhar a decisão fonte versus pacote compilado.
 - Parametrização parcial não significa generalização concluída.
 - Build aprovado prova que a árvore pode ser emitida; não prova que o pacote emitido contém assets, configuração e
   resolução de raiz adequados para distribuição.
-- Knip aprovado e 103 testes verdes são gates úteis, mas ainda insuficientes para afirmar ausência de código morto fora
+- Knip aprovado, 103 testes unitários verdes e o smoke de pacote aprovado são gates úteis, mas ainda insuficientes para afirmar ausência de código morto fora
   do grafo declarado, segurança de todos os comandos mutáveis ou portabilidade. O grafo do Knip agora é uma evidência
   útil de exports não consumidos; não substitui testes de pacote externo.
 
@@ -500,16 +509,17 @@ do perfil.
 
 1. **Efeitos colaterais**: inverter gradualmente defaults de auditorias geradoras para read-only e exigir ação explícita
    para persistir artefatos, usando o inventário da seção 3.6 e atualizando o único consumidor interno na mesma rodada.
-2. **Entry point e pacote**: o roteador agora é `sgc.ts`, o launcher do pacote executa `tsx` e os smoke de workspace
-   passam; ainda faltam o desenho completo de distribuição e o teste isolado de pacote.
-3. **Raiz do consumidor**: separar diretório de instalação do toolkit, diretório de trabalho e raiz do projeto auditado.
-   `process.cwd()`, `--base` e configuração explícita devem ter precedência documentada.
-4. **Modelo de distribuição**: decidir cedo se o reuso será por pacote compilado, pacote-fonte com runtime `tsx` ou cópia
-   vendorizada. A escolha define `version`, `private`, nome, `files`, `bin`, `exports`, assets e dependências de runtime.
+2. **[resolvido nesta rodada] Entry point e pacote**: o roteador é `sgc.ts`, o launcher executa `tsx`, e workspace,
+   tarball e instalação isolada passaram nos smoke tests.
+3. **[resolvido nesta rodada] Raiz do consumidor**: o diretório físico do toolkit, o `process.cwd()` e `--base` estão
+   separados e documentados; o teste do pacote prova a precedência da raiz do consumidor.
+4. **[decidido e validado nesta rodada] Modelo de distribuição**: o reuso será por pacote-fonte com runtime `tsx`;
+   `version`, `files`, `bin`, `exports`, assets e dependências de runtime refletem esse modelo. A política de publicação
+   continua uma decisão operacional futura.
 5. **[resolvido nesta rodada] TypeScript sem rigor uniforme**: `tsconfig.estrito.json` cobre os 72 módulos de
    implementação TypeScript com `strict` e `noImplicitOverride`; o gate estrito passou e tornou-se o `typecheck` oficial.
-6. **Dependência de runtime**: `tsx` já foi movido para `dependencies` e o launcher de pacote foi criado; ainda falta
-   decidir se o pacote final continuará fonte+tsx ou será compilado para distribuição.
+6. **[resolvido nesta rodada] Dependência de runtime**: `tsx` está em `dependencies`, o launcher de pacote foi criado e
+   a instalação isolada confirma que o pacote fonte+tsx não depende do hoisting do workspace.
 7. **[resolvido nesta rodada] Contrato `.js`/`.ts` temporário**: todos os comandos registrados usam caminhos `.ts` e o
    fallback do despachador foi removido.
 8. **Hard-coding de perfil**: várias regras continuam presas ao layout e ao vocabulário SGC. Antes de declarar o toolkit
@@ -567,14 +577,17 @@ configuração externa possui testes de precedência e erro.
 ### Fase A — fechar a fronteira TypeScript do runtime
 
 1. **[concluído nesta rodada]** Migrar `toolkit/sgc.js` para `toolkit/sgc.ts`.
-2. Tipar integralmente o registro de comandos do Commander, opções e resultado de `principal`.
+2. **[concluído nesta rodada]** Tipar o registro de comandos do Commander, opções e resultado de `principal`.
 3. **[concluído nesta rodada]** Atualizar scripts raiz, script do toolkit, README, ADRs, testes e referências internas
    para o novo entrypoint.
-4. Separar explicitamente três caminhos: diretório de instalação do toolkit, diretório atual e raiz do projeto auditado.
+4. **[concluído nesta rodada]** Separar explicitamente três caminhos: diretório físico de instalação do toolkit, diretório
+   atual (`process.cwd()`) e raiz explícita do projeto auditado (`--base`); o smoke do pacote cobre o consumidor isolado.
 5. **[concluído nesta rodada]** Corrigir o `bin` do pacote com launcher que chama `tsx` e testar a execução por `npm exec`,
    `npx tsx` e `npm --prefix toolkit run sgc`.
-6. Decidir e implementar o modelo de instalação externo: manter fonte+`tsx` como dependência ou adotar distribuição compilada.
-7. Criar teste de pacote isolado com `npm pack`, instalação em diretório temporário e projeto consumidor fixture.
+6. **[concluído nesta rodada]** Decidir e implementar o modelo de instalação externo: pacote fonte + `tsx` como
+   dependência de runtime, com `version`, `files`, `exports` e launcher declarados.
+7. **[concluído nesta rodada]** Criar `test:pacote`, que executa `npm pack`, instala em diretório temporário, cria um
+   projeto consumidor fixture e audita a raiz do consumidor pelo binário instalado.
 8. **[concluído nesta rodada]** Remover o fallback `.js` → `.ts` do despachador depois de todos os comandos registrados
    passarem a usar caminhos TypeScript explícitos.
 
@@ -585,21 +598,21 @@ roteador fonte/compilado possuir testes de smoke equivalentes.
 
 1. **[concluído nesta rodada]** Migrar `lib/dominios/cobertura-java.ts` e `lib/dominios/cobertura-web.ts`, mantendo os
    contratos de métricas, os caminhos relativos à base auditada e os fixtures existentes.
-2. **[parcial nesta rodada]** Migrar `backend/lib/testes-analisar-regras.ts`, `backend/cobertura-ramificacoes.ts`,
+2. **[concluído nesta rodada]** Migrar `backend/lib/testes-analisar-regras.ts`, `backend/cobertura-ramificacoes.ts`,
    `backend/cobertura-auditoria.ts`, `frontend/cobertura-ramificacoes.ts`, `frontend/cobertura-ramificacoes-erros.ts`,
    `frontend/cobertura-auditoria.ts`, `requisitos/cdus-mensagens-lib.ts`,
    `frontend/identificadores-teste-lib.ts`, `requisitos/cdus-lib.ts`, `requisitos/cdus-vocabulario-lib.ts`,
    `requisitos/cdus-mensagens-codigo-lib.ts`, `frontend/acoes-backend-lib.ts`, `frontend/residuos-lib.ts`,
    `frontend/arquitetura-lib.ts`, `projeto/diagnostico.ts`, `projeto/limpar.ts`, `projeto/preparar.ts`,
    `projeto/qualidade.ts`, `projeto/dependencias-auditar.ts`, `qualidade/coleta-execucao.ts`, `qualidade/coleta.ts`,
-   `qualidade/resumo.ts` e os três comandos de contratos OpenAPI; ainda faltam achados de auditoria e comandos
-   transversais maiores.
-3. **[parcial nesta rodada]** Introduzir tipos para JaCoCo, V8, regras da análise de testes backend, mensagens CDU,
+   `qualidade/resumo.ts` e os três comandos de contratos OpenAPI; os achados e comandos transversais restantes foram
+   convertidos nos lotes posteriores da Fase C.
+3. **[concluído nesta rodada]** Introduzir tipos para JaCoCo, V8, regras da análise de testes backend, mensagens CDU,
    cobertura frontend, violações de ações, resíduos, arquitetura AST, execução e resumo de qualidade, diagnóstico,
-   fotografias, exceções e contratos OpenAPI; ainda faltam achados de auditoria e diagnósticos dos comandos restantes.
+   fotografias, exceções e contratos OpenAPI; os contratos de entrada JSON não confiáveis são tratados como `unknown`.
 4. Substituir `any` implícito por `unknown` na entrada JSON e validar apenas o que o consumidor realmente exige.
-5. **[parcial nesta rodada]** Criar `tsconfig.estrito.json` com `strict` e `noImplicitOverride`, aplicando-o a toda a
-   implementação TypeScript; ainda falta zerar os diagnósticos desse gate e incorporá-lo ao `typecheck` principal.
+5. **[concluído nesta rodada]** Criar `tsconfig.estrito.json` com `strict` e `noImplicitOverride`, aplicá-lo a toda a
+   implementação TypeScript, zerar os diagnósticos e incorporá-lo ao `typecheck` principal.
 6. Eliminar defaults de caminho calculados durante import; expor funções que resolvam caminhos a partir da base e da
    configuração efetivas.
 
@@ -675,15 +688,17 @@ SGC está ativo.
 2. Dividir testes por domínio: runtime, configuração, saída, projeto, backend, frontend, integração e requisitos.
 3. Manter testes comportamentais sobre a API pública; não testar métodos privados por reflexão ou acoplamento à
    implementação.
-4. Adicionar smoke test de instalação em diretório externo, incluindo `npx tsx` e o binário do pacote.
+4. **[concluído nesta rodada]** Adicionar smoke test de instalação em diretório externo, incluindo a execução do binário
+   do pacote; o modelo fonte + `tsx` é exercitado pelo launcher e não depende de `node_modules` hoisted.
 5. Adicionar matriz de validação para Node `26.7+`, TypeScript 6 e as versões de Vitest/tsx usadas no workspace.
 6. Criar fixtures próprias do toolkit para Java/Spring, Vue e Markdown; não usar a suíte do produto SGC como validação
    rotineira da modernização do toolkit.
 7. Executar smoke tests sobre um recorte do SGC apenas quando necessário para provar que uma funcionalidade específica
    do perfil continua funcionando após a mudança do toolkit.
 8. Atualizar `toolkit/README.md` e exemplos a partir de uma fonte única de comandos.
-9. Fechar o modelo de distribuição e decidir se os testes também serão convertidos para TypeScript; a implementação já
-   não possui arquivos JS, aliases ou fallbacks de transição.
+9. O modelo de distribuição fonte + `tsx` está fechado; decidir se os testes também serão convertidos para TypeScript. A
+   implementação não possui arquivos JS, aliases ou fallbacks de transição; o launcher CJS e os testes JS são exceções
+   deliberadas e documentadas.
 
 ## 7. Validação obrigatória por rodada
 
@@ -723,8 +738,8 @@ npm --prefix toolkit run sgc -- --help
 npm exec --workspace toolkit sgc -- --help
 ```
 
-O último comando está atualmente reprovado e é critério da Fase A; não deve ser tratado como gate verde antes da correção
-do `bin`.
+O último comando está aprovado; o launcher usa `tsx` e o mesmo contrato também é validado pela instalação isolada do
+tarball em `test:pacote`.
 
 ### Verificações adicionais por classe de mudança
 
@@ -733,7 +748,7 @@ do `bin`.
 - **Auditoria**: comparar JSON e código de saída com fixture estável; confirmar ausência de escrita sem opção explícita.
 - **Comando mutável**: testar prévia, execução, idempotência quando aplicável e preservação de conteúdo não relacionado.
 - **Empacotamento**: usar `npm pack`, instalar o tarball em diretório temporário e executar o binário sem dependências
-  hoisted do monorepo.
+  hoisted do monorepo (`npm --prefix toolkit run test:pacote`).
 - **Build**: executar ao menos um subcomando compilado que importe biblioteca e um que despache outro script; `--help` da
   raiz isoladamente não prova o pacote.
 

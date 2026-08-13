@@ -2,7 +2,7 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import process from "node:process";
 import {execa} from "execa";
-import {DIRETORIO_RAIZ, resolverNaRaiz} from "../lib/caminhos.js";
+import {DIRETORIO_RAIZ, DIRETORIO_TOOLKIT} from "../lib/caminhos.js";
 import {CAMINHO_TSX, ehEntradaPrincipal} from "../lib/execucao.js";
 import {lerOpcao} from "../lib/cli-opcoes.js";
 import {resolverCaminhoConfigurado} from "../lib/configuracao.js";
@@ -11,7 +11,7 @@ import {extrairCoberturaJacoco} from "../lib/dominios/cobertura-java.js";
 import {extrairCoberturaFrontend} from "../lib/dominios/cobertura-web.js";
 import {escreverLinha} from "../lib/saida.js";
 
-const CAMINHO_SGC = resolverNaRaiz("toolkit", "sgc.ts");
+const CAMINHO_SGC = path.join(DIRETORIO_TOOLKIT, "sgc.ts");
 const VERSAO_SCHEMA = "1.0.0" as const;
 
 type PerfilQualidade = "rapido" | "completo" | "backend" | "frontend";

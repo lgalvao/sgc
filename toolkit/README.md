@@ -214,6 +214,23 @@ Execução dos testes do toolkit:
 npm --prefix toolkit run test
 ```
 
+O smoke de distribuição instala o tarball em um consumidor temporário, sem usar dependências hoisted do monorepo:
+
+```bash
+npm --prefix toolkit run test:pacote
+```
+
+O modelo de distribuição é fonte + `tsx`. Para consumir uma versão empacotada em outro projeto, instale o tarball e
+execute o binário pelo `npx`:
+
+```bash
+npm install --save-dev ./sgc-scripts-0.1.0.tgz
+npx sgc --help
+```
+
+Por padrão, a raiz auditada é o diretório de trabalho do processo. Use `--base` ou `configuracao-toolkit.json` quando
+o projeto auditado estiver em outro caminho; o local de instalação do toolkit não é usado como raiz do consumidor.
+
 Lint do toolkit:
 
 ```bash
@@ -232,6 +249,8 @@ npx tsx toolkit/sgc.ts projeto dependencias auditar
 O diretório `test/` contém:
 
 - `sgc.test.js`: testes da CLI principal
+- `cdus.test.js`: testes das regras CDU específicas do perfil SGC
+- `pacote.test.js`: smoke de empacotamento e instalação em consumidor isolado
 - `fixtures/`: dados auxiliares para simular cenários de execução
 
 Esses testes garantem que a CLI continue roteando comandos, produzindo saídas e respeitando contratos básicos de

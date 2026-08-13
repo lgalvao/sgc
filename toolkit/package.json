@@ -1,6 +1,6 @@
 {
   "name": "sgc-scripts",
-  "private": true,
+  "version": "0.1.0",
   "type": "module",
   "description": "Toolkit unificado de scripts do SGC",
   "engines": {
@@ -9,6 +9,23 @@
   "bin": {
     "sgc": "./bin/sgc.cjs"
   },
+  "files": [
+    "bin",
+    "*.ts",
+    "backend/**/*.ts",
+    "codigo/**/*.ts",
+    "frontend/**/*.ts",
+    "integracao/**/*.ts",
+    "lib/**/*.ts",
+    "projeto/**/*.ts",
+    "qualidade/**/*.ts",
+    "qualidade/politicas/**/*.json",
+    "qualidade/politicas/**/*.yml",
+    "requisitos/**/*.ts",
+    "README.md",
+    "tsconfig.json",
+    "tsconfig.estrito.json"
+  ],
   "exports": {
     ".": "./sgc.ts",
     "./lib/caminhos": "./lib/caminhos.ts",
@@ -25,7 +42,8 @@
     "sgc": "tsx ./sgc.ts",
     "deps:audit": "knip",
     "build": "tsc --project tsconfig.build.json",
-    "test": "vitest run",
+    "test": "vitest run --exclude test/pacote.test.js",
+    "test:pacote": "vitest run test/pacote.test.js",
     "typecheck": "npm run typecheck:estrito",
     "typecheck:estrito": "tsc --noEmit --project tsconfig.estrito.json",
     "lint": "oxlint . --node-plugin --vitest-plugin --disable-unicorn-plugin -D correctness -D suspicious --ignore-pattern node_modules --ignore-pattern test/fixtures",
@@ -37,7 +55,6 @@
     "consola": "^3.4.2",
     "dependency-cruiser": "^18.2.0",
     "execa": "^10.0.1",
-    "fs-extra": "^11.4.0",
     "globby": "^16.2.3",
     "listr2": "^11.0.0",
     "picocolors": "^1.1.1",
@@ -51,6 +68,7 @@
     "@types/which": "^3.0.4",
     "@types/xml2js": "^0.4.14",
     "@vitest/coverage-v8": "^4.1.10",
+    "fs-extra": "^11.4.0",
     "knip": "^6.32.2",
     "oxlint": "^1.78.0",
     "typescript": "^6.0.3",
