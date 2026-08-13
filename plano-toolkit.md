@@ -378,12 +378,10 @@ frontend e para os caminhos OpenAPI.
 
 Nas validações desta rodada, em 13 de agosto de 2026, executadas diretamente sob Node `26.7.0`:
 
-- `npm --prefix toolkit run test`: 111 testes aprovados em 3 arquivos; o smoke de pacote é separado para não tornar a
+- `npm --prefix toolkit run test`: 112 testes aprovados em 3 arquivos; o smoke de pacote é separado para não tornar a
   suíte unitária dependente de rede ou instalação;
-- `npm --prefix toolkit run test:coverage`: aprovado com baseline informativa de 40,65% de statements (522/1.284),
-  27,96% de branches (252/901), 47,61% de funções (120/252) e 40,96% de linhas (503/1.228); a pequena variação
-  decorre da resolução lazy do `tsx`, ainda sem threshold porque os testes permanecem concentrados e a prioridade é
-  transformar os contratos críticos em cenários explícitos;
+- `npm --prefix toolkit run test:coverage`: aprovado com baseline informativa de 41,74% de statements (536/1.284),
+  29,30% de branches (264/901), 48,80% de funções (123/252) e 42,01% de linhas (516/1.228); ainda sem threshold
   porque os testes permanecem concentrados e a prioridade é transformar os contratos críticos em cenários explícitos;
 - `npm --prefix toolkit run test:pacote`: 1 teste aprovado, com `npm pack`, instalação isolada, auditoria no consumidor
   e verificação da política Semgrep empacotada;
@@ -416,8 +414,9 @@ elevam a cobertura para 101 cenários; uma rodada chega a 102 com o teste compor
 esta rodada adiciona a resolução portável do Semgrep e o smoke de pacote isolado; a suíte unitária chega a 104 cenários;
 a parametrização de execuções externas chega a 105; uma rodada explicita as políticas de resíduos e chega a 106; outra
 uniformiza a família de nomenclatura e chega a 107; uma rodada uniformiza os relatórios de cobertura e chega a 108; uma
-rodada protege a sincronização de versão e chega a 109; uma rodada centraliza o catálogo da CLI e chega a 110; esta
-rodada adiciona o fixture externo Java/Vue e chega a 111.
+rodada protege a sincronização de versão e chega a 109; uma rodada centraliza o catálogo da CLI e chega a 110; uma
+rodada adiciona o fixture externo Java/Vue e chega a 111; esta rodada padroniza as opções da árvore de linhas e chega a
+112.
 
 ### 3.3 Tamanho e composição atual
 
@@ -427,7 +426,7 @@ Inventário dos arquivos rastreados do toolkit, excluindo `dist`, cobertura e ar
 - 0 arquivos JavaScript de implementação; o único CJS é o launcher mínimo do binário;
 - 0 arquivos JavaScript de teste e 4 arquivos TypeScript de teste (`test/sgc.test.ts`, `test/cdus.test.ts`,
   `test/externo.test.ts` e `test/pacote.test.ts`);
-- 3 arquivos de teste TypeScript concentrando 111 cenários, mais 1 smoke de distribuição isolada;
+- 3 arquivos de teste TypeScript concentrando 112 cenários, mais 1 smoke de distribuição isolada;
 - maior módulo atual: `frontend/arquitetura-lib.ts`, com aproximadamente 1.200 linhas;
 - outros hotspots: `codigo/nomes-simbolos-coletar.ts`, `frontend/residuos-lib.ts` e
   `qualidade/coleta-execucao.ts`.
@@ -465,7 +464,7 @@ O núcleo TypeScript de implementação foi concluído: 100% dos arquivos de imp
 - Parametrização parcial não significa generalização concluída.
 - Build aprovado prova que a árvore pode ser emitida; não prova que o pacote emitido contém assets, configuração e
   resolução de raiz adequados para distribuição.
-- Knip aprovado, 111 testes unitários verdes e o smoke de pacote aprovado são gates úteis, mas ainda insuficientes para afirmar ausência de código morto fora
+- Knip aprovado, 112 testes unitários verdes e o smoke de pacote aprovado são gates úteis, mas ainda insuficientes para afirmar ausência de código morto fora
   do grafo declarado, segurança de todos os comandos mutáveis ou portabilidade. O grafo do Knip agora é uma evidência
   útil de exports não consumidos; não substitui testes de pacote externo.
 
@@ -736,7 +735,9 @@ SGC está ativo.
 
 1. Inventariar todas as opções, defaults, mensagens e códigos de saída.
 2. Definir opções canônicas em português (`--entrada`, `--saida`, `--diretorio`, `--arquivo`, `--base`) e remover as
-   formas antigas que não tenham valor semântico, atualizando todos os usos internos.
+   formas antigas que não tenham valor semântico, atualizando todos os usos internos. O primeiro recorte foi aplicado
+   em `projeto arvore-linhas`, com `--profundidade`, `--minimo-linhas` e `--excluir-testes`; as demais famílias ainda
+   precisam ser inventariadas.
 3. Definir um envelope comum de resultado: versão do schema, status, resumo, violações, métricas, artefatos e avisos.
 4. Separar stdout estruturado, stdout humano e stderr operacional.
 5. Definir quando um comando retorna falha por violação encontrada versus erro de execução.

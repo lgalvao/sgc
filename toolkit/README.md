@@ -179,6 +179,9 @@ npx tsx toolkit/sgc.ts projeto arvore-linhas
 npx tsx toolkit/sgc.ts projeto versao-sincronizar 1.2.3 --gravar
 ```
 
+`projeto arvore-linhas` usa as opções `--profundidade`, `--minimo-linhas`, `--excluir-testes` e `--base`. O filtro
+de testes reconhece padrões comuns de JavaScript, Vue, Playwright e Java, incluindo qualquer caminho `src/test`.
+
 `projeto versao-sincronizar` apenas simula por padrão. Use `--base` para outra raiz e `--gravar` para atualizar
 `gradle.properties` e `frontend/package.json`.
 

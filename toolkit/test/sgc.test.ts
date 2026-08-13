@@ -5,7 +5,7 @@ import fs from "fs-extra";
 import {describe, expect, test} from "vitest";
 import {execa, execaNode, type Options} from "execa";
 import {pathToFileURL} from "node:url";
-import {calcularTotais, construirArvore, listarArquivosGit} from "../projeto/arvore-linhas.js";
+import {calcularTotais, construirArvore, ehArquivoTeste, listarArquivosGit, lerOpcoes} from "../projeto/arvore-linhas.js";
 import {sincronizarVersao} from "../projeto/versao-sincronizar.js";
 import {executarDiagnostico} from "../projeto/diagnostico.js";
 import {executarLimpeza} from "../projeto/limpar.js";
@@ -2924,6 +2924,25 @@ describe("CLI raiz do toolkit", () => {
         await execa("git", ["add", "arquivo.txt"], {cwd: diretorioBase});
 
         expect(listarArquivosGit(diretorioBase)).toEqual(["arquivo.txt"]);
+    });
+
+    test("padroniza opcoes da arvore de linhas em portugues e reconhece testes Java externos", () => {
+        expect(lerOpcoes([
+            "--base",
+            "/tmp/projeto",
+            "--profundidade",
+            "2",
+            "--minimo-linhas",
+            "10",
+            "--excluir-testes"
+        ])).toMatchObject({
+            diretorioBase: "/tmp/projeto",
+            profundidadeMaxima: 2,
+            minimoLinhas: 10,
+            excluirTestes: true
+        });
+        expect(ehArquivoTeste("aplicacao/src/test/java/ExemploTest.java")).toBe(true);
+        expect(ehArquivoTeste("aplicacao/src/main/java/Exemplo.java")).toBe(false);
     });
 
     test("executa o diagnostico em JSON", async () => {

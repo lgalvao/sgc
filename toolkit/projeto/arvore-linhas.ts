@@ -157,26 +157,26 @@ Uso recomendado: npx tsx toolkit/sgc.ts projeto arvore-linhas [opções]
 Execução direta: npx tsx toolkit/projeto/arvore-linhas.ts [opções]
 
 Opções:
-  --depth <n>          Limita a profundidade da árvore exibida (ex: --depth 2)
-  --min-lines <n>      Exibe apenas itens com no mínimo n linhas
-  --exclude-tests      Exclui arquivos de teste da contagem e da árvore
-  --base <diretorio>   Diretório Git analisado (padrão: diretório atual)
-  --help, -h           Exibe esta mensagem de ajuda
+  --profundidade <n>    Limita a profundidade da árvore exibida (ex: --profundidade 2)
+  --minimo-linhas <n>   Exibe apenas itens com no mínimo n linhas
+  --excluir-testes      Exclui arquivos de teste da contagem e da árvore
+  --base <diretorio>    Diretório Git analisado (padrão: diretório atual)
+  --help, -h            Exibe esta mensagem de ajuda
 \n`);
         return {ajuda: true};
     }
 
-    const indiceProfundidade = argumentos.indexOf("--depth");
+    const indiceProfundidade = argumentos.indexOf("--profundidade");
     if (indiceProfundidade !== -1 && argumentos[indiceProfundidade + 1]) {
         opcoes.profundidadeMaxima = Number.parseInt(argumentos[indiceProfundidade + 1], 10);
     }
 
-    const indiceMinimoLinhas = argumentos.indexOf("--min-lines");
+    const indiceMinimoLinhas = argumentos.indexOf("--minimo-linhas");
     if (indiceMinimoLinhas !== -1 && argumentos[indiceMinimoLinhas + 1]) {
         opcoes.minimoLinhas = Number.parseInt(argumentos[indiceMinimoLinhas + 1], 10);
     }
 
-    if (argumentos.includes("--exclude-tests")) {
+    if (argumentos.includes("--excluir-testes")) {
         opcoes.excluirTestes = true;
     }
 
@@ -188,8 +188,7 @@ const PADROES_TESTE: RegExp[] = [
     /\.test\.(js|ts|vue)$/,
     /__tests__\//,
     /e2e\//,
-    /frontend\/src\/__tests__\//,
-    /backend\/src\/test\//
+    /\/src\/test\//
 ];
 
 function ehArquivoTeste(caminhoArquivo: string): boolean {
@@ -229,6 +228,7 @@ if (ehEntradaPrincipal(import.meta.url)) {
 export {
     construirArvore,
     calcularTotais,
+    ehArquivoTeste,
     lerOpcoes,
     listarArquivosGit,
     principal
