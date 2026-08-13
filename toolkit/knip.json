@@ -49,7 +49,7 @@
     "requisitos/cdus-inventariar-duplicacoes.ts",
     "requisitos/cdus-inventariar-mensagens.js",
     "requisitos/cdus-inventariar-vocabulario.js",
-    "requisitos/cdus-inventariar.js"
+    "requisitos/cdus-inventariar.ts"
   ],
   "project": [
     "**/*.{js,ts}"

@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+// Inventário dos casos de uso CDU.
 
 import path from "node:path";
 import {ehEntradaPrincipal} from "../lib/execucao.js";
@@ -13,21 +14,42 @@ import {
     obterOpcoesCdu
 } from "./cdus-lib.js";
 
-function acumularMapa(mapa, chave) {
+type MapaContagem = Record<string, number>;
+
+interface DocumentoNumeracao {
+    arquivo: string;
+    repeticoes?: number[];
+    regressoes?: string[];
+}
+
+interface InventarioCdu {
+    base: string;
+    totalArquivos: number;
+    formatosAtor: MapaContagem;
+    formatosPreCondicoes: MapaContagem;
+    formatosFluxoPrincipal: MapaContagem;
+    documentosComReinicioNumeracao: DocumentoNumeracao[];
+    documentosComRegressaoNumeracao: DocumentoNumeracao[];
+    situacoesMaisFrequentes: MapaContagem;
+    elementosUiMaisFrequentes: MapaContagem;
+    placeholdersMaisFrequentes: MapaContagem;
+}
+
+function acumularMapa(mapa: MapaContagem, chave: string): void {
     mapa[chave] = (mapa[chave] ?? 0) + 1;
 }
 
-function ordenarMapa(mapa) {
+function ordenarMapa(mapa: MapaContagem): MapaContagem {
     return Object.fromEntries(
         Object.entries(mapa).toSorted((a, b) => b[1] - a[1] || a[0].localeCompare(b[0], "pt-BR"))
     );
 }
 
-async function principal(argumentos = process.argv.slice(2)) {
+async function principal(argumentos: string[] = process.argv.slice(2)): Promise<void> {
     const {emitirJson, base} = obterOpcoesCdu(argumentos);
 
     const arquivos = await listarArquivosCdu(base);
-    const inventario = {
+    const inventario: InventarioCdu = {
         base,
         totalArquivos: arquivos.length,
         formatosAtor: {},
