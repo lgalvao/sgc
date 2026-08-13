@@ -1,4 +1,3 @@
-import fs from "node:fs/promises";
 import path from "node:path";
 import process from "node:process";
 import {execa} from "execa";
@@ -6,11 +5,17 @@ import {DIRETORIO_RAIZ} from "../lib/caminhos.js";
 import {ehEntradaPrincipal} from "../lib/execucao.js";
 import {lerOpcao} from "../lib/cli-opcoes.js";
 import {resolverCaminhoConfigurado} from "../lib/configuracao.js";
-import {NOME_ARQUIVO_FOTOGRAFIA, obterDiretorioArtefatos} from "../lib/qualidade.js";
+import {obterDiretorioArtefatos} from "../lib/qualidade.js";
 import {escreverErro, escreverLinha} from "../lib/saida.js";
 import {criarAdaptadoresSgc, PERFIS_SGC} from "./coleta-adaptadores-sgc.js";
 import {executarComando, executarComandoSgc} from "./coleta-executor.js";
-import {consolidarJUnit, extrairHotspotsQualidade, parseJsonSeguro} from "./coleta-leitores.js";
+import {
+    criarFotografiaColeta,
+    persistirFotografia,
+    prepararDiretoriosFotografia,
+    type FotografiaColeta
+} from "./coleta-fotografia.js";
+import {consolidarJUnit, parseJsonSeguro} from "./coleta-leitores.js";
 
 const VERSAO_SCHEMA = "1.0.0" as const;
 
@@ -106,30 +111,6 @@ interface ResultadoPlaywright extends Record<string, unknown> {
 interface HotspotQualidade {
     arquivo: string;
     score: number;
-}
-
-interface FotografiaColeta {
-    versaoSchema: string;
-    metadados: {
-        geradoEm: string;
-        perfilExecucao: string;
-        duracaoTotalMs: number;
-        git: Record<string, string>;
-    };
-    verificacoes: ExecucaoQualidade[];
-    resumo: {
-        statusGeral: "verde" | "vermelho";
-        totais: {
-            verificacoes: number;
-            sucesso: number;
-            falha: number;
-        };
-    };
-    hotspots: Array<{
-        nome: string;
-        risco: number;
-        origem: string;
-    }>;
 }
 
 const PERFIS = PERFIS_SGC;
@@ -238,8 +219,10 @@ async function principal(
 
     const diretorioExecucao = path.join(contexto.diretorioExecucoes, timestamp);
 
-    await fs.mkdir(diretorioExecucao, {recursive: true});
-    await fs.mkdir(contexto.diretorioMaisRecente, {recursive: true});
+    await prepararDiretoriosFotografia({
+        diretorioExecucao,
+        diretorioMaisRecente: contexto.diretorioMaisRecente
+    });
 
     const verificacoes: ExecucaoQualidade[] = [];
     for (const nomeAdaptador of adaptadoresDoPerfil) {
@@ -252,38 +235,17 @@ async function principal(
         verificacoes.push(await adaptador(contexto));
     }
 
-    const hotspotsResiduos = verificacoes
-        .flatMap((item) => extrairHotspotsQualidade(item.metricas).map((hotspot) => ({
-            nome: hotspot.arquivo,
-            risco: hotspot.score,
-            origem: item.codigo
-        })))
-        .toSorted((a, b) => b.risco - a.risco)
-        .slice(0, 20);
-
-    const fotografia: FotografiaColeta = {
+    const fotografia = criarFotografiaColeta({
         versaoSchema: VERSAO_SCHEMA,
-        metadados: {
-            geradoEm: new Date().toISOString(),
-            perfilExecucao: perfilInformado,
-            duracaoTotalMs: Date.now() - inicio,
-            git: await coletarGit(contexto.base).catch(() => ({}))
-        },
+        perfilExecucao: perfilInformado,
+        inicio,
         verificacoes,
-        resumo: {
-            statusGeral: verificacoes.some(v => v.status === "falha") ? "vermelho" : "verde",
-            totais: {
-                verificacoes: verificacoes.length,
-                sucesso: verificacoes.filter(v => v.status === "sucesso").length,
-                falha: verificacoes.filter(v => v.status === "falha").length
-            }
-        },
-        hotspots: hotspotsResiduos
-    };
-
-    const caminhoFotografia = path.join(diretorioExecucao, NOME_ARQUIVO_FOTOGRAFIA);
-    await fs.writeFile(caminhoFotografia, JSON.stringify(fotografia, null, 2));
-    await fs.writeFile(path.join(contexto.diretorioMaisRecente, NOME_ARQUIVO_FOTOGRAFIA), JSON.stringify(fotografia, null, 2));
+        git: await coletarGit(contexto.base).catch(() => ({}))
+    });
+    const caminhoFotografia = await persistirFotografia(fotografia, {
+        diretorioExecucao,
+        diretorioMaisRecente: contexto.diretorioMaisRecente
+    });
     escreverLinha(`Fotografia gerada em ${caminhoRelativo(caminhoFotografia, contexto.base)}`);
 
     return fotografia;
