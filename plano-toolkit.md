@@ -240,6 +240,9 @@ frontend e para os caminhos OpenAPI.
 - `frontend/acessibilidade-crawler.ts` e `frontend/acessibilidade-processar-resultados.ts` foram convertidos para
   TypeScript; o processador valida o JSON externo antes de gerar Markdown e o crawler aceita base, spec, configuração e
   executor Playwright parametrizados, mantendo os defaults SGC.
+- `frontend/identificadores-teste-listar.ts` e `frontend/identificadores-teste-listar-duplicados.ts` foram convertidos
+  para TypeScript; os resultados de coleta/duplicação são tipados e o agrupamento usa `Map`, preservando as regras e a
+  saída dos identificadores de teste do perfil SGC.
 - `integracao/contratos-openapi-caminhos.ts` foi convertido para TypeScript com o contrato explícito dos caminhos
   atual, de referência e de relatório; ele permanece independente do gerador de tipos removido.
 - `integracao/contratos-exportar-openapi.ts`, `integracao/contratos-diff.ts` e
@@ -289,15 +292,15 @@ elevam a cobertura para 101 cenários.
 
 Inventário dos arquivos rastreados do toolkit, excluindo `dist`, cobertura e artefatos ignorados:
 
-- 43 arquivos TypeScript de implementação;
-- 29 arquivos JavaScript de implementação ainda pendentes;
+- 45 arquivos TypeScript de implementação;
+- 27 arquivos JavaScript de implementação ainda pendentes;
 - 2 arquivos JavaScript de teste (`test/sgc.test.js` e `test/cdus.test.js`);
 - 2 arquivos de teste concentrando 101 cenários;
 - maior módulo atual: `frontend/arquitetura-lib.ts`, com aproximadamente 1.200 linhas;
 - outros hotspots: `codigo/nomes-simbolos-coletar.js`, `backend/testes-analisar.js`,
   `frontend/residuos-lib.ts`, `backend/contratos-auditar.js` e `qualidade/coleta-execucao.ts`.
 
-O núcleo TypeScript está adiantado, mas a migração do toolkit como um todo ainda não terminou: aproximadamente 60% dos
+O núcleo TypeScript está adiantado, mas a migração do toolkit como um todo ainda não terminou: aproximadamente 63% dos
 arquivos de implementação rastreados são TypeScript.
 
 ### 3.4 Achados da auditoria crítica
@@ -542,8 +545,8 @@ Lotes sugeridos:
    catálogo padrão continua sendo o perfil SGC, com base e execução parametrizáveis para reuso externo.
 2. **Backend**: cobertura já convertida; faltam análise/priorização de testes, contratos e FQN. Parametrizar raiz Java, tarefas Gradle e
    categorias.
-3. **[parcial nesta rodada]** Frontend: cobertura V8, resíduos e acessibilidade já convertidos; faltam identificadores
-   de teste. Parametrizar raiz Vue, globs e convenções de componentes.
+3. **[parcial nesta rodada]** Frontend: cobertura V8, resíduos, acessibilidade e identificadores de teste já
+   convertidos; faltam parametrizar completamente raiz Vue, globs e convenções de componentes.
 4. **[concluído nesta rodada]** Integração: exportação, diff e baseline OpenAPI; o módulo permanece independente do
    gerador de tipos removido.
 5. **Requisitos**: converter o motor de Markdown e depois isolar o perfil CDU do SGC.

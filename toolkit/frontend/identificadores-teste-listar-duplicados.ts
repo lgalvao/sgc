@@ -6,22 +6,41 @@ import {lerOpcao} from "../lib/cli-opcoes.js";
 import {exibirAjudaComando} from "../lib/cli-ajuda.js";
 import {ehEntradaPrincipal} from "../lib/execucao.js";
 import {escreverLinha, imprimirJson} from "../lib/saida.js";
-import {coletarIdentificadores, obterDiretorioBusca} from "./identificadores-teste-lib.js";
+import {coletarIdentificadores, obterDiretorioBusca, type IdentificadorTeste, type ResultadoColetaIdentificadores} from "./identificadores-teste-lib.js";
 
-const IDENTIFICADORES_COMPARTILHADOS_PERMITIDOS = new Set([
+const IDENTIFICADORES_COMPARTILHADOS_PERMITIDOS = new Set<string>([
     "subprocesso-header__txt-header-unidade",
 ]);
 
-function encontrarDuplicados(identificadores) {
-    const identificadoresPorValor = Object.groupBy(identificadores, (item) => item.valor);
-    return Object.entries(identificadoresPorValor)
+interface GrupoIdentificadoresDuplicados {
+    valor: string;
+    itens: IdentificadorTeste[];
+}
+
+interface ResultadoIdentificadoresDuplicados {
+    diretorioBusca: string;
+    totalIdentificadores: number;
+    totalDuplicados: number;
+    totalOcorrenciasDuplicadas: number;
+    duplicados: GrupoIdentificadoresDuplicados[];
+}
+
+function encontrarDuplicados(identificadores: IdentificadorTeste[]): GrupoIdentificadoresDuplicados[] {
+    const identificadoresPorValor = new Map<string, IdentificadorTeste[]>();
+    for (const identificador of identificadores) {
+        const grupo = identificadoresPorValor.get(identificador.valor) ?? [];
+        grupo.push(identificador);
+        identificadoresPorValor.set(identificador.valor, grupo);
+    }
+
+    return [...identificadoresPorValor.entries()]
         .filter(([valor]) => !IDENTIFICADORES_COMPARTILHADOS_PERMITIDOS.has(valor))
         .filter(([, itens]) => itens.length > 1)
         .toSorted(([, itensA], [, itensB]) => itensB.length - itensA.length)
         .map(([valor, itens]) => ({valor, itens}));
 }
 
-function criarResultado(coleta) {
+function criarResultado(coleta: ResultadoColetaIdentificadores): ResultadoIdentificadoresDuplicados {
     const duplicados = encontrarDuplicados(coleta.identificadores);
     return {
         diretorioBusca: coleta.diretorioBusca,
@@ -32,7 +51,7 @@ function criarResultado(coleta) {
     };
 }
 
-function imprimirDuplicados(resultado) {
+function imprimirDuplicados(resultado: ResultadoIdentificadoresDuplicados): void {
     if (resultado.totalDuplicados === 0) {
         escreverLinha("Nenhum identificador de teste duplicado encontrado.");
         return;
@@ -52,14 +71,14 @@ function imprimirDuplicados(resultado) {
     escreverLinha(`Total de ocorrencias duplicadas: ${resultado.totalOcorrenciasDuplicadas}`);
 }
 
-async function principal(argumentos = process.argv.slice(2)) {
+async function principal(argumentos: string[] = process.argv.slice(2)): Promise<void> {
     const emitirJson = argumentos.includes("--json");
     const exibirAjuda = argumentos.includes("--help") || argumentos.includes("-h");
 
     if (exibirAjuda) {
         exibirAjudaComando({
             comandoSgc: "frontend identificadores-teste listar-duplicados",
-            scriptDireto: "frontend/identificadores-teste-listar-duplicados.js",
+            scriptDireto: "frontend/identificadores-teste-listar-duplicados.ts",
             descricao: "Lista identificadores de teste duplicados nos templates Vue.",
             opcoes: [
                 "--json               Emite os duplicados em JSON.",
@@ -74,7 +93,7 @@ async function principal(argumentos = process.argv.slice(2)) {
         return;
     }
 
-    const diretorioBase = path.resolve(lerOpcao(argumentos, "--base", DIRETORIO_RAIZ));
+    const diretorioBase = path.resolve(lerOpcao(argumentos, "--base", DIRETORIO_RAIZ) ?? DIRETORIO_RAIZ);
     const resultado = criarResultado(await coletarIdentificadores(obterDiretorioBusca(argumentos, diretorioBase), diretorioBase));
     if (emitirJson) {
         imprimirJson(resultado);

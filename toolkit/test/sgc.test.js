@@ -74,8 +74,8 @@ const CAMINHOS_COMANDOS_ESTRUTURA_FRONTEND = [
     "modais-validar.js",
     "residuos-auditar.ts",
     "residuos-validar.ts",
-    "identificadores-teste-listar.js",
-    "identificadores-teste-listar-duplicados.js",
+    "identificadores-teste-listar.ts",
+    "identificadores-teste-listar-duplicados.ts",
     "views-templates-validar.js"
 ].map(nome => path.join(DIRETORIO_RAIZ, "toolkit", "frontend", nome));
 const CAMINHOS_COMANDOS_COBERTURA_FRONTEND = [

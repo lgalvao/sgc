@@ -77,4 +77,6 @@ async function coletarIdentificadores(
 export {
     coletarIdentificadores,
     obterDiretorioBusca,
+    type IdentificadorTeste,
+    type ResultadoColetaIdentificadores,
 };
