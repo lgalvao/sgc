@@ -194,9 +194,9 @@ frontend e para os caminhos OpenAPI.
 - A auditoria de assuntos de notificação agora usa `backendCodigo` configurado, preservando as exceções específicas do
   perfil SGC sem fixar `backend/src/main/java/sgc` no código.
 - A análise de testes backend agora resolve separadamente `backendCodigo` e `backendTestes` pela configuração da base;
-  a opção histórica `--dir` continua significando a raiz do backend e deriva seus subdiretórios Java convencionais.
+  `--diretorio` significa a raiz do backend quando informado e deriva seus subdiretórios Java convencionais.
 - A auditoria de identificadores de teste frontend agora usa `--base` como raiz do projeto, resolve `frontendCodigo` e
-  reserva `--dir` para um diretório de busca explícito; o coletor de qualidade foi ajustado para esse contrato.
+  usa `--diretorio` para um diretório de busca explícito; o coletor de qualidade foi ajustado para esse contrato.
 - Os validadores estruturais de views e modais frontend agora resolvem `frontendCodigo` pela base, preservando as
   políticas SGC de `LayoutPadrao`, cabeçalhos e `ModalPadrao` sem fixar `frontend/src`.
 - O gate de arquitetura frontend e sua auditoria de ações agora resolvem o pacote Vue por `frontend` configurado,
@@ -381,7 +381,7 @@ frontend e para os caminhos OpenAPI.
 
 Nas validações desta rodada, em 13 de agosto de 2026, executadas diretamente sob Node `26.7.0`:
 
-- `npm --prefix toolkit run test`: 112 testes aprovados em 5 arquivos; o smoke de pacote é separado para não tornar a
+- `npm --prefix toolkit run test`: 112 testes aprovados em 6 arquivos; o smoke de pacote é separado para não tornar a
   suíte unitária dependente de rede ou instalação;
 - `npm --prefix toolkit run test:coverage`: aprovado com baseline informativa de 41,74% de statements (536/1.284),
   29,30% de branches (264/901), 48,80% de funções (123/252) e 42,01% de linhas (516/1.228); ainda sem threshold
@@ -390,7 +390,7 @@ Nas validações desta rodada, em 13 de agosto de 2026, executadas diretamente s
   e verificação da política Semgrep empacotada;
 - `npm --prefix toolkit run build`: aprovado;
 - `npm --prefix toolkit run typecheck`: aprovado;
-- `npm --prefix toolkit run typecheck:testes`: aprovado sobre os seis arquivos de teste TypeScript;
+- `npm --prefix toolkit run typecheck:testes`: aprovado sobre os sete arquivos de teste TypeScript;
 - `npm --prefix toolkit run lint`: aprovado;
 - `npm --prefix toolkit run deps:audit`: aprovado;
 - `npx knip --reporter compact` dentro de `toolkit/`: aprovado sem exports não consumidos;
@@ -424,6 +424,8 @@ com 86 cenários da CLI, saída, integração e requisitos, enquanto os contrato
 execução focada próprio. Na rodada seguinte, os 3 cenários de configuração foram extraídos para
 `test/configuracao.test.ts`, deixando 83 cenários no teste principal e tornando explícita a fronteira entre configuração
 parametrizada e roteamento da CLI.
+Na rodada posterior, os 2 cenários de integração e OpenAPI foram extraídos para `test/integracao.test.ts`, deixando 81
+cenários no teste principal e isolando o contrato de distribuição de artefatos de integração.
 
 ### 3.3 Tamanho e composição atual
 
@@ -431,9 +433,10 @@ Inventário dos arquivos rastreados do toolkit, excluindo `dist`, cobertura e ar
 
 - 73 arquivos TypeScript de implementação;
 - 0 arquivos JavaScript de implementação; o único CJS é o launcher mínimo do binário;
-- 0 arquivos JavaScript de teste e 6 arquivos TypeScript de teste (`test/sgc.test.ts`, `test/projeto.test.ts`,
-  `test/configuracao.test.ts`, `test/cdus.test.ts`, `test/externo.test.ts` e `test/pacote.test.ts`);
-- 5 arquivos de teste TypeScript concentram 112 cenários regulares, mais 1 smoke de distribuição isolada;
+- 0 arquivos JavaScript de teste e 7 arquivos TypeScript de teste (`test/sgc.test.ts`, `test/projeto.test.ts`,
+  `test/configuracao.test.ts`, `test/integracao.test.ts`, `test/cdus.test.ts`, `test/externo.test.ts` e
+  `test/pacote.test.ts`);
+- 6 arquivos de teste TypeScript concentram 112 cenários regulares, mais 1 smoke de distribuição isolada;
 - maior módulo atual: `frontend/arquitetura-lib.ts`, com aproximadamente 1.200 linhas;
 - outros hotspots: `codigo/nomes-simbolos-coletar.ts`, `frontend/residuos-lib.ts` e
   `qualidade/coleta-execucao.ts`.
@@ -460,6 +463,7 @@ O núcleo TypeScript de implementação foi concluído: 100% dos arquivos de imp
 | Resolvido nesta rodada | Cobertura funcional não medida | `npm run test:coverage` agora gera a baseline informativa do próprio toolkit com `@vitest/coverage-v8`; threshold fica para depois da divisão dos testes por domínio e da análise dos contratos críticos. |
 | Resolvido nesta rodada | Testes de projeto misturados ao teste da CLI | Os 14 cenários de versão, árvore, diagnóstico, limpeza, preparação, qualidade e dependências agora estão em `test/projeto.test.ts`; o teste principal caiu para 86 cenários e a suíte permite execução focada por domínio. |
 | Resolvido nesta rodada | Configuração misturada à validação da CLI | Os 3 cenários de carregamento, validação e execução parametrizada agora estão em `test/configuracao.test.ts`; o teste principal caiu para 83 cenários e a configuração pode ser validada sem importar o roteador. |
+| Resolvido nesta rodada | Integração OpenAPI misturada à validação da CLI | Os 2 cenários de importação e artefatos OpenAPI agora estão em `test/integracao.test.ts`; o teste principal caiu para 81 cenários e a persistência de diff continua coberta com `--gravar`. |
 | Resolvido nesta rodada | Roteador monolítico e inventário duplicado | Os 42 comandos que apenas despacham scripts agora vêm de `lib/catalogo-comandos.ts`, com teste de unicidade, descrição, rota e arquivo existente. A documentação passou a tratar `sgc --help` como catálogo canônico e mantém apenas exemplos; comandos com ações/opções próprias continuam explícitos em `sgc.ts`. |
 | Resolvido nesta rodada | Ajuda de folhas catalogadas era genérica | O roteador desativa a ajuda automática do Commander somente nas folhas que despacham arquivos e encaminha `--help` ao script TypeScript; grupos continuam usando a ajuda do Commander e as opções específicas ficam visíveis. |
 | Resolvido nesta rodada | Opção de meta de cobertura em inglês | `backend cobertura auditoria` e `frontend cobertura auditoria` agora usam `--minimo`; os símbolos internos e os relatórios Markdown da família foram normalizados sem alterar os campos JSON de integração. |
@@ -591,14 +595,16 @@ do perfil.
 
 ### Prioridade média
 
-9. **Testes ainda parcialmente concentrados**: `test/sgc.test.ts` ainda concentra 83 cenários, embora os 14 cenários
-   de projeto e os 3 de configuração já tenham sido extraídos para arquivos próprios. Dividir os cenários restantes por
-   domínio continua recomendado para localizar contratos, reduzir o custo de execução focada e permitir fixtures mais
-   independentes.
+9. **Testes ainda parcialmente concentrados**: `test/sgc.test.ts` ainda concentra 81 cenários, embora os 14 cenários
+   de projeto, os 3 de configuração e os 2 de integração já tenham sido extraídos para arquivos próprios. Dividir os
+   cenários restantes por domínio continua recomendado para localizar contratos, reduzir o custo de execução focada e
+   permitir fixtures mais independentes.
 10. **Schema de resultados**: fotografias, auditorias, cobertura, diagnósticos e relatórios usam objetos sem schema
    versionado. Formalizar tipos e versões de saída antes de extrair o pacote externo.
-11. **Opções inconsistentes**: há mistura de `--input`, `--output`, `--dir`, `--arquivo`, `--saida` e defaults locais.
-   Definir opções canônicas em português e remover formas antigas diretamente, atualizando o catálogo e os testes.
+11. **Opções heterogêneas, mas sem aliases ingleses próprios ativos**: a implementação usa `--entrada`, `--saida`,
+   `--diretorio`, `--arquivo`, `--base` e opções de domínio em português; a busca não encontrou `--input`, `--output`,
+   `--dir` ou `--directory` como contratos do toolkit. Ainda falta um contrato comum para parsing, mensagens de ajuda,
+   valores padrão e validação; flags de Node, Semgrep e Playwright permanecem somente como encaminhamento externo.
 12. **Documentação derivada**: o catálogo já foi atualizado para `sgc.ts`, mas ainda precisa ser centralizado para não
     derivar ajuda, comandos e exports em fontes duplicadas. O inventário de comandos não deve divergir do roteador.
 13. **Orquestração pesada**: `qualidade/coleta-execucao.ts` mistura subprocessos, Gradle, npm, Playwright, parsing de
@@ -745,11 +751,14 @@ SGC está ativo.
 
 ### Fase E — padronizar CLI e resultados
 
-1. Inventariar todas as opções, defaults, mensagens e códigos de saída.
-2. Definir opções canônicas em português (`--entrada`, `--saida`, `--diretorio`, `--arquivo`, `--base`) e remover as
-   formas antigas que não tenham valor semântico, atualizando todos os usos internos. Os primeiros recortes foram
-   aplicados em `projeto arvore-linhas`, com `--profundidade`, `--minimo-linhas` e `--excluir-testes`, e nas auditorias
-   de cobertura, com `--minimo`; as demais famílias ainda precisam ser inventariadas.
+1. **[parcial nesta rodada]** Inventariar opções, defaults, mensagens e códigos de saída: as opções próprias foram
+   catalogadas e não há aliases ingleses `--input`, `--output`, `--dir` ou `--directory`; ainda falta consolidar o
+   inventário de defaults, mensagens e códigos de saída por família.
+2. **[parcial nesta rodada]** Definir opções canônicas em português (`--entrada`, `--saida`, `--diretorio`, `--arquivo`,
+   `--base`) e remover as formas antigas que não tenham valor semântico, atualizando todos os usos internos. Os
+   primeiros recortes foram aplicados em `projeto arvore-linhas`, com `--profundidade`, `--minimo-linhas` e
+   `--excluir-testes`, nas auditorias de cobertura, com `--minimo`, e na substituição documentada de `--dir` por
+   `--diretorio`; permanece a oportunidade de compartilhar parsing e validação sem esconder semântica específica.
 3. Definir um envelope comum de resultado: versão do schema, status, resumo, violações, métricas, artefatos e avisos.
 4. Separar stdout estruturado, stdout humano e stderr operacional.
 5. Definir quando um comando retorna falha por violação encontrada versus erro de execução.
@@ -763,9 +772,9 @@ SGC está ativo.
 1. **[concluído nesta rodada]** Converter todos os testes para TypeScript estrito. O teste principal da CLI, os testes
    CDU, o fixture externo e o smoke de pacote passam em `tsconfig.testes.json`; `@types/fs-extra` formaliza a única
    dependência de tipos necessária ao teste principal.
-2. **[parcial nesta rodada]** Dividir testes por domínio: os cenários de projeto e configuração já estão em
-   `test/projeto.test.ts` e `test/configuracao.test.ts`; ainda falta separar runtime, saída, backend, frontend,
-   integração e requisitos que permanecem no `test/sgc.test.ts`.
+2. **[parcial nesta rodada]** Dividir testes por domínio: os cenários de projeto, configuração e integração já estão em
+   `test/projeto.test.ts`, `test/configuracao.test.ts` e `test/integracao.test.ts`; ainda falta separar runtime, saída,
+   backend, frontend e requisitos que permanecem no `test/sgc.test.ts`.
 3. Manter testes comportamentais sobre a API pública; não testar métodos privados por reflexão ou acoplamento à
    implementação.
 4. **[concluído nesta rodada]** Adicionar smoke test de instalação em diretório externo, incluindo a execução do binário
@@ -792,7 +801,7 @@ SGC está ativo.
 node --version
 cd toolkit
 npm run typecheck
-npx vitest run test/sgc.test.ts test/projeto.test.ts test/configuracao.test.ts test/cdus.test.ts test/externo.test.ts --reporter=dot --no-color
+npx vitest run test/sgc.test.ts test/projeto.test.ts test/configuracao.test.ts test/integracao.test.ts test/cdus.test.ts test/externo.test.ts --reporter=dot --no-color
 npm run build
 cd ..
 git diff --check

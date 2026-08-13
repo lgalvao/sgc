@@ -6,7 +6,6 @@ import {describe, expect, test} from "vitest";
 import {execa, execaNode, type Options} from "execa";
 import {pathToFileURL} from "node:url";
 import {resolverCaminhoConfigurado, VERSAO_CONFIGURACAO} from "../lib/configuracao.js";
-import {resolverCaminhosOpenapi} from "../integracao/contratos-openapi-caminhos.js";
 import {ADAPTADORES, PERFIS, principal as coletarFotografiaQualidade} from "../qualidade/coleta-execucao.js";
 import {obterComandoSemgrep, resolverDiretoriosPadrao} from "../codigo/semgrep-auditar.js";
 import {executarAuditoria as executarAuditoriaCheiros} from "../codigo/cheiros-auditar.js";
@@ -39,11 +38,6 @@ const CAMINHO_AUDITORIA_ASSUNTOS = path.join(DIRETORIO_RAIZ, "toolkit", "backend
 const CAMINHO_CORRIGIR_FQN = path.join(DIRETORIO_RAIZ, "toolkit", "backend", "java-corrigir-fqn.ts");
 const CAMINHO_SEMGREP_AUDITAR = path.join(DIRETORIO_RAIZ, "toolkit", "codigo", "semgrep-auditar.ts");
 const CAMINHO_CHEIROS_AUDITAR = path.join(DIRETORIO_RAIZ, "toolkit", "codigo", "cheiros-auditar.ts");
-const CAMINHOS_COMANDOS_CONTRATOS = [
-    "contratos-diff.ts",
-    "contratos-exportar-openapi.ts",
-    "contratos-fixar-baseline.ts"
-].map(nome => path.join(DIRETORIO_RAIZ, "toolkit", "integracao", nome));
 const CAMINHOS_COMANDOS_PROJETO = [
     "arvore-linhas.ts",
     "dependencias-auditar.ts",
@@ -236,122 +230,6 @@ describe("CLI raiz do toolkit", () => {
 
         expect(resultado.exitCode).toBe(0);
         expect(JSON.parse(resultado.stdout).base).toBe(base);
-    });
-
-    test("pode importar comandos de contratos sem executar integrações", async () => {
-        const resultados = await Promise.all(CAMINHOS_COMANDOS_CONTRATOS.map(async caminho => {
-            const urlModulo = pathToFileURL(caminho).href;
-            return execa(process.execPath, [
-                "--import=tsx",
-                "--input-type=module",
-                "-e",
-                `process.argv.push("--help"); await import(${JSON.stringify(urlModulo)}); process.stdout.write("importacao-ok\\n");`
-            ], {
-                cwd: DIRETORIO_RAIZ,
-                reject: false
-            });
-        }));
-
-        for (const resultado of resultados) {
-            expect(resultado.exitCode).toBe(0);
-            expect(resultado.stdout).toBe("importacao-ok");
-        }
-    });
-
-    test("resolve artefatos OpenAPI a partir da base externa", async () => {
-        const base = await mkdtemp(path.join(os.tmpdir(), "sgc-openapi-base-"));
-        await fs.outputJSON(path.join(base, "configuracao-toolkit.json"), {
-            versao: VERSAO_CONFIGURACAO,
-            diretorios: {
-                contratosOpenapi: "artefatos/contratos"
-            }
-        });
-
-        const caminhos = resolverCaminhosOpenapi(base);
-        const documentoAtual = {
-            openapi: "3.1.0",
-            info: {title: "Projeto externo", version: "1.0.0"},
-            paths: {"/exemplo": {get: {responses: {200: {description: "OK"}}}}}
-        };
-        const url = `data:application/json,${encodeURIComponent(JSON.stringify(documentoAtual))}`;
-        const exportacao = await executarSgc([
-            "integracao",
-            "contratos",
-            "exportar-openapi",
-            "--json",
-            "--base",
-            base,
-            "--url",
-            url
-        ]);
-
-        expect(exportacao.exitCode).toBe(0);
-        expect(JSON.parse(exportacao.stdout)).toMatchObject({
-            base,
-            saida: caminhos.caminhoAtual,
-            paths: 1
-        });
-        expect(await fs.pathExists(caminhos.caminhoAtual)).toBe(true);
-
-        await fs.outputJSON(caminhos.caminhoReferencia, {
-            openapi: "3.1.0",
-            info: {title: "Projeto externo", version: "0.9.0"},
-            paths: {}
-        });
-
-        const diferenca = await executarSgc([
-            "integracao",
-            "contratos",
-            "diff",
-            "--json",
-            "--base",
-            base
-        ]);
-
-        expect(diferenca.exitCode).toBe(0);
-        expect(JSON.parse(diferenca.stdout)).toMatchObject({
-            base,
-            anterior: caminhos.caminhoReferencia,
-            atual: caminhos.caminhoAtual,
-            houveMudancas: true
-        });
-        expect(await fs.pathExists(caminhos.caminhoRelatorio)).toBe(false);
-
-        const diferencaGravada = await executarSgc([
-            "integracao",
-            "contratos",
-            "diff",
-            "--json",
-            "--gravar",
-            "--base",
-            base
-        ]);
-
-        expect(diferencaGravada.exitCode).toBe(0);
-        expect(JSON.parse(diferencaGravada.stdout)).toMatchObject({
-            base,
-            anterior: caminhos.caminhoReferencia,
-            atual: caminhos.caminhoAtual,
-            houveMudancas: true
-        });
-        expect(await fs.pathExists(caminhos.caminhoRelatorio)).toBe(true);
-
-        const fixacao = await executarSgc([
-            "integracao",
-            "contratos",
-            "fixar-baseline",
-            "--json",
-            "--base",
-            base
-        ]);
-
-        expect(fixacao.exitCode).toBe(0);
-        expect(JSON.parse(fixacao.stdout)).toMatchObject({
-            base,
-            origem: caminhos.caminhoAtual,
-            destino: caminhos.caminhoReferencia
-        });
-        expect(await fs.readFile(caminhos.caminhoReferencia, "utf8")).toBe(await fs.readFile(caminhos.caminhoAtual, "utf8"));
     });
 
     test("pode importar comandos de cobertura backend sem ler JaCoCo", async () => {

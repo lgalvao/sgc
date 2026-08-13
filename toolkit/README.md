@@ -364,6 +364,7 @@ O diretório `test/` contém:
 - `projeto.test.ts`: testes dos comandos de projeto (versão, árvore de linhas, diagnóstico, limpeza, preparação,
   qualidade e dependências)
 - `configuracao.test.ts`: testes da configuração versionada e das execuções parametrizadas do projeto
+- `integracao.test.ts`: testes de importação segura e dos artefatos OpenAPI em uma base externa
 - `cdus.test.ts`: testes TypeScript das regras CDU específicas do perfil SGC
 - `externo.test.ts`: fixture TypeScript de reuso em projeto Java/Vue externo
 - `pacote.test.ts`: smoke de empacotamento e instalação em consumidor isolado
