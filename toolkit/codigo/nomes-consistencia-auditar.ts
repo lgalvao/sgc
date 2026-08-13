@@ -3,9 +3,10 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import {ehEntradaPrincipal, validarArgumentosEntradaDireta} from "../lib/execucao.js";
 import {DIRETORIO_RAIZ} from "../lib/caminhos.js";
-import {escreverLinha, imprimirCabecalho, imprimirJson} from "../lib/saida.js";
-import {executarColeta, type InventarioSimbolos} from "./nomes-simbolos-coletar.js";
+import {escreverErro, escreverLinha, imprimirCabecalho, imprimirJson} from "../lib/saida.js";
+import {carregarInventario, type InventarioSimbolos} from "./nomes-simbolos-coletar.js";
 import {obterCaminhoConsistencia, obterCaminhoSimbolos} from "./nomes-caminhos.js";
+import {VERSAO_AUDITORIA_NOMENCLATURA} from "./nomes-contrato.js";
 
 type FormatoNome = "camelCase" | "minusculo" | "PascalCase" | "kebab-case" | "snake_case" | "UPPER_SNAKE" | "outro";
 
@@ -44,6 +45,7 @@ interface PacoteForaPadrao {
 }
 
 interface AuditoriaNomes {
+    versao: typeof VERSAO_AUDITORIA_NOMENCLATURA;
     geradoEm: string;
     base: string;
     inventarioFonte: string;
@@ -271,36 +273,6 @@ function montarResumo(auditoria: AuditoriaNomes): string {
     return `${linhas.join("\n")}\n`;
 }
 
-function ehInventarioSimbolos(valor: unknown): valor is InventarioSimbolos {
-    if (typeof valor !== "object" || valor === null) {
-        return false;
-    }
-    const registro = valor as Record<string, unknown>;
-    const totais = registro.totais;
-    return typeof registro.base === "string"
-        && Array.isArray(registro.arquivos)
-        && typeof totais === "object"
-        && totais !== null;
-}
-
-async function carregarInventario(caminhoInventario: string, base: string, gravar: boolean): Promise<InventarioSimbolos> {
-    const caminhoAbsoluto = path.isAbsolute(caminhoInventario) ? caminhoInventario : path.resolve(base, caminhoInventario);
-    try {
-        const valor: unknown = JSON.parse(await fs.readFile(caminhoAbsoluto, "utf8"));
-        if (!ehInventarioSimbolos(valor)) {
-            throw new Error("Inventário de símbolos inválido.");
-        }
-        return valor;
-    } catch {
-        return executarColeta({
-            base,
-            gravar,
-            arquivoSaida: caminhoAbsoluto,
-            silencioso: true
-        });
-    }
-}
-
 async function executarAuditoriaNomes({
     base = DIRETORIO_RAIZ,
     json = false,
@@ -323,6 +295,7 @@ async function executarAuditoriaNomes({
     const pacotesJavaForaPadrao = auditarPacotesJava(dadosInventario);
 
     const auditoria: AuditoriaNomes = {
+        versao: VERSAO_AUDITORIA_NOMENCLATURA,
         geradoEm: new Date().toISOString(),
         base: baseResolvida,
         inventarioFonte: caminhoInventario,
@@ -425,7 +398,7 @@ async function principal(argumentos: string[] = process.argv.slice(2)): Promise<
 
 if (ehEntradaPrincipal(import.meta.url)) {
     principal().catch((erro: unknown) => {
-        escreverLinha(`Erro ao auditar nomenclatura: ${erro instanceof Error ? erro.message : String(erro)}`);
+        escreverErro(`Erro ao auditar nomenclatura: ${erro instanceof Error ? erro.message : String(erro)}`);
         process.exitCode = 1;
     });
 }

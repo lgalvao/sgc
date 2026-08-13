@@ -88,6 +88,11 @@ npx tsx toolkit/sgc.ts integracao contratos diff
 Cheiros e Semgrep são complementares: o primeiro aplica heurísticas internas, enquanto o segundo executa regras
 estruturais configuráveis.
 
+`codigo nomes coletar-simbolos` produz um inventário `versao: 1`. As auditorias `codigo nomes auditar-consistencia` e
+`codigo nomes auditar-idioma` reutilizam esse inventário e também emitem resultados versionados; um inventário existente
+com formato ou versão incompatível é rejeitado, enquanto a ausência do arquivo ainda permite uma coleta somente em
+memória quando o comando não usa `--gravar`.
+
 OpenAPI mantém exportação, comparação e promoção de baseline. O toolkit não gera tipos TypeScript a partir do contrato.
 
 ### Casos de uso CDU

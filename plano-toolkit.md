@@ -161,6 +161,8 @@ isolado funciona, mas as fronteiras ainda não estão concluídas:
   deliberado na borda CLI, enquanto as funções reutilizáveis retornam resultados ou lançam erros;
 - a análise e a priorização de testes já usam contratos versionados, campos em português/camelCase e categorias em
   português; os demais formatos próprios ainda precisam de revisão semelhante;
+- o inventário de símbolos e as auditorias de nomenclatura/idioma agora usam contratos versionados e uma validação única;
+  arquivo ausente pode ser coletado sob demanda, mas arquivo existente incompatível falha explicitamente;
 - apenas cobertura Java e web está publicada como API programática horizontal;
 - defaults de Gradle, Vue, OpenAPI, Semgrep e políticas SGC ainda aparecem dentro de módulos adaptáveis;
 - os maiores módulos concentram análise, política, formatação, persistência e CLI, dificultando reuso seletivo.

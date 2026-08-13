@@ -5,7 +5,9 @@ import {describe, expect, test} from "vitest";
 import {
     executarSgc,
     escreverArquivo,
-    existe
+    escreverJson,
+    existe,
+    lerJson
 } from "./apoio.js";
 
 describe("Auditorias de consistência e nomenclatura", () => {
@@ -27,6 +29,7 @@ describe("Auditorias de consistência e nomenclatura", () => {
 
         expect(resultado.exitCode).toBe(0);
         const inventario = JSON.parse(resultado.stdout);
+        expect(inventario.versao).toBe(1);
         expect(inventario.base).toBe(diretorioBase);
         expect(inventario.totais.arquivos).toBe(1);
         const caminhoSimbolos = path.join(
@@ -52,6 +55,7 @@ describe("Auditorias de consistência e nomenclatura", () => {
 
         expect(gravacao.exitCode).toBe(0);
         expect(await existe(caminhoSimbolos)).toBe(true);
+        expect((await lerJson<{versao: number}>(caminhoSimbolos)).versao).toBe(1);
     });
 
     test("mantem auditoria de nomenclatura read-only e propaga gravacao ao inventario", async () => {
@@ -71,6 +75,7 @@ describe("Auditorias de consistência e nomenclatura", () => {
         ]);
 
         expect(resultado.exitCode).toBe(0);
+        expect(JSON.parse(resultado.stdout).versao).toBe(1);
         expect(JSON.parse(resultado.stdout).base).toBe(diretorioBase);
         expect(await existe(path.join(diretorioBase, "toolkit"))).toBe(false);
 
@@ -94,6 +99,15 @@ describe("Auditorias de consistência e nomenclatura", () => {
             "mais-recente",
             "consistencia.json"
         ))).toBe(true);
+        expect((await lerJson<{versao: number}>(path.join(
+            diretorioBase,
+            "toolkit",
+            "qualidade",
+            "artefatos",
+            "nomenclatura",
+            "mais-recente",
+            "consistencia.json"
+        ))).versao).toBe(1);
     });
 
     test("mantem auditoria de idioma read-only e grava sob demanda", async () => {
@@ -113,6 +127,7 @@ describe("Auditorias de consistência e nomenclatura", () => {
         ]);
 
         expect(resultado.exitCode).toBe(0);
+        expect(JSON.parse(resultado.stdout).versao).toBe(1);
         expect(JSON.parse(resultado.stdout).indicadores.membrosIngles).toBeGreaterThan(0);
         expect(await existe(path.join(diretorioBase, "toolkit"))).toBe(false);
 
@@ -136,5 +151,39 @@ describe("Auditorias de consistência e nomenclatura", () => {
             "mais-recente",
             "idioma.json"
         ))).toBe(true);
+        expect((await lerJson<{versao: number}>(path.join(
+            diretorioBase,
+            "toolkit",
+            "qualidade",
+            "artefatos",
+            "nomenclatura",
+            "mais-recente",
+            "idioma.json"
+        ))).versao).toBe(1);
+    });
+
+    test("rejeita inventario de simbolos invalido em vez de substitui-lo silenciosamente", async () => {
+        const diretorioBase = await mkdtemp(path.join(os.tmpdir(), "sgc-nomenclatura-inventario-invalido-"));
+        const caminhoInventario = path.join(diretorioBase, "inventario-invalido.json");
+        await escreverArquivo(
+            path.join(diretorioBase, "frontend", "src", "exemplo.ts"),
+            "export function carregarExemplo(codigo: string) { return codigo; }\n"
+        );
+        await escreverJson(caminhoInventario, {versao: 99, base: diretorioBase, arquivos: []});
+
+        const resultado = await executarSgc([
+            "codigo",
+            "nomes",
+            "auditar-consistencia",
+            "--json",
+            "--base",
+            diretorioBase,
+            "--inventario",
+            caminhoInventario
+        ]);
+
+        expect(resultado.exitCode).toBe(1);
+        expect(resultado.stdout).toBe("");
+        expect(resultado.stderr).toContain("versao incompativel");
     });
 });

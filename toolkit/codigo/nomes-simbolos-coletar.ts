@@ -5,6 +5,7 @@ import {ehEntradaPrincipal, validarArgumentosEntradaDireta} from "../lib/execuca
 import {DIRETORIO_RAIZ} from "../lib/caminhos.js";
 import {escreverLinha, imprimirCabecalho, imprimirJson} from "../lib/saida.js";
 import {obterCaminhoSimbolos} from "./nomes-caminhos.js";
+import {VERSAO_INVENTARIO_SIMBOLOS} from "./nomes-contrato.js";
 
 type Linguagem = "java" | "typescript" | "javascript" | "vue";
 type CategoriaTipo = "class" | "interface" | "enum" | "record" | "type";
@@ -54,6 +55,7 @@ interface PacoteJava {
 }
 
 export interface InventarioSimbolos {
+    versao: typeof VERSAO_INVENTARIO_SIMBOLOS;
     geradoEm: string;
     base: string;
     totais: {
@@ -543,6 +545,7 @@ async function executarColeta({
     });
 
     const inventario: InventarioSimbolos = {
+        versao: VERSAO_INVENTARIO_SIMBOLOS,
         geradoEm: new Date().toISOString(),
         base: baseResolvida,
         totais: {
@@ -586,6 +589,44 @@ async function executarColeta({
     }
 
     return inventario;
+}
+
+function ehInventarioSimbolos(valor: unknown): valor is InventarioSimbolos {
+    if (typeof valor !== "object" || valor === null) {
+        return false;
+    }
+    const registro = valor as Record<string, unknown>;
+    const totais = registro.totais;
+    return registro.versao === VERSAO_INVENTARIO_SIMBOLOS
+        && typeof registro.geradoEm === "string"
+        && typeof registro.base === "string"
+        && typeof totais === "object"
+        && totais !== null
+        && typeof registro.porLinguagem === "object"
+        && registro.porLinguagem !== null
+        && Array.isArray(registro.pacotesJava)
+        && Array.isArray(registro.arquivos);
+}
+
+async function carregarInventario(caminhoInventario: string, base: string, gravar: boolean): Promise<InventarioSimbolos> {
+    const caminhoAbsoluto = path.isAbsolute(caminhoInventario) ? caminhoInventario : path.resolve(base, caminhoInventario);
+    try {
+        const valor: unknown = JSON.parse(await fs.readFile(caminhoAbsoluto, "utf8"));
+        if (!ehInventarioSimbolos(valor)) {
+            throw new Error(`Inventario de simbolos invalido ou com versao incompativel: esperado ${VERSAO_INVENTARIO_SIMBOLOS}.`);
+        }
+        return valor;
+    } catch (erro) {
+        if (typeof erro === "object" && erro !== null && "code" in erro && erro.code === "ENOENT") {
+            return executarColeta({
+                base,
+                gravar,
+                arquivoSaida: caminhoAbsoluto,
+                silencioso: true
+            });
+        }
+        throw erro;
+    }
 }
 
 function lerOpcoes(argv: string[]): OpcoesColeta {
@@ -641,6 +682,7 @@ if (ehEntradaPrincipal(import.meta.url)) {
 }
 
 export {
+    carregarInventario,
     executarColeta,
     principal
 };
