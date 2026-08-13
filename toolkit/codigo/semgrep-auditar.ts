@@ -199,7 +199,7 @@ async function principal(argumentos: string[] = process.argv.slice(2)): Promise<
                 "--base <diretorio>    Usa outra raiz para execução e artefatos.",
                 "--auto                Acumula as regras locais com `--config auto` do Semgrep CE.",
                 "--json                Emite resumo estruturado em JSON.",
-                "--sem-gravar          Não grava relatórios em disco."
+                "--gravar              Grava relatórios JSON e Markdown em disco."
             ],
             exemplos: [
                 "npx tsx toolkit/sgc.ts codigo semgrep auditar",
@@ -211,7 +211,7 @@ async function principal(argumentos: string[] = process.argv.slice(2)): Promise<
     }
 
     const emitirJson = argumentos.includes("--json");
-    const semGravar = argumentos.includes("--sem-gravar");
+    const gravar = argumentos.includes("--gravar");
     const auto = argumentos.includes("--auto");
     const diretorioBase = path.resolve(lerOpcao(argumentos, "--base", DIRETORIO_RAIZ) ?? DIRETORIO_RAIZ);
     const regra = lerOpcao(argumentos, "--regra", resolverCaminhoConfigurado("regrasSemgrep", diretorioBase))
@@ -229,7 +229,7 @@ async function principal(argumentos: string[] = process.argv.slice(2)): Promise<
 
     const execucao = await executarSemgrep({regra, diretorios: alvos, auto, diretorioBase});
 
-    if (!semGravar) {
+    if (gravar) {
         const caminhosRelatorios = await gravarRelatorios(execucao, diretorioSaida, diretorioBase);
         if (!emitirJson) {
             escreverLinha(`Relatório JSON: ${pc.dim(caminhosRelatorios.caminhoResultadoJson)}`);

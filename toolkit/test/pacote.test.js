@@ -79,8 +79,7 @@ test("pacote fonte executa em um projeto consumidor isolado", async () => {
         "codigo",
         "semgrep",
         "auditar",
-        "--json",
-        "--sem-gravar"
+        "--json"
     ], {
         cwd: diretorioConsumidor,
         env: {
@@ -91,4 +90,20 @@ test("pacote fonte executa em um projeto consumidor isolado", async () => {
         totalAchados: 0,
         codigoSaida: 0
     });
+    expect(await fs.pathExists(path.join(diretorioConsumidor, "toolkit", "qualidade", "artefatos", "semgrep"))).toBe(false);
+
+    const gravacaoSemgrep = await execa(executavel, [
+        "codigo",
+        "semgrep",
+        "auditar",
+        "--json",
+        "--gravar"
+    ], {
+        cwd: diretorioConsumidor,
+        env: {
+            PATH: `${diretorioBinario}${path.delimiter}${process.env.PATH ?? ""}`
+        }
+    });
+    expect(JSON.parse(gravacaoSemgrep.stdout)).toMatchObject({totalAchados: 0, codigoSaida: 0});
+    expect(await fs.pathExists(path.join(diretorioConsumidor, "toolkit", "qualidade", "artefatos", "semgrep", "mais-recente", "resultado.json"))).toBe(true);
 }, 60000);

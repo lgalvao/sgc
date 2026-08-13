@@ -118,6 +118,9 @@ o código Java.
 `frontend residuos auditar` e `frontend residuos validar` seguem o mesmo contrato. A fotografia, o resumo e a fotografia
 mais recente da validação só são atualizados com `--gravar`; sem essa opção, os resultados ficam no stdout.
 
+`codigo semgrep auditar` também só grava `resultado.json` e `resumo.md` com `--gravar`; a política padrão continua
+vindo do pacote e políticas locais podem ser informadas por `--regra` ou pela configuração.
+
 ### Requisitos
 
 ```bash
