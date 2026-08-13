@@ -332,7 +332,8 @@ defaults da CLI; `coleta-executor.ts` concentra subprocessos, `coleta-leitores.t
 validação de hotspots, `coleta-fotografia.ts` concentra o contrato e a persistência da fotografia,
 `coleta-contexto.ts` concentra a fábrica de contexto SGC substituível, e `coleta-execucao.ts` concentra agregação e
 orquestração; `coleta-metadados.ts` mantém a coleta Git como default substituível, e a versão do schema da fotografia
-fica centralizada no próprio módulo. A função
+fica centralizada no próprio módulo. Os formatos JSON específicos de resíduos, arquitetura e Playwright ficam nos
+adaptadores SGC, não no núcleo. A função
 `principal(argumentos, {perfis, adaptadores, criarContexto, coletarMetadados, persistirFotografia})` aceita catálogos e
 serviços externos por composição, sem mutar os defaults globais;
 essa é a fronteira experimental de reuso até que os adaptadores de ferramentas sejam separados do agregador. Mesmo no

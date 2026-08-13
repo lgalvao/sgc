@@ -8,12 +8,36 @@ import type {
     ExecucaoQualidade,
     OpcoesComando,
     OpcoesPlaywright,
-    ResultadoArquitetura,
     ResultadoComando,
-    ResultadoJUnit,
-    ResultadoPlaywright,
-    ResultadoResiduos
+    ResultadoJUnit
 } from "./coleta-execucao.js";
+import type {HotspotQualidade} from "./coleta-leitores.js";
+
+interface ResultadoResiduos {
+    status?: string;
+    resumo?: {
+        scoreTotal?: number;
+        faixa?: string;
+    };
+    violacoes?: unknown[];
+    avisos?: unknown[];
+    hotspots?: HotspotQualidade[];
+}
+
+interface ResultadoArquitetura {
+    resumo?: {
+        scoreTotal?: number;
+        faixa?: string;
+        metricas?: Record<string, unknown>;
+    };
+    hotspots?: unknown[];
+}
+
+interface ResultadoPlaywright extends Record<string, unknown> {
+    stats?: Record<string, unknown> & {
+        expected?: number;
+    };
+}
 
 type PerfilQualidadeSgc = "rapido" | "completo" | "backend" | "frontend";
 type NomeAdaptadorSgc =

@@ -1,6 +1,19 @@
 import fs from "node:fs/promises";
 import path from "node:path";
-import type {HotspotQualidade, ResultadoJUnit} from "./coleta-execucao.js";
+
+interface ResultadoJUnit extends Record<string, unknown> {
+    testes: number;
+    falhas: number;
+    ignorados: number;
+    tempoSegundos: number;
+    sucessos: number;
+    arquivosXml: string[];
+}
+
+interface HotspotQualidade {
+    arquivo: string;
+    score: number;
+}
 
 function parseJsonSeguro<T>(conteudo: string, fallback: T): T {
     try {
@@ -43,4 +56,10 @@ function extrairHotspotsQualidade(metricas: unknown): HotspotQualidade[] {
     return Array.isArray(hotspots) ? hotspots.filter(ehHotspotQualidade) : [];
 }
 
-export {consolidarJUnit, extrairHotspotsQualidade, parseJsonSeguro};
+export {
+    consolidarJUnit,
+    extrairHotspotsQualidade,
+    parseJsonSeguro,
+    type HotspotQualidade,
+    type ResultadoJUnit
+};

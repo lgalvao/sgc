@@ -339,7 +339,8 @@ frontend e para os caminhos OpenAPI.
   política mínima local do Node é a major 26 (`26.7.0`).
 - `qualidade/coleta-execucao.ts` foi convertido para TypeScript com contratos de contexto, JUnit e métricas heterogêneas;
   hotspots vindos de JSON são filtrados como `unknown`. O novo
-  `qualidade/coleta-adaptadores-sgc.ts` concentra os perfis e adaptadores Gradle/npm/Playwright específicos do SGC,
+  `qualidade/coleta-adaptadores-sgc.ts` concentra os perfis, adaptadores Gradle/npm/Playwright e seus formatos JSON
+  específicos do SGC,
   `qualidade/coleta-executor.ts` concentra a execução de subprocessos, `qualidade/coleta-leitores.ts` concentra a leitura
   de JSON/JUnit e a validação de hotspots, `qualidade/coleta-fotografia.ts` concentra o contrato, a construção e a
   persistência e a versão do schema da fotografia, `qualidade/coleta-contexto.ts` concentra a fábrica de contexto SGC padrão, e a função de
@@ -500,6 +501,8 @@ Na rodada seguinte, a preparação e a persistência da fotografia passaram a se
 regressão externa confirmou gravação em relatório próprio sem criar o diretório padrão `.qualidade`.
 Na rodada seguinte, a versão `1.0.0` do schema da fotografia foi centralizada em `coleta-fotografia.ts` e passou a
 restringir o contrato TypeScript do coletor.
+Na rodada seguinte, os tipos de relatório específicos de resíduos, arquitetura e Playwright foram removidos do núcleo e
+passaram a viver em `coleta-adaptadores-sgc.ts`; os contratos JUnit e hotspot ficaram no leitor reutilizável.
 
 ### 3.3 Tamanho e composição atual
 
@@ -550,6 +553,7 @@ O núcleo TypeScript de implementação foi concluído: 100% dos arquivos de imp
 | Resolvido nesta rodada | Coleta Git era obrigatória e embutida no agregador | `qualidade/coleta-metadados.ts` concentra o default Git, enquanto `principal` aceita `coletarMetadados`; consumidores externos podem fornecer ou omitir sua própria origem de metadados. |
 | Resolvido nesta rodada | Persistência da fotografia era fixa no toolkit | `principal` agora aceita `prepararDiretoriosFotografia` e `persistirFotografia`; o default SGC continua preservando os dois destinos, enquanto um consumidor externo pode escolher outro formato ou armazenamento. |
 | Resolvido nesta rodada | Versão do schema da fotografia estava no agregador | `coleta-fotografia.ts` agora é a única fonte de `VERSAO_SCHEMA_FOTOGRAFIA` (`1.0.0`), usada pelo tipo e pela construção; os demais formatos ainda permanecem em inventário separado. |
+| Resolvido nesta rodada | Núcleo carregava formatos de relatório específicos do SGC | `coleta-adaptadores-sgc.ts` agora mantém resíduos, arquitetura e Playwright; `coleta-leitores.ts` mantém JUnit e hotspots, reduzindo a superfície SGC do agregador. |
 | Resolvido | Efeito colateral oculto de gravação | `codigo nomes auditar-consistencia` gerava o inventário auxiliar com gravação habilitada e contaminava `--json`; a opção `--gravar` agora é propagada e a coleta interna é silenciosa. |
 | Resolvido | Configuração sem validação | `configuracao-toolkit.json` agora exige a versão `1` e valida estrutura, chaves conhecidas e caminhos textuais antes da combinação com defaults. |
 | Resolvido nesta rodada | Políticas de resíduos apontando para legado ausente | Os defaults de orçamento e exceções frontend foram removidos; overrides continuam aceitos, a ausência usa política neutra explícita e arquivo configurado ausente ou inválido falha visivelmente. |
@@ -716,8 +720,8 @@ do perfil.
     derivar ajuda, comandos e exports em fontes duplicadas. O inventário de comandos não deve divergir do roteador.
 13. **[parcial nesta rodada] Orquestração pesada**: `qualidade/coleta-adaptadores-sgc.ts`, `coleta-executor.ts`,
     `coleta-leitores.ts`, `coleta-fotografia.ts`, `coleta-contexto.ts` e `coleta-metadados.ts` já separam
-    perfis/adaptadores SGC, subprocessos, leitura de relatórios, contrato/persistência da fotografia, fábrica de contexto
-    e metadados; `coleta-execucao.ts` ainda coordena o fluxo e define o schema mínimo. O próximo recorte deve avaliar
+    perfis/adaptadores SGC e seus formatos, subprocessos, leitura de relatórios, contrato/persistência da fotografia,
+    fábrica de contexto e metadados; `coleta-execucao.ts` ainda coordena o fluxo e define o schema mínimo. O próximo recorte deve avaliar
     formalização do contrato de fotografia e uma política explícita para compatibilidade de schema, sem esconder os
     defaults específicos do SGC.
 

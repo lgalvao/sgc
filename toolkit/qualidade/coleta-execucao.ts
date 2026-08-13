@@ -16,6 +16,7 @@ import {
     type FotografiaColeta
 } from "./coleta-fotografia.js";
 import {consolidarJUnit, parseJsonSeguro} from "./coleta-leitores.js";
+import type {HotspotQualidade, ResultadoJUnit} from "./coleta-leitores.js";
 import {coletarMetadadosGit} from "./coleta-metadados.js";
 
 type CategoriaExecucao = "teste" | "cobertura" | "qualidade";
@@ -64,46 +65,6 @@ interface OpcoesComando {
 interface OpcoesPlaywright {
     descricao: string;
     argumentos: string[];
-}
-
-interface ResultadoJUnit extends Record<string, unknown> {
-    testes: number;
-    falhas: number;
-    ignorados: number;
-    tempoSegundos: number;
-    sucessos: number;
-    arquivosXml: string[];
-}
-
-interface ResultadoResiduos {
-    status?: string;
-    resumo?: {
-        scoreTotal?: number;
-        faixa?: string;
-    };
-    violacoes?: unknown[];
-    avisos?: unknown[];
-    hotspots?: HotspotQualidade[];
-}
-
-interface ResultadoArquitetura {
-    resumo?: {
-        scoreTotal?: number;
-        faixa?: string;
-        metricas?: Record<string, unknown>;
-    };
-    hotspots?: unknown[];
-}
-
-interface ResultadoPlaywright extends Record<string, unknown> {
-    stats?: Record<string, unknown> & {
-        expected?: number;
-    };
-}
-
-interface HotspotQualidade {
-    arquivo: string;
-    score: number;
 }
 
 const PERFIS = PERFIS_SGC;
@@ -248,9 +209,6 @@ export {
     type OpcoesColeta,
     type OpcoesComando,
     type OpcoesPlaywright,
-    type ResultadoArquitetura,
     type ResultadoComando,
-    type ResultadoJUnit,
-    type ResultadoPlaywright,
-    type ResultadoResiduos
+    type ResultadoJUnit
 };
