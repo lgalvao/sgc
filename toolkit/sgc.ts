@@ -2,6 +2,7 @@ import {pathToFileURL} from "node:url";
 import {Command} from "commander";
 import pc from "picocolors";
 import {CATALOGO_COMANDOS, CATALOGO_COMANDOS_COMPLETO} from "./lib/catalogo-comandos.js";
+import {validarArgumentos, type EsquemaArgumentos} from "./lib/cli-opcoes.js";
 import {executarNode} from "./lib/execucao.js";
 import logger from "./lib/logger.js";
 
@@ -9,7 +10,13 @@ function criarGrupoComando(pai: Command, nome: string, descricao: string): Comma
     return pai.command(nome).description(descricao);
 }
 
-function criarComandoArquivo(pai: Command, nome: string, descricao: string, relativo: string): void {
+function criarComandoArquivo(
+    pai: Command,
+    nome: string,
+    descricao: string,
+    relativo: string,
+    esquema: EsquemaArgumentos
+): void {
     pai
         .command(nome)
         .description(descricao)
@@ -18,7 +25,7 @@ function criarComandoArquivo(pai: Command, nome: string, descricao: string, rela
         .allowExcessArguments(true)
         .action(async (...valores: unknown[]) => {
             const comando = valores.at(-1) as Command;
-            const argumentos = comando.args ?? [];
+            const argumentos = validarArgumentos(comando.args ?? [], esquema);
             await executarNode(relativo, argumentos);
         });
 }
@@ -54,7 +61,7 @@ function registrarComandosCatalogados(programa: Command): void {
         if (pai.commands.some(comando => comando.name() === nome)) {
             throw new Error(`Comando duplicado no catálogo: ${definicao.caminho.join(" ")}`);
         }
-        criarComandoArquivo(pai, nome, definicao.descricao, definicao.arquivo);
+        criarComandoArquivo(pai, nome, definicao.descricao, definicao.arquivo, definicao.argumentos);
     }
 }
 
@@ -100,17 +107,14 @@ const tarefasQualidade = qualidade
 qualidade
     .command("coletar")
     .description(obterDescricaoComando(["qualidade", "coletar"]))
-    .allowUnknownOption(true)
     .option("--perfil <perfil>", "Perfil de execucao (rapido, completo, backend, frontend).", "rapido")
     .option("--base <diretorio>", "Sobrescreve o diretorio base do projeto auditado.")
-    .action(async (opcoes, comando) => {
+    .action(async (opcoes) => {
         const {executarColetaQualidade} = await import("./qualidade/coleta.js");
-        const argsExtras = comando.args ?? [];
         const args = ["--perfil", opcoes.perfil];
         if (opcoes.base) {
             args.push("--base", opcoes.base);
         }
-        args.push(...argsExtras);
         await executarColetaQualidade(args);
     });
 qualidade

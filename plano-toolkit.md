@@ -145,9 +145,10 @@ isolado funciona, mas as fronteiras ainda não estão concluídas:
 - a configuração não representa corpus, vocabulário, estilo nem extratores CDU;
 - a comparação com mensagens do código ainda depende de sete caminhos rígidos do SGC e só pode ser selecionada quando as
   fontes canônicas estão presentes;
-- `backend testes analisar` e `backend testes priorizar` já são somente leitura por padrão e persistem apenas com
-  `--gravar`, mas ainda não compartilham um contrato de opções com os demais comandos;
-- comandos encaminhados aceitam opções inexistentes sem erro;
+- `backend testes analisar` e `backend testes priorizar` são somente leitura por padrão, persistem apenas com `--gravar` e
+  já aparecem no mesmo catálogo de opções da CLI principal;
+- o roteador valida opções, valores e posicionais dos comandos catalogados, inclusive a forma `--opcao=valor`; os scripts
+  executados diretamente ainda têm parsers locais heterogêneos e precisam convergir gradualmente;
 - `efeito` no catálogo mistura intenção funcional e efeitos reais no sistema;
 - muitos módulos interpretam argumentos manualmente e controlam `process.exitCode` dentro da implementação;
 - resultados próprios ainda misturam português, inglês, `camelCase` e `snake_case`, especialmente na análise de testes;
@@ -163,7 +164,10 @@ Prioridade imediata, porque corrige comportamento surpreendente antes de ampliar
 
 - preservar o modo somente leitura de `backend testes analisar` e `backend testes priorizar`, com resumo humano ou JSON no
   stdout e persistência explícita por `--gravar`;
-- rejeitar opções desconhecidas e argumentos excedentes em todos os comandos, inclusive os encaminhados pelo roteador;
+- manter o esquema de argumentos no catálogo e rejeitar opções desconhecidas, valores ausentes e argumentos excedentes nos
+  comandos encaminhados pelo roteador;
+- aplicar o mesmo contrato aos scripts executados diretamente, evitando que a entrada direta aceite opções que a CLI
+  principal rejeita;
 - substituir o campo genérico `efeito` por metadados separados de finalidade e efeitos observáveis;
 - retirar `process.exitCode` das funções de domínio e concentrar a tradução de resultados em códigos de saída na borda;
 - definir códigos compartilhados para invocação inválida, falha operacional e achados, sem aplicar código não zero a

@@ -1,5 +1,5 @@
 import {describe, expect, test} from "vitest";
-import {lerNumero, lerOpcao} from "../lib/cli-opcoes.js";
+import {lerNumero, lerOpcao, validarArgumentos} from "../lib/cli-opcoes.js";
 
 describe("Leitura de opções da CLI", () => {
     test("aceita opção separada e opção por atribuição", () => {
@@ -25,5 +25,43 @@ describe("Leitura de opções da CLI", () => {
     test("falha quando uma opção exige valor", () => {
         expect(() => lerOpcao(["--base"], "--base", undefined)).toThrow("Informe um valor");
         expect(() => lerNumero(["--limite", "--json"], "--limite", 20)).toThrow("Informe um valor");
+    });
+
+    test("valida opções e normaliza a forma com atribuição", () => {
+        expect(validarArgumentos(
+            ["--base=/tmp/projeto", "--json", "--diretorio", "frontend", "--diretorio=backend"],
+            {
+                opcoesComValor: ["--base", "--diretorio"],
+                opcoesBooleanas: ["--json"],
+                minimoPosicionais: 0,
+                maximoPosicionais: 0
+            }
+        )).toEqual(["--base", "/tmp/projeto", "--json", "--diretorio", "frontend", "--diretorio", "backend"]);
+    });
+
+    test("rejeita opção desconhecida, valor ausente e booleano com valor", () => {
+        const esquema = {
+            opcoesComValor: ["--base"],
+            opcoesBooleanas: ["--json"],
+            minimoPosicionais: 0,
+            maximoPosicionais: 0
+        } as const;
+
+        expect(() => validarArgumentos(["--inexistente"], esquema)).toThrow("Opção desconhecida");
+        expect(() => validarArgumentos(["--base", "--json"], esquema)).toThrow("Informe um valor");
+        expect(() => validarArgumentos(["--json=true"], esquema)).toThrow("não recebe valor");
+    });
+
+    test("valida a quantidade de posicionais declarada pelo comando", () => {
+        const esquema = {
+            opcoesComValor: ["--base"],
+            opcoesBooleanas: [],
+            minimoPosicionais: 1,
+            maximoPosicionais: 1
+        } as const;
+
+        expect(validarArgumentos(["1.2.3", "--base=/tmp/projeto"], esquema)).toEqual(["1.2.3", "--base", "/tmp/projeto"]);
+        expect(() => validarArgumentos([], esquema)).toThrow("esperado 1");
+        expect(() => validarArgumentos(["1.2.3", "extra"], esquema)).toThrow("recebido 2");
     });
 });

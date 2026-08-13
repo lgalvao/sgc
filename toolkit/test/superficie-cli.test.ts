@@ -56,6 +56,24 @@ describe("Superfície da CLI", () => {
         expect(resultado.stdout).toContain("BModal diretamente no frontend");
     });
 
+    test("falha antes de executar o script quando recebe uma opção desconhecida", async () => {
+        const resultado = await executarSgc(["backend", "arquitetura", "auditar", "--opcao-inexistente"]);
+        expect(resultado.exitCode).toBe(1);
+        expect(`${resultado.stdout}\n${resultado.stderr}`).toContain("Opção desconhecida");
+    });
+
+    test("rejeita posicionais extras em comando sem argumentos posicionais", async () => {
+        const resultado = await executarSgc(["frontend", "modais", "validar", "extra"]);
+        expect(resultado.exitCode).toBe(1);
+        expect(`${resultado.stdout}\n${resultado.stderr}`).toContain("Quantidade de argumentos posicionais inválida");
+    });
+
+    test("rejeita opções desconhecidas no comando especial de coleta", async () => {
+        const resultado = await executarSgc(["qualidade", "coletar", "--opcao-inexistente"]);
+        expect(resultado.exitCode).not.toBe(0);
+        expect(`${resultado.stdout}\n${resultado.stderr}`).toContain("unknown option");
+    });
+
     test("exibe ajuda padronizada no script frontend cobertura auditoria", async () => {
         const resultado = await executarAjudaFrontendCobertura();
         expect(resultado.exitCode).toBe(0);

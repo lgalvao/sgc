@@ -25,6 +25,9 @@ npx tsx toolkit/sgc.ts qualidade --help
 npx tsx toolkit/sgc.ts projeto --help
 ```
 
+A CLI rejeita opções desconhecidas, valores ausentes e argumentos posicionais excedentes. Opções com valor também podem
+usar a forma `--opcao=valor`; ela é normalizada antes de chegar ao script executado.
+
 ## Organização
 
 | Caminho | Responsabilidade |
@@ -127,6 +130,7 @@ altera arquivos com `--gravar`.
 - Ações explicitamente geradoras ou promotoras, como exportar OpenAPI e fixar baseline, gravam como parte do seu contrato.
 - `--json` escreve dados em stdout; mensagens operacionais e erros devem permanecer fora do JSON.
 - Caminhos relativos são resolvidos contra `--base` quando a opção estiver disponível.
+- `--help` e `-h` mostram a ajuda sem exigir argumentos posicionais obrigatórios.
 
 A acessibilidade Playwright/Axe do SGC não pertence ao toolkit. Ela é executada diretamente pelo workspace `e2e/`.
 
