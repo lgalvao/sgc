@@ -1235,16 +1235,21 @@ describe("CLI raiz do toolkit", () => {
         await fs.outputJSON(caminhoExcecoes, {versaoSchema: "1.0.0", excecoes: []});
 
         const resultado = await executarSgc([
-            "frontend", "residuos", "validar", "--json", "--sem-gravar", "--base", base
+            "frontend", "residuos", "validar", "--json", "--base", base
         ]);
         expect(resultado.exitCode).toBe(0);
         const conteudo = JSON.parse(resultado.stdout);
         expect(conteudo.orcamento).toBe(path.relative(DIRETORIO_RAIZ, caminhoOrcamento));
         expect(conteudo.excecoes).toBe(path.relative(DIRETORIO_RAIZ, caminhoExcecoes));
+        const gravacao = await executarSgc([
+            "frontend", "residuos", "validar", "--json", "--gravar", "--base", base
+        ]);
+        expect(gravacao.exitCode).toBe(0);
+        expect(await fs.pathExists(path.join(base, "toolkit", "qualidade", "artefatos", "frontend-residuos", "mais-recente", "fotografia.json"))).toBe(true);
 
         await fs.outputFile(caminhoOrcamento, "{");
         const falha = await executarSgc([
-            "frontend", "residuos", "validar", "--json", "--sem-gravar", "--base", base
+            "frontend", "residuos", "validar", "--json", "--base", base
         ]);
         expect(falha.exitCode).toBe(1);
         expect(`${falha.stdout}\n${falha.stderr}`).toContain("Nao foi possivel ler a politica de residuos");
@@ -1386,7 +1391,6 @@ describe("CLI raiz do toolkit", () => {
             "residuos",
             "auditar",
             "--json",
-            "--sem-gravar",
             "--base",
             base,
             "--orcamento",
@@ -1415,6 +1419,7 @@ describe("CLI raiz do toolkit", () => {
             "residuos",
             "auditar",
             "--json",
+            "--gravar",
             "--base",
             base
         ]);
@@ -1449,7 +1454,6 @@ describe("CLI raiz do toolkit", () => {
             "residuos",
             "auditar",
             "--json",
-            "--sem-gravar",
             "--base",
             base,
         ]);
@@ -2019,7 +2023,6 @@ describe("CLI raiz do toolkit", () => {
             "residuos",
             "validar",
             "--json",
-            "--sem-gravar",
             "--base",
             base,
             "--orcamento",
@@ -2032,6 +2035,22 @@ describe("CLI raiz do toolkit", () => {
         const conteudo = JSON.parse(resultado.stdout);
         expect(conteudo.status).toBe("ok");
         expect(conteudo.violacoes).toEqual([]);
+        expect(await fs.pathExists(path.join(base, "toolkit", "qualidade", "artefatos", "frontend-residuos"))).toBe(false);
+        const gravacao = await executarSgc([
+            "frontend",
+            "residuos",
+            "validar",
+            "--json",
+            "--gravar",
+            "--base",
+            base,
+            "--orcamento",
+            orcamento,
+            "--excecoes",
+            excecoes
+        ]);
+        expect(gravacao.exitCode).toBe(0);
+        expect(await fs.pathExists(path.join(base, "toolkit", "qualidade", "artefatos", "frontend-residuos", "mais-recente", "fotografia.json"))).toBe(true);
     });
 
     test("analisa testes do backend com resumo no console e sidecar JSON", async () => {

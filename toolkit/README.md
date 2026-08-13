@@ -115,6 +115,9 @@ Markdown e JSON no diretório de artefatos configurado.
 `backend contratos auditar` também é somente leitura por padrão; `--gravar` persiste o relatório Markdown sem alterar
 o código Java.
 
+`frontend residuos auditar` e `frontend residuos validar` seguem o mesmo contrato. A fotografia, o resumo e a fotografia
+mais recente da validação só são atualizados com `--gravar`; sem essa opção, os resultados ficam no stdout.
+
 ### Requisitos
 
 ```bash

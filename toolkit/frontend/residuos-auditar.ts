@@ -17,7 +17,7 @@ interface OpcoesAuditoriaFrontendResiduos {
     base?: string;
     orcamento?: string;
     saida?: string;
-    semGravar?: boolean;
+    gravar?: boolean;
 }
 
 async function executarAuditoriaFrontendResiduos(opcoes: OpcoesAuditoriaFrontendResiduos = {}): Promise<FotografiaResiduos> {
@@ -26,7 +26,7 @@ async function executarAuditoriaFrontendResiduos(opcoes: OpcoesAuditoriaFrontend
         caminhoOrcamento: opcoes.orcamento,
     });
 
-    if (!opcoes.semGravar) {
+    if (opcoes.gravar) {
         await gravarFotografiaAuditoria(fotografia, opcoes.saida);
     }
 
@@ -44,7 +44,7 @@ async function principal(argumentos: string[] = process.argv.slice(2)): Promise<
             descricao: "Audita sinais de residuos estruturais e defensividade acidental no frontend.",
             opcoes: [
                 "--json               Emite a fotografia em JSON.",
-                "--sem-gravar         Nao grava fotografia/resumo em disco.",
+                "--gravar             Atualiza fotografia e resumo em disco.",
                 "--base <diretorio>   Sobrescreve o diretorio base da auditoria.",
                 "--orcamento <arquivo> Usa um arquivo de orcamento alternativo.",
                 "--saida <diretorio>  Sobrescreve o diretorio de saida da fotografia."
@@ -52,7 +52,7 @@ async function principal(argumentos: string[] = process.argv.slice(2)): Promise<
             exemplos: [
                 "npx tsx toolkit/sgc.ts frontend residuos auditar",
                 "npx tsx toolkit/sgc.ts frontend residuos auditar --json",
-                "npx tsx toolkit/sgc.ts frontend residuos auditar --sem-gravar --base /tmp/sgc"
+                "npx tsx toolkit/sgc.ts frontend residuos auditar --gravar --base /tmp/sgc"
             ]
         });
         return;
@@ -64,7 +64,7 @@ async function principal(argumentos: string[] = process.argv.slice(2)): Promise<
         base: baseResolvida,
         orcamento: lerOpcao(argumentos, "--orcamento", resolverCaminhoOrcamentoResiduos(baseResolvida)),
         saida: lerOpcao(argumentos, "--saida", resolverDiretorioSaidaResiduos(baseResolvida)),
-        semGravar: argumentos.includes("--sem-gravar"),
+        gravar: argumentos.includes("--gravar"),
     });
 
     if (emitirJson) {
@@ -92,7 +92,7 @@ async function principal(argumentos: string[] = process.argv.slice(2)): Promise<
         escreverLinha(`   Linhas: ${hotspot.linhas} | Score: ${hotspot.score}`);
     });
 
-    if (!argumentos.includes("--sem-gravar")) {
+    if (argumentos.includes("--gravar")) {
         const diretorio = lerOpcao(argumentos, "--saida", resolverDiretorioSaidaResiduos(fotografia.base)) ?? resolverDiretorioSaidaResiduos(fotografia.base);
         escreverLinha("");
         escreverLinha(`${pc.green("✓")} Fotografia salva em ${path.relative(process.cwd(), diretorio).replaceAll("\\", "/")}`);

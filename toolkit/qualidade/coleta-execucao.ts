@@ -347,8 +347,8 @@ const ADAPTADORES: Record<NomeAdaptador, (contexto: ContextoColeta) => Promise<E
         return execucao;
     },
     async residuosFrontend(contexto: ContextoColeta): Promise<ExecucaoQualidade> {
-        const execucao = criarExecucao("frontend-residuos", "Residuos do frontend", "qualidade", "npx tsx toolkit/sgc.ts frontend residuos validar --json-resumido", ".");
-        const saida = await executarComandoSgc(contexto, ["frontend", "residuos", "validar", "--json-resumido"]);
+        const execucao = criarExecucao("frontend-residuos", "Residuos do frontend", "qualidade", "npx tsx toolkit/sgc.ts frontend residuos validar --json-resumido --gravar", ".");
+        const saida = await executarComandoSgc(contexto, ["frontend", "residuos", "validar", "--json-resumido", "--gravar"]);
         const resultado = parseJsonSeguro<ResultadoResiduos>(saida.saida, {});
         execucao.status = saida.codigoSaida === 0 && resultado.status === "ok" ? "sucesso" : "falha";
         registrarResultadoExecucao(execucao, saida);

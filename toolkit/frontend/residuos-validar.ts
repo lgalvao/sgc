@@ -47,7 +47,7 @@ interface OpcoesValidacaoFrontendResiduos {
     orcamento?: string;
     excecoes?: string;
     saida?: string;
-    semGravar?: boolean;
+    gravar?: boolean;
 }
 
 function criarViolacao(tipo: string, mensagem: string, detalhes: Record<string, unknown> = {}): ViolacaoResiduoValidacao {
@@ -158,7 +158,7 @@ async function executarValidacaoFrontendResiduos(
         }
     }
 
-    if (!opcoes.semGravar) {
+    if (opcoes.gravar) {
         await gravarFotografiaAuditoria(fotografia, opcoes.saida ?? resolverDiretorioSaidaResiduos(base));
     }
 
@@ -194,7 +194,7 @@ async function principal(argumentos: string[] = process.argv.slice(2)): Promise<
             opcoes: [
                 "--json               Emite o resultado em JSON.",
                 "--json-resumido      Emite somente status, resumo, violacoes e hotspots.",
-                "--sem-gravar         Nao atualiza a fotografia mais recente.",
+                "--gravar             Atualiza a fotografia mais recente.",
                 "--base <diretorio>   Sobrescreve o diretorio base da validacao.",
                 "--orcamento <arquivo> Usa um arquivo de orcamento alternativo.",
                 "--excecoes <arquivo>  Usa um arquivo de excecoes alternativo.",
@@ -220,7 +220,7 @@ async function principal(argumentos: string[] = process.argv.slice(2)): Promise<
         orcamento,
         excecoes,
         saida: path.resolve(lerOpcao(argumentos, "--saida", resolverDiretorioSaidaResiduos(baseResolvida)) ?? resolverDiretorioSaidaResiduos(baseResolvida)),
-        semGravar: argumentos.includes("--sem-gravar"),
+        gravar: argumentos.includes("--gravar"),
     });
 
     if (emitirJson) {
