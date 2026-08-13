@@ -200,7 +200,7 @@ async function principal(argumentos: string[] = process.argv.slice(2)): Promise<
     const argumentosValidados = validarArgumentosEntradaDireta(import.meta.url, argumentos);
     if (argumentosValidados.includes("--help") || argumentosValidados.includes("-h")) {
         exibirAjudaComando({
-            comandoSgc: "codigo semgrep auditar",
+            comandoToolkit: "codigo semgrep auditar",
             scriptDireto: "codigo/semgrep-auditar.ts",
             descricao: "Executa um piloto de Semgrep OSS com a política configurada para monitorar deriva estrutural no projeto.",
             opcoes: [
@@ -212,9 +212,9 @@ async function principal(argumentos: string[] = process.argv.slice(2)): Promise<
                 "--gravar              Grava relatórios JSON e Markdown em disco."
             ],
             exemplos: [
-                "npx tsx toolkit/sgc.ts codigo semgrep auditar",
-                "npx tsx toolkit/sgc.ts codigo semgrep auditar --diretorio backend/src/main/java/exemplo",
-                "npx tsx toolkit/sgc.ts codigo semgrep auditar --auto --json"
+                "npx tsx toolkit/ferramentas.ts codigo semgrep auditar",
+                "npx tsx toolkit/ferramentas.ts codigo semgrep auditar --diretorio backend/src/main/java/exemplo",
+                "npx tsx toolkit/ferramentas.ts codigo semgrep auditar --auto --json"
             ]
         });
         return;

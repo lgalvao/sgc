@@ -33,7 +33,7 @@ async function principal(argumentosInformados: string[] = process.argv.slice(2))
 
     if (exibirAjuda) {
         exibirAjudaComando({
-            comandoSgc: "cliente arquitetura auditar",
+            comandoToolkit: "cliente arquitetura auditar",
             scriptDireto: "cliente/arquitetura-auditar.ts",
             descricao: "Audita vazamentos arquiteturais do cliente, incluindo estrategia de cache exposta nas views, hubs centrais sobrecarregados e server state caseiro.",
             opcoes: [
@@ -43,9 +43,9 @@ async function principal(argumentosInformados: string[] = process.argv.slice(2))
                 "--saida <diretorio>  Sobrescreve o diretorio de saida da fotografia."
             ],
             exemplos: [
-                "npx tsx toolkit/sgc.ts cliente arquitetura auditar",
-                "npx tsx toolkit/sgc.ts cliente arquitetura auditar --json",
-                "npx tsx toolkit/sgc.ts cliente arquitetura auditar --gravar --base /tmp/sgc"
+                "npx tsx toolkit/ferramentas.ts cliente arquitetura auditar",
+                "npx tsx toolkit/ferramentas.ts cliente arquitetura auditar --json",
+                "npx tsx toolkit/ferramentas.ts cliente arquitetura auditar --gravar --base /tmp/sgc"
             ]
         });
         return;

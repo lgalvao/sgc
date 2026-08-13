@@ -38,7 +38,7 @@ quando houver contrato claro e uso horizontal plausível ou comprovado.
 ### Código e linguagem
 
 - Implementação, testes, símbolos, mensagens, comentários e documentação devem usar TypeScript e português brasileiro.
-- O entrypoint fonte é `toolkit/sgc.ts`, executado diretamente com `tsx`; a identidade publicada é o pacote
+- O entrypoint fonte é `toolkit/ferramentas.ts`, executado diretamente com `tsx`; a identidade publicada é o pacote
   `ferramentas-projeto` e o binário `ferramentas`.
 - `dist/` é produto de verificação do build, não o caminho normal de execução.
 - Não manter implementação JavaScript paralela, wrappers de transição ou aliases legados sem finalidade atual, uso por
@@ -90,7 +90,7 @@ quando houver contrato claro e uso horizontal plausível ou comprovado.
   não exige consumidor prévio no código. Como não há clientes legados, um contrato pode ser criado, alterado ou removido
   diretamente quando a decisão de arquitetura mudar.
 - A identidade pública do pacote e do binário deve ser neutra antes de o toolkit ser oferecido para reutilização em outro
-  projeto; o pacote publicado agora se chama `ferramentas-projeto` e o binário `ferramentas`. O entrypoint fonte `sgc.ts`
+  projeto; o pacote publicado agora se chama `ferramentas-projeto` e o binário `ferramentas`. O entrypoint fonte `ferramentas.ts`
   pode ser renomeado quando isso melhorar a coerência; os pontos de chamada do SGC devem ser atualizados diretamente na
   mesma mudança.
 

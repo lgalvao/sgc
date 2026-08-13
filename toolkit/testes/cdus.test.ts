@@ -10,7 +10,7 @@ import {inventariarCdus} from "../requisitos/cdus-inventario-motor.js";
 import {carregarMensagensCanonicas} from "../requisitos/cdus-mensagens-codigo-lib.js";
 
 const DIRETORIO_RAIZ = path.resolve(import.meta.dirname, "..", "..");
-const CAMINHO_SGC = path.join(DIRETORIO_RAIZ, "toolkit", "sgc.ts");
+const CAMINHO_FERRAMENTAS = path.join(DIRETORIO_RAIZ, "toolkit", "ferramentas.ts");
 const CAMINHO_TSX = path.join(DIRETORIO_RAIZ, "node_modules", ".bin", process.platform === "win32" ? "tsx.cmd" : "tsx");
 const CAMINHOS_COMANDOS_CDU = [
     "cdus-inventariar.ts",
@@ -116,7 +116,7 @@ function lerJson<T>(resultado: ResultadoExecucao): T {
 }
 
 async function executarSgc(args: string[]): Promise<ResultadoExecucao> {
-    const resultado = await execa(CAMINHO_TSX, [CAMINHO_SGC, ...args], {
+    const resultado = await execa(CAMINHO_TSX, [CAMINHO_FERRAMENTAS, ...args], {
         cwd: DIRETORIO_RAIZ,
         reject: false,
     });

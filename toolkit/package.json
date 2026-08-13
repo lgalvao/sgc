@@ -27,12 +27,12 @@
     "tsconfig.estrito.json"
   ],
   "exports": {
-    ".": "./sgc.ts",
+    ".": "./ferramentas.ts",
     "./cobertura-java": "./biblioteca/dominios/cobertura-java.ts",
     "./cobertura-web": "./biblioteca/dominios/cobertura-web.ts"
   },
   "scripts": {
-    "ferramentas": "tsx ./sgc.ts",
+    "ferramentas": "tsx ./ferramentas.ts",
     "deps:audit": "knip",
     "build": "tsc --project tsconfig.build.json",
     "test": "vitest run --exclude testes/pacote.test.ts",

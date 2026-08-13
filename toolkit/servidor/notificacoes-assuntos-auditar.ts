@@ -121,7 +121,7 @@ async function auditarAssuntos(base: string): Promise<RelatorioAssuntos> {
 
 function exibirAjuda(): void {
     exibirAjudaComando({
-        comandoSgc: "servidor notificacoes auditar-assuntos",
+        comandoToolkit: "servidor notificacoes auditar-assuntos",
         scriptDireto: "servidor/notificacoes-assuntos-auditar.ts",
         descricao: "Audita literais de assunto de notificação fora de AssuntosNotificacao.",
         opcoes: [
@@ -130,8 +130,8 @@ function exibirAjuda(): void {
             "--help, -h          Exibe esta ajuda."
         ],
         exemplos: [
-            "npx tsx toolkit/sgc.ts servidor notificacoes auditar-assuntos",
-            "npx tsx toolkit/sgc.ts servidor notificacoes auditar-assuntos --json"
+            "npx tsx toolkit/ferramentas.ts servidor notificacoes auditar-assuntos",
+            "npx tsx toolkit/ferramentas.ts servidor notificacoes auditar-assuntos --json"
         ]
     });
 }

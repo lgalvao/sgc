@@ -9,7 +9,7 @@ Requisitos: Node 26.7 ou superior e dependências do workspace `toolkit` instala
 
 ```bash
 npm --prefix toolkit install
-npx tsx toolkit/sgc.ts --help
+npx tsx toolkit/ferramentas.ts --help
 ```
 
 O toolkit executa a fonte TypeScript diretamente com `tsx`. `dist/` é gerado apenas pelo gate de build e não participa
@@ -18,11 +18,11 @@ do fluxo normal.
 A ajuda da CLI é a fonte canônica para comandos, opções e descrições:
 
 ```bash
-npx tsx toolkit/sgc.ts servidor --help
-npx tsx toolkit/sgc.ts cliente --help
-npx tsx toolkit/sgc.ts requisitos --help
-npx tsx toolkit/sgc.ts qualidade --help
-npx tsx toolkit/sgc.ts projeto --help
+npx tsx toolkit/ferramentas.ts servidor --help
+npx tsx toolkit/ferramentas.ts cliente --help
+npx tsx toolkit/ferramentas.ts requisitos --help
+npx tsx toolkit/ferramentas.ts qualidade --help
+npx tsx toolkit/ferramentas.ts projeto --help
 ```
 
 A CLI rejeita opções desconhecidas, valores ausentes e argumentos posicionais excedentes. Opções com valor também podem
@@ -35,7 +35,7 @@ toolkit/codigo/cheiros-auditar.ts --opcao-inexistente` falha antes de iniciar a 
 
 | Caminho | Responsabilidade |
 |---|---|
-| `sgc.ts` | entrada e roteamento da CLI |
+| `ferramentas.ts` | entrada e roteamento da CLI |
 | `biblioteca/` | configuração, execução, saída, catálogo e domínios compartilhados |
 | `servidor/` | cobertura, arquitetura, contratos, testes e utilidades Java |
 | `cliente/` | cobertura, arquitetura, resíduos e validações Vue |
@@ -57,14 +57,14 @@ O desenho desejado separa:
 ### Servidor e cliente
 
 ```bash
-npx tsx toolkit/sgc.ts servidor cobertura auditoria --json
-npx tsx toolkit/sgc.ts servidor testes analisar --json
-npx tsx toolkit/sgc.ts servidor testes analisar --gravar --saida analise-testes.md
-npx tsx toolkit/sgc.ts servidor testes priorizar --entrada analise-testes.json --gravar
-npx tsx toolkit/sgc.ts servidor java corrigir-fqn
-npx tsx toolkit/sgc.ts cliente cobertura auditoria --json
-npx tsx toolkit/sgc.ts cliente residuos validar
-npx tsx toolkit/sgc.ts cliente identificadores-teste listar-duplicados
+npx tsx toolkit/ferramentas.ts servidor cobertura auditoria --json
+npx tsx toolkit/ferramentas.ts servidor testes analisar --json
+npx tsx toolkit/ferramentas.ts servidor testes analisar --gravar --saida analise-testes.md
+npx tsx toolkit/ferramentas.ts servidor testes priorizar --entrada analise-testes.json --gravar
+npx tsx toolkit/ferramentas.ts servidor java corrigir-fqn
+npx tsx toolkit/ferramentas.ts cliente cobertura auditoria --json
+npx tsx toolkit/ferramentas.ts cliente residuos validar
+npx tsx toolkit/ferramentas.ts cliente identificadores-teste listar-duplicados
 ```
 
 `servidor java corrigir-fqn` simula por padrão; use `--gravar` para modificar fontes.
@@ -83,10 +83,10 @@ O JSON persistido por `servidor testes analisar` usa `versao: 2`, campos em port
 ### Código e integração
 
 ```bash
-npx tsx toolkit/sgc.ts codigo cheiros auditar --json
-npx tsx toolkit/sgc.ts codigo semgrep auditar
-npx tsx toolkit/sgc.ts codigo nomes auditar-consistencia
-npx tsx toolkit/sgc.ts integracao contratos diff
+npx tsx toolkit/ferramentas.ts codigo cheiros auditar --json
+npx tsx toolkit/ferramentas.ts codigo semgrep auditar
+npx tsx toolkit/ferramentas.ts codigo nomes auditar-consistencia
+npx tsx toolkit/ferramentas.ts integracao contratos diff
 ```
 
 Cheiros e Semgrep são complementares: o primeiro aplica heurísticas internas, enquanto o segundo executa regras
@@ -126,11 +126,11 @@ resolvidos a partir de `--base`.
 ### Casos de uso CDU
 
 ```bash
-npx tsx toolkit/sgc.ts requisitos cdus inventariar
-npx tsx toolkit/sgc.ts requisitos cdus inventariar --secoes vocabulario,mensagens
-npx tsx toolkit/sgc.ts requisitos cdus auditar --json
-npx tsx toolkit/sgc.ts requisitos cdus auditar --secoes estrutura,estilo,vocabulario,mensagens
-npx tsx toolkit/sgc.ts requisitos cdus auditar --secoes mensagens-codigo
+npx tsx toolkit/ferramentas.ts requisitos cdus inventariar
+npx tsx toolkit/ferramentas.ts requisitos cdus inventariar --secoes vocabulario,mensagens
+npx tsx toolkit/ferramentas.ts requisitos cdus auditar --json
+npx tsx toolkit/ferramentas.ts requisitos cdus auditar --secoes estrutura,estilo,vocabulario,mensagens
+npx tsx toolkit/ferramentas.ts requisitos cdus auditar --secoes mensagens-codigo
 ```
 
 `inventariar` consolida formatos, vocabulário, mensagens, densidade e duplicações. `auditar` consolida estrutura, estilo,
@@ -146,13 +146,13 @@ para interfaces anteriores do toolkit.
 ### Qualidade e projeto
 
 ```bash
-npx tsx toolkit/sgc.ts qualidade coletar --perfil rapido
-npx tsx toolkit/sgc.ts qualidade tarefas executar rapido
-npx tsx toolkit/sgc.ts qualidade resumo
-npx tsx toolkit/sgc.ts projeto ambiente verificar
-npx tsx toolkit/sgc.ts projeto dependencias auditar
-npx tsx toolkit/sgc.ts projeto artefatos limpar
-npx tsx toolkit/sgc.ts projeto versao-sincronizar 1.2.3
+npx tsx toolkit/ferramentas.ts qualidade coletar --perfil rapido
+npx tsx toolkit/ferramentas.ts qualidade tarefas executar rapido
+npx tsx toolkit/ferramentas.ts qualidade resumo
+npx tsx toolkit/ferramentas.ts projeto ambiente verificar
+npx tsx toolkit/ferramentas.ts projeto dependencias auditar
+npx tsx toolkit/ferramentas.ts projeto artefatos limpar
+npx tsx toolkit/ferramentas.ts projeto versao-sincronizar 1.2.3
 ```
 
 `qualidade coletar` executa os adaptadores e perfis do SGC e produz uma fotografia consolidada. Seu motor interno de

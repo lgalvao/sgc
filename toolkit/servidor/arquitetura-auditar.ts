@@ -224,7 +224,7 @@ async function gravarRelatorios(relatorio: RelatorioArquitetura, diretorioSaida:
 
 function exibirAjuda(): void {
     exibirAjudaComando({
-        comandoSgc: "servidor arquitetura auditar",
+        comandoToolkit: "servidor arquitetura auditar",
         scriptDireto: "servidor/arquitetura-auditar.ts",
         descricao: "Audita Services, Facades e Controllers do servidor detectando god objects por linhas, métodos e dependências.",
         opcoes: [
@@ -234,9 +234,9 @@ function exibirAjuda(): void {
             "--help, -h          Exibe esta ajuda."
         ],
         exemplos: [
-            "npx tsx toolkit/sgc.ts servidor arquitetura auditar",
-            "npx tsx toolkit/sgc.ts servidor arquitetura auditar --json",
-            "npx tsx toolkit/sgc.ts servidor arquitetura auditar --gravar"
+            "npx tsx toolkit/ferramentas.ts servidor arquitetura auditar",
+            "npx tsx toolkit/ferramentas.ts servidor arquitetura auditar --json",
+            "npx tsx toolkit/ferramentas.ts servidor arquitetura auditar --gravar"
         ]
     });
 }

@@ -387,7 +387,7 @@ function lerOpcoes(argv: string[]): OpcoesAuditoriaNomes {
 async function principal(argumentos: string[] = process.argv.slice(2)): Promise<void> {
     const argumentosValidados = validarArgumentosEntradaDireta(import.meta.url, argumentos);
     if (argumentosValidados.includes("--help") || argumentosValidados.includes("-h")) {
-        escreverLinha("Uso: npx tsx toolkit/sgc.ts codigo nomes auditar-consistencia [--json] [--gravar] [--base <diretorio>] [--inventario <arquivo.json>] [--saida <arquivo.json>]");
+        escreverLinha("Uso: npx tsx toolkit/ferramentas.ts codigo nomes auditar-consistencia [--json] [--gravar] [--base <diretorio>] [--inventario <arquivo.json>] [--saida <arquivo.json>]");
         escreverLinha("");
         escreverLinha("Audita consistencia de nomenclatura com base no inventario de simbolos.");
         return;

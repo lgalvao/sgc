@@ -6,14 +6,14 @@ import {describe, expect, test} from "vitest";
 import {execa, execaNode} from "execa";
 import {
     DIRETORIO_RAIZ,
-    CAMINHO_SGC,
+    CAMINHO_FERRAMENTAS,
     escreverArquivo,
     existe
 } from "./apoio.js";
 import {CATALOGO_COMANDOS_COMPLETO} from "../biblioteca/catalogo-comandos.js";
-import {program} from "../sgc.js";
+import {program} from "../ferramentas.js";
 
-const CAMINHO_SGC_COMPILADO = path.join(DIRETORIO_RAIZ, "toolkit", "dist", "sgc.js");
+const CAMINHO_FERRAMENTAS_COMPILADO = path.join(DIRETORIO_RAIZ, "toolkit", "dist", "ferramentas.js");
 
 describe("Execução e distribuição da CLI", () => {
     test("mantem o catalogo de scripts sincronizado com a arvore da CLI", async () => {
@@ -59,7 +59,7 @@ describe("Execução e distribuição da CLI", () => {
     });
 
     test("pode ser importada sem executar a CLI", async () => {
-        const caminhoSgc = pathToFileURL(CAMINHO_SGC).href;
+        const caminhoSgc = pathToFileURL(CAMINHO_FERRAMENTAS).href;
         const resultado = await execa(process.execPath, [
             "--import=tsx",
             "--input-type=module",
@@ -104,7 +104,7 @@ describe("Execução e distribuição da CLI", () => {
             "export function exemplo(valor: unknown) { return valor; }\n"
         );
 
-        const resultado = await execaNode(CAMINHO_SGC_COMPILADO, [
+        const resultado = await execaNode(CAMINHO_FERRAMENTAS_COMPILADO, [
             "codigo",
             "cheiros",
             "auditar",

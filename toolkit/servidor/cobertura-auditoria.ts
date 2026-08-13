@@ -102,7 +102,7 @@ async function principal(argumentosInformados: string[] = process.argv.slice(2))
 
     if (exibirAjuda) {
         exibirAjudaComando({
-            comandoSgc: "servidor cobertura auditoria",
+            comandoToolkit: "servidor cobertura auditoria",
             scriptDireto: "servidor/cobertura-auditoria.ts",
             descricao: "Auditoria unificada de cobertura e risco (Servidor).",
             opcoes: [

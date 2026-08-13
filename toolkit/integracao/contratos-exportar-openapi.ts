@@ -76,7 +76,7 @@ async function principal(argumentosInformados: string[] = process.argv.slice(2))
     const argumentos = validarArgumentosEntradaDireta(import.meta.url, argumentosInformados);
     if (argumentos.includes("--help") || argumentos.includes("-h")) {
         exibirAjudaComando({
-            comandoSgc: "integracao contratos exportar-openapi",
+            comandoToolkit: "integracao contratos exportar-openapi",
             scriptDireto: "integracao/contratos-exportar-openapi.ts",
             descricao: "Busca o documento OpenAPI da aplicação em execução e grava uma fotografia local para auditorias de contrato.",
             opcoes: [
@@ -86,9 +86,9 @@ async function principal(argumentosInformados: string[] = process.argv.slice(2))
                 "--json               Emite o resultado em JSON."
             ],
             exemplos: [
-                "npx tsx toolkit/sgc.ts integracao contratos exportar-openapi",
-                "npx tsx toolkit/sgc.ts integracao contratos exportar-openapi --url http://127.0.0.1:10000/api-docs",
-                "npx tsx toolkit/sgc.ts integracao contratos exportar-openapi --saida /tmp/sgc-openapi.json --json"
+                "npx tsx toolkit/ferramentas.ts integracao contratos exportar-openapi",
+                "npx tsx toolkit/ferramentas.ts integracao contratos exportar-openapi --url http://127.0.0.1:10000/api-docs",
+                "npx tsx toolkit/ferramentas.ts integracao contratos exportar-openapi --saida /tmp/sgc-openapi.json --json"
             ]
         });
         return;

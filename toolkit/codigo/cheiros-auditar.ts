@@ -390,7 +390,7 @@ async function principal(argumentosInformados: string[] = process.argv.slice(2))
     const emitirJson = argumentos.includes("--json");
     if (argumentos.includes("--help") || argumentos.includes("-h")) {
         exibirAjudaComando({
-            comandoSgc: "codigo cheiros auditar",
+            comandoToolkit: "codigo cheiros auditar",
             scriptDireto: "codigo/cheiros-auditar.ts",
             descricao: "Gera uma fotografia com contagens e pontuacao de cheiros de codigo.",
             opcoes: [

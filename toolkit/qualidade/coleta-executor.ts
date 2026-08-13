@@ -5,7 +5,7 @@ import {DIRETORIO_TOOLKIT} from "../biblioteca/caminhos.js";
 import {resolverCaminhoTsx} from "../biblioteca/execucao.js";
 import type {ContextoColeta, OpcoesComando, ResultadoComando} from "./coleta-motor.js";
 
-const CAMINHO_SGC = path.join(DIRETORIO_TOOLKIT, "sgc.ts");
+const CAMINHO_FERRAMENTAS = path.join(DIRETORIO_TOOLKIT, "ferramentas.ts");
 
 async function executarComando({comando, args, cwd, env}: OpcoesComando): Promise<ResultadoComando> {
     const inicio = Date.now();
@@ -39,7 +39,7 @@ async function executarComandoSgc(
 ): Promise<ResultadoComando> {
     return executarComando({
         comando: resolverCaminhoTsx(),
-        args: [CAMINHO_SGC, ...argumentos, ...(incluirBase ? ["--base", contexto.base] : [])],
+        args: [CAMINHO_FERRAMENTAS, ...argumentos, ...(incluirBase ? ["--base", contexto.base] : [])],
         cwd: contexto.base,
     });
 }

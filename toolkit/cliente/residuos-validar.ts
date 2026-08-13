@@ -193,7 +193,7 @@ async function principal(argumentosInformados: string[] = process.argv.slice(2))
 
     if (exibirAjuda) {
         exibirAjudaComando({
-            comandoSgc: "cliente residuos validar",
+            comandoToolkit: "cliente residuos validar",
             scriptDireto: "cliente/residuos-validar.ts",
             descricao: "Valida orcamentos e excecoes dos residuos do cliente para impedir regressao estrutural.",
             opcoes: [
@@ -206,9 +206,9 @@ async function principal(argumentosInformados: string[] = process.argv.slice(2))
                 "--saida <diretorio>  Sobrescreve o diretorio de saida da fotografia."
             ],
             exemplos: [
-                "npx tsx toolkit/sgc.ts cliente residuos validar",
-                "npx tsx toolkit/sgc.ts cliente residuos validar --json",
-                "npx tsx toolkit/sgc.ts cliente residuos validar --base /tmp/sgc --orcamento /tmp/orcamento.json --excecoes /tmp/excecoes.json"
+                "npx tsx toolkit/ferramentas.ts cliente residuos validar",
+                "npx tsx toolkit/ferramentas.ts cliente residuos validar --json",
+                "npx tsx toolkit/ferramentas.ts cliente residuos validar --base /tmp/sgc --orcamento /tmp/orcamento.json --excecoes /tmp/excecoes.json"
             ]
         });
         return;

@@ -85,7 +85,7 @@ const COMANDOS_REGISTRADOS_PADRAO: RecursoArquivo[] = [
     {
         tipo: "arquivo",
         nome: "toolkit",
-        caminho: "toolkit/sgc.ts",
+        caminho: "toolkit/ferramentas.ts",
         obrigatorio: true,
         categoria: CATEGORIAS.CONFIGURACAO
     },
@@ -112,7 +112,7 @@ function caminhoDentroDiretorio(diretorio: string, nome: string): string {
 }
 
 function ehPerfilSgc(diretorioBase: string): boolean {
-    return existsSync(path.join(diretorioBase, "toolkit", "sgc.ts"));
+    return existsSync(path.join(diretorioBase, "toolkit", "ferramentas.ts"));
 }
 
 function obterRecursosAmbientePadrao(diretorioBase: string): Recurso[] {

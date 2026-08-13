@@ -5,7 +5,7 @@ import {execa} from "execa";
 import {describe, expect, test} from "vitest";
 
 const DIRETORIO_RAIZ = path.resolve(import.meta.dirname, "..", "..");
-const CAMINHO_SGC = path.join(DIRETORIO_RAIZ, "toolkit", "sgc.ts");
+const CAMINHO_FERRAMENTAS = path.join(DIRETORIO_RAIZ, "toolkit", "ferramentas.ts");
 const CAMINHO_TSX = path.join(
     DIRETORIO_RAIZ,
     "node_modules",
@@ -25,7 +25,7 @@ async function escreverArquivo(caminho: string, conteudo: string): Promise<void>
 }
 
 async function executarSgc(diretorioBase: string, argumentos: string[]): Promise<ResultadoExecucao> {
-    const resultado = await execa(CAMINHO_TSX, [CAMINHO_SGC, ...argumentos], {
+    const resultado = await execa(CAMINHO_TSX, [CAMINHO_FERRAMENTAS, ...argumentos], {
         cwd: diretorioBase,
         reject: false,
     });

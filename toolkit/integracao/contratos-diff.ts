@@ -92,7 +92,7 @@ async function principal(argumentosInformados: string[] = process.argv.slice(2))
     const argumentos = validarArgumentosEntradaDireta(import.meta.url, argumentosInformados);
     if (argumentos.includes("--help") || argumentos.includes("-h")) {
         exibirAjudaComando({
-            comandoSgc: "integracao contratos diff",
+            comandoToolkit: "integracao contratos diff",
             scriptDireto: "integracao/contratos-diff.ts",
             descricao: "Compara duas versões do OpenAPI e produz um resumo útil para revisão de mudanças de contrato.",
             opcoes: [
@@ -103,9 +103,9 @@ async function principal(argumentosInformados: string[] = process.argv.slice(2))
                 "--gravar             Grava o resumo Markdown."
             ],
             exemplos: [
-                "npx tsx toolkit/sgc.ts integracao contratos diff",
-                "npx tsx toolkit/sgc.ts integracao contratos diff --anterior /tmp/old.json --atual /tmp/new.json",
-                "npx tsx toolkit/sgc.ts integracao contratos diff --json"
+                "npx tsx toolkit/ferramentas.ts integracao contratos diff",
+                "npx tsx toolkit/ferramentas.ts integracao contratos diff --anterior /tmp/old.json --atual /tmp/new.json",
+                "npx tsx toolkit/ferramentas.ts integracao contratos diff --json"
             ]
         });
         return;

@@ -64,7 +64,7 @@ async function resolverFotografiaQualidade<TFotografia = FotografiaQualidade>(
 
     const maisRecente = candidatos.toSorted((a, b) => b.localeCompare(a))[0];
     if (!maisRecente) {
-        throw new Error("Nenhuma fotografia de qualidade foi encontrada. Execute `npx tsx toolkit/sgc.ts qualidade coletar --perfil rapido`.");
+        throw new Error("Nenhuma fotografia de qualidade foi encontrada. Execute `npx tsx toolkit/ferramentas.ts qualidade coletar --perfil rapido`.");
     }
 
     return {

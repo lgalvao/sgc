@@ -198,7 +198,7 @@ describe("Comandos de projeto do toolkit", () => {
         });
         expect(verificacaoAmbiente.verificacoes.some(verificacao => verificacao.nome === "toolkit/package.json")).toBe(false);
 
-        await escreverArquivo(path.join(diretorioBase, "toolkit", "sgc.ts"), "");
+        await escreverArquivo(path.join(diretorioBase, "toolkit", "ferramentas.ts"), "");
         const caminhosSgc = obterRecursosAmbientePadrao(diretorioBase).flatMap(recurso => "caminho" in recurso ? [recurso.caminho] : []);
         expect(caminhosSgc).toContain("toolkit/package.json");
     });

@@ -172,7 +172,7 @@ function criarAdaptadoresSgc(dependencias: DependenciasAdaptadoresSgc): Catalogo
             return execucao;
         },
         async residuosCliente(contexto: ContextoColeta): Promise<ExecucaoQualidade> {
-            const execucao = criarExecucao("cliente-residuos", "Residuos do cliente", "qualidade", "npx tsx toolkit/sgc.ts cliente residuos validar --json-resumido --gravar", ".");
+            const execucao = criarExecucao("cliente-residuos", "Residuos do cliente", "qualidade", "npx tsx toolkit/ferramentas.ts cliente residuos validar --json-resumido --gravar", ".");
             const saida = await executarComandoSgc(contexto, ["cliente", "residuos", "validar", "--json-resumido", "--gravar"]);
             const resultado = parseJsonSeguro<ResultadoResiduos>(saida.saida, {});
             execucao.status = saida.codigoSaida === 0 && resultado.status === "ok" ? "sucesso" : "falha";
@@ -190,7 +190,7 @@ function criarAdaptadoresSgc(dependencias: DependenciasAdaptadoresSgc): Catalogo
             return execucao;
         },
         async arquiteturaCliente(contexto: ContextoColeta): Promise<ExecucaoQualidade> {
-            const execucao = criarExecucao("cliente-arquitetura", "Arquitetura do cliente", "qualidade", "npx tsx toolkit/sgc.ts cliente arquitetura auditar --json --gravar", ".");
+            const execucao = criarExecucao("cliente-arquitetura", "Arquitetura do cliente", "qualidade", "npx tsx toolkit/ferramentas.ts cliente arquitetura auditar --json --gravar", ".");
             const saida = await executarComandoSgc(contexto, ["cliente", "arquitetura", "auditar", "--json", "--gravar"]);
             const resultado = parseJsonSeguro<ResultadoArquitetura>(saida.saida, {});
             execucao.status = saida.codigoSaida === 0 ? "sucesso" : "falha";
@@ -216,7 +216,7 @@ function criarAdaptadoresSgc(dependencias: DependenciasAdaptadoresSgc): Catalogo
             return execucao;
         },
         async identificadoresTesteCliente(contexto: ContextoColeta): Promise<ExecucaoQualidade> {
-            const execucao = criarExecucao("cliente-identificadores-teste", "Identificadores de teste do cliente", "qualidade", "npx tsx toolkit/sgc.ts cliente identificadores-teste listar-duplicados", ".");
+            const execucao = criarExecucao("cliente-identificadores-teste", "Identificadores de teste do cliente", "qualidade", "npx tsx toolkit/ferramentas.ts cliente identificadores-teste listar-duplicados", ".");
             const saida = await executarComandoSgc(contexto, [
                 "cliente",
                 "identificadores-teste",

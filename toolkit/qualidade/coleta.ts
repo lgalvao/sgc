@@ -58,7 +58,7 @@ async function executarColetaQualidade(argumentosInformados: string[] = process.
     const argumentos = validarArgumentosEntradaDireta(import.meta.url, argumentosInformados);
     if (argumentos.includes("--help") || argumentos.includes("-h")) {
         exibirAjudaComando({
-            comandoSgc: "qualidade coletar",
+            comandoToolkit: "qualidade coletar",
             scriptDireto: "qualidade/coleta.ts",
             descricao: "Coleta uma fotografia consolidada de qualidade do projeto.",
             opcoes: [
@@ -66,7 +66,7 @@ async function executarColetaQualidade(argumentosInformados: string[] = process.
                 "--base <diretorio>  Sobrescreve o diretorio base do projeto auditado."
             ],
             exemplos: [
-                "npx tsx toolkit/sgc.ts qualidade coletar --perfil rapido",
+                "npx tsx toolkit/ferramentas.ts qualidade coletar --perfil rapido",
                 "npx tsx toolkit/qualidade/coleta.ts --perfil cliente"
             ]
         });

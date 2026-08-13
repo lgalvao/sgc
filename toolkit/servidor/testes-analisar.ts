@@ -134,7 +134,7 @@ function lerArgumentos(argumentos: string[]): OpcoesAnalisar {
 
 function imprimirAjuda(): void {
     exibirAjudaComando({
-        comandoSgc: "servidor testes analisar",
+        comandoToolkit: "servidor testes analisar",
         scriptDireto: "servidor/testes-analisar.ts",
         descricao: 'Analisa classes sem testes correspondentes e gera relatorios em Markdown e JSON com resumo por categoria.',
         opcoes: [
@@ -148,7 +148,7 @@ function imprimirAjuda(): void {
             '--help, -h              Exibe esta ajuda'
         ],
         exemplos: [
-            "npx tsx toolkit/sgc.ts servidor testes analisar --diretorio backend --saida analise-testes.md --saida-json analise-testes.json"
+            "npx tsx toolkit/ferramentas.ts servidor testes analisar --diretorio backend --saida analise-testes.md --saida-json analise-testes.json"
         ]
     });
 }

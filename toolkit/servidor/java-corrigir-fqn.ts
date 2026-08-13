@@ -229,7 +229,7 @@ function lerArgumentos(argumentos: string[]): OpcoesCorretorFqn {
 
 function exibirAjuda(): void {
     exibirAjudaComando({
-        comandoSgc: "servidor java corrigir-fqn",
+        comandoToolkit: "servidor java corrigir-fqn",
         scriptDireto: "servidor/java-corrigir-fqn.ts",
         descricao: "Substitui nomes totalmente qualificados por imports em arquivos Java.",
         opcoes: [
@@ -238,9 +238,9 @@ function exibirAjuda(): void {
             "--help, -h          Exibe esta ajuda.",
         ],
         exemplos: [
-            "npx tsx toolkit/sgc.ts servidor java corrigir-fqn",
-            "npx tsx toolkit/sgc.ts servidor java corrigir-fqn --gravar",
-            "npx tsx toolkit/sgc.ts servidor java corrigir-fqn --base /tmp/backend",
+            "npx tsx toolkit/ferramentas.ts servidor java corrigir-fqn",
+            "npx tsx toolkit/ferramentas.ts servidor java corrigir-fqn --gravar",
+            "npx tsx toolkit/ferramentas.ts servidor java corrigir-fqn --base /tmp/backend",
         ],
     });
 }

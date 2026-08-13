@@ -80,7 +80,7 @@ function lerArgumentos(argumentos: string[]): OpcoesPriorizar {
 
 function imprimirAjuda() {
     exibirAjudaComando({
-        comandoSgc: "servidor testes priorizar",
+        comandoToolkit: "servidor testes priorizar",
         scriptDireto: "servidor/testes-priorizar.ts",
         descricao: 'Prioriza o backlog de testes a partir do relatorio estruturado ou Markdown.',
         opcoes: [
@@ -91,7 +91,7 @@ function imprimirAjuda() {
             '--help, -h          Exibe esta ajuda'
         ],
         exemplos: [
-            "npx tsx toolkit/sgc.ts servidor testes priorizar --entrada analise-testes.json --saida priorizacao-testes.md"
+            "npx tsx toolkit/ferramentas.ts servidor testes priorizar --entrada analise-testes.json --saida priorizacao-testes.md"
         ]
     });
 }

@@ -190,7 +190,7 @@ registrarComandosCatalogados(program);
 
 program.addHelpText(
     "after",
-    `\nExemplos:\n  ${pc.dim("npx tsx toolkit/sgc.ts servidor cobertura auditoria")}\n  ${pc.dim("npx tsx toolkit/sgc.ts cliente cobertura auditoria")}\n  ${pc.dim("npx tsx toolkit/sgc.ts qualidade coletar --perfil rapido")}\n  ${pc.dim("npx tsx toolkit/sgc.ts qualidade resumo")}\n  ${pc.dim("npx tsx toolkit/sgc.ts projeto ambiente verificar --json")}\n  ${pc.dim("npx tsx toolkit/sgc.ts codigo cheiros auditar --json")}`
+    `\nExemplos:\n  ${pc.dim("npx tsx toolkit/ferramentas.ts servidor cobertura auditoria")}\n  ${pc.dim("npx tsx toolkit/ferramentas.ts cliente cobertura auditoria")}\n  ${pc.dim("npx tsx toolkit/ferramentas.ts qualidade coletar --perfil rapido")}\n  ${pc.dim("npx tsx toolkit/ferramentas.ts qualidade resumo")}\n  ${pc.dim("npx tsx toolkit/ferramentas.ts projeto ambiente verificar --json")}\n  ${pc.dim("npx tsx toolkit/ferramentas.ts codigo cheiros auditar --json")}`
 );
 
 async function executar(argumentos = process.argv) {

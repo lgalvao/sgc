@@ -70,7 +70,7 @@ test("pacote fonte executa em um projeto consumidor isolado", async () => {
         cwd: diretorioConsumidor
     });
 
-    expect(await existe(path.join(diretorioConsumidor, "node_modules", "ferramentas-projeto", "sgc.ts"))).toBe(true);
+    expect(await existe(path.join(diretorioConsumidor, "node_modules", "ferramentas-projeto", "ferramentas.ts"))).toBe(true);
     expect(JSON.parse(String(resultado.stdout))).toMatchObject({
         base: await realpath(diretorioConsumidor),
         pontuacao: {faixa: "bom"}

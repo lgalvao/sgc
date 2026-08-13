@@ -41,7 +41,7 @@ async function principal(argumentosInformados: string[] = process.argv.slice(2))
 
     if (exibirAjuda) {
         exibirAjudaComando({
-            comandoSgc: "cliente identificadores-teste listar",
+            comandoToolkit: "cliente identificadores-teste listar",
             scriptDireto: "cliente/identificadores-teste-listar.ts",
             descricao: "Lista identificadores de teste declarados em templates Vue.",
             opcoes: [
@@ -50,8 +50,8 @@ async function principal(argumentosInformados: string[] = process.argv.slice(2))
                 "--diretorio <diretorio> Sobrescreve o diretório configurado de código.",
             ],
             exemplos: [
-                "npx tsx toolkit/sgc.ts cliente identificadores-teste listar",
-                "npx tsx toolkit/sgc.ts cliente identificadores-teste listar --diretorio /tmp/cliente",
+                "npx tsx toolkit/ferramentas.ts cliente identificadores-teste listar",
+                "npx tsx toolkit/ferramentas.ts cliente identificadores-teste listar --diretorio /tmp/cliente",
             ],
         });
         return;
