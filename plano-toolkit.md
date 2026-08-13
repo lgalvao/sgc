@@ -2,8 +2,8 @@
 
 ## Objetivos
 
-O trabalho abrange exclusivamente `toolkit/`. O restante do SGC participa apenas como consumidor, fixture e fonte de
-políticas locais.
+O trabalho abrange exclusivamente `toolkit/`. O SGC não consome nem depende do toolkit: seu workspace é alvo de
+auditoria, fonte de políticas locais e massa de regressão para os comandos que operam sobre ele.
 
 1. remover código temporário, obsoleto, redundante ou sem finalidade permanente;
 2. separar capacidades horizontais de integrações de stack e políticas específicas do SGC;
@@ -25,7 +25,7 @@ Cada capacidade mantida deve ter uma classificação explícita:
 |---|---|---|
 | Núcleo | algoritmo independente de projeto e stack | CLI, configuração, parser CDU, agregação de cobertura |
 | Adaptador | integração parametrizável com linguagem, framework ou ferramenta | Gradle, npm, Vue, OpenAPI, Semgrep, JaCoCo |
-| Perfil SGC | convenção, caminho ou política de negócio local | notificações, views, modais, coesão e defaults SGC |
+| Perfil SGC | convenção, caminho ou política para auditar o SGC | notificações, views, modais, coesão e defaults SGC |
 
 Não é necessário generalizar toda funcionalidade. Uma política SGC bem identificada é um resultado correto. Só promover
 uma regra para núcleo ou adaptador quando o contrato horizontal estiver claro e puder ser testado sem carregar defaults
@@ -121,7 +121,7 @@ Corrigir apenas violações encontradas no recorte 1:
 - atualizar contratos públicos deliberados sem aliases de compatibilidade.
 
 Critério de saída: nenhuma capacidade classificada como núcleo ou adaptador depende de vocabulário, caminho ou regra de
-negócio SGC; capacidades locais continuam executáveis pelo perfil SGC.
+negócio SGC; capacidades locais continuam executáveis contra o workspace do SGC.
 
 ### Recorte 3 — auditoria final e encerramento
 
@@ -142,7 +142,7 @@ A modernização termina quando todos estes itens forem verdadeiros:
 - [ ] não há JavaScript legado, alias de compatibilidade ou segundo caminho de execução;
 - [ ] nomes e contratos próprios do toolkit seguem TypeScript e português brasileiro;
 - [ ] motores classificados como núcleo/adaptador não importam política ou caminho SGC;
-- [ ] políticas SGC mantidas estão identificadas e continuam funcionando;
+- [ ] políticas para auditar o SGC estão identificadas e continuam funcionando contra seu workspace;
 - [ ] CDU e análise de testes Java funcionam com fixture externa sem editar o toolkit;
 - [ ] ajuda, parser, catálogo e README concordam sobre a superfície pública;
 - [ ] o tarball instalado isoladamente executa o binário e as APIs públicas suportadas;
@@ -157,7 +157,7 @@ generalização de toda política e padronização de formatos externos também 
 Um novo achado só bloqueia a conclusão se violar pelo menos um destes pontos:
 
 1. correção ou segurança de uma funcionalidade mantida;
-2. funcionamento atual do perfil SGC;
+2. funcionamento dos comandos que auditam o workspace do SGC;
 3. reuso de uma capacidade já declarada horizontal;
 4. consistência pública de CLI, configuração, pacote ou contrato persistido;
 5. um critério de término listado acima.

@@ -52,6 +52,9 @@ O desenho desejado separa:
 - adaptadores de Java/Gradle, Vue/npm, OpenAPI e ferramentas externas;
 - perfil SGC, com seus defaults e políticas específicas.
 
+O SGC não importa nem executa o toolkit como dependência. O termo “perfil SGC” identifica apenas a composição de regras
+e defaults usada quando o toolkit audita ou opera sobre o workspace do SGC.
+
 ## Comandos representativos
 
 ### Servidor e cliente
