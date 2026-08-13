@@ -12,10 +12,10 @@ import {executarLimpeza} from "../projeto/limpar.ts";
 import {resolverEscoposInstalacao} from "../projeto/preparar.ts";
 import {executarPerfilQualidade} from "../projeto/qualidade.ts";
 import {executarAuditoriaDependencias} from "../projeto/dependencias-auditar.ts";
-import {carregarConfiguracao, validarConfiguracao, VERSAO_CONFIGURACAO} from "../lib/configuracao.ts";
+import {carregarConfiguracao, resolverCaminhoConfigurado, validarConfiguracao, VERSAO_CONFIGURACAO} from "../lib/configuracao.ts";
 import {resolverCaminhosOpenapi} from "../integracao/contratos-openapi-caminhos.ts";
 import {ADAPTADORES, PERFIS, principal as coletarFotografiaQualidade} from "../qualidade/coleta-execucao.ts";
-import {resolverDiretoriosPadrao} from "../codigo/semgrep-auditar.ts";
+import {obterComandoSemgrep, resolverDiretoriosPadrao} from "../codigo/semgrep-auditar.ts";
 import {executarAuditoria as executarAuditoriaCheiros} from "../codigo/cheiros-auditar.ts";
 import {executarCrawler, normalizarArgumentosPlaywright} from "../frontend/acessibilidade-crawler.ts";
 import {normalizarResultados} from "../frontend/acessibilidade-processar-resultados.ts";
@@ -1092,6 +1092,35 @@ describe("CLI raiz do toolkit", () => {
         expect(() => validarConfiguracao({versao: VERSAO_CONFIGURACAO, diretorios: {backendCodigoo: "servidor/java"}})).toThrow("backendCodigoo");
         expect(() => validarConfiguracao({versao: VERSAO_CONFIGURACAO, diretorios: {backendCodigo: 42}})).toThrow("backendCodigo");
         expect(() => validarConfiguracao({versao: VERSAO_CONFIGURACAO, diretorios: {backendCodigo: "   "}})).toThrow("não vazio");
+    });
+
+    test("resolve politica Semgrep padrao a partir da instalacao do toolkit", async () => {
+        const base = await mkdtemp(path.join(os.tmpdir(), "sgc-configuracao-politica-"));
+        const caminhoEsperado = path.join(
+            DIRETORIO_RAIZ,
+            "toolkit",
+            "qualidade",
+            "politicas",
+            "semgrep",
+            "sgc-qualidade.yml"
+        );
+
+        expect(resolverCaminhoConfigurado("regrasSemgrep", base)).toBe(caminhoEsperado);
+
+        const caminhoAlternativo = path.join(base, "politicas", "regras.yml");
+        await fs.outputFile(caminhoAlternativo, "rules: []\n");
+        await fs.outputJSON(path.join(base, "configuracao-toolkit.json"), {
+            versao: VERSAO_CONFIGURACAO,
+            diretorios: {regrasSemgrep: "politicas/regras.yml"}
+        });
+        expect(resolverCaminhoConfigurado("regrasSemgrep", base)).toBe(caminhoAlternativo);
+
+        const diretorioBinario = await mkdtemp(path.join(os.tmpdir(), "sgc-semgrep-bin-"));
+        const caminhoExecutavel = path.join(diretorioBinario, "semgrep");
+        await fs.outputFile(caminhoExecutavel, "#!/bin/sh\nexit 0\n");
+        await fs.chmod(caminhoExecutavel, 0o755);
+        expect(obterComandoSemgrep(diretorioBinario)).toBe(caminhoExecutavel);
+        expect(obterComandoSemgrep(path.join(diretorioBinario, "inexistente"))).toBe("semgrep");
     });
 
     test("grava fotografia de qualidade na base externa", async () => {

@@ -1,6 +1,6 @@
 import {existsSync, readFileSync} from "node:fs";
 import path from "node:path";
-import {DIRETORIO_RAIZ} from "./caminhos.js";
+import {DIRETORIO_RAIZ, DIRETORIO_TOOLKIT} from "./caminhos.js";
 
 type DiretoriosConfigurados = Record<string, string>;
 
@@ -16,6 +16,7 @@ interface ConfiguracaoSobreposta {
 
 const NOME_ARQUIVO_CONFIGURACAO = "configuracao-toolkit.json";
 const VERSAO_CONFIGURACAO = 1 as const;
+const DIRETORIOS_FORNECIDOS_PELO_TOOLKIT = new Set(["regrasSemgrep"]);
 
 const CONFIGURACAO_PADRAO: ConfiguracaoToolkit = {
     versao: VERSAO_CONFIGURACAO,
@@ -123,6 +124,17 @@ function resolverCaminhoConfigurado(nomeDiretorio: string, diretorioBase = DIRET
     const caminhoRelativo = configuracao.diretorios[nomeDiretorio];
     if (!caminhoRelativo) {
         throw new Error(`Diretorio configurado desconhecido: ${nomeDiretorio}`);
+    }
+
+    const caminhoPadrao = CONFIGURACAO_PADRAO.diretorios[nomeDiretorio];
+    if (DIRETORIOS_FORNECIDOS_PELO_TOOLKIT.has(nomeDiretorio) && caminhoRelativo === caminhoPadrao) {
+        const caminhoRelativoNoToolkit = caminhoRelativo.startsWith("toolkit/")
+            ? caminhoRelativo.slice("toolkit/".length)
+            : caminhoRelativo;
+        const caminhoDoToolkit = path.resolve(DIRETORIO_TOOLKIT, caminhoRelativoNoToolkit);
+        if (existsSync(caminhoDoToolkit)) {
+            return caminhoDoToolkit;
+        }
     }
 
     return path.resolve(diretorioBase, caminhoRelativo);

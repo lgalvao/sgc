@@ -1,10 +1,10 @@
 #!/usr/bin/env node
 
 import fs from "node:fs/promises";
-import {homedir} from "node:os";
 import path from "node:path";
 import {execa} from "execa";
 import pc from "picocolors";
+import which from "which";
 import {DIRETORIO_RAIZ} from "../lib/caminhos.js";
 import {lerOpcao} from "../lib/cli-opcoes.js";
 import {resolverCaminhoConfigurado} from "../lib/configuracao.js";
@@ -84,8 +84,8 @@ function resolverDiretoriosPadrao(diretorioBase: string = DIRETORIO_RAIZ): strin
     ];
 }
 
-function obterComandoSemgrep(): string {
-    return path.join(homedir(), ".local", "bin", "semgrep");
+function obterComandoSemgrep(caminhoBusca: string | undefined = process.env.PATH): string {
+    return which.sync("semgrep", {path: caminhoBusca, nothrow: true}) ?? "semgrep";
 }
 
 function ehRegistro(valor: unknown): valor is Record<string, unknown> {
@@ -147,6 +147,10 @@ async function executarSemgrep({
     const baseResolvida = path.resolve(diretorioBase);
     const alvos = diretorios ?? resolverDiretoriosPadrao(baseResolvida);
     const comando = obterComandoSemgrep();
+    const diretorioComando = path.isAbsolute(comando) ? path.dirname(comando) : "";
+    const caminhoBusca = [diretorioComando, process.env.PATH]
+        .filter((valor): valor is string => Boolean(valor))
+        .join(path.delimiter);
     const configs = auto ? ["--config", "auto", "--config", regra] : ["--config", regra];
     const resultado = await execa(comando, [
         "scan",
@@ -155,9 +159,7 @@ async function executarSemgrep({
         ...alvos
     ], {
         cwd: baseResolvida,
-        env: {
-            PATH: `${path.dirname(comando)}:${process.env.PATH ?? ""}`
-        },
+        env: {PATH: caminhoBusca},
         reject: false
     });
 
@@ -268,6 +270,7 @@ if (ehEntradaPrincipal(import.meta.url)) {
 
 export {
     executarSemgrep,
+    obterComandoSemgrep,
     principal,
     resolverDiretoriosPadrao
 };

@@ -171,6 +171,9 @@ O arquivo exige a versão `1` e aceita uma seção `diretorios` com nomes conhec
 Chaves desconhecidas, versões não suportadas e caminhos vazios falham na borda de configuração, antes de um auditor
 iniciar.
 
+A regra Semgrep padrão é a política do perfil SGC fornecida pelo próprio pacote. Em outro projeto, informe
+`diretorios.regrasSemgrep` para usar uma política local; o toolkit resolve o override relativo à raiz auditada.
+
 Nos comandos de inspeção de frontend, `--base` representa a raiz do projeto e resolve `frontendCodigo`; use `--dir`
 quando a intenção for apontar diretamente para outro diretório de código.
 

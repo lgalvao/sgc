@@ -157,6 +157,8 @@ frontend e para os caminhos OpenAPI.
   enquanto `--base` continua sendo a forma explícita de auditar outra raiz.
 - `fs-extra` deixou de ser dependência de runtime: o código distribuído usa APIs nativas do Node, e a biblioteca ficou
   somente em `devDependencies` para os testes JavaScript ainda não convertidos.
+- A política Semgrep padrão e o executável Semgrep agora são resolvidos de forma portável: a primeira vem da instalação
+  física do pacote e o segundo vem do `PATH`, com override de regra pela configuração do projeto.
 - Dois comandos de projeto já foram convertidos:
   - `projeto/arvore-linhas.ts`;
   - `projeto/versao-sincronizar.ts`.
@@ -338,9 +340,10 @@ frontend e para os caminhos OpenAPI.
 Nas validações desta rodada, em 13 de agosto de 2026, executadas diretamente sob Node `26.5.1` (Node 26 disponível no
 ambiente):
 
-- `npm --prefix toolkit run test`: 103 testes aprovados em 2 arquivos; o smoke de pacote é separado para não tornar a
+- `npm --prefix toolkit run test`: 104 testes aprovados em 2 arquivos; o smoke de pacote é separado para não tornar a
   suíte unitária dependente de rede ou instalação;
-- `npm --prefix toolkit run test:pacote`: 1 teste aprovado, com `npm pack`, instalação isolada e auditoria no consumidor;
+- `npm --prefix toolkit run test:pacote`: 1 teste aprovado, com `npm pack`, instalação isolada, auditoria no consumidor
+  e verificação da política Semgrep empacotada;
 - `npm --prefix toolkit run build`: aprovado;
 - `npm --prefix toolkit run typecheck`: aprovado;
 - `npm --prefix toolkit run lint`: aprovado;
@@ -366,7 +369,7 @@ outra chegou a 92 com o núcleo AST de arquitetura dependente de `frontendCodigo
 de caminhos dos relatórios V8 frontend; esta chega a 96 com o launcher `tsx` do binário npm. Nenhuma dessas mudanças
 reintroduz o wrapper obsoleto; as rodadas posteriores de limpeza, preparação, qualidade, dependências e acessibilidade
 elevam a cobertura para 101 cenários; uma rodada chega a 102 com o teste comportamental do auditor de contratos backend;
-esta rodada adiciona o smoke de pacote isolado, sem alterar a contagem da suíte unitária de 103 cenários.
+esta rodada adiciona a resolução portável do Semgrep e o smoke de pacote isolado; a suíte unitária chega a 104 cenários.
 
 ### 3.3 Tamanho e composição atual
 
@@ -375,7 +378,7 @@ Inventário dos arquivos rastreados do toolkit, excluindo `dist`, cobertura e ar
 - 72 arquivos TypeScript de implementação;
 - 0 arquivos JavaScript de implementação; o único CJS é o launcher mínimo do binário;
 - 3 arquivos JavaScript de teste (`test/sgc.test.js`, `test/cdus.test.js` e `test/pacote.test.js`);
-- 2 arquivos de teste concentrando 103 cenários, mais 1 smoke de distribuição isolada;
+- 2 arquivos de teste concentrando 104 cenários, mais 1 smoke de distribuição isolada;
 - maior módulo atual: `frontend/arquitetura-lib.ts`, com aproximadamente 1.200 linhas;
 - outros hotspots: `codigo/nomes-simbolos-coletar.ts`, `frontend/residuos-lib.ts` e
   `qualidade/coleta-execucao.ts`.
@@ -389,6 +392,7 @@ O núcleo TypeScript de implementação foi concluído: 100% dos arquivos de imp
 | Resolvido nesta rodada | Binário npm quebrado | `bin.sgc` aponta para `bin/sgc.cjs`, que chama o CLI do `tsx`; o workspace e o tarball instalado em consumidor isolado executam `sgc --help` e uma auditoria real. |
 | Resolvido nesta rodada | Pacote não distribuível | `sgc-scripts@0.1.0` declara `version`, `files`, `exports`, `bin` e dependências de runtime; `npm pack` e `npm run test:pacote` passaram. A política de publicação ainda não foi escolhida. |
 | Resolvido nesta rodada | Raiz acoplada à posição física | `lib/caminhos.ts` usa `process.cwd()` como raiz padrão e mantém `DIRETORIO_TOOLKIT` para recursos do próprio pacote; o smoke isolado confirmou que o consumidor é a base auditada. |
+| Resolvido nesta rodada | Semgrep acoplado ao ambiente local | A política padrão vinha da raiz do consumidor e o executável era fixado em `~/.local/bin/semgrep`; ambos agora usam a instalação do toolkit e o `PATH`, com testes de override e consumidor isolado. |
 | Resolvido | Configuração permissiva do Knip | A configuração anterior tratava praticamente todos os arquivos como entrypoints. A nova lista os comandos reais, inclui JS/TS e, nesta rodada, encontrou e removeu oito exports internos não consumidos. |
 | Resolvido parcialmente | Base externa é parcialmente ignorada | Arquitetura, resíduos, OpenAPI, coleta, Semgrep, cheiros e assuntos de notificação agora respeitam a base/configuração; outros comandos ainda precisam da mesma correção. |
 | Alta | Auditores gravam por padrão | Arquitetura, resíduos, cobertura, nomenclatura, Semgrep e diff OpenAPI têm escrita automática ou defaults distintos. A diretriz read-only ainda é meta, não realidade. |
@@ -411,7 +415,7 @@ O núcleo TypeScript de implementação foi concluído: 100% dos arquivos de imp
 - Parametrização parcial não significa generalização concluída.
 - Build aprovado prova que a árvore pode ser emitida; não prova que o pacote emitido contém assets, configuração e
   resolução de raiz adequados para distribuição.
-- Knip aprovado, 103 testes unitários verdes e o smoke de pacote aprovado são gates úteis, mas ainda insuficientes para afirmar ausência de código morto fora
+- Knip aprovado, 104 testes unitários verdes e o smoke de pacote aprovado são gates úteis, mas ainda insuficientes para afirmar ausência de código morto fora
   do grafo declarado, segurança de todos os comandos mutáveis ou portabilidade. O grafo do Knip agora é uma evidência
   útil de exports não consumidos; não substitui testes de pacote externo.
 

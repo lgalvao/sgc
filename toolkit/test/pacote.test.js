@@ -63,4 +63,33 @@ test("pacote fonte executa em um projeto consumidor isolado", async () => {
         base: await fs.realpath(diretorioConsumidor),
         pontuacao: {faixa: "bom"}
     });
+
+    const diretorioBinario = path.join(diretorioTemporario, "bin");
+    const caminhoSemgrep = path.join(diretorioBinario, "semgrep");
+    await fs.ensureDir(diretorioBinario);
+    await fs.outputFile(caminhoSemgrep, [
+        "#!/bin/sh",
+        "case \"$*\" in",
+        "  *sgc-scripts/qualidade/politicas/semgrep/sgc-qualidade.yml*) printf '{\"results\":[]}';;",
+        "  *) exit 2;;",
+        "esac",
+        ""
+    ].join("\n"));
+    await fs.chmod(caminhoSemgrep, 0o755);
+    const auditoriaSemgrep = await execa(executavel, [
+        "codigo",
+        "semgrep",
+        "auditar",
+        "--json",
+        "--sem-gravar"
+    ], {
+        cwd: diretorioConsumidor,
+        env: {
+            PATH: `${diretorioBinario}${path.delimiter}${process.env.PATH ?? ""}`
+        }
+    });
+    expect(JSON.parse(auditoriaSemgrep.stdout)).toMatchObject({
+        totalAchados: 0,
+        codigoSaida: 0
+    });
 }, 60000);
