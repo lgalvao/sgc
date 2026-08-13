@@ -1582,6 +1582,47 @@ describe("CLI raiz do toolkit", () => {
         expect(conteudoJson.categorias.Repositories.tested.length).toBeGreaterThanOrEqual(1);
     }, 60000);
 
+    test("analisa fontes e testes backend pelos diretorios configurados", async () => {
+        const base = await mkdtemp(path.join(os.tmpdir(), "sgc-testes-analisar-configurado-"));
+        const fonte = path.join(base, "servidor", "java", "com", "exemplo");
+        const testes = path.join(base, "servidor", "testes", "com", "exemplo");
+        const markdown = path.join(base, "relatorio.md");
+        const json = path.join(base, "relatorio.json");
+
+        await fs.outputJSON(path.join(base, "configuracao-toolkit.json"), {
+            versao: VERSAO_CONFIGURACAO,
+            diretorios: {
+                backendCodigo: "servidor/java",
+                backendTestes: "servidor/testes"
+            }
+        });
+        await fs.outputFile(
+            path.join(fonte, "ExemploService.java"),
+            "package com.exemplo; public class ExemploService { public String buscar() { return \"ok\"; } }"
+        );
+        await fs.outputFile(
+            path.join(testes, "ExemploServiceTest.java"),
+            "package com.exemplo; class ExemploServiceTest {}"
+        );
+
+        const resultado = await executarSgc([
+            "backend",
+            "testes",
+            "analisar",
+            "--base",
+            base,
+            "--output",
+            markdown,
+            "--output-json",
+            json
+        ]);
+
+        expect(resultado.exitCode).toBe(0);
+        const conteudo = await fs.readJson(json);
+        expect(conteudo.backend_dir).toBe(path.join(base, "servidor", "java"));
+        expect(conteudo.estatisticas.classes_com_teste_dedicado).toBe(1);
+    });
+
     test("ignora DTOs estruturais e contratuais do backlog real", async () => {
         const base = await mkdtemp(path.join(os.tmpdir(), "sgc-testes-analise-dto-"));
         const backendDir = path.join(base, "backend-fake");

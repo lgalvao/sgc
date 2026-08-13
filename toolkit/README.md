@@ -161,6 +161,7 @@ O arquivo exige a versão `1` e aceita uma seção `diretorios` com nomes conhec
   "versao": 1,
   "diretorios": {
     "backendCodigo": "backend/src/main/java",
+    "backendTestes": "backend/src/test/java",
     "frontendCodigo": "frontend/src",
     "artefatosQualidade": "toolkit/qualidade/artefatos"
   }

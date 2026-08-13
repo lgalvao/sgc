@@ -2,6 +2,8 @@
 import fs from "node:fs";
 import path from "node:path";
 import {lerOpcao} from "../lib/cli-opcoes.js";
+import {DIRETORIO_RAIZ} from "../lib/caminhos.js";
+import {resolverCaminhoConfigurado} from "../lib/configuracao.js";
 import {exibirAjudaComando} from "../lib/cli-ajuda.js";
 import {ehEntradaPrincipal} from "../lib/execucao.js";
 import {escreverLinha} from "../lib/saida.js";
@@ -22,8 +24,17 @@ import {
 } from "./lib/testes-analisar-regras.js";
 
 function lerArgumentos(argumentos) {
+    const base = path.resolve(lerOpcao(argumentos, "--base", DIRETORIO_RAIZ));
+    const diretorioInformado = lerOpcao(argumentos, "--dir", null);
+    const raizBackendInformada = diretorioInformado ? path.resolve(diretorioInformado) : null;
     const resultado = {
-        diretorio: lerOpcao(argumentos, "--dir", "backend"),
+        base,
+        diretorio: raizBackendInformada
+            ? path.join(raizBackendInformada, "src", "main", "java")
+            : resolverCaminhoConfigurado("backendCodigo", base),
+        diretorioTestes: raizBackendInformada
+            ? path.join(raizBackendInformada, "src", "test", "java")
+            : resolverCaminhoConfigurado("backendTestes", base),
         saida: lerOpcao(argumentos, "--output", "unit-test-report.md"),
         saidaJson: lerOpcao(argumentos, "--output-json", null),
         arquivoJacoco: lerOpcao(argumentos, "--jacoco-xml", null),
@@ -38,7 +49,8 @@ function imprimirAjuda() {
         scriptDireto: "backend/testes-analisar.js",
         descricao: 'Analisa classes sem testes correspondentes e gera relatorios em Markdown e JSON com resumo por categoria.',
         opcoes: [
-            '--dir <caminho>         Diretorio raiz do backend (padrao: backend)',
+            '--base <diretorio>     Base do projeto para resolver configuracao.',
+            '--dir <caminho>         Diretorio de fontes Java; substitui backendCodigo.',
             '--output <arquivo>      Arquivo de saida em Markdown',
             '--output-json <arquivo> Arquivo de saida estruturado em JSON (padrao: sidecar do Markdown)',
             '--jacoco-xml <arquivo>  Relatorio XML do JaCoCo para classificar cobertura indireta',
@@ -166,9 +178,10 @@ function localizarTestes(nomeClasse, pacote, indicePorNome, indicePorPacote) {
     };
 }
 
-async function carregarCoberturaPorClasse(caminhoJacocoXml = null) {
+async function carregarCoberturaPorClasse(caminhoJacocoXml = null, diretorioBase = DIRETORIO_RAIZ) {
     try {
         const coleta = await extrairCoberturaJacoco(caminhoJacocoXml || undefined, {
+            diretorioBase,
             incluirSemLacunas: true,
             aplicarExclusoes: false
         });
@@ -177,16 +190,16 @@ async function carregarCoberturaPorClasse(caminhoJacocoXml = null) {
             coleta.classes.map(arquivo => [arquivo.nomeClasse, arquivo])
         );
     } catch (error) {
-        if (String(error.message || '').includes('Relatório JaCoCo não encontrado')) {
+        if (/JaCoCo nao encontrado|JaCoCo não encontrado/i.test(String(error.message || ''))) {
             return new Map();
         }
         throw error;
     }
 }
 
-async function analisarTestes(backendDir = 'backend', caminhoJacocoXml = null) {
-    const backendSrc = path.join(backendDir, 'src/main/java');
-    const backendTest = path.join(backendDir, 'src/test/java');
+async function analisarTestes({diretorioFonte, diretorioTestes, caminhoJacocoXml = null, base = DIRETORIO_RAIZ}) {
+    const backendSrc = path.resolve(diretorioFonte);
+    const backendTest = path.resolve(diretorioTestes);
 
     if (!fs.existsSync(backendSrc)) {
         throw new Error(`Diretorio de origem nao encontrado: ${backendSrc}`);
@@ -194,7 +207,7 @@ async function analisarTestes(backendDir = 'backend', caminhoJacocoXml = null) {
 
     const arquivosFonte = listarFontes(backendSrc);
     const {indicePorNome, indicePorPacote} = indexarTestes(backendTest);
-    const coberturaPorClasse = await carregarCoberturaPorClasse(caminhoJacocoXml);
+    const coberturaPorClasse = await carregarCoberturaPorClasse(caminhoJacocoXml, base);
 
     const relatorio = {
         Controllers: {tested: [], untested: []},
@@ -339,7 +352,7 @@ async function analisarTestes(backendDir = 'backend', caminhoJacocoXml = null) {
 
     return {
         gerado_em: new Date().toISOString(),
-        backend_dir: backendDir,
+        backend_dir: backendSrc,
         estatisticas: {
             total_classes: totalClasses,
             classes_com_teste_dedicado: totalComTeste,
@@ -542,7 +555,12 @@ async function principal(argumentos = process.argv.slice(2)) {
     }
 
     const caminhoSaidaJson = opcoes.saidaJson ?? resolverSaidaJsonPadrao(opcoes.saida);
-    const dados = await analisarTestes(opcoes.diretorio, opcoes.arquivoJacoco);
+    const dados = await analisarTestes({
+        diretorioFonte: opcoes.diretorio,
+        diretorioTestes: opcoes.diretorioTestes,
+        caminhoJacocoXml: opcoes.arquivoJacoco,
+        base: opcoes.base,
+    });
     gravarArquivo(opcoes.saida, gerarMarkdown(dados));
     gravarArquivo(caminhoSaidaJson, JSON.stringify(dados, null, 2));
 

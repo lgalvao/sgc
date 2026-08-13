@@ -23,6 +23,7 @@ const CONFIGURACAO_PADRAO: ConfiguracaoToolkit = {
         backend: "backend",
         frontend: "frontend",
         backendCodigo: "backend/src/main/java/sgc",
+        backendTestes: "backend/src/test/java",
         frontendCodigo: "frontend/src",
         testesIntegracao: "e2e",
         artefatosQualidade: "toolkit/qualidade/artefatos",
