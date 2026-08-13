@@ -2,6 +2,7 @@ import fs from "node:fs";
 import path from "node:path";
 import {globby} from "globby";
 import {DIRETORIO_RAIZ} from "../lib/caminhos.js";
+import {carregarConfiguracao} from "../lib/configuracao.js";
 
 const REGEX_TITULO = /^#\s+CDU-(\d{2})\s+-\s+(.+)$/m;
 const REGEX_SECAO_ATORES = /^##\s+Atores\s*$/m;
@@ -94,7 +95,8 @@ function obterOpcoesCdu(argumentos: string[] = process.argv.slice(2)): OpcoesCdu
 }
 
 async function listarArquivosCdu(base: string = DIRETORIO_RAIZ): Promise<string[]> {
-    const padrao = normalizarCaminho(path.join(base, "specs", "cdu", "cdu-*.md"));
+    const padraoConfigurado = carregarConfiguracao(base).requisitos.cdus.padraoArquivos;
+    const padrao = normalizarCaminho(path.resolve(base, padraoConfigurado));
     const arquivos = await globby(padrao, {absolute: true});
     return arquivos.toSorted((a, b) => a.localeCompare(b, "pt-BR", {numeric: true}));
 }

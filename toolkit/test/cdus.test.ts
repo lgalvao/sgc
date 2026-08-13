@@ -200,6 +200,56 @@ describe("Ferramentas de requisitos dos CDUs", () => {
         expect(formatos.elementosUiMaisFrequentes["`Painel`"]).toBe(1);
     });
 
+    test("usa o padrão de arquivos CDU configurado pelo projeto", async () => {
+        const base = await mkdtemp(path.join(os.tmpdir(), "sgc-cdus-configuracao-corpus-"));
+        const diretorioCorpus = path.join(base, "documentacao", "casos-de-uso");
+
+        await escreverArquivo(
+            path.join(diretorioCorpus, "cdu-01.md"),
+            [
+                "# CDU-01 - Corpus configurado",
+                "",
+                "## Atores",
+                "",
+                "- ADMIN",
+                "",
+                "## Pré-condições",
+                "",
+                "- Usuário autenticado",
+                "",
+                "## Fluxo principal",
+                "",
+                "1. O usuário acessa o painel."
+            ].join("\n")
+        );
+        await escreverArquivo(
+            path.join(base, "configuracao-toolkit.json"),
+            JSON.stringify({
+                versao: 1,
+                requisitos: {
+                    cdus: {
+                        padraoArquivos: "documentacao/casos-de-uso/cdu-*.md"
+                    }
+                }
+            })
+        );
+
+        const resultado = await executarSgc([
+            "requisitos",
+            "cdus",
+            "inventariar",
+            "--json",
+            "--secoes",
+            "formatos",
+            "--base",
+            base
+        ]);
+
+        expect(resultado.exitCode).toBe(0);
+        const conteudo = lerJson<ResultadoInventarioCdus>(resultado);
+        expect(conteudo.secoes.formatos?.totalArquivos).toBe(1);
+    });
+
     test("rejeita seção CDU desconhecida", async () => {
         const resultado = await executarSgc([
             "requisitos",

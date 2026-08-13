@@ -40,15 +40,29 @@ interface ExecucoesConfiguradas {
     qualidade?: Record<string, PerfilQualidadeConfigurado>;
 }
 
+interface ConfiguracaoCdu {
+    padraoArquivos: string;
+}
+
+interface RequisitosConfigurados {
+    cdus: ConfiguracaoCdu;
+}
+
+interface RequisitosSobrepostos {
+    cdus?: Partial<ConfiguracaoCdu>;
+}
+
 interface ConfiguracaoToolkit {
     versao: 1;
     diretorios: DiretoriosConfigurados;
+    requisitos: RequisitosConfigurados;
     execucoes?: ExecucoesConfiguradas;
 }
 
 interface ConfiguracaoSobreposta {
     versao: 1;
     diretorios?: DiretoriosConfigurados;
+    requisitos?: RequisitosSobrepostos;
     execucoes?: ExecucoesConfiguradas;
 }
 
@@ -71,6 +85,11 @@ const CONFIGURACAO_PADRAO: ConfiguracaoToolkit = {
         coberturaFrontend: "frontend/coverage/coverage-final.json",
         regrasSemgrep: "toolkit/qualidade/politicas/semgrep/sgc-qualidade.yml",
         contratosOpenapi: "toolkit/qualidade/artefatos/openapi"
+    },
+    requisitos: {
+        cdus: {
+            padraoArquivos: "specs/cdu/cdu-*.md"
+        }
     }
 };
 
@@ -185,12 +204,43 @@ function validarExecucoes(valor: unknown): ExecucoesConfiguradas {
     return resultado;
 }
 
+function validarRequisitos(valor: unknown): RequisitosSobrepostos {
+    if (!ehObjeto(valor)) {
+        throw new Error(`${NOME_ARQUIVO_CONFIGURACAO}.requisitos deve ser um objeto JSON.`);
+    }
+
+    const chavesPermitidas = new Set(["cdus"]);
+    const chavesDesconhecidas = Object.keys(valor).filter(chave => !chavesPermitidas.has(chave));
+    if (chavesDesconhecidas.length > 0) {
+        throw new Error(`${NOME_ARQUIVO_CONFIGURACAO}.requisitos possui chave(s) desconhecida(s): ${chavesDesconhecidas.join(", ")}.`);
+    }
+
+    if (valor.cdus === undefined) {
+        return {};
+    }
+    if (!ehObjeto(valor.cdus)) {
+        throw new Error(`${NOME_ARQUIVO_CONFIGURACAO}.requisitos.cdus deve ser um objeto JSON.`);
+    }
+
+    const chavesPermitidasCdus = new Set(["padraoArquivos"]);
+    const chavesDesconhecidasCdus = Object.keys(valor.cdus).filter(chave => !chavesPermitidasCdus.has(chave));
+    if (chavesDesconhecidasCdus.length > 0) {
+        throw new Error(`${NOME_ARQUIVO_CONFIGURACAO}.requisitos.cdus possui chave(s) desconhecida(s): ${chavesDesconhecidasCdus.join(", ")}.`);
+    }
+
+    return {
+        cdus: valor.cdus.padraoArquivos === undefined
+            ? {}
+            : {padraoArquivos: validarTexto(valor.cdus.padraoArquivos, "requisitos.cdus.padraoArquivos")}
+    };
+}
+
 function validarConfiguracao(valor: unknown): ConfiguracaoSobreposta {
     if (!ehObjeto(valor)) {
         throw new Error(`${NOME_ARQUIVO_CONFIGURACAO} deve conter um objeto JSON.`);
     }
 
-    const chavesPermitidas = new Set(["versao", "diretorios", "execucoes"]);
+    const chavesPermitidas = new Set(["versao", "diretorios", "requisitos", "execucoes"]);
     const chavesDesconhecidas = Object.keys(valor).filter(chave => !chavesPermitidas.has(chave));
     if (chavesDesconhecidas.length > 0) {
         throw new Error(`${NOME_ARQUIVO_CONFIGURACAO} possui chave(s) desconhecida(s): ${chavesDesconhecidas.join(", ")}.`);
@@ -204,11 +254,13 @@ function validarConfiguracao(valor: unknown): ConfiguracaoSobreposta {
         throw new Error(`${NOME_ARQUIVO_CONFIGURACAO} possui versão ${String(versao)}; a versão suportada é ${VERSAO_CONFIGURACAO}.`);
     }
 
+    const requisitos = valor.requisitos === undefined ? undefined : validarRequisitos(valor.requisitos);
     const execucoes = valor.execucoes === undefined ? undefined : validarExecucoes(valor.execucoes);
     const diretorios = valor.diretorios;
     if (diretorios === undefined) {
         return {
             versao,
+            ...(requisitos === undefined ? {} : {requisitos}),
             ...(execucoes === undefined ? {} : {execucoes})
         };
     }
@@ -236,6 +288,7 @@ function validarConfiguracao(valor: unknown): ConfiguracaoSobreposta {
     return {
         versao: VERSAO_CONFIGURACAO,
         diretorios: diretoriosValidados,
+        ...(requisitos === undefined ? {} : {requisitos}),
         ...(execucoes === undefined ? {} : {execucoes})
     };
 }
@@ -254,6 +307,15 @@ function combinarConfiguracoes(
             ...execucoesSobrepostas.qualidade,
         },
     };
+    const requisitosSobrepostos = configuracaoSobreposta.requisitos ?? {};
+    const requisitos = {
+        ...configuracaoBase.requisitos,
+        ...requisitosSobrepostos,
+        cdus: {
+            ...configuracaoBase.requisitos.cdus,
+            ...requisitosSobrepostos.cdus
+        }
+    };
     return {
         ...configuracaoBase,
         ...configuracaoSobreposta,
@@ -261,6 +323,7 @@ function combinarConfiguracoes(
             ...configuracaoBase.diretorios,
             ...configuracaoSobreposta.diretorios
         },
+        requisitos,
         ...(Object.keys(execucoes).some(chave => chave !== "qualidade") || Object.keys(execucoes.qualidade ?? {}).length > 0
             ? {execucoes}
             : {})

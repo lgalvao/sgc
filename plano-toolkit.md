@@ -118,6 +118,10 @@ O formato CDU será usado em vários projetos e deve ser tratado como capacidade
 - comparação de mensagens com código recebe adaptadores por stack;
 - caminho do corpus, perfis, situações, tipos de processo, mensagens e extratores atuais do SGC pertencem ao perfil SGC.
 
+O padrão de arquivos do corpus já pode ser substituído por `requisitos.cdus.padraoArquivos` em
+`configuracao-toolkit.json`; o default continua sendo `specs/cdu/cdu-*.md`. A comparação com mensagens do código ainda
+precisa receber fontes e adaptadores configuráveis.
+
 O SGC deve continuar funcionando com `specs/cdu/cdu-*.md`, mas esse caminho não pode permanecer uma regra rígida do
 motor horizontal.
 
@@ -140,9 +144,9 @@ isolado funciona, mas as fronteiras ainda não estão concluídas:
 
 - `requisitos cdus inventariar` e `requisitos cdus auditar` agora são os únicos comandos CDU públicos; as regras menores
   continuam como módulos internos compostos por eles;
-- os dois agregadores aceitam `--secoes` e produzem JSON versionado, mas o caminho do corpus ainda é fixo em
-  `specs/cdu/cdu-*.md`;
-- a configuração não representa corpus, vocabulário, estilo nem extratores CDU;
+- os dois agregadores aceitam `--secoes` e produzem JSON versionado; o caminho do corpus já é configurável por
+  `requisitos.cdus.padraoArquivos`, com default `specs/cdu/cdu-*.md`;
+- a configuração ainda não representa vocabulário, estilo nem extratores CDU;
 - a comparação com mensagens do código ainda depende de sete caminhos rígidos do SGC e só pode ser selecionada quando as
   fontes canônicas estão presentes;
 - `backend testes analisar` e `backend testes priorizar` são somente leitura por padrão, persistem apenas com `--gravar` e
@@ -151,7 +155,8 @@ isolado funciona, mas as fronteiras ainda não estão concluídas:
   forma `--opcao=valor`; os scripts internos não publicados continuam fora desse contrato deliberado;
 - o catálogo já separa finalidade (`auditar`, `inventariar`, `gerar`, `transformar`, `orquestrar`) dos efeitos diretos de
   persistência, remoção, subprocessos e rede;
-- muitos módulos interpretam argumentos manualmente e controlam `process.exitCode` dentro da implementação;
+- os entrypoints diretos ainda atribuem `process.exitCode` ao converter erros ou achados em status do processo; isso é
+  deliberado na borda CLI, enquanto as funções reutilizáveis retornam resultados ou lançam erros;
 - resultados próprios ainda misturam português, inglês, `camelCase` e `snake_case`, especialmente na análise de testes;
 - apenas cobertura Java e web está publicada como API programática horizontal;
 - defaults de Gradle, Vue, OpenAPI, Semgrep e políticas SGC ainda aparecem dentro de módulos adaptáveis;
@@ -171,9 +176,8 @@ Prioridade imediata, porque corrige comportamento surpreendente antes de ampliar
   públicos de arquivo e `qualidade/coleta.ts` já compartilham o preflight da CLI;
 - refinar metadados de efeitos quando novas integrações forem adicionadas, mantendo a distinção entre escrita direta e
   efeitos de subprocessos externos;
-- retirar `process.exitCode` das funções de domínio e concentrar a tradução de resultados em códigos de saída na borda;
-- definir códigos compartilhados para invocação inválida, falha operacional e achados, sem aplicar código não zero a
-  inventários meramente informativos;
+- manter `process.exitCode` somente na borda dos entrypoints; não criar uma taxonomia de códigos além do contrato atual até
+  existir consumidor que precise distinguir invocação inválida, falha operacional e achados;
 - adicionar testes de contrato para erro de digitação, modo somente leitura, persistência explícita, stdout JSON e stderr.
 
 Critério de saída: nenhum comando de auditoria grava sem solicitação, opções inválidas nunca são ignoradas e o catálogo
@@ -186,7 +190,8 @@ permite determinar efeitos sem ler a implementação.
 - manter `auditar` reunindo estrutura, estilo, vocabulário, mensagens mecânicas e comparação com mensagens do código;
 - manter seleção de seções com uma opção explícita, sem transformar cada regra em subcomando público;
 - conservar detalhes e capacidades atuais no JSON agregado, identificados por seção, para não perder informação do SGC;
-- representar o corpus por configuração conceitual, com glob ou arquivos, em vez de embutir `specs/cdu/cdu-*.md`;
+- ampliar a configuração do corpus com políticas conceituais somente quando houver necessidade real de composição; o
+  padrão de glob já está em `requisitos.cdus.padraoArquivos`;
 - extrair parser e análise estrutural para contratos independentes do SGC;
 - mover vocabulário, situações, tipos, estilo e placeholders do SGC para uma política explícita;
 - separar comparação de mensagens dos extratores Java/TypeScript e permitir composição por stack;

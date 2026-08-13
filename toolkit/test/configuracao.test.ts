@@ -28,6 +28,7 @@ describe("Configuracao do toolkit", () => {
         expect(configuracao.versao).toBe(VERSAO_CONFIGURACAO);
         expect(configuracao.diretorios.backendCodigo).toBe("servidor/java");
         expect(configuracao.diretorios.frontend).toBe("frontend");
+        expect(configuracao.requisitos.cdus.padraoArquivos).toBe("specs/cdu/cdu-*.md");
     });
 
     test("rejeita configuracao com versao, chave ou caminho invalido", () => {
@@ -36,6 +37,14 @@ describe("Configuracao do toolkit", () => {
         expect(() => validarConfiguracao({versao: VERSAO_CONFIGURACAO, diretorios: {backendCodigoo: "servidor/java"}})).toThrow("backendCodigoo");
         expect(() => validarConfiguracao({versao: VERSAO_CONFIGURACAO, diretorios: {backendCodigo: 42}})).toThrow("backendCodigo");
         expect(() => validarConfiguracao({versao: VERSAO_CONFIGURACAO, diretorios: {backendCodigo: "   "}})).toThrow("não vazio");
+        expect(() => validarConfiguracao({
+            versao: VERSAO_CONFIGURACAO,
+            requisitos: {cdus: {padraoArquivos: "   "}}
+        })).toThrow("requisitos.cdus.padraoArquivos");
+        expect(() => validarConfiguracao({
+            versao: VERSAO_CONFIGURACAO,
+            requisitos: {cdus: {padraoArquivoss: "docs/*.md"}}
+        })).toThrow("padraoArquivoss");
         expect(() => validarConfiguracao({
             versao: VERSAO_CONFIGURACAO,
             execucoes: {qualidade: {rapido: {descricao: "", tarefas: []}}}

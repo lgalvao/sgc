@@ -159,6 +159,11 @@ caminhos vazios.
     "coberturaBackend": "servidor/build/reports/jacoco/test/jacocoTestReport.xml",
     "coberturaFrontend": "cliente/coverage/coverage-final.json",
     "artefatosQualidade": ".qualidade"
+  },
+  "requisitos": {
+    "cdus": {
+      "padraoArquivos": "documentacao/casos-de-uso/cdu-*.md"
+    }
   }
 }
 ```
@@ -168,6 +173,11 @@ Diretórios reconhecidos:
 - `backend`, `frontend`, `backendCodigo`, `backendTestes`, `frontendCodigo` e `testesIntegracao`;
 - `artefatosQualidade`, `coberturaBackend`, `coberturaFrontend` e `contratosOpenapi`;
 - `regrasSemgrep`, `orcamentoResiduosFrontend` e `excecoesResiduosFrontend`.
+
+O corpus CDU usa `specs/cdu/cdu-*.md` por padrão. Para outro layout, configure
+`requisitos.cdus.padraoArquivos` com um glob relativo à raiz auditada. O parser, as auditorias estruturais, a densidade e
+as duplicações continuam horizontais; políticas de vocabulário, estilo e comparação com mensagens do código ainda são
+específicas do perfil configurado.
 
 Execuções de dependências e qualidade também podem ser substituídas:
 
