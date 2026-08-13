@@ -1,13 +1,79 @@
 #!/usr/bin/env node
+
 import fs from "node:fs/promises";
 import path from "node:path";
 import {ehEntradaPrincipal} from "../lib/execucao.js";
 import {DIRETORIO_RAIZ} from "../lib/caminhos.js";
 import {escreverLinha, imprimirCabecalho, imprimirJson} from "../lib/saida.js";
-import {executarColeta} from "./nomes-simbolos-coletar.js";
+import {executarColeta, type InventarioSimbolos} from "./nomes-simbolos-coletar.js";
 import {obterCaminhoConsistencia, obterCaminhoSimbolos} from "./nomes-caminhos.js";
 
-function classificarFormatoNome(nome) {
+type FormatoNome = "camelCase" | "minusculo" | "PascalCase" | "kebab-case" | "snake_case" | "UPPER_SNAKE" | "outro";
+
+interface TipoForaPadrao {
+    arquivo: string;
+    categoria: string;
+    nome: string;
+    formato: FormatoNome;
+}
+
+interface MembroForaPadrao {
+    arquivo: string;
+    categoria: string;
+    nome: string;
+    assinatura: string;
+    formato: FormatoNome;
+}
+
+interface ParametroForaPadrao {
+    arquivo: string;
+    membro: string;
+    parametro: string;
+    formato: FormatoNome;
+}
+
+interface ParametroComId {
+    arquivo: string;
+    membro: string;
+    parametro: string;
+}
+
+interface PacoteForaPadrao {
+    pacote: string;
+    partesInvalidas: string[];
+    arquivos: string[];
+}
+
+interface AuditoriaNomes {
+    geradoEm: string;
+    base: string;
+    inventarioFonte: string;
+    indicadores: {
+        arquivos: number;
+        tiposForaPadrao: number;
+        membrosForaPadrao: number;
+        parametrosForaPadrao: number;
+        parametrosComId: number;
+        pacotesJavaForaPadrao: number;
+    };
+    formatosArquivos: Record<string, Record<string, string[]>>;
+    formatosDiretorios: Record<string, FormatoNome>;
+    tiposForaPadrao: TipoForaPadrao[];
+    membrosForaPadrao: MembroForaPadrao[];
+    parametrosForaPadrao: ParametroForaPadrao[];
+    parametrosComId: ParametroComId[];
+    pacotesJavaForaPadrao: PacoteForaPadrao[];
+}
+
+interface OpcoesAuditoriaNomes {
+    base?: string;
+    json?: boolean;
+    semGravar?: boolean;
+    inventario?: string | null;
+    saidaJson?: string | null;
+}
+
+function classificarFormatoNome(nome: string): FormatoNome {
     if (/^[a-z][a-zA-Z0-9]*$/.test(nome)) {
         if (/[A-Z]/.test(nome)) {
             return "camelCase";
@@ -29,43 +95,42 @@ function classificarFormatoNome(nome) {
     return "outro";
 }
 
-function coletarFormatosArquivos(inventario) {
-    const porExtensao = {};
+function coletarFormatosArquivos(inventario: InventarioSimbolos): Record<string, Record<string, string[]>> {
+    const porExtensao: Record<string, Record<string, string[]>> = {};
     for (const arquivo of inventario.arquivos) {
         const nomeArquivo = path.basename(arquivo.caminho);
         const extensao = path.extname(nomeArquivo) || "<sem-ext>";
         const semExtensao = nomeArquivo.slice(0, nomeArquivo.length - extensao.length);
         const formato = classificarFormatoNome(semExtensao);
 
-        if (!porExtensao[extensao]) {
-            porExtensao[extensao] = {};
-        }
-        if (!porExtensao[extensao][formato]) {
-            porExtensao[extensao][formato] = [];
-        }
+        porExtensao[extensao] ??= {};
+        porExtensao[extensao][formato] ??= [];
         porExtensao[extensao][formato].push(arquivo.caminho);
     }
     return porExtensao;
 }
 
-function coletarSegmentosDiretorio(inventario) {
-    const formatos = {};
+function coletarSegmentosDiretorio(inventario: InventarioSimbolos): Record<string, FormatoNome> {
+    const formatos: Record<string, FormatoNome> = {};
     for (const arquivo of inventario.arquivos) {
         const segmentos = arquivo.caminho.split("/").slice(0, -1);
         for (const segmento of segmentos) {
-            if (!formatos[segmento]) {
-                formatos[segmento] = classificarFormatoNome(segmento);
-            }
+            formatos[segmento] ??= classificarFormatoNome(segmento);
         }
     }
     return formatos;
 }
 
-function filtrarSimbolosForaPadrao(inventario) {
-    const tiposForaPadrao = [];
-    const membrosForaPadrao = [];
-    const parametrosForaPadrao = [];
-    const parametrosComId = [];
+function filtrarSimbolosForaPadrao(inventario: InventarioSimbolos): {
+    tiposForaPadrao: TipoForaPadrao[];
+    membrosForaPadrao: MembroForaPadrao[];
+    parametrosForaPadrao: ParametroForaPadrao[];
+    parametrosComId: ParametroComId[];
+} {
+    const tiposForaPadrao: TipoForaPadrao[] = [];
+    const membrosForaPadrao: MembroForaPadrao[] = [];
+    const parametrosForaPadrao: ParametroForaPadrao[] = [];
+    const parametrosComId: ParametroComId[] = [];
 
     for (const arquivo of inventario.arquivos) {
         for (const tipo of arquivo.tipos) {
@@ -97,7 +162,10 @@ function filtrarSimbolosForaPadrao(inventario) {
 
             for (const parametro of membro.parametros ?? []) {
                 const formatoParametro = classificarFormatoNome(parametro);
-                if (formatoParametro !== "camelCase" && formatoParametro !== "minusculo" && !parametro.startsWith("{") && !parametro.startsWith("[")) {
+                if (formatoParametro !== "camelCase"
+                    && formatoParametro !== "minusculo"
+                    && !parametro.startsWith("{")
+                    && !parametro.startsWith("[")) {
                     parametrosForaPadrao.push({
                         arquivo: arquivo.caminho,
                         membro: membro.assinatura,
@@ -117,19 +185,14 @@ function filtrarSimbolosForaPadrao(inventario) {
         }
     }
 
-    return {
-        tiposForaPadrao,
-        membrosForaPadrao,
-        parametrosForaPadrao,
-        parametrosComId
-    };
+    return {tiposForaPadrao, membrosForaPadrao, parametrosForaPadrao, parametrosComId};
 }
 
-function auditarPacotesJava(inventario) {
-    const pacotesForaPadrao = [];
+function auditarPacotesJava(inventario: InventarioSimbolos): PacoteForaPadrao[] {
+    const pacotesForaPadrao: PacoteForaPadrao[] = [];
     for (const pacote of inventario.pacotesJava) {
         const partes = pacote.nome.split(".");
-        const partesInvalidas = partes.filter((parte) => !/^[a-z][a-z0-9]*$/.test(parte));
+        const partesInvalidas = partes.filter(parte => !/^[a-z][a-z0-9]*$/.test(parte));
         if (partesInvalidas.length > 0) {
             pacotesForaPadrao.push({
                 pacote: pacote.nome,
@@ -141,8 +204,8 @@ function auditarPacotesJava(inventario) {
     return pacotesForaPadrao;
 }
 
-function montarResumo(auditoria) {
-    const linhas = [];
+function montarResumo(auditoria: AuditoriaNomes): string {
+    const linhas: string[] = [];
     linhas.push("# Auditoria de consistencia de nomenclatura");
     linhas.push("");
     linhas.push(`Gerado em: ${auditoria.geradoEm}`);
@@ -209,12 +272,28 @@ function montarResumo(auditoria) {
     return `${linhas.join("\n")}\n`;
 }
 
-async function carregarInventario(caminhoInventario, base, semGravar = false) {
+function ehInventarioSimbolos(valor: unknown): valor is InventarioSimbolos {
+    if (typeof valor !== "object" || valor === null) {
+        return false;
+    }
+    const registro = valor as Record<string, unknown>;
+    const totais = registro.totais;
+    return typeof registro.base === "string"
+        && Array.isArray(registro.arquivos)
+        && typeof totais === "object"
+        && totais !== null;
+}
+
+async function carregarInventario(caminhoInventario: string, base: string, semGravar: boolean): Promise<InventarioSimbolos> {
     const caminhoAbsoluto = path.isAbsolute(caminhoInventario) ? caminhoInventario : path.resolve(base, caminhoInventario);
     try {
-        return JSON.parse(await fs.readFile(caminhoAbsoluto, "utf8"));
+        const valor: unknown = JSON.parse(await fs.readFile(caminhoAbsoluto, "utf8"));
+        if (!ehInventarioSimbolos(valor)) {
+            throw new Error("Inventário de símbolos inválido.");
+        }
+        return valor;
     } catch {
-        return await executarColeta({
+        return executarColeta({
             base,
             semGravar,
             arquivoSaida: caminhoAbsoluto,
@@ -224,12 +303,12 @@ async function carregarInventario(caminhoInventario, base, semGravar = false) {
 }
 
 async function executarAuditoriaNomes({
-                                          base = DIRETORIO_RAIZ,
-                                          json = false,
-                                          semGravar = false,
-                                          inventario = null,
-                                          saidaJson = null
-                                      } = {}) {
+    base = DIRETORIO_RAIZ,
+    json = false,
+    semGravar = false,
+    inventario = null,
+    saidaJson = null
+}: OpcoesAuditoriaNomes = {}): Promise<AuditoriaNomes> {
     const baseResolvida = path.resolve(base);
     const caminhoInventario = inventario ?? obterCaminhoSimbolos(baseResolvida);
     const caminhoSaida = saidaJson ?? obterCaminhoConsistencia(baseResolvida);
@@ -244,7 +323,7 @@ async function executarAuditoriaNomes({
     } = filtrarSimbolosForaPadrao(dadosInventario);
     const pacotesJavaForaPadrao = auditarPacotesJava(dadosInventario);
 
-    const auditoria = {
+    const auditoria: AuditoriaNomes = {
         geradoEm: new Date().toISOString(),
         base: baseResolvida,
         inventarioFonte: caminhoInventario,
@@ -295,8 +374,8 @@ async function executarAuditoriaNomes({
     return auditoria;
 }
 
-function lerOpcoes(argv) {
-    const opcoes = {
+function lerOpcoes(argv: string[]): OpcoesAuditoriaNomes {
+    const opcoes: OpcoesAuditoriaNomes = {
         base: DIRETORIO_RAIZ,
         json: false,
         semGravar: false,
@@ -333,7 +412,7 @@ function lerOpcoes(argv) {
     return opcoes;
 }
 
-async function principal(argumentos = process.argv.slice(2)) {
+async function principal(argumentos: string[] = process.argv.slice(2)): Promise<void> {
     if (argumentos.includes("--help") || argumentos.includes("-h")) {
         escreverLinha("Uso: npx tsx toolkit/sgc.ts codigo nomes auditar-consistencia [--json] [--sem-gravar] [--base <diretorio>] [--inventario <arquivo.json>] [--saida <arquivo.json>]");
         escreverLinha("");
@@ -345,7 +424,7 @@ async function principal(argumentos = process.argv.slice(2)) {
 }
 
 if (ehEntradaPrincipal(import.meta.url)) {
-    principal().catch((erro) => {
+    principal().catch((erro: unknown) => {
         escreverLinha(`Erro ao auditar nomenclatura: ${erro instanceof Error ? erro.message : String(erro)}`);
         process.exitCode = 1;
     });

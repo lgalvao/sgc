@@ -11,7 +11,7 @@
     "backend/testes-priorizar.ts",
     "codigo/cheiros-auditar.js",
     "codigo/idioma-consistencia-auditar.js",
-    "codigo/nomes-consistencia-auditar.js",
+    "codigo/nomes-consistencia-auditar.ts",
     "codigo/nomes-simbolos-coletar.ts",
     "codigo/semgrep-auditar.js",
     "frontend/acessibilidade-crawler.ts",

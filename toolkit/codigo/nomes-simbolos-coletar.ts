@@ -24,7 +24,7 @@ interface MembroSimbolo {
     retorno?: string | null;
 }
 
-interface ArquivoSimbolos {
+export interface ArquivoSimbolos {
     caminho: string;
     linguagem: Linguagem;
     pacote: string | null;
@@ -46,7 +46,7 @@ interface PacoteJava {
     arquivos: string[];
 }
 
-interface InventarioSimbolos {
+export interface InventarioSimbolos {
     geradoEm: string;
     base: string;
     totais: {
