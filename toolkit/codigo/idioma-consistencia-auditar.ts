@@ -1,53 +1,122 @@
 #!/usr/bin/env node
-/**
- * Audita inconsistências de idioma (inglês vs português) e uso de `id` vs `codigo`
- * em nomes de membros, campos e parâmetros no código-fonte do SGC.
- *
- * Uso: npx tsx toolkit/sgc.ts codigo nomes auditar-idioma [--json] [--sem-gravar]
- */
+
 import fs from "node:fs/promises";
 import path from "node:path";
 import {ehEntradaPrincipal} from "../lib/execucao.js";
 import {DIRETORIO_RAIZ} from "../lib/caminhos.js";
 import {escreverLinha, imprimirCabecalho, imprimirJson} from "../lib/saida.js";
-import {executarColeta} from "./nomes-simbolos-coletar.js";
+import {executarColeta, type InventarioSimbolos} from "./nomes-simbolos-coletar.js";
 import {obterCaminhoIdioma, obterCaminhoSimbolos} from "./nomes-caminhos.js";
 
-// Prefixos/sufixos ingleses conhecidos em APIs públicas de composables/views/services
+type TipoIdioma = "nome-ingles-exato" | "prefixo-ingles";
+type TipoId = "campo-id-exato" | "sufixo-Id";
+
+interface DeteccaoIdioma {
+    tipo: TipoIdioma;
+    nome: string;
+    prefixo?: string;
+}
+
+interface DeteccaoId {
+    tipo: TipoId;
+    nome: string;
+}
+
+interface MembroIngles {
+    arquivo: string;
+    categoria: string;
+    nome: string;
+    assinatura: string;
+    tipo: TipoIdioma;
+    prefixo?: string;
+}
+
+interface CampoComId {
+    arquivo: string;
+    categoria: string;
+    nome: string;
+    assinatura: string;
+    tipo: TipoId;
+}
+
+interface ParametroComId {
+    arquivo: string;
+    membro: string;
+    parametro: string;
+    tipo: TipoId;
+}
+
+interface ArquivoIdioma {
+    arquivo: string;
+    quantidade: number;
+    nomes: string[];
+}
+
+interface AnaliseIdioma {
+    membrosIngles: MembroIngles[];
+    camposComId: CampoComId[];
+    parametrosComId: ParametroComId[];
+    topArquivos: ArquivoIdioma[];
+    porPrefixo: Record<string, number>;
+}
+
+interface AuditoriaIdioma {
+    geradoEm: string;
+    base: string;
+    inventarioFonte: string;
+    indicadores: {
+        arquivos: number;
+        membrosIngles: number;
+        camposComId: number;
+        parametrosComId: number;
+        scoreTotal: number;
+    };
+    porPrefixo: Record<string, number>;
+    topArquivos: ArquivoIdioma[];
+    membrosIngles: MembroIngles[];
+    camposComId: CampoComId[];
+    parametrosComId: ParametroComId[];
+}
+
+interface OpcoesAuditoriaIdioma {
+    base?: string;
+    json?: boolean;
+    semGravar?: boolean;
+    inventario?: string | null;
+    saidaJson?: string | null;
+}
+
 const PREFIXOS_INGLES = [
     "get", "set", "clear", "has", "is", "handle", "with", "last", "fetch",
     "reset", "update", "delete", "create", "save", "load", "show", "hide",
     "open", "close", "toggle", "add", "remove", "build", "parse"
 ];
 
-// Padrão regex para detectar nomes que começam com prefixo inglês seguido de maiúscula
-const REGEX_PREFIXO_INGLES = new RegExp(
-    `^(${PREFIXOS_INGLES.join("|")})[A-Z]`
-);
+const REGEX_PREFIXO_INGLES = new RegExp(`^(${PREFIXOS_INGLES.join("|")})[A-Z]`);
 
-// Palavras inglesas standalone (nomes completos, não prefixos)
 const NOMES_INGLES_EXATOS = new Set([
     "loading", "saving", "error", "errors", "warning", "success",
     "pending", "disabled", "enabled", "visible", "hidden",
     "loading", "submitting", "fetching"
 ]);
 
-// Sufixos de identificador que deveriam ser `Codigo` no SGC
 const SUFIXOS_ID_FINAL = /Id$/;
 const NOME_EXATO_ID = /^id$/;
 
-function detectarIdiomaMembro(nome) {
+function detectarIdiomaMembro(nome: string): DeteccaoIdioma | null {
     if (NOMES_INGLES_EXATOS.has(nome)) {
         return {tipo: "nome-ingles-exato", nome};
     }
     if (REGEX_PREFIXO_INGLES.test(nome)) {
-        const prefixo = PREFIXOS_INGLES.find(p => nome.startsWith(p) && nome.length > p.length && nome[p.length] === nome[p.length].toUpperCase());
+        const prefixo = PREFIXOS_INGLES.find(p => nome.startsWith(p)
+            && nome.length > p.length
+            && nome[p.length] === nome[p.length].toUpperCase());
         return {tipo: "prefixo-ingles", nome, prefixo};
     }
     return null;
 }
 
-function detectarUsoId(nome) {
+function detectarUsoId(nome: string): DeteccaoId | null {
     if (NOME_EXATO_ID.test(nome)) {
         return {tipo: "campo-id-exato", nome};
     }
@@ -57,41 +126,38 @@ function detectarUsoId(nome) {
     return null;
 }
 
-function analisarInventario(inventario) {
-    const membrosIngles = [];
-    const camposComId = [];
-    const parametrosComId = [];
+function analisarInventario(inventario: InventarioSimbolos): AnaliseIdioma {
+    const membrosIngles: MembroIngles[] = [];
+    const camposComId: CampoComId[] = [];
+    const parametrosComId: ParametroComId[] = [];
 
     for (const arquivo of inventario.arquivos) {
         for (const membro of arquivo.membros) {
-            // Detectar nomes de membros em inglês
             const deteccaoIdioma = detectarIdiomaMembro(membro.nome);
             if (deteccaoIdioma) {
                 membrosIngles.push({
                     arquivo: arquivo.caminho,
                     categoria: membro.categoria,
-                    nome: membro.nome,
                     assinatura: membro.assinatura,
                     ...deteccaoIdioma
                 });
             }
 
-            // Detectar campos/propriedades com `id`/`*Id`
-            if (membro.categoria === "campo" || membro.categoria === "propriedade" ||
-                membro.categoria === "campo-record" || membro.categoria === "atributo") {
+            if (membro.categoria === "campo"
+                || membro.categoria === "propriedade"
+                || membro.categoria === "campo-record"
+                || membro.categoria === "atributo") {
                 const deteccaoId = detectarUsoId(membro.nome);
                 if (deteccaoId) {
                     camposComId.push({
                         arquivo: arquivo.caminho,
                         categoria: membro.categoria,
-                        nome: membro.nome,
                         assinatura: membro.assinatura,
                         ...deteccaoId
                     });
                 }
             }
 
-            // Detectar parâmetros com `id`/`*Id`
             for (const parametro of membro.parametros ?? []) {
                 const nomeLimpo = parametro.replace(/^[{[\]},\s]+/, "").split(/[,\s]/)[0];
                 const deteccaoId = detectarUsoId(nomeLimpo);
@@ -107,39 +173,28 @@ function analisarInventario(inventario) {
         }
     }
 
-    // Agrupar membros ingleses por arquivo para facilitar análise
-    const porArquivo = {};
+    const porArquivo: Record<string, string[]> = {};
     for (const item of membrosIngles) {
-        if (!porArquivo[item.arquivo]) {
-            porArquivo[item.arquivo] = [];
-        }
+        porArquivo[item.arquivo] ??= [];
         porArquivo[item.arquivo].push(item.nome);
     }
 
-    // Top arquivos com mais membros ingleses
-    const topArquivos = Object.entries(porArquivo)
+    const topArquivos: ArquivoIdioma[] = Object.entries(porArquivo)
         .map(([arquivo, nomes]) => ({arquivo, quantidade: nomes.length, nomes}))
         .toSorted((a, b) => b.quantidade - a.quantidade)
         .slice(0, 20);
 
-    // Distribuição por prefixo
-    const porPrefixo = {};
+    const porPrefixo: Record<string, number> = {};
     for (const item of membrosIngles) {
         const chave = item.prefixo ?? item.tipo;
         porPrefixo[chave] = (porPrefixo[chave] ?? 0) + 1;
     }
 
-    return {
-        membrosIngles,
-        camposComId,
-        parametrosComId,
-        topArquivos,
-        porPrefixo
-    };
+    return {membrosIngles, camposComId, parametrosComId, topArquivos, porPrefixo};
 }
 
-function montarResumo(auditoria) {
-    const linhas = [];
+function montarResumo(auditoria: AuditoriaIdioma): string {
+    const linhas: string[] = [];
     linhas.push("# Auditoria de consistência de idioma (inglês vs português)");
     linhas.push("");
     linhas.push(`Gerado em: ${auditoria.geradoEm}`);
@@ -156,8 +211,8 @@ function montarResumo(auditoria) {
     linhas.push("");
     linhas.push("| Prefixo/Tipo | Ocorrências |");
     linhas.push("|---|---|");
-    for (const [prefixo, qtd] of Object.entries(auditoria.porPrefixo).toSorted((a, b) => b[1] - a[1])) {
-        linhas.push(`| ${prefixo} | ${qtd} |`);
+    for (const [prefixo, quantidade] of Object.entries(auditoria.porPrefixo).toSorted((a, b) => b[1] - a[1])) {
+        linhas.push(`| ${prefixo} | ${quantidade} |`);
     }
     if (Object.keys(auditoria.porPrefixo).length === 0) {
         linhas.push("| (nenhum) | 0 |");
@@ -189,35 +244,51 @@ function montarResumo(auditoria) {
     return `${linhas.join("\n")}\n`;
 }
 
-async function carregarInventario(caminhoInventario, base) {
+function ehInventarioSimbolos(valor: unknown): valor is InventarioSimbolos {
+    if (typeof valor !== "object" || valor === null) {
+        return false;
+    }
+    const registro = valor as Record<string, unknown>;
+    const totais = registro.totais;
+    return typeof registro.base === "string"
+        && Array.isArray(registro.arquivos)
+        && typeof totais === "object"
+        && totais !== null;
+}
+
+async function carregarInventario(caminhoInventario: string, base: string, semGravar: boolean): Promise<InventarioSimbolos> {
     const caminhoAbsoluto = path.isAbsolute(caminhoInventario) ? caminhoInventario : path.resolve(base, caminhoInventario);
     try {
-        return JSON.parse(await fs.readFile(caminhoAbsoluto, "utf8"));
+        const valor: unknown = JSON.parse(await fs.readFile(caminhoAbsoluto, "utf8"));
+        if (!ehInventarioSimbolos(valor)) {
+            throw new Error("Inventário de símbolos inválido.");
+        }
+        return valor;
     } catch {
-        return await executarColeta({
+        return executarColeta({
             base,
-            semGravar: false,
-            arquivoSaida: caminhoAbsoluto
+            semGravar,
+            arquivoSaida: caminhoAbsoluto,
+            silencioso: true
         });
     }
 }
 
 async function executarAuditoriaIdioma({
-                                           base = DIRETORIO_RAIZ,
-                                           json = false,
-                                           semGravar = false,
-                                           inventario = null,
-                                           saidaJson = null
-                                       } = {}) {
+    base = DIRETORIO_RAIZ,
+    json = false,
+    semGravar = false,
+    inventario = null,
+    saidaJson = null
+}: OpcoesAuditoriaIdioma = {}): Promise<AuditoriaIdioma> {
     const baseResolvida = path.resolve(base);
     const caminhoInventario = inventario ?? obterCaminhoSimbolos(baseResolvida);
     const caminhoSaida = saidaJson ?? obterCaminhoIdioma(baseResolvida);
-    const dadosInventario = await carregarInventario(caminhoInventario, baseResolvida);
+    const dadosInventario = await carregarInventario(caminhoInventario, baseResolvida, semGravar);
     const {membrosIngles, camposComId, parametrosComId, topArquivos, porPrefixo} = analisarInventario(dadosInventario);
 
     const scoreTotal = membrosIngles.length + camposComId.length + parametrosComId.length;
-
-    const auditoria = {
+    const auditoria: AuditoriaIdioma = {
         geradoEm: new Date().toISOString(),
         base: baseResolvida,
         inventarioFonte: caminhoInventario,
@@ -251,8 +322,8 @@ async function executarAuditoriaIdioma({
     imprimirCabecalho("Auditoria de idioma (inglês vs português)", `Base: ${auditoria.base}`);
     escreverLinha(`Arquivos analisados: ${auditoria.indicadores.arquivos}`);
     escreverLinha(`Membros com nome inglês: ${auditoria.indicadores.membrosIngles}`);
-    escreverLinha(`Campos com id/*Id: ${auditoria.indicadores.camposComId}`);
-    escreverLinha(`Parâmetros com id/*Id: ${auditoria.indicadores.parametrosComId}`);
+    escreverLinha("Campos com id/*Id: " + auditoria.indicadores.camposComId);
+    escreverLinha("Parâmetros com id/*Id: " + auditoria.indicadores.parametrosComId);
     escreverLinha(`Score total (menor = melhor): ${auditoria.indicadores.scoreTotal}`);
 
     if (auditoria.topArquivos.length > 0) {
@@ -273,8 +344,8 @@ async function executarAuditoriaIdioma({
     return auditoria;
 }
 
-function lerOpcoes(argv) {
-    const opcoes = {
+function lerOpcoes(argv: string[]): OpcoesAuditoriaIdioma {
+    const opcoes: OpcoesAuditoriaIdioma = {
         base: DIRETORIO_RAIZ,
         json: false,
         semGravar: false,
@@ -303,7 +374,7 @@ function lerOpcoes(argv) {
     return opcoes;
 }
 
-async function principal(argumentos = process.argv.slice(2)) {
+async function principal(argumentos: string[] = process.argv.slice(2)): Promise<void> {
     if (argumentos.includes("--help") || argumentos.includes("-h")) {
         escreverLinha("Uso: npx tsx toolkit/sgc.ts codigo nomes auditar-idioma [--json] [--sem-gravar] [--base <diretorio>] [--inventario <arquivo.json>] [--saida <arquivo.json>]");
         escreverLinha("");
@@ -315,7 +386,7 @@ async function principal(argumentos = process.argv.slice(2)) {
 }
 
 if (ehEntradaPrincipal(import.meta.url)) {
-    principal().catch((erro) => {
+    principal().catch((erro: unknown) => {
         escreverLinha(`Erro ao auditar idioma: ${erro instanceof Error ? erro.message : String(erro)}`);
         process.exitCode = 1;
     });

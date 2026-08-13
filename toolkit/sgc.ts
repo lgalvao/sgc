@@ -84,7 +84,7 @@ criarComandoScript(codigoSemgrep, "auditar", "Executa regras locais de Semgrep p
 const codigoNomes = codigo.command("nomes").description("Inventario e auditoria de nomenclatura do projeto.");
 criarComandoScript(codigoNomes, "coletar-simbolos", "Gera inventario de pacotes, arquivos, tipos e membros.", "toolkit/codigo/nomes-simbolos-coletar.ts");
 criarComandoScript(codigoNomes, "auditar-consistencia", "Audita padroes e divergencias de nomenclatura.", "toolkit/codigo/nomes-consistencia-auditar.ts");
-criarComandoScript(codigoNomes, "auditar-idioma", "Detecta nomes em inglês e campos com 'id' que deveriam usar 'codigo'.", "toolkit/codigo/idioma-consistencia-auditar.js");
+criarComandoScript(codigoNomes, "auditar-idioma", "Detecta nomes em inglês e campos com 'id' que deveriam usar 'codigo'.", "toolkit/codigo/idioma-consistencia-auditar.ts");
 
 const integracao = program.command("integracao").description("Ferramentas de qualidade na fronteira backend/frontend.");
 const integracaoContratos = integracao.command("contratos").description("Auditorias e artefatos de contrato HTTP.");

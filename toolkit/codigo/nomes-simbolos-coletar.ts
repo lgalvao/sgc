@@ -9,7 +9,15 @@ import {obterCaminhoSimbolos} from "./nomes-caminhos.js";
 
 type Linguagem = "java" | "typescript" | "javascript" | "vue";
 type CategoriaTipo = "class" | "interface" | "enum" | "record" | "type";
-type CategoriaMembro = "funcao" | "funcao-arrow" | "metodo" | "construtor";
+type CategoriaMembro =
+    | "funcao"
+    | "funcao-arrow"
+    | "metodo"
+    | "construtor"
+    | "campo"
+    | "propriedade"
+    | "campo-record"
+    | "atributo";
 
 interface TipoSimbolo {
     categoria: CategoriaTipo;
