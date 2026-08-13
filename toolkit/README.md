@@ -112,6 +112,9 @@ Markdown e JSON no diretório de artefatos configurado.
 
 `backend coesao auditar` segue o mesmo contrato e só grava os relatórios quando recebe `--gravar`.
 
+`backend contratos auditar` também é somente leitura por padrão; `--gravar` persiste o relatório Markdown sem alterar
+o código Java.
+
 ### Requisitos
 
 ```bash

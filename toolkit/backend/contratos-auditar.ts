@@ -400,20 +400,21 @@ function exibirAjuda(): void {
         descricao: "Audita DTOs e responses expostos por controllers para detectar vazamento de tipos model.* no contrato HTTP.",
         opcoes: [
             "--json              Emite o relatório em JSON.",
-            "--sem-gravar        Nao grava o Markdown em disco.",
+            "--gravar            Grava o relatório Markdown em disco.",
+            "--base <diretorio>  Sobrescreve a base da auditoria.",
             "--help, -h          Exibe esta ajuda."
         ],
         exemplos: [
             "npx tsx toolkit/sgc.ts backend contratos auditar",
             "npx tsx toolkit/sgc.ts backend contratos auditar --json",
-            "npx tsx toolkit/sgc.ts backend contratos auditar --sem-gravar"
+            "npx tsx toolkit/sgc.ts backend contratos auditar --gravar"
         ]
     });
 }
 
 async function principal(argumentos: string[] = process.argv.slice(2)): Promise<void> {
     const emitirJson = argumentos.includes("--json");
-    const semGravar = argumentos.includes("--sem-gravar");
+    const gravar = argumentos.includes("--gravar");
     const diretorioBase = path.resolve(lerOpcao(argumentos, "--base", DIRETORIO_RAIZ) ?? DIRETORIO_RAIZ);
     const diretorioCodigo = resolverCaminhoConfigurado("backendCodigo", diretorioBase);
     const diretorioSaida = path.join(resolverCaminhoConfigurado("artefatosQualidade", diretorioBase), "backend", "latest");
@@ -430,7 +431,7 @@ async function principal(argumentos: string[] = process.argv.slice(2)): Promise<
 
     const relatorio = await auditarContratos(diretorioCodigo, diretorioBase);
 
-    if (!semGravar) {
+    if (gravar) {
         const caminhoRelatorio = await gravarRelatorio(relatorio, diretorioSaida);
         if (!emitirJson) {
             escreverLinha(`Relatório Markdown: ${pc.dim(caminhoRelatorio)}`);
