@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+// Inventário de duplicações textuais nos casos de uso CDU.
 
 import path from "node:path";
 import {ehEntradaPrincipal} from "../lib/execucao.js";
@@ -6,7 +7,28 @@ import {escreverLinha, imprimirJson} from "../lib/saida.js";
 import {lerArquivo, listarArquivosCdu, obterOpcoesCdu} from "./cdus-lib.js";
 import {extrairAssuntos, extrairDescricoes, extrairMensagens, extrairToasts} from "./cdus-mensagens-lib.js";
 
-function normalizarBloco(texto) {
+type TipoDuplicacao = "bloco_texto" | "assunto" | "descricao" | "mensagem" | "toast";
+
+interface ItemRegistrado {
+    arquivos: string[];
+    tipo: TipoDuplicacao;
+    amostra: string;
+}
+
+interface Duplicacao {
+    ocorrencias: number;
+    arquivos: string[];
+    tipo: TipoDuplicacao;
+    amostra: string;
+}
+
+interface ResultadoDuplicacoes {
+    base: string;
+    totalArquivos: number;
+    duplicacoes: Duplicacao[];
+}
+
+function normalizarBloco(texto: string): string {
     return texto
         .trim()
         .replaceAll(/\r/g, "")
@@ -14,14 +36,20 @@ function normalizarBloco(texto) {
         .replaceAll(/\n{2,}/g, "\n");
 }
 
-async function principal(argumentos = process.argv.slice(2)) {
+async function principal(argumentos: string[] = process.argv.slice(2)): Promise<void> {
     const {emitirJson, base} = obterOpcoesCdu(argumentos);
 
     const arquivos = await listarArquivosCdu(base);
-    const blocos = new Map();
-    const itens = new Map();
+    const blocos = new Map<string, ItemRegistrado>();
+    const itens = new Map<string, ItemRegistrado>();
 
-    function registrar(mapa, chave, arquivo, tipo, amostra) {
+    function registrar(
+        mapa: Map<string, ItemRegistrado>,
+        chave: string,
+        arquivo: string,
+        tipo: TipoDuplicacao,
+        amostra: string
+    ): void {
         const atual = mapa.get(chave) ?? {arquivos: [], tipo, amostra};
         atual.arquivos.push(arquivo);
         mapa.set(chave, atual);
@@ -55,7 +83,7 @@ async function principal(argumentos = process.argv.slice(2)) {
         }
     }
 
-    const duplicacoes = [
+    const duplicacoes: Duplicacao[] = [
         ...[...blocos.values()].map(item => ({
             ocorrencias: item.arquivos.length,
             arquivos: [...new Set(item.arquivos)].toSorted((a, b) => a.localeCompare(b, "pt-BR")),
@@ -72,7 +100,7 @@ async function principal(argumentos = process.argv.slice(2)) {
         .filter(item => item.arquivos.length > 1)
         .toSorted((a, b) => b.ocorrencias - a.ocorrencias || a.arquivos[0].localeCompare(b.arquivos[0], "pt-BR"));
 
-    const resultado = {
+    const resultado: ResultadoDuplicacoes = {
         base,
         totalArquivos: arquivos.length,
         duplicacoes

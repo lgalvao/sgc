@@ -46,7 +46,7 @@
     "requisitos/cdus-auditar-vocabulario.js",
     "requisitos/cdus-auditar.ts",
     "requisitos/cdus-inventariar-densidade.ts",
-    "requisitos/cdus-inventariar-duplicacoes.js",
+    "requisitos/cdus-inventariar-duplicacoes.ts",
     "requisitos/cdus-inventariar-mensagens.js",
     "requisitos/cdus-inventariar-vocabulario.js",
     "requisitos/cdus-inventariar.js"

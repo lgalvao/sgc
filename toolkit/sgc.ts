@@ -103,7 +103,7 @@ criarComandoScript(requisitosCdus, "inventariar-mensagens", "Inventaria descriç
 criarComandoScript(requisitosCdus, "auditar-mensagens", "Audita problemas mecânicos em descrições, assuntos, mensagens e toasts dos `specs/cdu-*.md`.", "toolkit/requisitos/cdus-auditar-mensagens.js");
 criarComandoScript(requisitosCdus, "auditar-mensagens-codigo", "Compara descrições, mensagens e toasts dos `specs/cdu-*.md` com mensagens canônicas extraídas do código.", "toolkit/requisitos/cdus-auditar-mensagens-codigo.js");
 criarComandoScript(requisitosCdus, "inventariar-densidade", "Inventaria densidade documental dos `specs/cdu-*.md` por palavras, passos e profundidade de listas.", "toolkit/requisitos/cdus-inventariar-densidade.ts");
-criarComandoScript(requisitosCdus, "inventariar-duplicacoes", "Inventaria blocos textuais duplicados nos `specs/cdu-*.md`.", "toolkit/requisitos/cdus-inventariar-duplicacoes.js");
+criarComandoScript(requisitosCdus, "inventariar-duplicacoes", "Inventaria blocos textuais duplicados nos `specs/cdu-*.md`.", "toolkit/requisitos/cdus-inventariar-duplicacoes.ts");
 
 const qualidade = program.command("qualidade").description("Ferramentas de coleta e analise da qualidade.");
 qualidade

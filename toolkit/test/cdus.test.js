@@ -19,7 +19,7 @@ const CAMINHOS_COMANDOS_CDU = [
     "cdus-auditar-mensagens.js",
     "cdus-auditar-mensagens-codigo.js",
     "cdus-inventariar-densidade.ts",
-    "cdus-inventariar-duplicacoes.js"
+    "cdus-inventariar-duplicacoes.ts"
 ].map(nome => path.join(DIRETORIO_RAIZ, "toolkit", "requisitos", nome));
 
 async function executarSgc(args, opcoes = {}) {
