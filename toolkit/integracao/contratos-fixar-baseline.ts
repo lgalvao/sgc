@@ -1,5 +1,4 @@
 
-import fs from "node:fs/promises";
 import path from "node:path";
 import pc from "picocolors";
 import {DIRETORIO_RAIZ} from "../biblioteca/caminhos.js";
@@ -7,28 +6,8 @@ import {exibirAjudaComando} from "../biblioteca/cli-ajuda.js";
 import {lerOpcao} from "../biblioteca/cli-opcoes.js";
 import {ehEntradaPrincipal, validarArgumentosEntradaDireta} from "../biblioteca/execucao.js";
 import {escreverErro, escreverLinha, imprimirCabecalho, imprimirJson} from "../biblioteca/saida.js";
-import {resolverCaminhoArquivoOpenapi, resolverCaminhosOpenapi} from "./contratos-openapi-caminhos.js";
-
-interface OpcoesFixarBaselineContrato {
-    base?: string;
-    origem?: string;
-    destino?: string;
-}
-
-interface ResultadoFixacaoBaselineContrato {
-    base: string;
-    origem: string;
-    destino: string;
-}
-
-async function fixarBaselineContrato({base = DIRETORIO_RAIZ, origem, destino}: OpcoesFixarBaselineContrato = {}): Promise<ResultadoFixacaoBaselineContrato> {
-    const caminhos = resolverCaminhosOpenapi(base);
-    const origemResolvida = resolverCaminhoArquivoOpenapi(base, origem ?? caminhos.caminhoAtual);
-    const destinoResolvido = resolverCaminhoArquivoOpenapi(base, destino ?? caminhos.caminhoReferencia);
-    await fs.mkdir(path.dirname(destinoResolvido), {recursive: true});
-    await fs.copyFile(origemResolvida, destinoResolvido);
-    return {base: caminhos.base, origem: origemResolvida, destino: destinoResolvido};
-}
+import {fixarBaselineContrato} from "./contratos-baseline-motor.js";
+import {resolverCaminhosOpenapi} from "./contratos-openapi-caminhos.js";
 
 async function principal(argumentosInformados: string[] = process.argv.slice(2)): Promise<void> {
     const argumentos = validarArgumentosEntradaDireta(import.meta.url, argumentosInformados);
@@ -81,6 +60,5 @@ if (ehEntradaPrincipal(import.meta.url)) {
 }
 
 export {
-    fixarBaselineContrato,
     principal
 };

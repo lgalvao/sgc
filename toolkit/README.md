@@ -127,8 +127,9 @@ contratos próprios; campos antigos não são aceitos.
 OpenAPI mantém exportação, comparação e promoção de baseline. O toolkit não gera tipos TypeScript a partir do contrato.
 O documento exportado preserva o vocabulário oficial da especificação; os resultados operacionais do toolkit usam campos
 em português/camelCase (`quantidadeRotas`, `saidaPadrao`, `saidaErro`) e caminhos relativos informados por opção são
-resolvidos a partir de `--base`. O motor `integracao/contratos-openapi-motor.ts` exige URL, base e saída explícitas; o
-comando do SGC mantém `http://127.0.0.1:10000/api-docs` apenas como conveniência da sua borda.
+resolvidos a partir de `--base`. Os motores `integracao/contratos-openapi-motor.ts`, `contratos-diff-motor.ts` e
+`contratos-baseline-motor.ts` exigem URL, base e arquivos explícitos; os comandos do SGC mantêm os caminhos configurados
+e `http://127.0.0.1:10000/api-docs` apenas como conveniências da sua borda.
 
 ### Casos de uso CDU
 

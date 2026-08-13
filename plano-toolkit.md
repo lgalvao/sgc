@@ -212,8 +212,8 @@ isolado funciona, mas as fronteiras ainda não estão concluídas:
   explicitamente a política em `servidor/cobertura-padroes.ts`;
 - o motor Semgrep foi separado da borda CLI: recebe regra, alvos e comando explicitamente; somente o comando do SGC
   resolve os diretórios, a política local e o diretório de artefatos;
-- o motor OpenAPI foi separado da borda CLI e exige URL, base e saída explícitas; o endpoint em `127.0.0.1:10000` ficou
-  identificado como conveniência do perfil SGC;
+- os motores OpenAPI de exportação, diff e baseline foram separados da borda CLI e exigem URL/base/arquivos explícitos;
+  os caminhos configurados e o endpoint em `127.0.0.1:10000` ficaram identificados como conveniências do perfil SGC;
 - os agregadores CDU ficaram reduzidos a bordas de comando; parser, descoberta do corpus, inventário e auditoria não
   importam mais `process.argv`, execução de processo ou saída textual;
 - defaults de Gradle, Vue, caminhos configurados e outras políticas SGC ainda aparecem em bordas ou módulos adaptáveis;

@@ -1,74 +1,15 @@
 
 import fs from "node:fs/promises";
 import path from "node:path";
-import {execa} from "execa";
 import pc from "picocolors";
 import {DIRETORIO_RAIZ} from "../biblioteca/caminhos.js";
 import {exibirAjudaComando} from "../biblioteca/cli-ajuda.js";
 import {lerOpcao} from "../biblioteca/cli-opcoes.js";
 import {ehEntradaPrincipal, validarArgumentosEntradaDireta} from "../biblioteca/execucao.js";
 import {escreverErro, escreverLinha, imprimirCabecalho, imprimirJson} from "../biblioteca/saida.js";
+import {executarDiffContratos} from "./contratos-diff-motor.js";
 import {resolverCaminhoArquivoOpenapi, resolverCaminhosOpenapi} from "./contratos-openapi-caminhos.js";
-
-interface OpcoesDiffContratos {
-    base?: string;
-    anterior?: string;
-    atual?: string;
-}
-
-type ModoDiffContratos = "identico" | "diferencaTextual";
-
-interface ResultadoDiffContratos {
-    base: string;
-    anterior: string;
-    atual: string;
-    houveMudancas: boolean;
-    modo: ModoDiffContratos;
-    saidaPadrao: string;
-    saidaErro: string;
-}
-
-async function executarDiffContratos({base = DIRETORIO_RAIZ, anterior, atual}: OpcoesDiffContratos = {}): Promise<ResultadoDiffContratos> {
-    const caminhos = resolverCaminhosOpenapi(base);
-    const anteriorResolvido = anterior ?? caminhos.caminhoReferencia;
-    const atualResolvido = atual ?? caminhos.caminhoAtual;
-    const [conteudoAnterior, conteudoAtual] = await Promise.all([
-        fs.readFile(anteriorResolvido, "utf-8"),
-        fs.readFile(atualResolvido, "utf-8")
-    ]);
-
-    if (conteudoAnterior === conteudoAtual) {
-        return {
-            base: caminhos.base,
-            anterior: anteriorResolvido,
-            atual: atualResolvido,
-            houveMudancas: false,
-            modo: "identico",
-            saidaPadrao: "Nenhuma diferença detectada entre a referência e a fotografia atual.",
-            saidaErro: ""
-        };
-    }
-
-    const resultado = await execa("git", ["diff", "--no-index", "--minimal", "--unified=3", anteriorResolvido, atualResolvido], {
-        reject: false,
-        cwd: caminhos.base
-    });
-
-    const codigoSaida = resultado.exitCode ?? 0;
-    if (codigoSaida > 1) {
-        throw new Error(resultado.stderr || `git diff terminou com codigo ${codigoSaida}.`);
-    }
-
-    return {
-        base: caminhos.base,
-        anterior: anteriorResolvido,
-        atual: atualResolvido,
-        houveMudancas: true,
-        modo: "diferencaTextual",
-        saidaPadrao: resultado.stdout ?? "",
-        saidaErro: resultado.stderr ?? ""
-    };
-}
+type ResultadoDiffContratos = Awaited<ReturnType<typeof executarDiffContratos>>;
 
 function criarResumoMarkdown(resultado: ResultadoDiffContratos): string {
     return [
@@ -160,6 +101,5 @@ if (ehEntradaPrincipal(import.meta.url)) {
 }
 
 export {
-    executarDiffContratos,
     principal
 };

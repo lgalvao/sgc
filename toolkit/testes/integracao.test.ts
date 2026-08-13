@@ -4,6 +4,8 @@ import {mkdtemp} from "node:fs/promises";
 import {describe, expect, test} from "vitest";
 import {execa} from "execa";
 import {pathToFileURL} from "node:url";
+import {executarDiffContratos} from "../integracao/contratos-diff-motor.js";
+import {fixarBaselineContrato} from "../integracao/contratos-baseline-motor.js";
 import {resolverCaminhoArquivoOpenapi, resolverCaminhosOpenapi} from "../integracao/contratos-openapi-caminhos.js";
 import {exportarOpenapi} from "../integracao/contratos-openapi-motor.js";
 import {VERSAO_CONFIGURACAO} from "../biblioteca/configuracao.js";
@@ -159,6 +161,38 @@ describe("Integrações de contratos do toolkit", () => {
             quantidadeRotas: 1
         });
         expect(await existe(resultado.saida)).toBe(true);
+    });
+
+    test("compara e promove arquivos OpenAPI pelos motores com caminhos explícitos", async () => {
+        const base = await mkdtemp(path.join(os.tmpdir(), "sgc-openapi-operacoes-"));
+        await escreverJson(path.join(base, "anterior.json"), {openapi: "3.1.0", info: {version: "1.0.0"}, paths: {}});
+        await escreverJson(path.join(base, "atual.json"), {openapi: "3.1.0", info: {version: "1.1.0"}, paths: {"/saude": {}}});
+
+        const diferenca = await executarDiffContratos({
+            base,
+            anterior: "anterior.json",
+            atual: "atual.json"
+        });
+        expect(diferenca).toMatchObject({
+            base,
+            houveMudancas: true,
+            modo: "diferencaTextual"
+        });
+
+        const identidade = await executarDiffContratos({base, anterior: "atual.json", atual: "atual.json"});
+        expect(identidade).toMatchObject({houveMudancas: false, modo: "identico"});
+
+        const fixacao = await fixarBaselineContrato({
+            base,
+            origem: "atual.json",
+            destino: "referencia/openapi.json"
+        });
+        expect(fixacao).toMatchObject({
+            base,
+            origem: path.join(base, "atual.json"),
+            destino: path.join(base, "referencia", "openapi.json")
+        });
+        expect(await existe(fixacao.destino)).toBe(true);
     });
 
     test("resolve caminhos informados relativos a base", async () => {
