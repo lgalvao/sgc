@@ -62,9 +62,20 @@ describe("Auditorias de cobertura da CLI", () => {
             "--arquivo",
             caminhoV8
         ]);
+        const backendRamificacoes = await executarSgc([
+            "backend",
+            "cobertura",
+            "ramificacoes",
+            "--json",
+            "--base",
+            base,
+            "--arquivo",
+            caminhoJacoco
+        ]);
 
         expect(backendLeitura.exitCode).toBe(0);
         expect(frontendLeitura.exitCode).toBe(0);
+        expect(backendRamificacoes.exitCode).toBe(0);
         const backendJson = JSON.parse(backendLeitura.stdout);
         const frontendJson = JSON.parse(frontendLeitura.stdout);
         expect(backendJson).toMatchObject({
@@ -81,6 +92,10 @@ describe("Auditorias de cobertura da CLI", () => {
         expect(frontendJson.geradoEm).toBeTypeOf("string");
         expect(frontendJson.pontosCriticos).toBeInstanceOf(Array);
         expect(frontendJson.hotspots).toBeUndefined();
+        const backendRamificacoesJson = JSON.parse(backendRamificacoes.stdout);
+        expect(backendRamificacoesJson).toMatchObject({versaoSchema: "1.0.0", status: "ok"});
+        expect(backendRamificacoesJson.geradoEm).toBeTypeOf("string");
+        expect(backendRamificacoesJson.timestamp).toBeUndefined();
         expect(await existe(path.join(base, "backend-cobertura-auditoria.md"))).toBe(false);
         expect(await existe(path.join(base, "frontend-cobertura-auditoria.md"))).toBe(false);
 
@@ -141,6 +156,9 @@ describe("Auditorias de cobertura da CLI", () => {
 
         expect(resultado.exitCode).toBe(0);
         const conteudo = JSON.parse(resultado.stdout);
+        expect(conteudo.versaoSchema).toBe("1.0.0");
+        expect(conteudo.geradoEm).toBeTypeOf("string");
+        expect(conteudo.timestamp).toBeUndefined();
         expect(conteudo.totais.total).toBe(2);
         expect(conteudo.arquivos[0]).toMatchObject({
             arquivo: "frontend/src/exemplo.ts",
@@ -209,6 +227,10 @@ describe("Auditorias de cobertura da CLI", () => {
         ]);
 
         expect(resultado.exitCode).toBe(0);
-        expect(JSON.parse(resultado.stdout).arquivos).toEqual([]);
+        const conteudo = JSON.parse(resultado.stdout);
+        expect(conteudo.versaoSchema).toBe("1.0.0");
+        expect(conteudo.geradoEm).toBeTypeOf("string");
+        expect(conteudo.timestamp).toBeUndefined();
+        expect(conteudo.arquivos).toEqual([]);
     });
 });

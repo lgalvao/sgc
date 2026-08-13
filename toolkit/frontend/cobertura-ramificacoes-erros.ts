@@ -8,6 +8,8 @@ import {exibirAjudaComando} from "../lib/cli-ajuda.js";
 import {escreverLinha, imprimirCabecalho, imprimirJson} from "../lib/saida.js";
 import {extrairCoberturaFrontend, type ArquivoCobertura, type ResultadoCoberturaFrontend} from "../lib/dominios/cobertura-web.js";
 
+const VERSAO_SCHEMA_RESULTADO = "1.0.0" as const;
+
 interface LinhaSuspeita {
     numero: number;
     texto: string;
@@ -20,7 +22,8 @@ interface ArquivoRamificacoesErros extends Pick<ArquivoCobertura, "arquivo" | "r
 
 interface ResultadoRamificacoesErros {
     status: "ok";
-    timestamp: string;
+    versaoSchema: typeof VERSAO_SCHEMA_RESULTADO;
+    geradoEm: string;
     totais: ResultadoCoberturaFrontend["ramificacoes"];
     arquivos: ArquivoRamificacoesErros[];
 }
@@ -108,7 +111,8 @@ async function principal(argumentosInformados: string[] = process.argv.slice(2))
 
     const resultado: ResultadoRamificacoesErros = {
         status: "ok",
-        timestamp: new Date().toISOString(),
+        versaoSchema: VERSAO_SCHEMA_RESULTADO,
+        geradoEm: new Date().toISOString(),
         totais: coleta.ramificacoes,
         arquivos,
     };
@@ -123,7 +127,7 @@ async function principal(argumentosInformados: string[] = process.argv.slice(2))
     escreverLinha("");
 
     if (arquivos.length === 0) {
-        escreverLinha(pc.green("Nenhum hotspot com sinais claros de tratamento de erro foi encontrado no recorte atual."));
+        escreverLinha(pc.green("Nenhum ponto critico com sinais claros de tratamento de erro foi encontrado no recorte atual."));
         return;
     }
 

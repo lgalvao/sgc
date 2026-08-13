@@ -108,6 +108,9 @@ de ser tratada como se não existisse.
 `pontosCriticos` e `pontuacaoImpacto`; os campos de cobertura dentro de `totais` continuam seguindo os formatos JaCoCo e
 V8 lidos na fronteira.
 
+Os três comandos de ramificações também emitem `versaoSchema: "1.0.0"` e `geradoEm`; seus campos de JaCoCo/V8 permanecem
+nos nomes da fonte externa.
+
 `qualidade resumo` lê fotografias `versaoSchema: "2.0.0"` produzidas pelo coletor, projeta apenas verificações e pontos
 críticos atuais e rejeita fotografias incompatíveis. O coletor e os adaptadores usam `pontosCriticos` e `pontuacao` nos
 contratos próprios; campos antigos não são aceitos.

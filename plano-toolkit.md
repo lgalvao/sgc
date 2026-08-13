@@ -182,6 +182,8 @@ isolado funciona, mas as fronteiras ainda não estão concluídas:
   `pontosCriticos`, `pontuacao` e `pontuacaoTotal`; o adaptador de qualidade agora consome diretamente esse contrato;
 - os dois auditores de cobertura agora compartilham resultados próprios `versaoSchema: "1.0.0"`, com `pontosCriticos` e
   `pontuacaoImpacto`; os vocabulários externos de JaCoCo e V8 permanecem somente na fronteira de leitura;
+- os três comandos de ramificações agora também possuem `versaoSchema: "1.0.0"` e `geradoEm`; o `timestamp` próprio foi
+  removido e a mensagem de `hotspot` foi padronizada como ponto crítico;
 - apenas cobertura Java e web está publicada como API programática horizontal;
 - defaults de Gradle, Vue, OpenAPI, Semgrep e políticas SGC ainda aparecem dentro de módulos adaptáveis;
 - os maiores módulos concentram análise, política, formatação, persistência e CLI, dificultando reuso seletivo.

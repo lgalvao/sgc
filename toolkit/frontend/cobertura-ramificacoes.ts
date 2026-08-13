@@ -7,6 +7,8 @@ import {extrairCoberturaFrontend, type ArquivoCobertura, type ResultadoCobertura
 import {escreverLinha, imprimirCabecalho, imprimirJson} from "../lib/saida.js";
 import {exibirAjudaComando} from "../lib/cli-ajuda.js";
 
+const VERSAO_SCHEMA_RESULTADO = "1.0.0" as const;
+
 interface ArquivoRamificacoes {
     arquivo: string;
     ramificacoesTotal: number;
@@ -16,7 +18,8 @@ interface ArquivoRamificacoes {
 
 interface ResultadoRamificacoes {
     status: "ok";
-    timestamp: string;
+    versaoSchema: typeof VERSAO_SCHEMA_RESULTADO;
+    geradoEm: string;
     totais: ResultadoCoberturaFrontend["ramificacoes"];
     arquivos: ArquivoRamificacoes[];
 }
@@ -62,7 +65,8 @@ async function principal(argumentosInformados: string[] = process.argv.slice(2))
 
     const resultado: ResultadoRamificacoes = {
         status: "ok",
-        timestamp: new Date().toISOString(),
+        versaoSchema: VERSAO_SCHEMA_RESULTADO,
+        geradoEm: new Date().toISOString(),
         totais: coleta.ramificacoes,
         arquivos
     };

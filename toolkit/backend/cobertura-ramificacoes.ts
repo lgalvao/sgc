@@ -8,6 +8,8 @@ import type {ClasseCobertura, ResultadoCoberturaJacoco} from "../lib/dominios/co
 import {escreverErro, escreverLinha, imprimirCabecalho, imprimirJson} from "../lib/saida.js";
 import {exibirAjudaComando} from "../lib/cli-ajuda.js";
 
+const VERSAO_SCHEMA_RESULTADO = "1.0.0" as const;
+
 interface ClasseRamificacoes {
     nome: string;
     ramificacoesPerdidas: number;
@@ -18,7 +20,8 @@ interface ClasseRamificacoes {
 
 interface ResultadoRamificacoes {
     status: "ok";
-    timestamp: string;
+    versaoSchema: typeof VERSAO_SCHEMA_RESULTADO;
+    geradoEm: string;
     totais: ResultadoCoberturaJacoco["ramificacoes"];
     classes: ClasseRamificacoes[];
 }
@@ -73,7 +76,8 @@ async function principal(argumentosInformados: string[] = process.argv.slice(2))
 
     const resultado: ResultadoRamificacoes = {
         status: "ok",
-        timestamp: new Date().toISOString(),
+        versaoSchema: VERSAO_SCHEMA_RESULTADO,
+        geradoEm: new Date().toISOString(),
         totais: coleta.ramificacoes,
         classes
     };
