@@ -10,26 +10,26 @@ import {exibirAjudaComando} from "../lib/cli-ajuda.js";
 
 interface ClasseRamificacoes {
     nome: string;
-    branchesPerdidos: number;
-    totalBranches: number;
-    branchesPercentual: number;
-    branchesPerdidosLista: string[];
+    ramificacoesPerdidas: number;
+    totalRamificacoes: number;
+    ramificacoesPercentual: number;
+    ramificacoesPerdidasLista: string[];
 }
 
 interface ResultadoRamificacoes {
     status: "ok";
     timestamp: string;
-    totais: ResultadoCoberturaJacoco["branches"];
+    totais: ResultadoCoberturaJacoco["ramificacoes"];
     classes: ClasseRamificacoes[];
 }
 
 function resumirClasse(classe: ClasseCobertura): ClasseRamificacoes {
     return {
         nome: classe.nome,
-        branchesPerdidos: classe.branchesPerdidos,
-        totalBranches: classe.totalBranches,
-        branchesPercentual: classe.branchesPercentual,
-        branchesPerdidosLista: classe.branchesPerdidosLista
+        ramificacoesPerdidas: classe.ramificacoesPerdidas,
+        totalRamificacoes: classe.totalRamificacoes,
+        ramificacoesPercentual: classe.ramificacoesPercentual,
+        ramificacoesPerdidasLista: classe.ramificacoesPerdidasLista
     };
 }
 
@@ -65,15 +65,15 @@ async function principal(argumentos: string[] = process.argv.slice(2)): Promise<
     });
 
     const classes = coleta.classes
-        .filter((classe) => classe.branchesPerdidos > 0)
-        .toSorted((a, b) => b.branchesPerdidos - a.branchesPerdidos || a.branchesPercentual - b.branchesPercentual)
+        .filter((classe) => classe.ramificacoesPerdidas > 0)
+        .toSorted((a, b) => b.ramificacoesPerdidas - a.ramificacoesPerdidas || a.ramificacoesPercentual - b.ramificacoesPercentual)
         .slice(0, limite)
         .map(resumirClasse);
 
     const resultado: ResultadoRamificacoes = {
         status: "ok",
         timestamp: new Date().toISOString(),
-        totais: coleta.branches,
+        totais: coleta.ramificacoes,
         classes
     };
 
@@ -82,21 +82,21 @@ async function principal(argumentos: string[] = process.argv.slice(2)): Promise<
         return;
     }
 
-    imprimirCabecalho("COBERTURA DE BRANCHES BACKEND");
-    escreverLinha(`Cobertura global de branches: ${pc.bold(`${coleta.branches.percentual}%`)} (${coleta.branches.cobertos}/${coleta.branches.cobertos + coleta.branches.perdidos})`);
+    imprimirCabecalho("COBERTURA DE RAMIFICAÇÕES BACKEND");
+    escreverLinha(`Cobertura global de ramificações: ${pc.bold(`${coleta.ramificacoes.percentual}%`)} (${coleta.ramificacoes.cobertos}/${coleta.ramificacoes.cobertos + coleta.ramificacoes.perdidos})`);
     escreverLinha("");
 
     if (classes.length === 0) {
-        escreverLinha(pc.green("Nenhuma lacuna de branches encontrada nas classes auditadas."));
+        escreverLinha(pc.green("Nenhuma lacuna de ramificações encontrada nas classes auditadas."));
         return;
     }
 
-    escreverLinha(pc.bold(pc.underline(`TOP ${classes.length} CLASSES COM LACUNAS DE BRANCHES:`)));
+    escreverLinha(pc.bold(pc.underline(`TOP ${classes.length} CLASSES COM LACUNAS DE RAMIFICAÇÕES:`)));
     classes.forEach((classe, indice) => {
         escreverLinha(`${indice + 1}. ${pc.bold(classe.nome)}`);
-        escreverLinha(`   Branches perdidos: ${classe.branchesPerdidos}/${classe.totalBranches} | Cobertura: ${classe.branchesPercentual}%`);
-        if (classe.branchesPerdidosLista.length > 0) {
-            escreverLinha(`   Linhas: ${pc.dim(classe.branchesPerdidosLista.join(", "))}`);
+        escreverLinha(`   Ramificações perdidas: ${classe.ramificacoesPerdidas}/${classe.totalRamificacoes} | Cobertura: ${classe.ramificacoesPercentual}%`);
+        if (classe.ramificacoesPerdidasLista.length > 0) {
+            escreverLinha(`   Linhas: ${pc.dim(classe.ramificacoesPerdidasLista.join(", "))}`);
         }
     });
 }
@@ -104,7 +104,7 @@ async function principal(argumentos: string[] = process.argv.slice(2)): Promise<
 if (ehEntradaPrincipal(import.meta.url)) {
     principal().catch((erro) => {
         const mensagem = erro instanceof Error ? erro.message : String(erro);
-        escreverErro(`${pc.red(`Erro ao analisar branches do backend: ${mensagem}`)}\n`);
+        escreverErro(`${pc.red(`Erro ao analisar ramificações do backend: ${mensagem}`)}\n`);
         process.exitCode = 1;
     });
 }

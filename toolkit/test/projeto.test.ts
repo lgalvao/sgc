@@ -240,8 +240,8 @@ describe("Comandos de projeto do toolkit", () => {
         const json = JSON.parse(resultado.stdout);
         expect(json.totais.percentual).toBe(50);
         expect(json.classes[0].nome).toBe("com.exemplo.Servico");
-        expect(json.classes[0].branchesPerdidos).toBe(1);
-        expect(json.classes[0].branchesPerdidosLista).toEqual(["10(1/2)"]);
+        expect(json.classes[0].ramificacoesPerdidas).toBe(1);
+        expect(json.classes[0].ramificacoesPerdidasLista).toEqual(["10(1/2)"]);
     });
 
     test("simula e executa limpeza em diretório temporário", async () => {

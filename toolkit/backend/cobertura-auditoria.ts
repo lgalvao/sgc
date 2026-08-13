@@ -15,8 +15,8 @@ interface PontoCriticoRelatorio {
     complexidade: number;
     linhasPerdidas: number;
     linhasPerdidasLista: number[];
-    branchesPerdidos: number;
-    branchesPerdidosLista: string[];
+    ramificacoesPerdidas: number;
+    ramificacoesPerdidasLista: string[];
     scoreImpacto: number;
     coberturaLinhas: number;
 }
@@ -32,16 +32,16 @@ function calcularPontuacaoImpacto(classe: ClasseCobertura): number {
     // Classes complexas com lacunas são os verdadeiros pontos críticos.
     // Se não há lacunas (100% de cobertura), a pontuação deve ser zero.
 
-    if (classe.linhasPerdidas === 0 && classe.branchesPerdidos === 0) {
+    if (classe.linhasPerdidas === 0 && classe.ramificacoesPerdidas === 0) {
         return 0;
     }
 
     const pesoLinhas = 1.0;
-    const pesoBranches = 1.5;
+    const pesoRamificacoes = 1.5;
     const fatorComplexidade = 1 + (classe.complexidade / 50); // Multiplicador baseado na complexidade
 
     const pontuacaoLacunas = (classe.linhasPerdidas * pesoLinhas) +
-        (classe.branchesPerdidos * pesoBranches);
+        (classe.ramificacoesPerdidas * pesoRamificacoes);
 
     return pontuacaoLacunas * fatorComplexidade;
 }
@@ -59,28 +59,28 @@ async function gerarRelatorioMarkdown(dados: ResultadoAuditoriaCobertura, caminh
     markdown += `## Resumo Geral\n`;
     markdown += `- **Cobertura Global (Instruções):** ${totais.instrucoes.percentual}%\n`;
     markdown += `- **Cobertura de Linhas:** ${totais.linhas.percentual}%\n`;
-    markdown += `- **Cobertura de Branches:** ${totais.branches.percentual}%\n`;
+    markdown += `- **Cobertura de Ramificações:** ${totais.ramificacoes.percentual}%\n`;
     markdown += `- **Complexidade Total:** ${totais.complexidade.cobertos + totais.complexidade.perdidos}\n\n`;
 
     markdown += `## Top 10 Pontos Críticos de Qualidade (Maior Risco)\n`;
     markdown += `Prioridade baseada em complexidade ciclomática cruzada com lacunas de teste.\n\n`;
-    markdown += `| Posição | Classe | Pontuação | Complexidade | Linhas S/ Cobertura | Branches S/ Cobertura | Prioridade |\n`;
+    markdown += `| Posição | Classe | Pontuação | Complexidade | Linhas S/ Cobertura | Ramificações S/ Cobertura | Prioridade |\n`;
     markdown += `|---------|--------|-----------|--------------|---------------------|-----------------------|------------|\n`;
 
     hotspots.slice(0, 10).forEach((ponto, indice) => {
         const prioridade = ponto.scoreImpacto > 50 ? "P1" : (ponto.scoreImpacto > 20 ? "P2" : "P3");
-        markdown += `| ${indice + 1} | \`${ponto.nome}\` | ${ponto.scoreImpacto.toFixed(1)} | ${ponto.complexidade} | ${ponto.linhasPerdidas} | ${ponto.branchesPerdidos} | ${prioridade} |\n`;
+        markdown += `| ${indice + 1} | \`${ponto.nome}\` | ${ponto.scoreImpacto.toFixed(1)} | ${ponto.complexidade} | ${ponto.linhasPerdidas} | ${ponto.ramificacoesPerdidas} | ${prioridade} |\n`;
     });
 
     markdown += `\n## Detalhamento das Lacunas dos Principais Pontos Críticos\n\n`;
     hotspots.slice(0, 10).forEach((ponto) => {
-        if (ponto.linhasPerdidas > 0 || ponto.branchesPerdidos > 0) {
+        if (ponto.linhasPerdidas > 0 || ponto.ramificacoesPerdidas > 0) {
             markdown += `### \`${ponto.nome}\` (Risco: ${ponto.scoreImpacto.toFixed(1)})\n`;
             if (ponto.linhasPerdidas > 0) {
                 markdown += `- **Linhas 100% descobertas:** ${ponto.linhasPerdidasLista.join(", ")}\n`;
             }
-            if (ponto.branchesPerdidos > 0) {
-                markdown += `- **Branches sem cobertura total/parcial (linha(perdidos/total)):** ${ponto.branchesPerdidosLista.join(", ")}\n`;
+            if (ponto.ramificacoesPerdidas > 0) {
+                markdown += `- **Ramificações sem cobertura total/parcial (linha(perdidos/total)):** ${ponto.ramificacoesPerdidasLista.join(", ")}\n`;
             }
             markdown += `\n`;
         }
@@ -149,8 +149,8 @@ async function principal(argumentos: string[] = process.argv.slice(2)): Promise<
                 complexidade: ponto.complexidade,
                 linhasPerdidas: ponto.linhasPerdidas,
                 linhasPerdidasLista: ponto.linhasPerdidasLista,
-                branchesPerdidos: ponto.branchesPerdidos,
-                branchesPerdidosLista: ponto.branchesPerdidosLista,
+                ramificacoesPerdidas: ponto.ramificacoesPerdidas,
+                ramificacoesPerdidasLista: ponto.ramificacoesPerdidasLista,
                 scoreImpacto: ponto.pontuacaoImpacto,
                 coberturaLinhas: ponto.linhasPercentual
             }))
@@ -175,19 +175,19 @@ async function principal(argumentos: string[] = process.argv.slice(2)): Promise<
         escreverLinha(`${pc.bold("Resumo do Projeto:")}`);
         escreverLinha(`  Instruções: ${coleta.instrucoes.percentual}%`);
         escreverLinha(`  Linhas:      ${coleta.linhas.percentual}%`);
-        escreverLinha(`  Branches:    ${coleta.branches.percentual}%`);
+        escreverLinha(`  Ramificações: ${coleta.ramificacoes.percentual}%`);
         escreverLinha("");
 
         escreverLinha(pc.bold(pc.underline("TOP 5 PENDÊNCIAS PRIORITÁRIAS:")));
         pontosCriticos.slice(0, 5).forEach((ponto, indice) => {
             escreverLinha(`${indice + 1}. ${pc.bold(ponto.nome)}`);
             escreverLinha(`   Impacto: ${pc.bold(ponto.pontuacaoImpacto.toFixed(1))} | Prioridade: ${obterPrioridade(ponto.pontuacaoImpacto)}`);
-            escreverLinha(`   Lacunas: ${ponto.linhasPerdidas} linhas e ${ponto.branchesPerdidos} branches sem teste.`);
+            escreverLinha(`   Lacunas: ${ponto.linhasPerdidas} linhas e ${ponto.ramificacoesPerdidas} ramificações sem teste.`);
             if (ponto.linhasPerdidas > 0) {
                 escreverLinha(`     ↳ Linhas sem cobertura: ${pc.dim(ponto.linhasPerdidasLista.join(", "))}`);
             }
-            if (ponto.branchesPerdidos > 0) {
-                escreverLinha(`     ↳ Branches sem cobertura (linha(perdidos/total)): ${pc.dim(ponto.branchesPerdidosLista.join(", "))}`);
+            if (ponto.ramificacoesPerdidas > 0) {
+                escreverLinha(`     ↳ Ramificações sem cobertura (linha(perdidos/total)): ${pc.dim(ponto.ramificacoesPerdidasLista.join(", "))}`);
             }
         });
 

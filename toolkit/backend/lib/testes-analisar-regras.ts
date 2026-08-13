@@ -38,9 +38,9 @@ interface CoberturaRelatorio {
     cobertura_linhas_percentual: number;
     linhas_cobertas: number;
     linhas_total: number;
-    cobertura_branches_percentual: number;
-    branches_cobertos: number;
-    branches_total: number;
+    cobertura_ramificacoes_percentual: number;
+    ramificacoes_cobertas: number;
+    ramificacoes_total: number;
 }
 
 interface ItemRelatorio {
@@ -240,9 +240,9 @@ function criarItemRelatorio({
             cobertura_linhas_percentual: Number(coberturaClasse.coberturaLinhas.toFixed(2)),
             linhas_cobertas: coberturaClasse.linhasCobertas,
             linhas_total: coberturaClasse.totalLinhas,
-            cobertura_branches_percentual: Number(coberturaClasse.coberturaBranches.toFixed(2)),
-            branches_cobertos: coberturaClasse.branchesCobertos,
-            branches_total: coberturaClasse.totalBranches
+            cobertura_ramificacoes_percentual: Number(coberturaClasse.coberturaRamificacoes.toFixed(2)),
+            ramificacoes_cobertas: coberturaClasse.ramificacoesCobertas,
+            ramificacoes_total: coberturaClasse.totalRamificacoes
         } : null
     };
 }

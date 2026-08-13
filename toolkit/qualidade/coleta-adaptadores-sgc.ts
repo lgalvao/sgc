@@ -130,7 +130,7 @@ function criarAdaptadoresSgc(dependencias: DependenciasAdaptadoresSgc): Catalogo
             execucao.status = saida.codigoSaida === 0 ? "sucesso" : "falha";
             registrarResultadoExecucao(execucao, saida);
             execucao.metricas = cobertura;
-            execucao.sumario = `Cobertura: ${cobertura.linhas.percentual}% linhas, ${cobertura.branches.percentual}% branches.`;
+            execucao.sumario = `Cobertura: ${cobertura.linhas.percentual}% linhas, ${cobertura.ramificacoes.percentual}% ramificações.`;
             return execucao;
         },
         async coberturaFrontend(contexto: ContextoColeta): Promise<ExecucaoQualidade> {

@@ -42,7 +42,7 @@ export interface ResumoContador {
 
 export interface MetricasGlobais {
     linhas: ResumoContador;
-    branches: ResumoContador;
+    ramificacoes: ResumoContador;
     instrucoes: ResumoContador;
     metodos: ResumoContador;
     complexidade: ResumoContador;
@@ -52,10 +52,10 @@ export interface TotaisCobertura {
     totalArquivos: number;
     totalLinhas: number;
     linhasCobertas: number;
-    totalBranches: number;
-    branchesCobertos: number;
+    totalRamificacoes: number;
+    ramificacoesCobertas: number;
     coberturaGlobalLinhas: number;
-    coberturaGlobalBranches: number;
+    coberturaGlobalRamificacoes: number;
 }
 
 export interface ClasseCobertura {
@@ -69,12 +69,12 @@ export interface ClasseCobertura {
     linhasPerdidasLista: number[];
     linhasPercentual: number;
     coberturaLinhas: number;
-    totalBranches: number;
-    branchesCobertos: number;
-    branchesPerdidos: number;
-    branchesPerdidosLista: string[];
-    branchesPercentual: number;
-    coberturaBranches: number;
+    totalRamificacoes: number;
+    ramificacoesCobertas: number;
+    ramificacoesPerdidas: number;
+    ramificacoesPerdidasLista: string[];
+    ramificacoesPercentual: number;
+    coberturaRamificacoes: number;
     complexidade: number;
     contadoresGlobais: MetricasGlobais;
 }
@@ -140,7 +140,7 @@ function extrairContadoresGlobais(counters: ContadorXml[] = []): MetricasGlobais
     }
     return {
         linhas: resumo.LINE ?? {cobertos: 0, perdidos: 0, percentual: 0},
-        branches: resumo.BRANCH ?? {cobertos: 0, perdidos: 0, percentual: 0},
+        ramificacoes: resumo.BRANCH ?? {cobertos: 0, perdidos: 0, percentual: 0},
         instrucoes: resumo.INSTRUCTION ?? {cobertos: 0, perdidos: 0, percentual: 0},
         metodos: resumo.METHOD ?? {cobertos: 0, perdidos: 0, percentual: 0},
         complexidade: resumo.COMPLEXITY ?? {cobertos: 0, perdidos: 0, percentual: 0}
@@ -185,10 +185,10 @@ async function extrairCoberturaJacoco(
         totalArquivos: 0,
         totalLinhas: 0,
         linhasCobertas: 0,
-        totalBranches: 0,
-        branchesCobertos: 0,
+        totalRamificacoes: 0,
+        ramificacoesCobertas: 0,
         coberturaGlobalLinhas: 0,
-        coberturaGlobalBranches: 0,
+        coberturaGlobalRamificacoes: 0,
     };
 
     for (const pacote of relatorio.report.package ?? []) {
@@ -209,17 +209,17 @@ async function extrairCoberturaJacoco(
             const linhas = sourceFile.line || [];
             let totalLinhas = 0;
             let linhasCobertas = 0;
-            let totalBranches = 0;
-            let branchesCobertos = 0;
+            let totalRamificacoes = 0;
+            let ramificacoesCobertas = 0;
             const linhasPerdidasLista = [];
-            const branchesParciais = [];
+            const ramificacoesParciais = [];
 
             for (const line of linhas) {
                 const numeroLinha = Number.parseInt(line.$.nr ?? "0", 10);
                 const instrucoesCobertas = Number.parseInt(line.$.ci ?? "0", 10);
-                const branchesPerdidosLinha = Number.parseInt(line.$.mb ?? "0", 10);
-                const branchesCobertosLinha = Number.parseInt(line.$.cb ?? "0", 10);
-                const branchesLinha = branchesPerdidosLinha + branchesCobertosLinha;
+                const ramificacoesPerdidasLinha = Number.parseInt(line.$.mb ?? "0", 10);
+                const ramificacoesCobertasLinha = Number.parseInt(line.$.cb ?? "0", 10);
+                const ramificacoesLinha = ramificacoesPerdidasLinha + ramificacoesCobertasLinha;
 
                 totalLinhas++;
 
@@ -229,25 +229,25 @@ async function extrairCoberturaJacoco(
                     linhasPerdidasLista.push(numeroLinha);
                 }
 
-                if (branchesLinha > 0) {
-                    totalBranches += branchesLinha;
-                    branchesCobertos += branchesCobertosLinha;
+                if (ramificacoesLinha > 0) {
+                    totalRamificacoes += ramificacoesLinha;
+                    ramificacoesCobertas += ramificacoesCobertasLinha;
 
-                    if (branchesPerdidosLinha > 0) {
-                        branchesParciais.push(`${numeroLinha}(${branchesPerdidosLinha}/${branchesLinha})`);
+                    if (ramificacoesPerdidasLinha > 0) {
+                        ramificacoesParciais.push(`${numeroLinha}(${ramificacoesPerdidasLinha}/${ramificacoesLinha})`);
                     }
                 }
             }
 
             const linhasPerdidasCount = totalLinhas - linhasCobertas;
-            const branchesPerdidosCount = totalBranches - branchesCobertos;
-            const temLacunas = linhasPerdidasCount > 0 || branchesPerdidosCount > 0;
+            const ramificacoesPerdidasCount = totalRamificacoes - ramificacoesCobertas;
+            const temLacunas = linhasPerdidasCount > 0 || ramificacoesPerdidasCount > 0;
 
             totais.totalArquivos++;
             totais.totalLinhas += totalLinhas;
             totais.linhasCobertas += linhasCobertas;
-            totais.totalBranches += totalBranches;
-            totais.branchesCobertos += branchesCobertos;
+            totais.totalRamificacoes += totalRamificacoes;
+            totais.ramificacoesCobertas += ramificacoesCobertas;
 
             if (incluirSemLacunas || temLacunas) {
                 const sourceFileCounters = sourceFile.counter || [];
@@ -255,7 +255,7 @@ async function extrairCoberturaJacoco(
                 const complexidade = complexidadeCounter ? extrairInteiroCounter(complexidadeCounter, 'covered') + extrairInteiroCounter(complexidadeCounter, 'missed') : 0;
 
                 const linhasPercentual = calcularPercentual(linhasCobertas, linhasPerdidasCount);
-                const branchesPercentual = totalBranches > 0 ? calcularPercentual(branchesCobertos, branchesPerdidosCount) : 100;
+                const ramificacoesPercentual = totalRamificacoes > 0 ? calcularPercentual(ramificacoesCobertas, ramificacoesPerdidasCount) : 100;
 
                 classes.push({
                     nomePacote,
@@ -268,12 +268,12 @@ async function extrairCoberturaJacoco(
                     linhasPerdidasLista,
                     linhasPercentual,
                     coberturaLinhas: linhasPercentual,
-                    totalBranches,
-                    branchesCobertos,
-                    branchesPerdidos: branchesPerdidosCount,
-                    branchesPerdidosLista: branchesParciais,
-                    branchesPercentual,
-                    coberturaBranches: branchesPercentual,
+                    totalRamificacoes,
+                    ramificacoesCobertas,
+                    ramificacoesPerdidas: ramificacoesPerdidasCount,
+                    ramificacoesPerdidasLista: ramificacoesParciais,
+                    ramificacoesPercentual,
+                    coberturaRamificacoes: ramificacoesPercentual,
                     complexidade,
                     contadoresGlobais: extrairContadoresGlobais(sourceFileCounters)
                 });
@@ -282,8 +282,8 @@ async function extrairCoberturaJacoco(
     }
 
     totais.coberturaGlobalLinhas = calcularPercentual(totais.linhasCobertas, totais.totalLinhas - totais.linhasCobertas);
-    totais.coberturaGlobalBranches = totais.totalBranches > 0
-        ? calcularPercentual(totais.branchesCobertos, totais.totalBranches - totais.branchesCobertos)
+    totais.coberturaGlobalRamificacoes = totais.totalRamificacoes > 0
+        ? calcularPercentual(totais.ramificacoesCobertas, totais.totalRamificacoes - totais.ramificacoesCobertas)
         : 100;
 
     return {
