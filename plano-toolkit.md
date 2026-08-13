@@ -338,7 +338,8 @@ frontend e para os caminhos OpenAPI.
 - `qualidade/resumo.ts` foi convertido para TypeScript; o carregador de fotografias passou a aceitar um tipo genérico e
   o comando `qualidade resumo` agora resolve a fotografia mais recente pela opção `--base`.
 - `projeto/limpar.ts` foi convertido para TypeScript, substituiu `fs-extra` por APIs nativas do Node e aceita uma
-  política de padrões de limpeza injetável; os padrões padrão do SGC e o modo de prévia continuam preservados.
+  política de padrões de limpeza injetável; os padrões padrão agora derivam backend, frontend e artefatos de qualidade
+  da configuração da base, removendo nomes legados que já não são produzidos.
 - `projeto/preparar.ts` foi convertido para TypeScript; a base efetiva chega ao diagnóstico e aos comandos externos,
   os escopos de instalação de dependências podem ser fornecidos por projeto e a opção obsoleta `showTimer` do Listr2
   foi removida.
@@ -390,10 +391,10 @@ frontend e para os caminhos OpenAPI.
 
 Nas validações desta rodada, em 13 de agosto de 2026, executadas diretamente sob Node `26.7.0`:
 
-- `npm --prefix toolkit run test`: 117 testes aprovados em 7 arquivos; o smoke de pacote é separado para não tornar a
+- `npm --prefix toolkit run test`: 118 testes aprovados em 7 arquivos; o smoke de pacote é separado para não tornar a
   suíte unitária dependente de rede ou instalação;
-- `npm --prefix toolkit run test:coverage`: aprovado com baseline informativa de 45,14% de statements (591/1.309),
-  33,29% de branches (304/913), 51,72% de funções (135/261) e 45,36% de linhas (568/1.252); o script exclui
+- `npm --prefix toolkit run test:coverage`: aprovado com baseline informativa de 45,27% de statements (594/1.312),
+  33,29% de branches (304/913), 51,90% de funções (136/262) e 45,49% de linhas (571/1.255); o script exclui
   `test/**` para não contar o apoio de testes como implementação e ainda não aplica threshold, porque a prioridade é
   transformar os contratos críticos em cenários explícitos;
 - `npm --prefix toolkit run test:pacote`: 1 teste aprovado, com `npm pack`, instalação isolada, auditoria no consumidor
@@ -448,7 +449,10 @@ na função pura de opções; a suíte chega a 115 cenários regulares e `test/q
 Na rodada seguinte, o diagnóstico passou a separar recursos estruturais configuráveis do perfil SGC, com regressão para
 uma base sem o toolkit instalado; a suíte chega a 116 cenários regulares e `test/projeto.test.ts` passa a ter 16.
 Na rodada seguinte, o corretor FQN passou a usar `backendCodigo` e `backendTestes` quando configurados, cobrindo fonte e
-testes Java externos; a suíte chega a 117 cenários regulares e `test/sgc.test.ts` passa a ter 79.
+testes Java externos; a suíte chega a 117 cenários regulares e `test/sgc.test.ts` passa a ter 79. Na rodada seguinte,
+os relatórios backend passaram a usar os nomes portugueses `analise-testes.md/json` e `priorizacao-testes.md`; a limpeza
+passou a derivar backend, frontend e artefatos da configuração e a suíte chega a 118 cenários regulares, com
+`test/projeto.test.ts` em 17.
 
 ### 3.3 Tamanho e composição atual
 
@@ -459,7 +463,7 @@ Inventário dos arquivos rastreados do toolkit, excluindo `dist`, cobertura e ar
 - 0 arquivos JavaScript de teste e 8 arquivos TypeScript de teste (`test/sgc.test.ts`, `test/projeto.test.ts`,
   `test/configuracao.test.ts`, `test/integracao.test.ts`, `test/qualidade.test.ts`, `test/cdus.test.ts`,
   `test/externo.test.ts` e `test/pacote.test.ts`);
-- 7 arquivos de teste TypeScript concentram 117 cenários regulares, mais 1 smoke de distribuição isolada;
+- 7 arquivos de teste TypeScript concentram 118 cenários regulares, mais 1 smoke de distribuição isolada;
 - `test/apoio.ts` centraliza a raiz do toolkit, o launcher `tsx`, o contrato de execução e `executarSgc`, evitando
   cópias divergentes nos testes de projeto, integração, qualidade e CLI;
 - maior módulo atual: `frontend/arquitetura-lib.ts`, com aproximadamente 1.200 linhas;
@@ -487,7 +491,8 @@ O núcleo TypeScript de implementação foi concluído: 100% dos arquivos de imp
 | Média | Opções e efeitos divergentes | Os comandos principais já usam opções em português; ainda há defaults de nomes de artefatos e alguns contratos de geração que precisam ser uniformizados, além de mutações sem prévia uniforme. |
 | Resolvido nesta rodada | Testes não representam pacote externo | A suíte interna continua separada do smoke de distribuição, e `npm run test:pacote` empacota, instala em diretório isolado e executa o binário sem dependências hoisted do monorepo. |
 | Resolvido nesta rodada | Cobertura funcional não medida | `npm run test:coverage` agora gera a baseline informativa do próprio toolkit com `@vitest/coverage-v8`; threshold fica para depois da divisão dos testes por domínio e da análise dos contratos críticos. |
-| Resolvido nesta rodada | Testes de projeto misturados ao teste da CLI | Os 16 cenários de versão, árvore, diagnóstico, limpeza, preparação, qualidade e dependências agora estão em `test/projeto.test.ts`; o teste principal concentra 79 cenários e a suíte permite execução focada por domínio. |
+| Resolvido nesta rodada | Testes de projeto misturados ao teste da CLI | Os 17 cenários de versão, árvore, diagnóstico, limpeza, preparação, qualidade e dependências agora estão em `test/projeto.test.ts`; o teste principal concentra 79 cenários e a suíte permite execução focada por domínio. |
+| Resolvido nesta rodada | Nomenclatura e limpeza de relatórios divergentes | O pipeline backend agora usa `analise-testes.md/json` -> `priorizacao-testes.md`; `projeto/limpar` deriva diretórios configurados e remove apenas padrões ainda produzidos, descartando caminhos legados sem referências. |
 | Resolvido nesta rodada | Configuração misturada à validação da CLI | Os 3 cenários de carregamento, validação e execução parametrizada agora estão em `test/configuracao.test.ts`; o teste principal caiu para 83 cenários e a configuração pode ser validada sem importar o roteador. |
 | Resolvido nesta rodada | Integração OpenAPI misturada à validação da CLI | Os 2 cenários de importação e artefatos OpenAPI agora estão em `test/integracao.test.ts`; o teste principal caiu para 81 cenários e a persistência de diff continua coberta com `--gravar`. |
 | Resolvido nesta rodada | Qualidade misturada à validação da CLI | Os 4 cenários iniciais de resumo e coleta foram extraídos para `test/qualidade.test.ts`; o teste principal caiu para 77 cenários e o arquivo agora cobre também a montagem configurada do Playwright. |
@@ -514,7 +519,7 @@ O núcleo TypeScript de implementação foi concluído: 100% dos arquivos de imp
 - Parametrização parcial não significa generalização concluída.
 - Build aprovado prova que a árvore pode ser emitida; não prova que o pacote emitido contém assets, configuração e
   resolução de raiz adequados para distribuição.
-- Knip aprovado, 117 testes unitários verdes e o smoke de pacote aprovado são gates úteis, mas ainda insuficientes para afirmar ausência de código morto fora
+- Knip aprovado, 118 testes unitários verdes e o smoke de pacote aprovado são gates úteis, mas ainda insuficientes para afirmar ausência de código morto fora
   do grafo declarado, segurança de todos os comandos mutáveis ou portabilidade. O grafo do Knip agora é uma evidência
   útil de exports não consumidos; não substitui testes de pacote externo.
 
@@ -630,7 +635,7 @@ do perfil.
 
 ### Prioridade média
 
-9. **Testes ainda parcialmente concentrados**: `test/sgc.test.ts` ainda concentra 79 cenários, embora os 16 cenários
+9. **Testes ainda parcialmente concentrados**: `test/sgc.test.ts` ainda concentra 79 cenários, embora os 17 cenários
    de projeto, os 3 de configuração, os 2 de integração e os 4 de qualidade já tenham sido extraídos para arquivos
    próprios. Dividir os cenários restantes por domínio continua recomendado para localizar contratos, reduzir o custo de
    execução focada e permitir fixtures mais independentes.

@@ -119,7 +119,7 @@ function lerArgumentos(argumentos: string[]): OpcoesAnalisar {
         diretorioTestes: raizBackendInformada
             ? path.join(raizBackendInformada, "src", "test", "java")
             : resolverCaminhoConfigurado("backendTestes", base),
-        saida: lerOpcao(argumentos, "--saida", "unit-test-report.md") ?? "unit-test-report.md",
+        saida: lerOpcao(argumentos, "--saida", "analise-testes.md") ?? "analise-testes.md",
         saidaJson: lerOpcao(argumentos, "--saida-json", undefined) ?? null,
         arquivoJacoco: lerOpcao(argumentos, "--arquivo-jacoco", undefined) ?? null,
         ajuda: argumentos.includes("--help") || argumentos.includes("-h"),

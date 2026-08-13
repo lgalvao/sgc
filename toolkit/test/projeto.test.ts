@@ -8,7 +8,7 @@ import {executarSgc} from "./apoio.js";
 import {calcularTotais, construirArvore, ehArquivoTeste, listarArquivosGit, lerOpcoes} from "../projeto/arvore-linhas.js";
 import {sincronizarVersao} from "../projeto/versao-sincronizar.js";
 import {executarDiagnostico, obterRecursosPadrao} from "../projeto/diagnostico.js";
-import {executarLimpeza} from "../projeto/limpar.js";
+import {executarLimpeza, obterPadroesLimpezaPadrao} from "../projeto/limpar.js";
 import {resolverEscoposInstalacao} from "../projeto/preparar.js";
 import {executarPerfilQualidade} from "../projeto/qualidade.js";
 import {executarAuditoriaDependencias} from "../projeto/dependencias-auditar.js";
@@ -284,6 +284,27 @@ describe("Comandos de projeto do toolkit", () => {
         });
         expect(await fs.pathExists(path.join(diretorioBase, "artefatos-projeto"))).toBe(true);
         expect(await fs.pathExists(path.join(diretorioBase, "nao-listado.txt"))).toBe(true);
+    });
+
+    test("deriva padrões de limpeza dos diretórios configurados e remove nomes legados", async () => {
+        const diretorioBase = await mkdtemp(path.join(os.tmpdir(), "sgc-limpeza-configurada-"));
+        await fs.outputJSON(path.join(diretorioBase, "configuracao-toolkit.json"), {
+            versao: VERSAO_CONFIGURACAO,
+            diretorios: {
+                backend: "servidor",
+                frontend: "cliente",
+                artefatosQualidade: "artefatos"
+            }
+        });
+
+        const padroes = obterPadroesLimpezaPadrao(diretorioBase);
+        expect(padroes).toContain("servidor/build");
+        expect(padroes).toContain("cliente/coverage");
+        expect(padroes).toContain("artefatos");
+        expect(padroes).not.toContain("backend/build");
+        expect(padroes).not.toContain("frontend/coverage");
+        expect(padroes).not.toContain("toolkit/qualidade/semgrep/latest");
+        expect(padroes).not.toContain("complexity-ranking.md");
     });
 
     test("resolve escopos de instalação a partir da base e da política do projeto", async () => {

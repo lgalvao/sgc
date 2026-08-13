@@ -89,6 +89,9 @@ npx tsx toolkit/sgc.ts backend notificacoes auditar-assuntos
 `configuracao-toolkit.json`, ele usa `diretorios.backendCodigo` e `diretorios.backendTestes`; sem configuração, conserva
 a descoberta tradicional de `src/main/java` e `src/test/java`.
 
+`backend testes analisar` gera `analise-testes.md` e `analise-testes.json` por padrão; `backend testes priorizar` consome
+esse sidecar e grava `priorizacao-testes.md` por padrão.
+
 ### Frontend
 
 ```bash
@@ -188,6 +191,9 @@ de testes reconhece padrões comuns de JavaScript, Vue, Playwright e Java, inclu
 `projeto versao-sincronizar` apenas simula por padrão. Use `--base` para outra raiz e `--gravar` para atualizar
 `gradle.properties` e o `package.json` do diretório definido por `diretorios.frontend` em
 `configuracao-toolkit.json` (o padrão do SGC é `frontend`).
+
+`projeto limpar` mantém a prévia por padrão, resolve `diretorios.backend`, `diretorios.frontend` e
+`diretorios.artefatosQualidade` da configuração da base e não inclui nomes de relatórios legados removidos.
 
 `projeto diagnostico` resolve os arquivos de backend, frontend e integração pelos diretórios configurados. Em uma base
 externa, não exige arquivos do próprio toolkit nem as portas e o `.env.e2e` específicos do SGC; esses recursos voltam a

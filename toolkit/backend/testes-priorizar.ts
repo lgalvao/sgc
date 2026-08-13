@@ -61,9 +61,9 @@ const PADROES_ESTRUTURAIS = [
 
 function lerArgumentos(argumentos: string[]): OpcoesPriorizar {
     const resultado = {
-        entrada: lerOpcao(argumentos, "--entrada", "unit-test-report.md") ?? "unit-test-report.md",
+        entrada: lerOpcao(argumentos, "--entrada", "analise-testes.md") ?? "analise-testes.md",
         entradaExplicita: argumentos.includes("--entrada") || argumentos.some((argumento) => argumento.startsWith("--entrada=")),
-        saida: lerOpcao(argumentos, "--saida", "prioritized-tests.md") ?? "prioritized-tests.md",
+        saida: lerOpcao(argumentos, "--saida", "priorizacao-testes.md") ?? "priorizacao-testes.md",
         ajuda: argumentos.includes("--help") || argumentos.includes("-h"),
     };
     return resultado;

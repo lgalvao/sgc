@@ -2455,9 +2455,9 @@ describe("CLI raiz do toolkit", () => {
 
     test("prioriza testes usando sidecar JSON automaticamente quando disponivel", async () => {
         const diretorioSaida = await mkdtemp(path.join(os.tmpdir(), "sgc-testes-priorizar-"));
-        const markdown = path.join(diretorioSaida, "unit-test-report.md");
-        const json = path.join(diretorioSaida, "unit-test-report.json");
-        const saida = path.join(diretorioSaida, "prioritized-tests.md");
+        const markdown = path.join(diretorioSaida, "analise-testes.md");
+        const json = path.join(diretorioSaida, "analise-testes.json");
+        const saida = path.join(diretorioSaida, "priorizacao-testes.md");
 
         await fs.writeFile(markdown, "# Relatorio simplificado\n");
         await fs.writeJson(json, {
@@ -2478,7 +2478,7 @@ describe("CLI raiz do toolkit", () => {
         const resultado = await executarScriptTestesPriorizar(["--saida", saida], {cwd: diretorioSaida});
 
         expect(resultado.exitCode).toBe(0);
-        expect(resultado.stdout).toContain("Entrada utilizada: unit-test-report.json");
+        expect(resultado.stdout).toContain("Entrada utilizada: analise-testes.json");
         expect(resultado.stdout).toContain("Encontrados 1 P1, 0 P2, 1 P3");
 
         const conteudo = await fs.readFile(saida, "utf-8");
@@ -2488,8 +2488,8 @@ describe("CLI raiz do toolkit", () => {
 
     test("prioriza apenas backlog acionavel do JSON e preserva evidencia", async () => {
         const diretorioSaida = await mkdtemp(path.join(os.tmpdir(), "sgc-testes-priorizar-real-"));
-        const json = path.join(diretorioSaida, "unit-test-report.json");
-        const saida = path.join(diretorioSaida, "prioritized-tests.md");
+        const json = path.join(diretorioSaida, "analise-testes.json");
+        const saida = path.join(diretorioSaida, "priorizacao-testes.md");
 
         await fs.writeJson(json, {
             categorias: {
