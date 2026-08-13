@@ -623,6 +623,43 @@ describe("CLI raiz do toolkit", () => {
         });
     });
 
+    test("preserva caminhos de cobertura frontend em layout configurado", async () => {
+        const diretorioBase = await mkdtemp(path.join(os.tmpdir(), "sgc-cobertura-frontend-configurado-"));
+        const caminhoRelativo = path.join("cliente", "codigo", "exemplo.ts");
+        const caminhoArquivo = path.join(diretorioBase, caminhoRelativo);
+        const caminhoRelatorio = path.join(diretorioBase, "coverage", "coverage-final.json");
+
+        await fs.outputJSON(path.join(diretorioBase, "configuracao-toolkit.json"), {
+            versao: VERSAO_CONFIGURACAO,
+            diretorios: {frontendCodigo: "cliente/codigo"},
+        });
+        await fs.outputFile(caminhoArquivo, "export function exemplo() { return true; }\n");
+        await fs.outputJSON(caminhoRelatorio, {
+            [caminhoRelativo]: {
+                s: {"1": 1},
+                f: {"1": 1},
+                b: {"1": [0]},
+                statementMap: {"1": {}},
+            },
+        });
+
+        const resultado = await executarSgc([
+            "frontend",
+            "cobertura",
+            "ramificacoes",
+            "--json",
+            "--base",
+            diretorioBase,
+            "--arquivo",
+            caminhoRelatorio,
+        ]);
+
+        expect(resultado.exitCode).toBe(0);
+        const conteudo = JSON.parse(resultado.stdout);
+        expect(conteudo.totais.total).toBe(1);
+        expect(conteudo.arquivos[0].arquivo).toBe(caminhoRelativo);
+    });
+
     test("resolve artefatos de nomenclatura relativos a uma base externa", async () => {
         const diretorioBase = await mkdtemp(path.join(os.tmpdir(), "sgc-nomenclatura-base-"));
         await fs.outputFile(

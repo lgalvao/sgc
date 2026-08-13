@@ -36,14 +36,15 @@ function criarResumoCobertura(cobertos, total) {
     };
 }
 
-function normalizarCaminho(caminhoAbsolutoOuRelativo) {
-    let relativo = caminhoAbsolutoOuRelativo.replace(/\\/g, "/");
-    if (relativo.includes("frontend/src")) {
-        relativo = relativo.substring(relativo.indexOf("frontend/src"));
-    } else if (relativo.includes("src")) {
-        relativo = relativo.substring(relativo.indexOf("src"));
+function normalizarCaminho(caminhoAbsolutoOuRelativo, diretorioBase = null) {
+    if (!diretorioBase) {
+        return caminhoAbsolutoOuRelativo.replace(/\\/g, "/");
     }
-    return relativo;
+
+    const caminhoAbsoluto = path.isAbsolute(caminhoAbsolutoOuRelativo)
+        ? caminhoAbsolutoOuRelativo
+        : path.resolve(diretorioBase, caminhoAbsolutoOuRelativo);
+    return path.relative(diretorioBase, caminhoAbsoluto).replace(/\\/g, "/");
 }
 
 function deveIgnorarArquivo(caminhoRelativo) {
@@ -75,7 +76,7 @@ async function extrairCoberturaFrontend(caminhoRelativo = null, opcoes = {}) {
     };
 
     for (const [arquivoPath, dados] of Object.entries(cobertura)) {
-        const caminhoNorm = normalizarCaminho(arquivoPath);
+        const caminhoNorm = normalizarCaminho(arquivoPath, diretorioBase);
         if (deveIgnorarArquivo(caminhoNorm)) continue;
 
         const statements = extrairContagemCobertura(dados.s ?? {});
