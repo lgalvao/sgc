@@ -181,7 +181,7 @@ describe("CLI raiz do toolkit", () => {
         expect(resultado.stdout).toContain("Toolkit do SGC");
     });
 
-    test("CLI compilada despacha scripts compilados", async () => {
+    test("CLI compilada despacha scripts TypeScript pelo tsx", async () => {
         const compilacao = await execa("npm", ["run", "build"], {
             cwd: path.join(DIRETORIO_RAIZ, "toolkit"),
             reject: false

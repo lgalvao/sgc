@@ -50,9 +50,8 @@ sistema auditado.
 - `toolkit/dist/` é somente artefato opcional para verificar compilação, distribuição ou smoke test de pacote; não é o
   fluxo de desenvolvimento.
 - Não criar novos arquivos `.js` como cópias, wrappers permanentes ou shims para uma implementação `.ts`.
-- O despachador recebe exclusivamente caminhos TypeScript registrados; em fonte executa `.ts` diretamente e, no
-  artefato compilado, resolve o mesmo caminho para o `.js` correspondente dentro de `dist`, sem compatibilidade com
-  registros `.js` antigos.
+- O despachador recebe exclusivamente caminhos TypeScript registrados e sempre executa a fonte `.ts` pelo `tsx`; um
+  `sgc.js` compilado pode ser usado apenas no smoke opcional, sem fallback para uma segunda implementação em `dist`.
 - Node padrão do projeto: `26.7.0`, registrado em `.nvmrc` e nos `engines`. TypeScript 6 permanece a linha adotada;
   TS7 fica explicitamente fora do escopo até que o ecossistema usado pelo projeto seja compatível. O alvo TypeScript
   foi elevado para ES2025, coerente com o runtime mínimo e com a ausência deliberada de compatibilidade legada.
@@ -168,7 +167,8 @@ frontend e para os caminhos OpenAPI.
 - `projeto/versao-sincronizar.ts` agora calcula pendências sem gravar por padrão, aceita `--base`, aplica alterações
   somente com `--gravar`, resolve o manifesto pelo diretório `frontend` configurado e evita reescrita quando a versão já
   está sincronizada; o teste externo confirma o layout `cliente/package.json`.
-- `garantirArquivo` resolve entradas `.ts` na fonte e o `.js` correspondente no build, sem aliases de comandos antigos.
+- `garantirArquivo` resolve somente entradas `.ts` na árvore-fonte física do toolkit; o despachador não mantém fallback
+  para `.js` compilado nem aliases de comandos antigos.
 - Exports de `toolkit/package.json` já expõem a árvore TypeScript do toolkit; todos os testes agora são TypeScript
   estrito, incluindo a CLI grande e o smoke de pacote.
 - O corretor de FQN possui teste de escrita, conteúdo esperado sem duplicação e idempotência; agora resolve
@@ -328,8 +328,8 @@ frontend e para os caminhos OpenAPI.
   modo automático e o schema de saída do Semgrep.
 - `codigo/semgrep-auditar.ts` agora normaliza caminhos de achados relativos ou absolutos antes de gerar stdout e
   resumo Markdown, evitando que relatórios de bases externas exibam caminhos calculados contra o diretório do toolkit.
-- O despachador agora resolve exclusivamente os caminhos TypeScript registrados; o artefato compilado possui uma
-  resolução explícita para os `.js` correspondentes em `dist`.
+- O despachador agora resolve exclusivamente os caminhos TypeScript registrados pela árvore-fonte física; até o smoke
+  do `sgc.js` compilado continua delegando a execução dos comandos ao `tsx` sobre a fonte `.ts`.
 - Foi criado `tsconfig.estrito.json`, cobrindo toda a implementação TypeScript com `strict` e `noImplicitOverride`; o
   gate passou e tornou-se o `typecheck` oficial.
 - `projeto/diagnostico.ts` foi convertido para TypeScript, deixou de depender de `fs-extra` e aceita catálogos
@@ -402,8 +402,8 @@ Nas validações desta rodada, em 13 de agosto de 2026, executadas diretamente s
 
 - `npm --prefix toolkit run test`: 120 testes aprovados em 7 arquivos; o smoke de pacote é separado para não tornar a
   suíte unitária dependente de rede ou instalação;
-- `npm --prefix toolkit run test:coverage`: aprovado com baseline informativa de 45,36% de statements (597/1.316),
-  33,47% de branches (307/917), 52,09% de funções (137/263) e 45,59% de linhas (574/1.259); o script exclui
+- `npm --prefix toolkit run test:coverage`: aprovado com baseline informativa de 45,42% de statements (596/1.312),
+  33,69% de branches (307/911), 52,09% de funções (137/263) e 45,65% de linhas (573/1.255); o script exclui
   `test/**` para não contar o apoio de testes como implementação e ainda não aplica threshold, porque a prioridade é
   transformar os contratos críticos em cenários explícitos;
 - `npm --prefix toolkit run test:pacote`: 1 teste aprovado, com `npm pack`, instalação isolada, auditoria no consumidor
@@ -470,6 +470,8 @@ a alinhar entradas, saídas e mensagens de artefatos à base efetiva; a contagem
 seguinte, o alvo de compilação TypeScript passou de ES2023 para ES2025, coerente com Node 26 e sem compatibilidade legada;
 os 120 cenários e a baseline de cobertura permanecem verdes. Na rodada seguinte, os `tsconfig` passaram a incluir somente
 TypeScript; o launcher `bin/sgc.cjs` continua como fronteira npm fora do grafo de compilação.
+Na rodada seguinte, o despachador deixou de procurar `.js` em `dist`: inclusive no smoke do `sgc.js` compilado, a
+execução é delegada ao `tsx` sobre a fonte `.ts`; `dist` permanece apenas um artefato de verificação.
 
 ### 3.3 Tamanho e composição atual
 
@@ -507,6 +509,7 @@ O núcleo TypeScript de implementação foi concluído: 100% dos arquivos de imp
 | Resolvido nesta rodada | Resumo de qualidade calculava caminho contra o `cwd` | `qualidade resumo` agora informa a fotografia relativa à base efetiva, preservando a mesma referência em JSON e saída humana para bases externas. |
 | Resolvido nesta rodada | Auditorias frontend misturavam `cwd` e base auditada | Arquitetura, resíduos e cobertura frontend agora resolvem caminhos relativos contra `--base` e exibem artefatos relativos à mesma raiz. |
 | Resolvido nesta rodada | Configuração TypeScript ainda incluía JavaScript legado | Os `tsconfig` de checagem e build agora incluem somente `.ts`; o único `.cjs` restante é o launcher deliberadamente externo ao compilador. |
+| Resolvido nesta rodada | Despachador mantinha fallback para implementação compilada | `lib/execucao.ts` agora resolve sempre a fonte `.ts` via `DIRETORIO_TOOLKIT` e `tsx`; o build não cria nem exige uma segunda árvore de comandos `.js`. |
 | Resolvido | Efeito colateral oculto de gravação | `codigo nomes auditar-consistencia` gerava o inventário auxiliar com gravação habilitada e contaminava `--json`; a opção `--gravar` agora é propagada e a coleta interna é silenciosa. |
 | Resolvido | Configuração sem validação | `configuracao-toolkit.json` agora exige a versão `1` e valida estrutura, chaves conhecidas e caminhos textuais antes da combinação com defaults. |
 | Resolvido nesta rodada | Políticas de resíduos apontando para legado ausente | Os defaults de orçamento e exceções frontend foram removidos; overrides continuam aceitos, a ausência usa política neutra explícita e arquivo configurado ausente ou inválido falha visivelmente. |
@@ -536,8 +539,8 @@ O núcleo TypeScript de implementação foi concluído: 100% dos arquivos de imp
 - O toolkit funciona como ferramenta interna executada pelo script npm ou por `npx tsx` dentro deste workspace.
 - O toolkit também funciona como pacote CLI externo fonte + `tsx`: o tarball foi instalado em consumidor isolado e o
   binário executou uma auditoria contra a raiz do consumidor.
-- `exports` aponta alguns subpaths diretamente para `.ts`; esse contrato serve ao workspace com loader, mas não é um
-  contrato consumível por Node puro e precisa acompanhar a decisão fonte versus pacote compilado.
+- `exports` aponta alguns subpaths diretamente para `.ts`; esse contrato serve ao workspace e ao pacote fonte com `tsx`,
+  mas não é um contrato consumível por Node puro sem um loader TypeScript.
 - Parametrização parcial não significa generalização concluída.
 - Build aprovado prova que a árvore pode ser emitida; não prova que o pacote emitido contém assets, configuração e
   resolução de raiz adequados para distribuição.
@@ -722,11 +725,11 @@ configuração externa possui testes de precedência e erro.
    dependência de runtime, com `version`, `files`, `exports` e launcher declarados.
 7. **[concluído nesta rodada]** Criar `test:pacote`, que executa `npm pack`, instala em diretório temporário, cria um
    projeto consumidor fixture e audita a raiz do consumidor pelo binário instalado.
-8. **[concluído nesta rodada]** Remover o fallback `.js` → `.ts` do despachador depois de todos os comandos registrados
+8. **[concluído nesta rodada]** Remover o fallback `.ts` → `.js` do despachador depois de todos os comandos registrados
    passarem a usar caminhos TypeScript explícitos.
 
 Critério de aceite: nenhum comando fonte depender de `node` puro, nenhum binário apontar para um caminho quebrado e o
-roteador fonte/compilado possuir testes de smoke equivalentes.
+launcher compilado, quando exercitado no smoke opcional, continuar despachando a mesma fonte TypeScript pelo `tsx`.
 
 ### Fase B — converter bibliotecas puras e contratos de dados
 
