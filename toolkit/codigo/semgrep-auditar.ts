@@ -10,7 +10,7 @@ import {lerOpcao} from "../lib/cli-opcoes.js";
 import {resolverCaminhoConfigurado} from "../lib/configuracao.js";
 import {exibirAjudaComando} from "../lib/cli-ajuda.js";
 import {ehEntradaPrincipal} from "../lib/execucao.js";
-import {escreverLinha, imprimirCabecalho, imprimirJson} from "../lib/saida.js";
+import {escreverErro, escreverLinha, imprimirCabecalho, imprimirJson} from "../lib/saida.js";
 
 interface PosicaoSemgrep {
     line?: number;
@@ -263,7 +263,7 @@ async function principal(argumentos: string[] = process.argv.slice(2)): Promise<
 
 if (ehEntradaPrincipal(import.meta.url)) {
     principal().catch((erro: unknown) => {
-        process.stderr.write(`Erro ao executar auditoria Semgrep: ${erro instanceof Error ? erro.message : String(erro)}\n`);
+        escreverErro(`Erro ao executar auditoria Semgrep: ${erro instanceof Error ? erro.message : String(erro)}\n`);
         process.exitCode = 1;
     });
 }

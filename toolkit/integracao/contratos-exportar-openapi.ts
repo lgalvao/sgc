@@ -7,7 +7,7 @@ import {DIRETORIO_RAIZ} from "../lib/caminhos.js";
 import {exibirAjudaComando} from "../lib/cli-ajuda.js";
 import {lerOpcao} from "../lib/cli-opcoes.js";
 import {ehEntradaPrincipal} from "../lib/execucao.js";
-import {escreverLinha, imprimirCabecalho, imprimirJson} from "../lib/saida.js";
+import {escreverErro, escreverLinha, imprimirCabecalho, imprimirJson} from "../lib/saida.js";
 import {URL_OPENAPI_PADRAO, resolverCaminhosOpenapi} from "./contratos-openapi-caminhos.js";
 
 interface OpcoesExportarOpenapi {
@@ -113,8 +113,8 @@ async function principal(argumentos: string[] = process.argv.slice(2)): Promise<
             escreverLinha(`Paths: ${resultado.paths}`);
         }
     } catch (erro) {
-        process.stderr.write(`Erro ao exportar OpenAPI: ${erro instanceof Error ? erro.message : String(erro)}\n`);
-        process.stderr.write("Dica: execute o backend com perfil `e2e` ou informe `--url` para uma instância já ativa.\n");
+        escreverErro(`Erro ao exportar OpenAPI: ${erro instanceof Error ? erro.message : String(erro)}\n`);
+        escreverErro("Dica: execute o backend com perfil `e2e` ou informe `--url` para uma instância já ativa.\n");
         process.exitCode = 1;
     }
 }

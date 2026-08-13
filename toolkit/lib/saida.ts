@@ -4,6 +4,10 @@ function escrever(texto = ""): void {
     process.stdout.write(texto);
 }
 
+function escreverErro(texto = ""): void {
+    process.stderr.write(texto);
+}
+
 function escreverLinha(texto = ""): void {
     escrever(`${texto}\n`);
 }
@@ -37,6 +41,7 @@ function formatarStatus(status: string): string {
 
 export {
     escrever,
+    escreverErro,
     escreverLinha,
     formatarStatus,
     imprimirCabecalho,

@@ -5,6 +5,7 @@ import {resolverNaRaiz} from "../lib/caminhos.js";
 import {lerOpcao} from "../lib/cli-opcoes.js";
 import {exibirAjudaComando} from "../lib/cli-ajuda.js";
 import {ehEntradaPrincipal} from "../lib/execucao.js";
+import {escreverErro} from "../lib/saida.js";
 
 const CAMINHO_ESPECIFICACAO = "e2e/a11y/crawler.spec.ts";
 const CAMINHO_CONFIGURACAO = "e2e/playwright.config.ts";
@@ -119,7 +120,7 @@ async function principal(argumentos: string[] = process.argv.slice(2)): Promise<
 if (ehEntradaPrincipal(import.meta.url)) {
     principal().catch((erro) => {
         const mensagem = erro instanceof Error ? erro.message : String(erro);
-        process.stderr.write(`Erro ao executar crawler de acessibilidade: ${mensagem}\n`);
+        escreverErro(`Erro ao executar crawler de acessibilidade: ${mensagem}\n`);
         process.exitCode = 1;
     });
 }

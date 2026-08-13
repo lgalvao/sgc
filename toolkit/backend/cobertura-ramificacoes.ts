@@ -6,7 +6,7 @@ import {resolverNaRaiz} from "../lib/caminhos.js";
 import {ehEntradaPrincipal} from "../lib/execucao.js";
 import {extrairCoberturaJacoco} from "../lib/dominios/cobertura-java.js";
 import type {ClasseCobertura, ResultadoCoberturaJacoco} from "../lib/dominios/cobertura-java.js";
-import {escreverLinha, imprimirCabecalho, imprimirJson} from "../lib/saida.js";
+import {escreverErro, escreverLinha, imprimirCabecalho, imprimirJson} from "../lib/saida.js";
 import {exibirAjudaComando} from "../lib/cli-ajuda.js";
 
 interface ClasseRamificacoes {
@@ -105,7 +105,7 @@ async function principal(argumentos: string[] = process.argv.slice(2)): Promise<
 if (ehEntradaPrincipal(import.meta.url)) {
     principal().catch((erro) => {
         const mensagem = erro instanceof Error ? erro.message : String(erro);
-        process.stderr.write(`${pc.red(`Erro ao analisar branches do backend: ${mensagem}`)}\n`);
+        escreverErro(`${pc.red(`Erro ao analisar branches do backend: ${mensagem}`)}\n`);
         process.exitCode = 1;
     });
 }

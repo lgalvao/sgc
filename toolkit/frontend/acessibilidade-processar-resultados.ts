@@ -6,7 +6,7 @@ import {resolverCaminhoConfigurado} from "../lib/configuracao.js";
 import {lerOpcao} from "../lib/cli-opcoes.js";
 import {exibirAjudaComando} from "../lib/cli-ajuda.js";
 import {ehEntradaPrincipal} from "../lib/execucao.js";
-import {escreverLinha} from "../lib/saida.js";
+import {escreverErro, escreverLinha} from "../lib/saida.js";
 
 interface NoAcessibilidade {
     target: string[];
@@ -169,7 +169,7 @@ async function principal(argumentos: string[] = process.argv.slice(2)): Promise<
 if (ehEntradaPrincipal(import.meta.url)) {
     principal().catch((erro) => {
         const mensagem = erro instanceof Error ? erro.message : String(erro);
-        process.stderr.write(`Erro ao processar acessibilidade: ${mensagem}\n`);
+        escreverErro(`Erro ao processar acessibilidade: ${mensagem}\n`);
         process.exitCode = 1;
     });
 }

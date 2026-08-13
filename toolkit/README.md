@@ -326,6 +326,8 @@ Para medir a cobertura do próprio toolkit sem impor threshold prematuro:
 npm --prefix toolkit run test:coverage
 ```
 
+O relatório exclui `test/**` para medir somente a implementação distribuível, sem contar o apoio ou os próprios testes.
+
 O smoke de distribuição instala o tarball em um consumidor temporário, sem usar dependências hoisted do monorepo:
 
 ```bash

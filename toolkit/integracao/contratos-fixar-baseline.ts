@@ -7,7 +7,7 @@ import {DIRETORIO_RAIZ} from "../lib/caminhos.js";
 import {exibirAjudaComando} from "../lib/cli-ajuda.js";
 import {lerOpcao} from "../lib/cli-opcoes.js";
 import {ehEntradaPrincipal} from "../lib/execucao.js";
-import {escreverLinha, imprimirCabecalho, imprimirJson} from "../lib/saida.js";
+import {escreverErro, escreverLinha, imprimirCabecalho, imprimirJson} from "../lib/saida.js";
 import {resolverCaminhosOpenapi} from "./contratos-openapi-caminhos.js";
 
 interface OpcoesFixarBaselineContrato {
@@ -75,7 +75,7 @@ async function principal(argumentos: string[] = process.argv.slice(2)): Promise<
 
 if (ehEntradaPrincipal(import.meta.url)) {
     principal().catch((erro) => {
-        process.stderr.write(`Erro ao fixar baseline OpenAPI: ${erro instanceof Error ? erro.message : String(erro)}\n`);
+        escreverErro(`Erro ao fixar baseline OpenAPI: ${erro instanceof Error ? erro.message : String(erro)}\n`);
         process.exitCode = 1;
     });
 }

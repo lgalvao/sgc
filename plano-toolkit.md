@@ -387,9 +387,10 @@ Nas validações desta rodada, em 13 de agosto de 2026, executadas diretamente s
 
 - `npm --prefix toolkit run test`: 112 testes aprovados em 7 arquivos; o smoke de pacote é separado para não tornar a
   suíte unitária dependente de rede ou instalação;
-- `npm --prefix toolkit run test:coverage`: aprovado com baseline informativa de 41,74% de statements (536/1.284),
-  29,30% de branches (264/901), 48,80% de funções (123/252) e 42,01% de linhas (516/1.228); ainda sem threshold
-  porque os testes permanecem concentrados e a prioridade é transformar os contratos críticos em cenários explícitos;
+- `npm --prefix toolkit run test:coverage`: aprovado com baseline informativa de 41,75% de statements (537/1.286),
+  29,26% de branches (264/902), 48,61% de funções (123/253) e 42,03% de linhas (517/1.230); o script exclui
+  `test/**` para não contar o apoio de testes como implementação e ainda não aplica threshold, porque a prioridade é
+  transformar os contratos críticos em cenários explícitos;
 - `npm --prefix toolkit run test:pacote`: 1 teste aprovado, com `npm pack`, instalação isolada, auditoria no consumidor
   e verificação da política Semgrep empacotada;
 - `npm --prefix toolkit run build`: aprovado;
@@ -475,6 +476,7 @@ O núcleo TypeScript de implementação foi concluído: 100% dos arquivos de imp
 | Resolvido nesta rodada | Integração OpenAPI misturada à validação da CLI | Os 2 cenários de importação e artefatos OpenAPI agora estão em `test/integracao.test.ts`; o teste principal caiu para 81 cenários e a persistência de diff continua coberta com `--gravar`. |
 | Resolvido nesta rodada | Qualidade misturada à validação da CLI | Os 4 cenários de resumo e coleta agora estão em `test/qualidade.test.ts`; o teste principal caiu para 77 cenários e continua cobrindo perfis válidos e inválidos. |
 | Resolvido nesta rodada | Apoio de execução duplicado entre testes | `test/apoio.ts` passou a ser a fonte única da raiz do toolkit, do `tsx` e do contrato `ResultadoExecucao`; os quatro testes que executam a CLI não mantêm cópias locais desse mecanismo. |
+| Resolvido nesta rodada | Apoio de testes contaminava a cobertura | `test:coverage` agora exclui `test/**`; a baseline permanece focada na implementação e não conta `test/apoio.ts` como código produtivo. |
 | Resolvido nesta rodada | Resumo de análise bypassava a saída comum | `backend/testes-analisar.ts` agora usa `escreverLinha` em todas as linhas humanas; stdout continua igual e não há mistura com o JSON gravado. |
 | Resolvido nesta rodada | Auditoria de dependências bypassava a saída comum | `projeto/dependencias-auditar.ts` agora usa `escreverLinha` para a separação dos escopos; o fluxo mantém títulos, quebras e códigos de falha. |
 | Resolvido nesta rodada | Roteador monolítico e inventário duplicado | Os 42 comandos que apenas despacham scripts agora vêm de `lib/catalogo-comandos.ts`, com teste de unicidade, descrição, rota e arquivo existente. A documentação passou a tratar `sgc --help` como catálogo canônico e mantém apenas exemplos; comandos com ações/opções próprias continuam explícitos em `sgc.ts`. |

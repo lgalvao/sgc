@@ -3,7 +3,7 @@ import path from "node:path";
 import {ehEntradaPrincipal} from "../lib/execucao.js";
 import {resolverNaRaiz} from "../lib/caminhos.js";
 import {lerOpcao} from "../lib/cli-opcoes.js";
-import {escreverLinha} from "../lib/saida.js";
+import {escreverErro, escreverLinha} from "../lib/saida.js";
 
 interface ResultadoSincronizacao {
     novaVersao: string;
@@ -73,8 +73,8 @@ function principal(argumentos: string[] = process.argv.slice(2)): ResultadoSincr
 
     const novaVersao = argumentos[0];
     if (!novaVersao) {
-        process.stderr.write("Uso recomendado: npx tsx toolkit/sgc.ts projeto versao-sincronizar <versao> [--base <diretorio>] [--gravar]\n");
-        process.stderr.write("Execução direta: npx tsx toolkit/projeto/versao-sincronizar.ts <versao>\n");
+        escreverErro("Uso recomendado: npx tsx toolkit/sgc.ts projeto versao-sincronizar <versao> [--base <diretorio>] [--gravar]\n");
+        escreverErro("Execução direta: npx tsx toolkit/projeto/versao-sincronizar.ts <versao>\n");
         process.exitCode = 1;
         return;
     }
@@ -96,7 +96,7 @@ if (ehEntradaPrincipal(import.meta.url)) {
     try {
         principal();
     } catch (erro: unknown) {
-        process.stderr.write(`Erro ao sincronizar versão: ${erro instanceof Error ? erro.message : String(erro)}\n`);
+        escreverErro(`Erro ao sincronizar versão: ${erro instanceof Error ? erro.message : String(erro)}\n`);
         process.exitCode = 1;
     }
 }

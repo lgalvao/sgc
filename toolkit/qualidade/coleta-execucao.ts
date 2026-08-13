@@ -9,7 +9,7 @@ import {resolverCaminhoConfigurado} from "../lib/configuracao.js";
 import {NOME_ARQUIVO_FOTOGRAFIA, obterDiretorioArtefatos} from "../lib/qualidade.js";
 import {extrairCoberturaJacoco} from "../lib/dominios/cobertura-java.js";
 import {extrairCoberturaFrontend} from "../lib/dominios/cobertura-web.js";
-import {escreverLinha} from "../lib/saida.js";
+import {escreverErro, escreverLinha} from "../lib/saida.js";
 
 const CAMINHO_SGC = path.join(DIRETORIO_TOOLKIT, "sgc.ts");
 const VERSAO_SCHEMA = "1.0.0" as const;
@@ -494,7 +494,7 @@ async function principal(argumentos: string[] = process.argv.slice(2)): Promise<
 if (ehEntradaPrincipal(import.meta.url)) {
     principal().catch((erro) => {
         const mensagem = erro instanceof Error ? erro.message : String(erro);
-        process.stderr.write(`Erro ao coletar qualidade: ${mensagem}\n`);
+        escreverErro(`Erro ao coletar qualidade: ${mensagem}\n`);
         process.exitCode = 1;
     });
 }
