@@ -1,16 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
+import {carregarConfiguracao, type FonteMensagensCodigo} from "../lib/configuracao.js";
 import {lerArquivo} from "./cdus-lib.js";
-
-const CAMINHO_MENSAGENS_BACKEND = "backend/src/main/java/sgc/comum/Mensagens.java";
-const CAMINHO_ASSUNTOS_BACKEND = "backend/src/main/java/sgc/alerta/AssuntosNotificacao.java";
-const CAMINHOS_CONSTANTES_FRONTEND = [
-    "frontend/src/constants/notificacoes.ts",
-    "frontend/src/constants/textos-subprocesso.ts",
-    "frontend/src/constants/textos-mapa.ts",
-    "frontend/src/constants/textos-diagnostico.ts",
-    "frontend/src/constants/textos-processo.ts"
-];
 
 const STOPWORDS = new Set<string>(["a", "ao", "as", "da", "das", "de", "do", "dos", "e", "em", "na", "no", "o", "os", "para"]);
 const PREFIXOS_UI_EXCLUIDOS = [
@@ -39,18 +30,16 @@ const CHAVES_MENSAGEM_EXPLICITAS = new Set<string>([
     "PROCESSO_INICIADO"
 ]);
 
-const CAMINHOS_FONTES_MENSAGENS = [
-    "backend/src/main/java/sgc/comum/Mensagens.java",
-    "backend/src/main/java/sgc/alerta/AssuntosNotificacao.java",
-    "frontend/src/constants/notificacoes.ts",
-    "frontend/src/constants/textos-subprocesso.ts",
-    "frontend/src/constants/textos-mapa.ts",
-    "frontend/src/constants/textos-diagnostico.ts",
-    "frontend/src/constants/textos-processo.ts"
-];
+function resolverCaminhoFonte(base: string, fonte: FonteMensagensCodigo): string {
+    return path.resolve(base, fonte.caminho);
+}
 
-function possuiFontesMensagensCanonicas(base: string): boolean {
-    return CAMINHOS_FONTES_MENSAGENS.every(caminho => fs.existsSync(path.join(base, caminho)));
+function obterFontesMensagensCodigo(base: string): FonteMensagensCodigo[] {
+    return carregarConfiguracao(base).requisitos.cdus.fontesMensagensCodigo;
+}
+
+function possuiFontesMensagensCanonicas(base: string, fontes: FonteMensagensCodigo[] = obterFontesMensagensCodigo(base)): boolean {
+    return fontes.length > 0 && fontes.every(fonte => fs.existsSync(resolverCaminhoFonte(base, fonte)));
 }
 
 interface MensagemExtraida {
@@ -233,48 +222,55 @@ function sugerirCanonicos(texto: string, canonicos: MensagemCanonica[], limite: 
         .slice(0, limite);
 }
 
-function carregarMensagensCanonicas(base: string): ResultadoMensagensCanonicas {
+function adicionarConstantesTypescript(itens: MensagemCanonica[], texto: string, fonte: FonteMensagensCodigo): void {
+    const constantes = extrairConstantesTypescript(texto, fonte.caminho);
+    for (const item of constantes) {
+        if (item.chave.startsWith("SUCESSO_")) {
+            itens.push({...item, categoria: "toast", grupo: "sucesso_frontend"});
+            itens.push({...item, categoria: "mensagem", grupo: "sucesso_frontend"});
+            continue;
+        }
+        if (fonte.tipo === "notificacoesTypescript") {
+            itens.push({...item, categoria: "descricao", grupo: "notificacao_frontend"});
+            continue;
+        }
+        if (item.chave.startsWith("PROCESSO_")) {
+            itens.push({...item, categoria: "descricao", grupo: "movimentacao_frontend"});
+        }
+        const ehUiExcluida = PREFIXOS_UI_EXCLUIDOS.some(prefixo => item.chave.startsWith(prefixo));
+        if (!ehUiExcluida && CHAVES_MENSAGEM_EXPLICITAS.has(item.chave)) {
+            itens.push({...item, categoria: "toast", grupo: "resultado_frontend"});
+            itens.push({...item, categoria: "mensagem", grupo: "resultado_frontend"});
+        }
+    }
+}
+
+function carregarMensagensCanonicas(
+    base: string,
+    fontes: FonteMensagensCodigo[] = obterFontesMensagensCodigo(base)
+): ResultadoMensagensCanonicas {
     const itens: MensagemCanonica[] = [];
 
-    const caminhoBackend = path.join(base, CAMINHO_MENSAGENS_BACKEND);
-    const constantesBackend = extrairConstantesJava(lerArquivo(caminhoBackend), CAMINHO_MENSAGENS_BACKEND);
-    for (const item of constantesBackend) {
-        if (item.chave.startsWith("HIST_")) {
-            itens.push({...item, categoria: "descricao", grupo: "historico_backend"});
+    for (const fonte of fontes) {
+        const texto = lerArquivo(resolverCaminhoFonte(base, fonte));
+        if (fonte.tipo === "mensagensJava") {
+            for (const item of extrairConstantesJava(texto, fonte.caminho)) {
+                if (item.chave.startsWith("HIST_")) {
+                    itens.push({...item, categoria: "descricao", grupo: "historico_backend"});
+                }
+                if (item.chave.startsWith("ALERTA_")) {
+                    itens.push({...item, categoria: "descricao", grupo: "alerta_backend"});
+                }
+            }
+            continue;
         }
-        if (item.chave.startsWith("ALERTA_")) {
-            itens.push({...item, categoria: "descricao", grupo: "alerta_backend"});
+        if (fonte.tipo === "assuntosJava") {
+            for (const item of extrairAssuntosBackend(texto, fonte.caminho)) {
+                itens.push({...item, categoria: "assunto", grupo: "assunto_backend"});
+            }
+            continue;
         }
-    }
-
-    const caminhoAssuntos = path.join(base, CAMINHO_ASSUNTOS_BACKEND);
-    const assuntosBackend = extrairAssuntosBackend(lerArquivo(caminhoAssuntos), CAMINHO_ASSUNTOS_BACKEND);
-    for (const item of assuntosBackend) {
-        itens.push({...item, categoria: "assunto", grupo: "assunto_backend"});
-    }
-
-    for (const caminhoRelativo of CAMINHOS_CONSTANTES_FRONTEND) {
-        const caminhoCompleto = path.join(base, caminhoRelativo);
-        const constantes = extrairConstantesTypescript(lerArquivo(caminhoCompleto), caminhoRelativo);
-        for (const item of constantes) {
-            if (item.chave.startsWith("SUCESSO_")) {
-                itens.push({...item, categoria: "toast", grupo: "sucesso_frontend"});
-                itens.push({...item, categoria: "mensagem", grupo: "sucesso_frontend"});
-                continue;
-            }
-            if (caminhoRelativo.endsWith("notificacoes.ts")) {
-                itens.push({...item, categoria: "descricao", grupo: "notificacao_frontend"});
-                continue;
-            }
-            if (item.chave.startsWith("PROCESSO_")) {
-                itens.push({...item, categoria: "descricao", grupo: "movimentacao_frontend"});
-            }
-            const ehUiExcluida = PREFIXOS_UI_EXCLUIDOS.some(prefixo => item.chave.startsWith(prefixo));
-            if (!ehUiExcluida && CHAVES_MENSAGEM_EXPLICITAS.has(item.chave)) {
-                itens.push({...item, categoria: "toast", grupo: "resultado_frontend"});
-                itens.push({...item, categoria: "mensagem", grupo: "resultado_frontend"});
-            }
-        }
+        adicionarConstantesTypescript(itens, texto, fonte);
     }
 
     return {

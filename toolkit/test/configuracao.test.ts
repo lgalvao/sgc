@@ -29,6 +29,7 @@ describe("Configuracao do toolkit", () => {
         expect(configuracao.diretorios.backendCodigo).toBe("servidor/java");
         expect(configuracao.diretorios.frontend).toBe("frontend");
         expect(configuracao.requisitos.cdus.padraoArquivos).toBe("specs/cdu/cdu-*.md");
+        expect(configuracao.requisitos.cdus.fontesMensagensCodigo).toHaveLength(7);
     });
 
     test("rejeita configuracao com versao, chave ou caminho invalido", () => {
@@ -45,6 +46,10 @@ describe("Configuracao do toolkit", () => {
             versao: VERSAO_CONFIGURACAO,
             requisitos: {cdus: {padraoArquivoss: "docs/*.md"}}
         })).toThrow("padraoArquivoss");
+        expect(() => validarConfiguracao({
+            versao: VERSAO_CONFIGURACAO,
+            requisitos: {cdus: {fontesMensagensCodigo: [{caminho: "mensagens.java", tipo: "kotlin"}]}}
+        })).toThrow("tipo de fonte conhecido");
         expect(() => validarConfiguracao({
             versao: VERSAO_CONFIGURACAO,
             execucoes: {qualidade: {rapido: {descricao: "", tarefas: []}}}

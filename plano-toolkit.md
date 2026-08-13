@@ -119,8 +119,9 @@ O formato CDU será usado em vários projetos e deve ser tratado como capacidade
 - caminho do corpus, perfis, situações, tipos de processo, mensagens e extratores atuais do SGC pertencem ao perfil SGC.
 
 O padrão de arquivos do corpus já pode ser substituído por `requisitos.cdus.padraoArquivos` em
-`configuracao-toolkit.json`; o default continua sendo `specs/cdu/cdu-*.md`. A comparação com mensagens do código ainda
-precisa receber fontes e adaptadores configuráveis.
+`configuracao-toolkit.json`; o default continua sendo `specs/cdu/cdu-*.md`. As fontes da comparação com mensagens do código
+também podem ser declaradas por caminho e tipo de adaptador; prefixos, grupos e convenções de mensagens ainda são política
+do perfil.
 
 O SGC deve continuar funcionando com `specs/cdu/cdu-*.md`, mas esse caminho não pode permanecer uma regra rígida do
 motor horizontal.
@@ -147,8 +148,8 @@ isolado funciona, mas as fronteiras ainda não estão concluídas:
 - os dois agregadores aceitam `--secoes` e produzem JSON versionado; o caminho do corpus já é configurável por
   `requisitos.cdus.padraoArquivos`, com default `specs/cdu/cdu-*.md`;
 - a configuração ainda não representa vocabulário, estilo nem extratores CDU;
-- a comparação com mensagens do código ainda depende de sete caminhos rígidos do SGC e só pode ser selecionada quando as
-  fontes canônicas estão presentes;
+- a comparação com mensagens do código usa fontes configuráveis por caminho e tipo de adaptador; o default SGC mantém sete
+  fontes e as heurísticas de prefixos e grupos ainda estão dentro do adaptador;
 - `backend testes analisar` e `backend testes priorizar` são somente leitura por padrão, persistem apenas com `--gravar` e
   já aparecem no mesmo catálogo de opções da CLI principal;
 - o roteador e os entrypoints diretos publicados validam opções, valores e posicionais pelo mesmo preflight, inclusive a
@@ -194,7 +195,7 @@ permite determinar efeitos sem ler a implementação.
   padrão de glob já está em `requisitos.cdus.padraoArquivos`;
 - extrair parser e análise estrutural para contratos independentes do SGC;
 - mover vocabulário, situações, tipos, estilo e placeholders do SGC para uma política explícita;
-- separar comparação de mensagens dos extratores Java/TypeScript e permitir composição por stack;
+- separar a comparação de mensagens das heurísticas de prefixos e grupos e permitir composição por stack;
 - reclassificar cada comando CDU individualmente: análise estrutural no núcleo, integração no adaptador e convenções no
   perfil SGC;
 - criar fixture de um segundo projeto com caminho e vocabulário próprios e preservar o SGC por regressão;

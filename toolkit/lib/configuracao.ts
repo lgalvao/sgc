@@ -40,8 +40,16 @@ interface ExecucoesConfiguradas {
     qualidade?: Record<string, PerfilQualidadeConfigurado>;
 }
 
+type TipoFonteMensagensCodigo = "mensagensJava" | "assuntosJava" | "notificacoesTypescript" | "textosTypescript";
+
+interface FonteMensagensCodigo {
+    caminho: string;
+    tipo: TipoFonteMensagensCodigo;
+}
+
 interface ConfiguracaoCdu {
     padraoArquivos: string;
+    fontesMensagensCodigo: FonteMensagensCodigo[];
 }
 
 interface RequisitosConfigurados {
@@ -88,7 +96,16 @@ const CONFIGURACAO_PADRAO: ConfiguracaoToolkit = {
     },
     requisitos: {
         cdus: {
-            padraoArquivos: "specs/cdu/cdu-*.md"
+            padraoArquivos: "specs/cdu/cdu-*.md",
+            fontesMensagensCodigo: [
+                {caminho: "backend/src/main/java/sgc/comum/Mensagens.java", tipo: "mensagensJava"},
+                {caminho: "backend/src/main/java/sgc/alerta/AssuntosNotificacao.java", tipo: "assuntosJava"},
+                {caminho: "frontend/src/constants/notificacoes.ts", tipo: "notificacoesTypescript"},
+                {caminho: "frontend/src/constants/textos-subprocesso.ts", tipo: "textosTypescript"},
+                {caminho: "frontend/src/constants/textos-mapa.ts", tipo: "textosTypescript"},
+                {caminho: "frontend/src/constants/textos-diagnostico.ts", tipo: "textosTypescript"},
+                {caminho: "frontend/src/constants/textos-processo.ts", tipo: "textosTypescript"}
+            ]
         }
     }
 };
@@ -222,16 +239,46 @@ function validarRequisitos(valor: unknown): RequisitosSobrepostos {
         throw new Error(`${NOME_ARQUIVO_CONFIGURACAO}.requisitos.cdus deve ser um objeto JSON.`);
     }
 
-    const chavesPermitidasCdus = new Set(["padraoArquivos"]);
+    const chavesPermitidasCdus = new Set(["padraoArquivos", "fontesMensagensCodigo"]);
     const chavesDesconhecidasCdus = Object.keys(valor.cdus).filter(chave => !chavesPermitidasCdus.has(chave));
     if (chavesDesconhecidasCdus.length > 0) {
         throw new Error(`${NOME_ARQUIVO_CONFIGURACAO}.requisitos.cdus possui chave(s) desconhecida(s): ${chavesDesconhecidasCdus.join(", ")}.`);
     }
 
+    const fontes = valor.cdus.fontesMensagensCodigo;
+    if (fontes !== undefined && (!Array.isArray(fontes) || fontes.some(fonte => !ehObjeto(fonte)))) {
+        throw new Error(`${NOME_ARQUIVO_CONFIGURACAO}.requisitos.cdus.fontesMensagensCodigo deve ser uma lista de objetos.`);
+    }
+
+    const fontesValidadas = fontes?.map((fonte, indice) => {
+        const chavesPermitidasFonte = new Set(["caminho", "tipo"]);
+        const chavesDesconhecidasFonte = Object.keys(fonte).filter(chave => !chavesPermitidasFonte.has(chave));
+        if (chavesDesconhecidasFonte.length > 0) {
+            throw new Error(`${NOME_ARQUIVO_CONFIGURACAO}.requisitos.cdus.fontesMensagensCodigo[${indice}] possui chave(s) desconhecida(s): ${chavesDesconhecidasFonte.join(", ")}.`);
+        }
+        const tiposPermitidos: readonly TipoFonteMensagensCodigo[] = [
+            "mensagensJava",
+            "assuntosJava",
+            "notificacoesTypescript",
+            "textosTypescript"
+        ];
+        const tipo = fonte.tipo;
+        if (typeof tipo !== "string" || !tiposPermitidos.includes(tipo as TipoFonteMensagensCodigo)) {
+            throw new Error(`${NOME_ARQUIVO_CONFIGURACAO}.requisitos.cdus.fontesMensagensCodigo[${indice}].tipo deve ser um tipo de fonte conhecido.`);
+        }
+        return {
+            caminho: validarTexto(fonte.caminho, `requisitos.cdus.fontesMensagensCodigo[${indice}].caminho`),
+            tipo: tipo as TipoFonteMensagensCodigo
+        };
+    });
+
     return {
-        cdus: valor.cdus.padraoArquivos === undefined
-            ? {}
-            : {padraoArquivos: validarTexto(valor.cdus.padraoArquivos, "requisitos.cdus.padraoArquivos")}
+        cdus: {
+            ...(valor.cdus.padraoArquivos === undefined
+                ? {}
+                : {padraoArquivos: validarTexto(valor.cdus.padraoArquivos, "requisitos.cdus.padraoArquivos")}),
+            ...(fontesValidadas === undefined ? {} : {fontesMensagensCodigo: fontesValidadas})
+        }
     };
 }
 
@@ -385,6 +432,7 @@ export {
     validarConfiguracao,
     type NomeDiretorioConfigurado,
     type EscopoComandoConfigurado,
+    type FonteMensagensCodigo,
     type PerfilQualidadeConfigurado,
     type TarefaConfigurada
 };

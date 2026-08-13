@@ -179,6 +179,27 @@ O corpus CDU usa `specs/cdu/cdu-*.md` por padrão. Para outro layout, configure
 as duplicações continuam horizontais; políticas de vocabulário, estilo e comparação com mensagens do código ainda são
 específicas do perfil configurado.
 
+A seção `mensagens-codigo` usa sete fontes SGC por padrão. Um projeto pode substituí-las por fontes próprias, declarando
+o caminho e o adaptador de cada arquivo; uma lista vazia desativa essa comparação:
+
+```json
+{
+  "versao": 1,
+  "requisitos": {
+    "cdus": {
+      "fontesMensagensCodigo": [
+        {"caminho": "servidor/src/main/java/app/Mensagens.java", "tipo": "mensagensJava"},
+        {"caminho": "cliente/src/constants/textos.ts", "tipo": "textosTypescript"}
+      ]
+    }
+  }
+}
+```
+
+Os tipos aceitos são `mensagensJava`, `assuntosJava`, `notificacoesTypescript` e `textosTypescript`. Eles definem o
+adaptador de leitura; prefixos, grupos e convenções de mensagens continuam sendo políticas que precisam ser extraídas do
+perfil quando houver necessidade de generalização adicional.
+
 Execuções de dependências e qualidade também podem ser substituídas:
 
 ```json

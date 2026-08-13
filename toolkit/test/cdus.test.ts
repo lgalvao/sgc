@@ -668,6 +668,64 @@ describe("Ferramentas de requisitos dos CDUs", () => {
         expect(toast.referenciasExatas.some(item => item.texto === "Diagnóstico homologado")).toBe(true);
     });
 
+    test("usa fontes canônicas de mensagens configuradas pelo projeto", async () => {
+        const base = await mkdtemp(path.join(os.tmpdir(), "sgc-cdus-fontes-mensagens-configuradas-"));
+        const dirSpecs = path.join(base, "specs", "cdu");
+
+        await escreverArquivo(
+            path.join(dirSpecs, "cdu-01.md"),
+            [
+                "# CDU-01 - Exemplo",
+                "",
+                "## Atores",
+                "",
+                "- ADMIN",
+                "",
+                "## Pré-condições",
+                "",
+                "- Usuário autenticado",
+                "",
+                "## Fluxo principal",
+                "",
+                "1. O sistema registra:",
+                "   - `Descrição`: \"Pedido criado\""
+            ].join("\n")
+        );
+        await escreverArquivo(
+            path.join(base, "codigo", "mensagens.java"),
+            "public static final String HIST_PEDIDO_CRIADO = \"Pedido criado\";\n"
+        );
+        await escreverArquivo(
+            path.join(base, "configuracao-toolkit.json"),
+            JSON.stringify({
+                versao: 1,
+                requisitos: {
+                    cdus: {
+                        fontesMensagensCodigo: [
+                            {caminho: "codigo/mensagens.java", tipo: "mensagensJava"}
+                        ]
+                    }
+                }
+            })
+        );
+
+        const resultado = await executarSgc([
+            "requisitos",
+            "cdus",
+            "auditar",
+            "--secoes",
+            "mensagens-codigo",
+            "--json",
+            "--base",
+            base
+        ]);
+
+        expect(resultado.exitCode).toBe(0);
+        const agregado = lerJson<ResultadoAuditoriaCdu>(resultado);
+        const descricao = agregado.secoes.mensagensCodigo?.relatorio.find(item => item.valor === "Pedido criado");
+        expect(descricao?.referenciasExatas.some(item => item.texto === "Pedido criado")).toBe(true);
+    });
+
     test("inventaria densidade documental dos CDUs", async () => {
         const base = await mkdtemp(path.join(os.tmpdir(), "sgc-cdus-densidade-"));
         const dirSpecs = path.join(base, "specs", "cdu");
