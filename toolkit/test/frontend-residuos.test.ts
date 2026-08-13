@@ -48,6 +48,32 @@ describe("Resíduos do frontend", () => {
         ]);
         expect(falha.exitCode).toBe(1);
         expect(`${falha.stdout}\n${falha.stderr}`).toContain("Nao foi possivel ler a politica de residuos");
+
+        await escreverJson(caminhoOrcamento, {
+            versaoSchema: "99.0.0",
+            camadas: {},
+            metricas: {maximosProducao: {}}
+        });
+        const versaoInvalida = await executarSgc([
+            "frontend", "residuos", "validar", "--json", "--base", base
+        ]);
+        expect(versaoInvalida.exitCode).toBe(1);
+        expect(`${versaoInvalida.stdout}\n${versaoInvalida.stderr}`).toContain("versaoSchema 1.0.0");
+
+        await escreverJson(caminhoOrcamento, {
+            versaoSchema: "1.0.0",
+            camadas: {},
+            metricas: {maximosProducao: {}}
+        });
+        await escreverJson(caminhoExcecoes, {
+            versaoSchema: "1.0.0",
+            excecoes: [{arquivo: "", maxLinhas: -1}]
+        });
+        const excecaoInvalida = await executarSgc([
+            "frontend", "residuos", "validar", "--json", "--base", base
+        ]);
+        expect(excecaoInvalida.exitCode).toBe(1);
+        expect(`${excecaoInvalida.stdout}\n${excecaoInvalida.stderr}`).toContain("excecoes com arquivo ou maxLinhas invalidos");
     });
 
     test("audita residuos do frontend em um recorte controlado", async () => {
