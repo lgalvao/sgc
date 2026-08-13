@@ -68,7 +68,7 @@ interface AuditoriaNomes {
 interface OpcoesAuditoriaNomes {
     base?: string;
     json?: boolean;
-    semGravar?: boolean;
+    gravar?: boolean;
     inventario?: string | null;
     saidaJson?: string | null;
 }
@@ -284,7 +284,7 @@ function ehInventarioSimbolos(valor: unknown): valor is InventarioSimbolos {
         && totais !== null;
 }
 
-async function carregarInventario(caminhoInventario: string, base: string, semGravar: boolean): Promise<InventarioSimbolos> {
+async function carregarInventario(caminhoInventario: string, base: string, gravar: boolean): Promise<InventarioSimbolos> {
     const caminhoAbsoluto = path.isAbsolute(caminhoInventario) ? caminhoInventario : path.resolve(base, caminhoInventario);
     try {
         const valor: unknown = JSON.parse(await fs.readFile(caminhoAbsoluto, "utf8"));
@@ -295,7 +295,7 @@ async function carregarInventario(caminhoInventario: string, base: string, semGr
     } catch {
         return executarColeta({
             base,
-            semGravar,
+            gravar,
             arquivoSaida: caminhoAbsoluto,
             silencioso: true
         });
@@ -305,14 +305,14 @@ async function carregarInventario(caminhoInventario: string, base: string, semGr
 async function executarAuditoriaNomes({
     base = DIRETORIO_RAIZ,
     json = false,
-    semGravar = false,
+    gravar = false,
     inventario = null,
     saidaJson = null
 }: OpcoesAuditoriaNomes = {}): Promise<AuditoriaNomes> {
     const baseResolvida = path.resolve(base);
     const caminhoInventario = inventario ?? obterCaminhoSimbolos(baseResolvida);
     const caminhoSaida = saidaJson ?? obterCaminhoConsistencia(baseResolvida);
-    const dadosInventario = await carregarInventario(caminhoInventario, baseResolvida, semGravar);
+    const dadosInventario = await carregarInventario(caminhoInventario, baseResolvida, gravar);
     const formatosArquivos = coletarFormatosArquivos(dadosInventario);
     const formatosDiretorios = coletarSegmentosDiretorio(dadosInventario);
     const {
@@ -344,7 +344,7 @@ async function executarAuditoriaNomes({
         pacotesJavaForaPadrao
     };
 
-    if (!semGravar) {
+    if (gravar) {
         const destinoJson = path.isAbsolute(caminhoSaida) ? caminhoSaida : path.resolve(baseResolvida, caminhoSaida);
         const destinoMarkdown = path.join(path.dirname(destinoJson), "consistencia-resumo.md");
         await fs.mkdir(path.dirname(destinoJson), {recursive: true});
@@ -364,7 +364,7 @@ async function executarAuditoriaNomes({
     escreverLinha(`Parametros fora de camelCase: ${auditoria.indicadores.parametrosForaPadrao}`);
     escreverLinha(`Parametros com 'id': ${auditoria.indicadores.parametrosComId}`);
     escreverLinha(`Pacotes Java fora de lowercase.dotted: ${auditoria.indicadores.pacotesJavaForaPadrao}`);
-    if (!semGravar) {
+    if (gravar) {
         const destinoJson = path.isAbsolute(caminhoSaida) ? caminhoSaida : path.resolve(baseResolvida, caminhoSaida);
         escreverLinha("");
         escreverLinha(`Auditoria salva em ${destinoJson}`);
@@ -378,7 +378,7 @@ function lerOpcoes(argv: string[]): OpcoesAuditoriaNomes {
     const opcoes: OpcoesAuditoriaNomes = {
         base: DIRETORIO_RAIZ,
         json: false,
-        semGravar: false,
+        gravar: false,
         inventario: null,
         saidaJson: null
     };
@@ -389,8 +389,8 @@ function lerOpcoes(argv: string[]): OpcoesAuditoriaNomes {
             opcoes.json = true;
             continue;
         }
-        if (argumento === "--sem-gravar") {
-            opcoes.semGravar = true;
+        if (argumento === "--gravar") {
+            opcoes.gravar = true;
             continue;
         }
         if (argumento === "--base") {
@@ -414,7 +414,7 @@ function lerOpcoes(argv: string[]): OpcoesAuditoriaNomes {
 
 async function principal(argumentos: string[] = process.argv.slice(2)): Promise<void> {
     if (argumentos.includes("--help") || argumentos.includes("-h")) {
-        escreverLinha("Uso: npx tsx toolkit/sgc.ts codigo nomes auditar-consistencia [--json] [--sem-gravar] [--base <diretorio>] [--inventario <arquivo.json>] [--saida <arquivo.json>]");
+        escreverLinha("Uso: npx tsx toolkit/sgc.ts codigo nomes auditar-consistencia [--json] [--gravar] [--base <diretorio>] [--inventario <arquivo.json>] [--saida <arquivo.json>]");
         escreverLinha("");
         escreverLinha("Audita consistencia de nomenclatura com base no inventario de simbolos.");
         return;

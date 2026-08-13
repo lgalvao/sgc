@@ -81,7 +81,7 @@ interface AuditoriaIdioma {
 interface OpcoesAuditoriaIdioma {
     base?: string;
     json?: boolean;
-    semGravar?: boolean;
+    gravar?: boolean;
     inventario?: string | null;
     saidaJson?: string | null;
 }
@@ -256,7 +256,7 @@ function ehInventarioSimbolos(valor: unknown): valor is InventarioSimbolos {
         && totais !== null;
 }
 
-async function carregarInventario(caminhoInventario: string, base: string, semGravar: boolean): Promise<InventarioSimbolos> {
+async function carregarInventario(caminhoInventario: string, base: string, gravar: boolean): Promise<InventarioSimbolos> {
     const caminhoAbsoluto = path.isAbsolute(caminhoInventario) ? caminhoInventario : path.resolve(base, caminhoInventario);
     try {
         const valor: unknown = JSON.parse(await fs.readFile(caminhoAbsoluto, "utf8"));
@@ -267,7 +267,7 @@ async function carregarInventario(caminhoInventario: string, base: string, semGr
     } catch {
         return executarColeta({
             base,
-            semGravar,
+            gravar,
             arquivoSaida: caminhoAbsoluto,
             silencioso: true
         });
@@ -277,14 +277,14 @@ async function carregarInventario(caminhoInventario: string, base: string, semGr
 async function executarAuditoriaIdioma({
     base = DIRETORIO_RAIZ,
     json = false,
-    semGravar = false,
+    gravar = false,
     inventario = null,
     saidaJson = null
 }: OpcoesAuditoriaIdioma = {}): Promise<AuditoriaIdioma> {
     const baseResolvida = path.resolve(base);
     const caminhoInventario = inventario ?? obterCaminhoSimbolos(baseResolvida);
     const caminhoSaida = saidaJson ?? obterCaminhoIdioma(baseResolvida);
-    const dadosInventario = await carregarInventario(caminhoInventario, baseResolvida, semGravar);
+    const dadosInventario = await carregarInventario(caminhoInventario, baseResolvida, gravar);
     const {membrosIngles, camposComId, parametrosComId, topArquivos, porPrefixo} = analisarInventario(dadosInventario);
 
     const scoreTotal = membrosIngles.length + camposComId.length + parametrosComId.length;
@@ -306,7 +306,7 @@ async function executarAuditoriaIdioma({
         parametrosComId
     };
 
-    if (!semGravar) {
+    if (gravar) {
         const destinoJson = path.isAbsolute(caminhoSaida) ? caminhoSaida : path.resolve(baseResolvida, caminhoSaida);
         const destinoMarkdown = path.join(path.dirname(destinoJson), "idioma-resumo.md");
         await fs.mkdir(path.dirname(destinoJson), {recursive: true});
@@ -334,7 +334,7 @@ async function executarAuditoriaIdioma({
         }
     }
 
-    if (!semGravar) {
+    if (gravar) {
         const destinoJson = path.isAbsolute(caminhoSaida) ? caminhoSaida : path.resolve(baseResolvida, caminhoSaida);
         escreverLinha("");
         escreverLinha(`Auditoria salva em ${destinoJson}`);
@@ -348,7 +348,7 @@ function lerOpcoes(argv: string[]): OpcoesAuditoriaIdioma {
     const opcoes: OpcoesAuditoriaIdioma = {
         base: DIRETORIO_RAIZ,
         json: false,
-        semGravar: false,
+        gravar: false,
         inventario: null,
         saidaJson: null
     };
@@ -357,8 +357,8 @@ function lerOpcoes(argv: string[]): OpcoesAuditoriaIdioma {
         const argumento = argv[indice];
         if (argumento === "--json") {
             opcoes.json = true;
-        } else if (argumento === "--sem-gravar") {
-            opcoes.semGravar = true;
+        } else if (argumento === "--gravar") {
+            opcoes.gravar = true;
         } else if (argumento === "--base") {
             opcoes.base = argv[indice + 1] ?? DIRETORIO_RAIZ;
             indice += 1;
@@ -376,7 +376,7 @@ function lerOpcoes(argv: string[]): OpcoesAuditoriaIdioma {
 
 async function principal(argumentos: string[] = process.argv.slice(2)): Promise<void> {
     if (argumentos.includes("--help") || argumentos.includes("-h")) {
-        escreverLinha("Uso: npx tsx toolkit/sgc.ts codigo nomes auditar-idioma [--json] [--sem-gravar] [--base <diretorio>] [--inventario <arquivo.json>] [--saida <arquivo.json>]");
+        escreverLinha("Uso: npx tsx toolkit/sgc.ts codigo nomes auditar-idioma [--json] [--gravar] [--base <diretorio>] [--inventario <arquivo.json>] [--saida <arquivo.json>]");
         escreverLinha("");
         escreverLinha("Detecta membros com nomes em inglês e campos com 'id' que deveriam usar 'codigo'.");
         return;

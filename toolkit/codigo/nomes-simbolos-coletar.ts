@@ -71,7 +71,7 @@ export interface InventarioSimbolos {
 interface OpcoesColeta {
     base?: string;
     json?: boolean;
-    semGravar?: boolean;
+    gravar?: boolean;
     arquivoSaida?: string | null;
     silencioso?: boolean;
 }
@@ -474,7 +474,7 @@ function montarResumoMarkdown(inventario: InventarioSimbolos): string {
 async function executarColeta({
     base = DIRETORIO_RAIZ,
     json = false,
-    semGravar = false,
+    gravar = false,
     arquivoSaida = null,
     silencioso = false
 }: OpcoesColeta = {}): Promise<InventarioSimbolos> {
@@ -557,7 +557,7 @@ async function executarColeta({
         arquivos: resultadoArquivos.toSorted((a, b) => a.caminho.localeCompare(b.caminho, "pt-BR"))
     };
 
-    if (!semGravar) {
+    if (gravar) {
         const destinoJson = path.isAbsolute(caminhoSaida) ? caminhoSaida : path.resolve(baseResolvida, caminhoSaida);
         const destinoMarkdown = path.join(path.dirname(destinoJson), "simbolos-resumo.md");
         await fs.mkdir(path.dirname(destinoJson), {recursive: true});
@@ -578,7 +578,7 @@ async function executarColeta({
         escreverLinha(`Pacotes Java: ${inventario.totais.pacotesJava}`);
         escreverLinha(`Tipos catalogados: ${inventario.totais.tipos}`);
         escreverLinha(`Membros catalogados: ${inventario.totais.membros}`);
-        if (!semGravar) {
+        if (gravar) {
             const destinoJson = path.isAbsolute(caminhoSaida) ? caminhoSaida : path.resolve(baseResolvida, caminhoSaida);
             escreverLinha("");
             escreverLinha(`Inventario salvo em ${destinoJson}`);
@@ -593,7 +593,7 @@ function lerOpcoes(argv: string[]): OpcoesColeta {
     const opcoes: Required<OpcoesColeta> = {
         base: DIRETORIO_RAIZ,
         json: false,
-        semGravar: false,
+        gravar: false,
         arquivoSaida: null,
         silencioso: false
     };
@@ -604,8 +604,8 @@ function lerOpcoes(argv: string[]): OpcoesColeta {
             opcoes.json = true;
             continue;
         }
-        if (argumento === "--sem-gravar") {
-            opcoes.semGravar = true;
+        if (argumento === "--gravar") {
+            opcoes.gravar = true;
             continue;
         }
         if (argumento === "--base") {
@@ -624,7 +624,7 @@ function lerOpcoes(argv: string[]): OpcoesColeta {
 
 async function principal(argumentos: string[] = process.argv.slice(2)): Promise<void> {
     if (argumentos.includes("--help") || argumentos.includes("-h")) {
-        escreverLinha("Uso: npx tsx toolkit/sgc.ts codigo nomes coletar-simbolos [--json] [--sem-gravar] [--base <diretorio>] [--saida <arquivo.json>]");
+        escreverLinha("Uso: npx tsx toolkit/sgc.ts codigo nomes coletar-simbolos [--json] [--gravar] [--base <diretorio>] [--saida <arquivo.json>]");
         escreverLinha("");
         escreverLinha("Gera inventario completo de pacotes, arquivos, tipos e membros.");
         return;

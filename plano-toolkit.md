@@ -75,9 +75,10 @@ arquivos pertencem ao comando ou a uma biblioteca de domínio, não ao roteador.
 ### 2.4 Auditorias e efeitos colaterais
 
 - O estado final desejado é: auditorias são read-only por padrão.
-- O comportamento atual ainda não cumpre integralmente essa regra: vários comandos gravam fotografias ou relatórios por
-  padrão e alguns oferecem `--sem-gravar`. Como o SGC tem um único consumidor sob nosso controle, a migração pode inverter
-  o default diretamente, atualizando o roteador, testes e documentação no mesmo recorte.
+- O comportamento atual ainda não cumpre integralmente essa regra: cobertura e diff OpenAPI ainda têm contratos de
+  geração que precisam ser uniformizados. As famílias já migradas usam `--gravar` como ação positiva; como o SGC tem um
+  único consumidor sob nosso controle, a migração pode inverter o default diretamente, atualizando testes e documentação
+  no mesmo recorte.
 - Gravação de fotografia, baseline, relatório ou correção deve exigir uma opção explícita e um nome de ação claro.
 - Não normalizar, renumerar ou reescrever documentos apenas durante a leitura.
 - Saída JSON deve ir para stdout sem texto decorativo; logs operacionais e diagnóstico de falha devem ir para stderr.
@@ -168,8 +169,8 @@ frontend e para os caminhos OpenAPI.
   de escopo, não por dependência de runtime.
 - O corretor de FQN possui teste de escrita, conteúdo esperado sem duplicação e idempotência; a implementação não foi
   alterada porque a suspeita de duplicação não se confirmou.
-- A auditoria de efeitos corrigiu um vazamento de `--sem-gravar` em `codigo nomes auditar-consistencia`: a geração
-  automática do inventário auxiliar agora não grava nem polui o JSON final quando executada internamente.
+- A auditoria de efeitos corrigiu um vazamento de gravação em `codigo nomes auditar-consistencia`: a geração automática do
+  inventário auxiliar agora acompanha `--gravar` e não grava nem polui o JSON final na execução padrão.
 - A configuração externa agora exige schema versão `1`, valida estrutura, nomes de diretório e caminhos não vazios na
   borda, antes de qualquer auditoria.
 - A configuração externa também aceita a seção opcional `execucoes`, com perfis de qualidade, escopos de auditoria de
@@ -252,7 +253,7 @@ frontend e para os caminhos OpenAPI.
   e `backendTestes` e as classificações SGC de DTOs, models e outros.
 - `backend/contratos-auditar.ts` foi convertido para TypeScript com tipos para imports, retornos de controllers, campos
   expostos, índice Java, modelos e achados; a política SGC de detectar `model.*` em DTOs permanece e agora tem fixture
-  externo cobrindo JSON, `backendCodigo` configurado e `--sem-gravar`.
+  externo cobrindo JSON, `backendCodigo` configurado e gravação explícita com `--gravar`.
 - `backend/java-corrigir-fqn.ts` foi convertido para TypeScript com contratos para análise de imports, decisões de
   substituição, preservação de linhas e opções; a mutação continua protegida por `--dry-run`, escrita explícita e
   idempotência.
@@ -261,7 +262,7 @@ frontend e para os caminhos OpenAPI.
   política explícita do auditor.
 - `backend/arquitetura-auditar.ts` foi convertido para TypeScript com tipos para limiares, tipos de alvo, severidade,
   hotspots e relatório; um fixture externo valida a classificação de um service com múltiplos sinais, a configuração de
-  `backendCodigo` e o modo `--sem-gravar`.
+  `backendCodigo` e o modo read-only padrão com gravação explícita.
 - `backend/notificacoes-assuntos-auditar.ts` foi convertido para TypeScript; regras de achado, itens de arquivo, resumo
   e relatório estão tipados, mantendo as exceções específicas de `AssuntosNotificacao`/`E2eController` e o exit code de
   violação do perfil SGC.
@@ -290,11 +291,13 @@ frontend e para os caminhos OpenAPI.
   a resolução relativa à configuração e à base auditada.
 - `codigo/nomes-simbolos-coletar.ts` foi convertido para TypeScript com contratos para linguagens, tipos, membros,
   arquivos, pacotes, estatísticas, inventário e opções; o parser regex e a coleta recursiva continuam preservando o
-  formato JSON e a parametrização da base auditada.
+  formato JSON, a parametrização da base auditada e a gravação somente com `--gravar`.
 - `codigo/nomes-consistencia-auditar.ts` foi convertido para TypeScript usando o contrato compartilhado do inventário
-  de símbolos; a classificação de formatos, parâmetros, pacotes Java e a opção `--sem-gravar` permanecem inalteradas.
+  de símbolos; a classificação de formatos, parâmetros, pacotes Java e a fronteira read-only com `--gravar` foram
+  preservadas e uniformizadas.
 - `codigo/idioma-consistencia-auditar.ts` foi convertido para TypeScript usando o mesmo contrato de inventário; as
-  detecções de nomes ingleses e de `id`/`*Id`, seus indicadores e o modo `--sem-gravar` permanecem preservados.
+  detecções de nomes ingleses e de `id`/`*Id`, seus indicadores e a fronteira read-only com `--gravar` permanecem
+  preservados.
 - `codigo/cheiros-auditar.ts` foi convertido para TypeScript com tipos para padrões, filtros, contagens, pontuação,
   deltas, hotspots, fotografia e opções; os pesos e filtros parametrizados por `backendCodigo`/`frontendCodigo` foram
   preservados.
@@ -365,7 +368,7 @@ frontend e para os caminhos OpenAPI.
 
 Nas validações desta rodada, em 13 de agosto de 2026, executadas diretamente sob Node `26.7.0`:
 
-- `npm --prefix toolkit run test`: 106 testes aprovados em 2 arquivos; o smoke de pacote é separado para não tornar a
+- `npm --prefix toolkit run test`: 107 testes aprovados em 2 arquivos; o smoke de pacote é separado para não tornar a
   suíte unitária dependente de rede ou instalação;
 - `npm --prefix toolkit run test:pacote`: 1 teste aprovado, com `npm pack`, instalação isolada, auditoria no consumidor
   e verificação da política Semgrep empacotada;
@@ -395,7 +398,8 @@ de caminhos dos relatórios V8 frontend; esta chega a 96 com o launcher `tsx` do
 reintroduz o wrapper obsoleto; as rodadas posteriores de limpeza, preparação, qualidade, dependências e acessibilidade
 elevam a cobertura para 101 cenários; uma rodada chega a 102 com o teste comportamental do auditor de contratos backend;
 esta rodada adiciona a resolução portável do Semgrep e o smoke de pacote isolado; a suíte unitária chega a 104 cenários;
-a parametrização de execuções externas chega a 105; esta rodada explicita as políticas de resíduos e chega a 106.
+a parametrização de execuções externas chega a 105; uma rodada explicita as políticas de resíduos e chega a 106; esta
+rodada uniformiza a família de nomenclatura e chega a 107.
 
 ### 3.3 Tamanho e composição atual
 
@@ -404,7 +408,7 @@ Inventário dos arquivos rastreados do toolkit, excluindo `dist`, cobertura e ar
 - 72 arquivos TypeScript de implementação;
 - 0 arquivos JavaScript de implementação; o único CJS é o launcher mínimo do binário;
 - 3 arquivos JavaScript de teste (`test/sgc.test.js`, `test/cdus.test.js` e `test/pacote.test.js`);
-- 2 arquivos de teste concentrando 106 cenários, mais 1 smoke de distribuição isolada;
+- 2 arquivos de teste concentrando 107 cenários, mais 1 smoke de distribuição isolada;
 - maior módulo atual: `frontend/arquitetura-lib.ts`, com aproximadamente 1.200 linhas;
 - outros hotspots: `codigo/nomes-simbolos-coletar.ts`, `frontend/residuos-lib.ts` e
   `qualidade/coleta-execucao.ts`.
@@ -421,12 +425,12 @@ O núcleo TypeScript de implementação foi concluído: 100% dos arquivos de imp
 | Resolvido nesta rodada | Semgrep acoplado ao ambiente local | A política padrão vinha da raiz do consumidor e o executável era fixado em `~/.local/bin/semgrep`; ambos agora usam a instalação do toolkit e o `PATH`, com testes de override e consumidor isolado. |
 | Resolvido | Configuração permissiva do Knip | A configuração anterior tratava praticamente todos os arquivos como entrypoints. A nova lista os comandos reais, inclui JS/TS e, nesta rodada, encontrou e removeu oito exports internos não consumidos. |
 | Resolvido parcialmente | Base externa é parcialmente ignorada | Arquitetura, resíduos, OpenAPI, coleta, Semgrep, cheiros e assuntos de notificação agora respeitam a base/configuração; outros comandos ainda precisam da mesma correção. |
-| Alta | Auditores gravam por padrão | Cobertura, nomenclatura e diff OpenAPI ainda têm escrita automática ou defaults distintos. `codigo cheiros auditar`, `frontend arquitetura auditar`, `backend arquitetura auditar`, `backend coesao auditar`, `backend contratos auditar`, `frontend residuos auditar/validar` e `codigo semgrep auditar` já exigem `--gravar`; a diretriz read-only ainda precisa ser aplicada às demais famílias. |
+| Alta | Auditores gravam por padrão | Cobertura e diff OpenAPI ainda têm escrita automática ou defaults distintos. `codigo cheiros auditar`, `frontend arquitetura auditar`, `backend arquitetura auditar`, `backend coesao auditar`, `backend contratos auditar`, `frontend residuos auditar/validar`, `codigo semgrep auditar` e toda a família `codigo nomes` já exigem `--gravar`; a diretriz read-only ainda precisa ser aplicada às demais famílias. |
 | Resolvido | Cobertura insuficiente de mutação | O corretor `backend/java-corrigir-fqn.ts` agora tem fixture de escrita, verificação de conteúdo sem duplicação e segunda execução idempotente. |
-| Resolvido | Efeito colateral oculto de `--sem-gravar` | `codigo nomes auditar-consistencia` gerava o inventário auxiliar com gravação habilitada e contaminava `--json`; a opção agora é propagada e a coleta interna é silenciosa. |
+| Resolvido | Efeito colateral oculto de gravação | `codigo nomes auditar-consistencia` gerava o inventário auxiliar com gravação habilitada e contaminava `--json`; a opção `--gravar` agora é propagada e a coleta interna é silenciosa. |
 | Resolvido | Configuração sem validação | `configuracao-toolkit.json` agora exige a versão `1` e valida estrutura, chaves conhecidas e caminhos textuais antes da combinação com defaults. |
 | Resolvido nesta rodada | Políticas de resíduos apontando para legado ausente | Os defaults de orçamento e exceções frontend foram removidos; overrides continuam aceitos, a ausência usa política neutra explícita e arquivo configurado ausente ou inválido falha visivelmente. |
-| Média | Opções e efeitos divergentes | Há `--input`/`--output` e `--entrada`/`--saida`, `--dry-run` e `--sem-gravar`, além de comandos mutáveis sem modo de prévia uniforme. |
+| Média | Opções e efeitos divergentes | Há `--input`/`--output` e `--entrada`/`--saida`, `--dry-run` e comandos geradores com contratos de gravação ainda distintos, além de mutações sem modo de prévia uniforme. |
 | Resolvido nesta rodada | Testes não representam pacote externo | A suíte interna continua separada do smoke de distribuição, e `npm run test:pacote` empacota, instala em diretório isolado e executa o binário sem dependências hoisted do monorepo. |
 | Média | Cobertura funcional não medida | `@vitest/coverage-v8` está instalado, mas não há script, threshold ou relatório de cobertura do próprio toolkit. Quantidade de testes não mede contratos não exercitados. |
 | Média | Roteador monolítico e inventário duplicado | `sgc.ts` registra todos os comandos e a documentação repete a lista manualmente; é fácil haver deriva de nomes, extensões e ajuda. |
@@ -442,7 +446,7 @@ O núcleo TypeScript de implementação foi concluído: 100% dos arquivos de imp
 - Parametrização parcial não significa generalização concluída.
 - Build aprovado prova que a árvore pode ser emitida; não prova que o pacote emitido contém assets, configuração e
   resolução de raiz adequados para distribuição.
-- Knip aprovado, 106 testes unitários verdes e o smoke de pacote aprovado são gates úteis, mas ainda insuficientes para afirmar ausência de código morto fora
+- Knip aprovado, 107 testes unitários verdes e o smoke de pacote aprovado são gates úteis, mas ainda insuficientes para afirmar ausência de código morto fora
   do grafo declarado, segurança de todos os comandos mutáveis ou portabilidade. O grafo do Knip agora é uma evidência
   útil de exports não consumidos; não substitui testes de pacote externo.
 
@@ -453,17 +457,16 @@ o comportamento atual; não transforma automaticamente todo comando que gera rel
 
 | Classe atual | Comandos ou famílias | Efeito observado e controle existente |
 |---|---|---|
-| Auditoria read-only | `requisitos cdus *`, `backend cobertura ramificacoes`, `frontend cobertura ramificacoes`, `frontend arquitetura validar`, `frontend modais validar`, `frontend views templates-validar`, `frontend identificadores-teste *`, `projeto diagnostico` | Leem código/relatórios e escrevem somente stdout/JSON; não criam artefatos próprios. Dependências externas podem fazer leitura adicional. |
-| Auditoria com geração por padrão | `codigo nomes coletar-simbolos/auditar-consistencia/auditar-idioma` | Gravem fotografias ou relatórios em caminhos padrão. A maioria oferece `--sem-gravar`, mas a ausência da opção ainda permite mutação de artefatos. `codigo cheiros auditar`, `frontend arquitetura auditar`, `backend arquitetura auditar`, `backend coesao auditar`, `backend contratos auditar`, `frontend residuos auditar/validar` e `codigo semgrep auditar` foram retirados desta classe e só gravam com `--gravar`. |
+| Auditoria read-only | `requisitos cdus *`, `backend cobertura ramificacoes`, `frontend cobertura ramificacoes`, `frontend arquitetura validar`, `frontend modais validar`, `frontend views templates-validar`, `frontend identificadores-teste *`, `codigo nomes coletar-simbolos/auditar-consistencia/auditar-idioma`, `projeto diagnostico` | Leem código/relatórios e escrevem somente stdout/JSON por padrão; não criam artefatos próprios. As famílias que oferecem persistência usam `--gravar`. Dependências externas podem fazer leitura adicional. |
 | Geração de relatório indicado | `backend cobertura auditoria`, `frontend cobertura auditoria`, `backend testes analisar/priorizar`, `frontend acessibilidade processar` | Criam arquivos Markdown/JSON definidos por `--output`, `--output-json` ou defaults. São geradores explícitos, não auditores read-only. |
 | Artefato de contrato | `integracao contratos exportar-openapi`, `integracao contratos diff` | Exportação grava OpenAPI; diff grava resumo Markdown por padrão. `--sem-gravar` existe no diff, mas não é o default. |
 | Mutação de fonte ou baseline | `backend java corrigir-fqn`, `projeto versao-sincronizar`, `integracao contratos fixar-baseline` | Alteram código/configuração ou promovem arquivo. FQN usa `--dry-run` opt-in; versão não possui prévia; baseline copia diretamente para o destino. |
 | Limpeza confirmada | `projeto limpar` | Lista em prévia por padrão e remove somente com `--confirmar`; é o modelo de confirmação explícita a preservar. |
 | Orquestração externa | `qualidade coletar`, `projeto qualidade`, `projeto dependencias auditar`, `projeto preparar`, `frontend acessibilidade crawler` | Executam Gradle, npm, Playwright, Semgrep ou Git e podem criar artefatos fora da biblioteca do toolkit. Precisam de perfil/ação explícita e limites de raiz. |
 
-Achado corrigido nesta rodada: quando `codigo nomes auditar-consistencia --sem-gravar` precisava gerar um inventário
-auxiliar ausente, ele chamava a coleta com gravação habilitada. A propagação de `semGravar` e a opção interna
-`silencioso` preservam o contrato de leitura e mantêm o stdout JSON válido.
+Achado corrigido nesta rodada: quando `codigo nomes auditar-consistencia` precisa gerar um inventário auxiliar ausente,
+ele só chama a coleta com gravação habilitada se a auditoria recebeu `--gravar`. A propagação de `gravar` e a opção
+interna `silencioso` preservam o contrato de leitura e mantêm o stdout JSON válido.
 
 ## 4. Classificação para reuso externo
 
@@ -711,9 +714,9 @@ SGC está ativo.
 3. Definir um envelope comum de resultado: versão do schema, status, resumo, violações, métricas, artefatos e avisos.
 4. Separar stdout estruturado, stdout humano e stderr operacional.
 5. Definir quando um comando retorna falha por violação encontrada versus erro de execução.
-6. Adicionar `--json`/`--sem-gravar` de forma consistente, sem inventar opções para comandos que não precisam delas.
-7. Substituir gradualmente `--sem-gravar` por execução read-only padrão e uma opção positiva de persistência; remover
-   `--sem-gravar` quando cada comando tiver sido migrado e seus testes atualizados.
+6. Adicionar `--json`/`--gravar` de forma consistente, sem inventar opções para comandos que não precisam delas.
+7. Aplicar execução read-only padrão e opção positiva de persistência às famílias restantes; não reintroduzir
+   `--sem-gravar` como compatibilidade sem um consumidor identificado.
 8. Separar no catálogo da CLI comandos de auditoria, geração, manutenção e orquestração para tornar efeitos explícitos.
 
 ### Fase F — testes, documentação e distribuição

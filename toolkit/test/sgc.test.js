@@ -166,7 +166,6 @@ describe("CLI raiz do toolkit", () => {
             "cheiros",
             "auditar",
             "--json",
-            "--sem-gravar",
             "--base",
             base
         ], {
@@ -736,7 +735,7 @@ describe("CLI raiz do toolkit", () => {
         expect(conteudo.arquivos[0].arquivo).toBe(caminhoRelativo);
     });
 
-    test("resolve artefatos de nomenclatura relativos a uma base externa", async () => {
+    test("mantem coleta de simbolos read-only por padrao e grava sob demanda", async () => {
         const diretorioBase = await mkdtemp(path.join(os.tmpdir(), "sgc-nomenclatura-base-"));
         await fs.outputFile(
             path.join(diretorioBase, "frontend", "src", "exemplo.ts"),
@@ -756,7 +755,7 @@ describe("CLI raiz do toolkit", () => {
         const inventario = JSON.parse(resultado.stdout);
         expect(inventario.base).toBe(diretorioBase);
         expect(inventario.totais.arquivos).toBe(1);
-        expect(await fs.pathExists(path.join(
+        const caminhoSimbolos = path.join(
             diretorioBase,
             "toolkit",
             "qualidade",
@@ -764,11 +763,25 @@ describe("CLI raiz do toolkit", () => {
             "nomenclatura",
             "mais-recente",
             "simbolos.json"
-        ))).toBe(true);
+        );
+        expect(await fs.pathExists(caminhoSimbolos)).toBe(false);
+
+        const gravacao = await executarSgc([
+            "codigo",
+            "nomes",
+            "coletar-simbolos",
+            "--json",
+            "--gravar",
+            "--base",
+            diretorioBase
+        ]);
+
+        expect(gravacao.exitCode).toBe(0);
+        expect(await fs.pathExists(caminhoSimbolos)).toBe(true);
     });
 
-    test("respeita sem-gravar ao gerar inventario auxiliar da auditoria de nomenclatura", async () => {
-        const diretorioBase = await mkdtemp(path.join(os.tmpdir(), "sgc-nomenclatura-sem-gravar-"));
+    test("mantem auditoria de nomenclatura read-only e propaga gravacao ao inventario", async () => {
+        const diretorioBase = await mkdtemp(path.join(os.tmpdir(), "sgc-nomenclatura-read-only-"));
         await fs.outputFile(
             path.join(diretorioBase, "frontend", "src", "exemplo.ts"),
             "export function carregarExemplo(codigo: string) { return codigo; }\n"
@@ -779,7 +792,6 @@ describe("CLI raiz do toolkit", () => {
             "nomes",
             "auditar-consistencia",
             "--json",
-            "--sem-gravar",
             "--base",
             diretorioBase
         ]);
@@ -787,6 +799,69 @@ describe("CLI raiz do toolkit", () => {
         expect(resultado.exitCode).toBe(0);
         expect(JSON.parse(resultado.stdout).base).toBe(diretorioBase);
         expect(await fs.pathExists(path.join(diretorioBase, "toolkit"))).toBe(false);
+
+        const gravacao = await executarSgc([
+            "codigo",
+            "nomes",
+            "auditar-consistencia",
+            "--json",
+            "--gravar",
+            "--base",
+            diretorioBase
+        ]);
+
+        expect(gravacao.exitCode).toBe(0);
+        expect(await fs.pathExists(path.join(
+            diretorioBase,
+            "toolkit",
+            "qualidade",
+            "artefatos",
+            "nomenclatura",
+            "mais-recente",
+            "consistencia.json"
+        ))).toBe(true);
+    });
+
+    test("mantem auditoria de idioma read-only e grava sob demanda", async () => {
+        const diretorioBase = await mkdtemp(path.join(os.tmpdir(), "sgc-idioma-"));
+        await fs.outputFile(
+            path.join(diretorioBase, "frontend", "src", "exemplo.ts"),
+            "export function getExemplo(id: string) { return id; }\n"
+        );
+
+        const resultado = await executarSgc([
+            "codigo",
+            "nomes",
+            "auditar-idioma",
+            "--json",
+            "--base",
+            diretorioBase
+        ]);
+
+        expect(resultado.exitCode).toBe(0);
+        expect(JSON.parse(resultado.stdout).indicadores.membrosIngles).toBeGreaterThan(0);
+        expect(await fs.pathExists(path.join(diretorioBase, "toolkit"))).toBe(false);
+
+        const gravacao = await executarSgc([
+            "codigo",
+            "nomes",
+            "auditar-idioma",
+            "--json",
+            "--gravar",
+            "--base",
+            diretorioBase
+        ]);
+
+        expect(gravacao.exitCode).toBe(0);
+        expect(await fs.pathExists(path.join(
+            diretorioBase,
+            "toolkit",
+            "qualidade",
+            "artefatos",
+            "nomenclatura",
+            "mais-recente",
+            "idioma.json"
+        ))).toBe(true);
     });
 
     test("exibe a ajuda principal", async () => {
