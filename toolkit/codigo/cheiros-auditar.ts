@@ -58,7 +58,7 @@ interface FotografiaCheiros {
     };
     contagens: ContagensCheiros;
     deltas: DeltasCheiros;
-    hotspots: ResumoArquivoCheiros[];
+    pontosCriticos: ResumoArquivoCheiros[];
 }
 
 interface ResultadoAuditoriaCheiros {
@@ -299,13 +299,13 @@ function gerarMarkdown(fotografia: FotografiaCheiros): string {
         linhas.push(`| ${padrao.titulo} | ${fotografia.contagens[padrao.chave]} | ${formatarDelta(fotografia.deltas[padrao.chave])} | ${padrao.peso} |`);
     }
 
-    linhas.push("", "## Hotspots", "", "| Arquivo | Pontos | Sinais |", "|---|---:|---|");
-    for (const hotspot of fotografia.hotspots) {
-        const sinais = Object.entries(hotspot.categorias)
+    linhas.push("", "## Principais pontos criticos", "", "| Arquivo | Pontos | Sinais |", "|---|---:|---|");
+    for (const pontoCritico of fotografia.pontosCriticos) {
+        const sinais = Object.entries(pontoCritico.categorias)
             .toSorted((a, b) => b[1] - a[1])
             .map(([categoria, valor]) => `${categoria}: ${valor}`)
             .join(", ");
-        linhas.push(`| ${hotspot.arquivo} | ${hotspot.pontuacao} | ${sinais} |`);
+        linhas.push(`| ${pontoCritico.arquivo} | ${pontoCritico.pontuacao} | ${sinais} |`);
     }
 
     linhas.push("", "## Escopos", "");
@@ -371,7 +371,7 @@ async function executarAuditoria({
         pontuacao: {total: pontuacaoTotal, faixa: classificarPontuacao(pontuacaoTotal), porEscopo: pontuacaoPorEscopo},
         contagens,
         deltas: calcularDelta(contagens, anterior),
-        hotspots: arquivosPontuados
+        pontosCriticos: arquivosPontuados
             .toSorted((a, b) => b.pontuacao - a.pontuacao || a.arquivo.localeCompare(b.arquivo))
             .slice(0, 15)
     };
@@ -417,9 +417,9 @@ async function principal(argumentosInformados: string[] = process.argv.slice(2))
         escreverLinha(`- ${padrao.titulo}: ${fotografia.contagens[padrao.chave]} (delta ${formatarDelta(fotografia.deltas[padrao.chave])})`);
     }
     escreverLinha("");
-    escreverLinha("Hotspots:");
-    for (const hotspot of fotografia.hotspots.slice(0, 10)) {
-        escreverLinha(`- ${hotspot.arquivo}: ${hotspot.pontuacao} ponto(s)`);
+    escreverLinha("Pontos criticos:");
+    for (const pontoCritico of fotografia.pontosCriticos.slice(0, 10)) {
+        escreverLinha(`- ${pontoCritico.arquivo}: ${pontoCritico.pontuacao} ponto(s)`);
     }
     if (argumentos.includes("--gravar")) {
         escreverLinha("");

@@ -55,7 +55,7 @@ describe("Auditores de código", () => {
 
         expect(resultado.exitCode).toBe(0);
         const conteudo = JSON.parse(resultado.stdout);
-        expect(conteudo.versao).toBe(1);
+        expect(conteudo.versao).toBe(2);
         expect(conteudo.contagens.backendDtoNulavel).toBe(1);
         expect(conteudo.contagens.backendVerificacoesNulas).toBe(1);
         expect(conteudo.contagens.frontendAnyProducao).toBe(2);
@@ -68,7 +68,9 @@ describe("Auditores de código", () => {
         expect(await existe(path.join(diretorioSaida, "fotografia.json"))).toBe(true);
         expect(await existe(path.join(diretorioSaida, "resumo.md"))).toBe(true);
         const fotografia = JSON.parse(await readFile(path.join(diretorioSaida, "fotografia.json"), "utf8"));
-        expect(fotografia.versao).toBe(1);
+        expect(fotografia.versao).toBe(2);
+        expect(fotografia.pontosCriticos).toBeInstanceOf(Array);
+        expect(fotografia.hotspots).toBeUndefined();
     });
 
     test("resolve politica Semgrep padrao a partir da instalacao do toolkit", async () => {

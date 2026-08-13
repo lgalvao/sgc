@@ -97,7 +97,7 @@ estruturais configuráveis.
 com formato ou versão incompatível é rejeitado, enquanto a ausência do arquivo ainda permite uma coleta somente em
 memória quando o comando não usa `--gravar`.
 
-`codigo cheiros auditar` produz uma fotografia `versao: 1`; ela é reutilizada para calcular deltas na execução seguinte.
+`codigo cheiros auditar` produz uma fotografia `versao: 2`; ela é reutilizada para calcular deltas na execução seguinte.
 As chaves próprias da fotografia usam camelCase em português, e uma fotografia anterior incompatível é rejeitada em vez
 de ser tratada como se não existisse.
 
