@@ -598,16 +598,16 @@ function gravarArquivo(caminho: string, conteudo: string): void {
 
 function imprimirResumoConsole(dados: RelatorioTestes): void {
     const {estatisticas, categorias} = dados;
-    console.log(`Resumo: ${estatisticas.classes_com_teste_dedicado}/${estatisticas.total_classes} classes com teste dedicado (${estatisticas.cobertura_arquivos_percentual.toFixed(2)}%).`);
-    console.log(`- Cobertura indireta: ${estatisticas.classes_com_cobertura_indireta}`);
-    console.log(`- Sem evidencia no escopo: ${estatisticas.classes_sem_evidencia_no_escopo}`);
-    console.log(`- Fora do escopo do JaCoCo: ${estatisticas.classes_fora_escopo_jacoco}`);
-    console.log(`- Ruido ignorado no backlog: ${estatisticas.classes_ruido_ignorado}`);
-    console.log(`- Backlog real coberto por teste dedicado: ${estatisticas.cobertura_backlog_real_percentual.toFixed(2)}%`);
+    escreverLinha(`Resumo: ${estatisticas.classes_com_teste_dedicado}/${estatisticas.total_classes} classes com teste dedicado (${estatisticas.cobertura_arquivos_percentual.toFixed(2)}%).`);
+    escreverLinha(`- Cobertura indireta: ${estatisticas.classes_com_cobertura_indireta}`);
+    escreverLinha(`- Sem evidencia no escopo: ${estatisticas.classes_sem_evidencia_no_escopo}`);
+    escreverLinha(`- Fora do escopo do JaCoCo: ${estatisticas.classes_fora_escopo_jacoco}`);
+    escreverLinha(`- Ruido ignorado no backlog: ${estatisticas.classes_ruido_ignorado}`);
+    escreverLinha(`- Backlog real coberto por teste dedicado: ${estatisticas.cobertura_backlog_real_percentual.toFixed(2)}%`);
     if (estatisticas.jacoco_disponivel) {
-        console.log(`- Cobertura observada: ${estatisticas.cobertura_observada_percentual.toFixed(2)}%`);
+        escreverLinha(`- Cobertura observada: ${estatisticas.cobertura_observada_percentual.toFixed(2)}%`);
     } else {
-        console.log('- Cobertura observada: indisponivel (JaCoCo ausente)');
+        escreverLinha('- Cobertura observada: indisponivel (JaCoCo ausente)');
     }
 
     [...CATEGORIAS_PRIORITARIAS, ...CATEGORIAS_SECUNDARIAS].forEach(categoria => {
@@ -619,26 +619,26 @@ function imprimirResumoConsole(dados: RelatorioTestes): void {
         if (categoria === 'DTOs') {
             const totalRelevante = itens.tested.length + itens.untested.filter(item => !item.dto_ruido_ignorado).length;
             const ignorados = itens.untested.filter(item => item.dto_ruido_ignorado).length;
-            console.log(`- ${categoria}: ${itens.tested.length}/${totalRelevante} testados no backlog real (${ignorados} ignorados)`);
+            escreverLinha(`- ${categoria}: ${itens.tested.length}/${totalRelevante} testados no backlog real (${ignorados} ignorados)`);
             return;
         }
         if (categoria === 'Models') {
             const totalRelevante = itens.tested.length + itens.untested.filter(item => !item.model_ruido_ignorado).length;
             const ignorados = itens.untested.filter(item => item.model_ruido_ignorado).length;
-            console.log(`- ${categoria}: ${itens.tested.length}/${totalRelevante} testados no backlog real (${ignorados} ignorados)`);
+            escreverLinha(`- ${categoria}: ${itens.tested.length}/${totalRelevante} testados no backlog real (${ignorados} ignorados)`);
             return;
         }
         if (categoria === 'Others') {
             const totalRelevante = itens.tested.length + itens.untested.filter(item => !item.other_ruido_ignorado).length;
             const ignorados = itens.untested.filter(item => item.other_ruido_ignorado).length;
-            console.log(`- ${categoria}: ${itens.tested.length}/${totalRelevante} testados no backlog real (${ignorados} ignorados)`);
+            escreverLinha(`- ${categoria}: ${itens.tested.length}/${totalRelevante} testados no backlog real (${ignorados} ignorados)`);
             return;
         }
-        console.log(`- ${categoria}: ${itens.tested.length}/${total} testados`);
+        escreverLinha(`- ${categoria}: ${itens.tested.length}/${total} testados`);
     });
 
     if (estatisticas.correspondencias_ambiguas > 0) {
-        console.log(`- Correspondencias ambiguas: ${estatisticas.correspondencias_ambiguas}`);
+        escreverLinha(`- Correspondencias ambiguas: ${estatisticas.correspondencias_ambiguas}`);
     }
 }
 

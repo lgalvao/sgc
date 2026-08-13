@@ -260,6 +260,8 @@ frontend e para os caminhos OpenAPI.
   e `backendTestes` e as classificações SGC de DTOs, models e outros.
 - `backend/testes-analisar.ts` e `backend/testes-priorizar.ts` agora expõem opções em português (`--diretorio`,
   `--entrada`, `--saida`, `--saida-json`, `--arquivo-jacoco`), sem alterar as chaves estruturadas do relatório.
+- `backend/testes-analisar.ts` agora usa `lib/saida.ts` também para o resumo humano; a emissão não bypassa mais a
+  fronteira comum com `console.log`, sem alterar o Markdown, o JSON ou os textos produzidos.
 - Cobertura, Semgrep e identificadores de teste frontend também adotaram `--saida`/`--diretorio`; a CLI não mantém
   `--output`/`--dir` como aliases sem consumidor identificado.
 - `backend/contratos-auditar.ts` foi convertido para TypeScript com tipos para imports, retornos de controllers, campos
@@ -471,6 +473,7 @@ O núcleo TypeScript de implementação foi concluído: 100% dos arquivos de imp
 | Resolvido nesta rodada | Integração OpenAPI misturada à validação da CLI | Os 2 cenários de importação e artefatos OpenAPI agora estão em `test/integracao.test.ts`; o teste principal caiu para 81 cenários e a persistência de diff continua coberta com `--gravar`. |
 | Resolvido nesta rodada | Qualidade misturada à validação da CLI | Os 4 cenários de resumo e coleta agora estão em `test/qualidade.test.ts`; o teste principal caiu para 77 cenários e continua cobrindo perfis válidos e inválidos. |
 | Resolvido nesta rodada | Apoio de execução duplicado entre testes | `test/apoio.ts` passou a ser a fonte única da raiz do toolkit, do `tsx` e do contrato `ResultadoExecucao`; os quatro testes que executam a CLI não mantêm cópias locais desse mecanismo. |
+| Resolvido nesta rodada | Resumo de análise bypassava a saída comum | `backend/testes-analisar.ts` agora usa `escreverLinha` em todas as linhas humanas; stdout continua igual e não há mistura com o JSON gravado. |
 | Resolvido nesta rodada | Roteador monolítico e inventário duplicado | Os 42 comandos que apenas despacham scripts agora vêm de `lib/catalogo-comandos.ts`, com teste de unicidade, descrição, rota e arquivo existente. A documentação passou a tratar `sgc --help` como catálogo canônico e mantém apenas exemplos; comandos com ações/opções próprias continuam explícitos em `sgc.ts`. |
 | Resolvido nesta rodada | Ajuda de folhas catalogadas era genérica | O roteador desativa a ajuda automática do Commander somente nas folhas que despacham arquivos e encaminha `--help` ao script TypeScript; grupos continuam usando a ajuda do Commander e as opções específicas ficam visíveis. |
 | Resolvido nesta rodada | Opção de meta de cobertura em inglês | `backend cobertura auditoria` e `frontend cobertura auditoria` agora usam `--minimo`; os símbolos internos e os relatórios Markdown da família foram normalizados sem alterar os campos JSON de integração. |
