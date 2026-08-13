@@ -443,7 +443,7 @@ provam utilidade funcional.
 
 Nas validações desta rodada, em 13 de agosto de 2026, executadas diretamente sob Node `26.7.0`:
 
-- `npm --prefix toolkit run test`: 125 testes aprovados em 20 arquivos; o smoke de pacote é separado para não tornar a
+- `npm --prefix toolkit run test`: 125 testes aprovados em 21 arquivos; o smoke de pacote é separado para não tornar a
   suíte unitária dependente de rede ou instalação;
 - `npm --prefix toolkit run test:coverage`: aprovado com baseline informativa de 59,19% de instruções (792/1.338),
   47,27% de ramificações (443/937), 66,29% de funções (179/270) e 59,34% de linhas (759/1.279); o script exclui
@@ -453,7 +453,7 @@ Nas validações desta rodada, em 13 de agosto de 2026, executadas diretamente s
   verificação da política Semgrep empacotada e importação programática da cobertura parametrizável;
 - `npm --prefix toolkit run build`: aprovado;
 - `npm --prefix toolkit run typecheck`: aprovado;
-- `npm --prefix toolkit run typecheck:testes`: aprovado sobre os vinte e um arquivos de teste TypeScript e o apoio comum
+- `npm --prefix toolkit run typecheck:testes`: aprovado sobre os vinte e dois arquivos de teste TypeScript e o apoio comum
   `test/apoio.ts`;
 - `npm --prefix toolkit run lint`: aprovado;
 - `npm --prefix toolkit run deps:audit`: aprovado;
@@ -593,6 +593,9 @@ os contratos de orçamento, exceções, diretórios configurados e persistência
 Nesta rodada, três cenários de auditoria arquitetural do frontend foram extraídos para
 `test/frontend-arquitetura.test.ts`; `test/sgc.test.ts` caiu de 32 para 29 cenários, mantendo a contagem total e
 isolando hotspots, defaults de saída e diretórios configurados.
+Nesta rodada, três cenários de gates dependency-cruiser do frontend foram extraídos para
+`test/frontend-arquitetura-gates.test.ts`; `test/sgc.test.ts` caiu de 29 para 26 cenários, mantendo a contagem total e
+isolando falha, sucesso via composable e diretório frontend configurado.
 
 ### 3.3 Tamanho e composição atual
 
@@ -600,10 +603,10 @@ Inventário dos arquivos rastreados do toolkit, excluindo `dist`, cobertura e ar
 
 - 79 arquivos TypeScript de implementação;
 - 0 arquivos JavaScript de implementação; o único CJS é o launcher mínimo do binário;
-- 0 arquivos JavaScript de teste e 21 arquivos TypeScript de teste (`test/sgc.test.ts`, `test/execucao-cli.test.ts`, `test/backend-fqn.test.ts`, `test/backend-testes.test.ts`, `test/backend-importacao.test.ts`, `test/frontend-residuos.test.ts`, `test/frontend-arquitetura.test.ts`, `test/frontend-importacao.test.ts`, `test/frontend-acessibilidade.test.ts`, `test/cobertura-cli.test.ts`, `test/consistencia.test.ts`, `test/superficie-cli.test.ts`, `test/importacao-nucleos.test.ts`, `test/codigo-importacao.test.ts`, `test/projeto.test.ts`,
+- 0 arquivos JavaScript de teste e 22 arquivos TypeScript de teste (`test/sgc.test.ts`, `test/execucao-cli.test.ts`, `test/backend-fqn.test.ts`, `test/backend-testes.test.ts`, `test/backend-importacao.test.ts`, `test/frontend-residuos.test.ts`, `test/frontend-arquitetura.test.ts`, `test/frontend-arquitetura-gates.test.ts`, `test/frontend-importacao.test.ts`, `test/frontend-acessibilidade.test.ts`, `test/cobertura-cli.test.ts`, `test/consistencia.test.ts`, `test/superficie-cli.test.ts`, `test/importacao-nucleos.test.ts`, `test/codigo-importacao.test.ts`, `test/projeto.test.ts`,
   `test/configuracao.test.ts`, `test/integracao.test.ts`, `test/qualidade.test.ts`, `test/cdus.test.ts`,
   `test/externo.test.ts` e `test/pacote.test.ts`);
-- 20 arquivos de teste TypeScript concentram 125 cenários regulares; `test/pacote.test.ts` contém 2 cenários de distribuição
+- 21 arquivos de teste TypeScript concentram 125 cenários regulares; `test/pacote.test.ts` contém 2 cenários de distribuição
   isolada;
 - `test/apoio.ts` centraliza a raiz do toolkit, o launcher `tsx`, o contrato de execução, `executarSgc` e helpers nativos
   de arquivo, evitando cópias divergentes nos testes de projeto, integração, qualidade e CLI;
@@ -711,8 +714,8 @@ interna `silencioso` preservam o contrato de leitura e mantêm o stdout JSON vá
 Esta revisão confrontou o plano com a árvore rastreada, o manifesto do pacote, o catálogo da CLI e os testes atuais.
 Conclusões confirmadas:
 
-- a árvore possui 79 arquivos TypeScript de implementação, 21 arquivos `*.test.ts`, 125 cenários regulares e 2 cenários
-  de pacote; `test/sgc.test.ts` ainda concentra 29 cenários e aproximadamente 1.000 linhas;
+- a árvore possui 79 arquivos TypeScript de implementação, 22 arquivos `*.test.ts`, 125 cenários regulares e 2 cenários
+  de pacote; `test/sgc.test.ts` ainda concentra 26 cenários e aproximadamente 900 linhas;
 - o catálogo declarativo contém 42 comandos que apenas despacham módulos; comandos com opções e ações próprias ainda
   são registrados diretamente em `sgc.ts`, portanto o catálogo não é ainda a fonte única de toda a superfície CLI;
 - a instalação externa comprova o binário, a raiz do consumidor, os assets Semgrep e uma API programática horizontal de
@@ -900,9 +903,10 @@ do perfil.
     cobertura em `test/cobertura-cli.test.ts`, além de três de consistência em `test/consistencia.test.ts`;
     seis de superfície em `test/superficie-cli.test.ts`, três de importação de núcleos em `test/importacao-nucleos.test.ts`,
     dois de importação de código em `test/codigo-importacao.test.ts`, nove de análise/priorização backend em
-    `test/backend-testes.test.ts`, cinco de resíduos frontend em `test/frontend-residuos.test.ts` e três de auditoria
-    arquitetural frontend em `test/frontend-arquitetura.test.ts`; `test/sgc.test.ts` ainda possui 29 cenários e cerca
-    de 1.000 linhas. Separar depois os grupos de projeto e comportamento de domínio; `test/qualidade.test.ts` possui
+    `test/backend-testes.test.ts`, cinco de resíduos frontend em `test/frontend-residuos.test.ts`, três de auditoria
+    arquitetural frontend em `test/frontend-arquitetura.test.ts` e três de gates em
+    `test/frontend-arquitetura-gates.test.ts`; `test/sgc.test.ts` ainda possui 26 cenários e cerca de 900 linhas.
+    Separar depois os grupos de projeto e comportamento de domínio; `test/qualidade.test.ts` possui
     10 cenários.
 11. **Defaults de perfil ainda implícitos**: URL OpenAPI, tarefas Gradle, convenções Vue e caminhos de políticas devem
     ser associados explicitamente ao perfil SGC ou à configuração. Um default SGC é válido; o problema é o núcleo não
@@ -948,9 +952,10 @@ As fases históricas abaixo continuam úteis como registro, mas a execução dev
    cobertura para `test/cobertura-cli.test.ts`, três de consistência para `test/consistencia.test.ts`, seis de superfície
    para `test/superficie-cli.test.ts`, três de importação de núcleos para `test/importacao-nucleos.test.ts` e dois de
    importação de código para `test/codigo-importacao.test.ts`, nove de análise/priorização backend para
-   `test/backend-testes.test.ts`, cinco de resíduos frontend para `test/frontend-residuos.test.ts` e três de auditoria
-   arquitetural frontend para `test/frontend-arquitetura.test.ts`; seguir com os demais grupos comportamentais coesos,
-   mantendo testes sem reorganização puramente estética.
+   `test/backend-testes.test.ts`, cinco de resíduos frontend para `test/frontend-residuos.test.ts`, três de auditoria
+   arquitetural frontend para `test/frontend-arquitetura.test.ts` e três de gates para
+   `test/frontend-arquitetura-gates.test.ts`; seguir com os demais grupos comportamentais coesos, mantendo testes sem
+   reorganização puramente estética.
 9. **Formalizar resultados consumidos**: começar pelos JSON usados por coleta, resumo ou CI; acrescentar versão e
    validação de entrada por família, sem envelope universal obrigatório.
 
