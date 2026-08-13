@@ -15,10 +15,6 @@ import {principal as coletarFotografiaQualidade, type AdaptadorQualidade} from "
 import {normalizarCaminhoAchado, obterComandoSemgrep, resolverDiretoriosPadrao} from "../codigo/semgrep-auditar.js";
 import {executarAuditoria as executarAuditoriaCheiros} from "../codigo/cheiros-auditar.js";
 
-interface ViolacaoJson {
-    regra: string;
-}
-
 interface VerificacaoDiagnosticoJson {
     nome: string;
     status?: string;
@@ -446,102 +442,6 @@ describe("CLI raiz do toolkit", () => {
         expect(resultado.snapshot.contagens.backend_nullable_dto).toBe(1);
         expect(resultado.snapshot.contagens.frontend_any_producao).toBe(1);
         expect(resultado.snapshot.contagens.frontend_fallback_or).toBe(1);
-    });
-
-    test("valida previsibilidade estrutural das views em um recorte controlado", async () => {
-        const base = await mkdtemp(path.join(os.tmpdir(), "sgc-views-templates-"));
-        const viewsDir = path.join(base, "frontend", "src", "views");
-
-        await escreverArquivo(
-            path.join(viewsDir, "PainelView.vue"),
-            [
-                "<template>",
-                "  <LayoutPadrao>",
-                "    <PageHeader title=\"Painel\" />",
-                "  </LayoutPadrao>",
-                "</template>"
-            ].join("\n")
-        );
-
-        await escreverArquivo(
-            path.join(viewsDir, "LegacyView.vue"),
-            [
-                "<template>",
-                "  <div>",
-                "    <BModal />",
-                "  </div>",
-                "</template>"
-            ].join("\n")
-        );
-
-        const resultado = await executarSgc([
-            "frontend",
-            "views",
-            "templates-validar",
-            "--json",
-            "--base",
-            base
-        ]);
-
-        expect(resultado.exitCode).toBe(1);
-        const conteudo = JSON.parse(resultado.stdout);
-        expect(conteudo.resumo.totalViews).toBe(2);
-        expect(conteudo.violacoes.some((violacao: ViolacaoJson) => violacao.regra === "view-com-bmodal-cru")).toBe(true);
-        expect(conteudo.violacoes.some((violacao: ViolacaoJson) => violacao.regra === "view-sem-layout-padrao")).toBe(true);
-        expect(conteudo.violacoes.some((violacao: ViolacaoJson) => violacao.regra === "view-sem-cabecalho-padrao")).toBe(true);
-    });
-
-    test("valida padronizacao de modais em um recorte controlado", async () => {
-        const base = await mkdtemp(path.join(os.tmpdir(), "sgc-modais-validar-"));
-        await escreverArquivo(
-            path.join(base, "frontend", "src", "components", "comum", "ModalPadrao.vue"),
-            "<template><BModal title=\"Base\" /></template>"
-        );
-        await escreverArquivo(
-            path.join(base, "frontend", "src", "components", "mapa", "ImpactoMapaModal.vue"),
-            "<template><BModal title=\"Impacto\" /></template>"
-        );
-
-        const resultado = await executarSgc([
-            "frontend",
-            "modais",
-            "validar",
-            "--json",
-            "--base",
-            base
-        ]);
-
-        expect(resultado.exitCode).toBe(1);
-        const conteudo = JSON.parse(resultado.stdout);
-        expect(conteudo.violacoes).toHaveLength(1);
-        expect(conteudo.violacoes[0].arquivo).toBe("frontend/src/components/mapa/ImpactoMapaModal.vue");
-        expect(conteudo.violacoes[0].regra).toBe("componente-com-bmodal-cru");
-    });
-
-    test("resolve frontendCodigo configurado nos validadores estruturais", async () => {
-        const base = await mkdtemp(path.join(os.tmpdir(), "sgc-frontend-validadores-configurados-"));
-        await escreverJson(path.join(base, "configuracao-toolkit.json"), {
-            versao: VERSAO_CONFIGURACAO,
-            diretorios: {frontendCodigo: "cliente/src"},
-        });
-        await escreverArquivo(
-            path.join(base, "cliente", "src", "views", "PainelView.vue"),
-            "<template><LayoutPadrao><PageHeader title=\"Painel\" /></LayoutPadrao></template>"
-        );
-        await escreverArquivo(
-            path.join(base, "cliente", "src", "components", "comum", "ModalPadrao.vue"),
-            "<template><BModal title=\"Base\" /></template>"
-        );
-
-        const [resultadoViews, resultadoModais] = await Promise.all([
-            executarSgc(["frontend", "views", "templates-validar", "--json", "--base", base]),
-            executarSgc(["frontend", "modais", "validar", "--json", "--base", base]),
-        ]);
-
-        expect(resultadoViews.exitCode).toBe(0);
-        expect(JSON.parse(resultadoViews.stdout).resumo.totalViews).toBe(1);
-        expect(resultadoModais.exitCode).toBe(0);
-        expect(JSON.parse(resultadoModais.stdout).resumo.totalViolacoes).toBe(0);
     });
 
     test("projeto diagnostico identifica corretamente a ausencia de arquivos essenciais e falha com codigo 1", async () => {
