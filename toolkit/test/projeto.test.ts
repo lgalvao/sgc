@@ -7,7 +7,7 @@ import {execa} from "execa";
 import {executarSgc} from "./apoio.js";
 import {calcularTotais, construirArvore, ehArquivoTeste, listarArquivosGit, lerOpcoes} from "../projeto/arvore-linhas.js";
 import {sincronizarVersao} from "../projeto/versao-sincronizar.js";
-import {executarDiagnostico} from "../projeto/diagnostico.js";
+import {executarDiagnostico, obterRecursosPadrao} from "../projeto/diagnostico.js";
 import {executarLimpeza} from "../projeto/limpar.js";
 import {resolverEscoposInstalacao} from "../projeto/preparar.js";
 import {executarPerfilQualidade} from "../projeto/qualidade.js";
@@ -172,6 +172,37 @@ describe("Comandos de projeto do toolkit", () => {
         expect(resultado.statusGeral).toBe("ok");
         expect(resultado.verificacoes).toHaveLength(1);
         expect(resultado.verificacoes[0]).toMatchObject({nome: "manifesto", status: "ok"});
+    });
+
+    test("diagnostico deriva recursos estruturais dos diretorios configurados", async () => {
+        const diretorioBase = await mkdtemp(path.join(os.tmpdir(), "sgc-diagnostico-diretorios-"));
+        await fs.outputJSON(path.join(diretorioBase, "configuracao-toolkit.json"), {
+            versao: VERSAO_CONFIGURACAO,
+            diretorios: {
+                backend: "servidor",
+                frontend: "cliente",
+                testesIntegracao: "testes-e2e"
+            }
+        });
+
+        const caminhos = obterRecursosPadrao(diretorioBase).flatMap(recurso => "caminho" in recurso ? [recurso.caminho] : []);
+        expect(caminhos).toContain("servidor/build.gradle.kts");
+        expect(caminhos).toContain("cliente/package.json");
+        expect(caminhos).toContain("testes-e2e/package.json");
+        expect(caminhos).not.toContain("backend/build.gradle.kts");
+        expect(caminhos).not.toContain("frontend/package.json");
+        expect(caminhos).not.toContain("toolkit/package.json");
+
+        const diagnostico = await executarDiagnostico({
+            base: diretorioBase,
+            silencioso: true,
+            comandosRegistrados: []
+        });
+        expect(diagnostico.verificacoes.some(verificacao => verificacao.nome === "toolkit/package.json")).toBe(false);
+
+        await fs.outputFile(path.join(diretorioBase, "toolkit", "sgc.ts"), "");
+        const caminhosSgc = obterRecursosPadrao(diretorioBase).flatMap(recurso => "caminho" in recurso ? [recurso.caminho] : []);
+        expect(caminhosSgc).toContain("toolkit/package.json");
     });
 
     test("audita cobertura JaCoCo a partir de arquivo e base externos", async () => {

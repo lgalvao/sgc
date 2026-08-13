@@ -187,6 +187,11 @@ de testes reconhece padrões comuns de JavaScript, Vue, Playwright e Java, inclu
 `gradle.properties` e o `package.json` do diretório definido por `diretorios.frontend` em
 `configuracao-toolkit.json` (o padrão do SGC é `frontend`).
 
+`projeto diagnostico` resolve os arquivos de backend, frontend e integração pelos diretórios configurados. Em uma base
+externa, não exige arquivos do próprio toolkit nem as portas e o `.env.e2e` específicos do SGC; esses recursos voltam a
+ser verificados quando a base contém `toolkit/sgc.ts`. Catálogos adicionais continuam disponíveis pela API
+`executarDiagnostico`.
+
 ## Casos de uso típicos
 
 - gerar fotografia consolidada de qualidade para revisão técnica;
