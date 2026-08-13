@@ -6,7 +6,7 @@
     "moduleResolution": "NodeNext",
     "noEmit": true,
     "skipLibCheck": true,
-    "target": "ES2023",
+    "target": "ES2025",
     "types": ["node"]
   },
   "include": [

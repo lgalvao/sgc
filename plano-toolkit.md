@@ -54,7 +54,8 @@ sistema auditado.
   artefato compilado, resolve o mesmo caminho para o `.js` correspondente dentro de `dist`, sem compatibilidade com
   registros `.js` antigos.
 - Node padrão do projeto: `26.7.0`, registrado em `.nvmrc` e nos `engines`. TypeScript 6 permanece a linha adotada;
-  TS7 fica explicitamente fora do escopo até que o ecossistema usado pelo projeto seja compatível.
+  TS7 fica explicitamente fora do escopo até que o ecossistema usado pelo projeto seja compatível. O alvo TypeScript
+  foi elevado para ES2025, coerente com o runtime mínimo e com a ausência deliberada de compatibilidade legada.
 - ESM continua sendo o formato do toolkit.
 
 ### 2.3 Fronteiras de módulo
@@ -465,7 +466,9 @@ passou a derivar backend, frontend e artefatos da configuração e a suíte cheg
 Na rodada seguinte, o Semgrep passou a normalizar caminhos de achados relativos e absolutos em relação à base auditada;
 a suíte chega a 120 cenários regulares. Na rodada seguinte, `qualidade resumo` passou a exibir o caminho da fotografia
 relativo à base auditada, inclusive em consumidores externos. Na rodada seguinte, a família de auditorias frontend passou
-a alinhar entradas, saídas e mensagens de artefatos à base efetiva; a contagem permanece em 120 cenários.
+a alinhar entradas, saídas e mensagens de artefatos à base efetiva; a contagem permanece em 120 cenários. Na rodada
+seguinte, o alvo de compilação TypeScript passou de ES2023 para ES2025, coerente com Node 26 e sem compatibilidade legada;
+os 120 cenários e a baseline de cobertura permanecem verdes.
 
 ### 3.3 Tamanho e composição atual
 
