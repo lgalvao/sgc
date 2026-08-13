@@ -369,6 +369,7 @@ O diretório `test/` contém:
 - `cdus.test.ts`: testes TypeScript das regras CDU específicas do perfil SGC
 - `externo.test.ts`: fixture TypeScript de reuso em projeto Java/Vue externo
 - `pacote.test.ts`: smoke de empacotamento e instalação em consumidor isolado
+- `apoio.ts`: raiz, launcher `tsx` e execução comum da CLI compartilhados pelos testes
 - `fixtures/`: dados auxiliares para simular cenários de execução
 
 Esses testes garantem que a CLI continue roteando comandos, produzindo saídas e respeitando contratos básicos de

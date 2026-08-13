@@ -5,6 +5,7 @@ import fs from "fs-extra";
 import {describe, expect, test} from "vitest";
 import {execa, execaNode, type Options} from "execa";
 import {pathToFileURL} from "node:url";
+import {DIRETORIO_RAIZ, CAMINHO_SGC, CAMINHO_TSX, executarSgc, type ResultadoExecucao} from "./apoio.js";
 import {resolverCaminhoConfigurado, VERSAO_CONFIGURACAO} from "../lib/configuracao.js";
 import {ADAPTADORES, PERFIS, principal as coletarFotografiaQualidade} from "../qualidade/coleta-execucao.js";
 import {obterComandoSemgrep, resolverDiretoriosPadrao} from "../codigo/semgrep-auditar.js";
@@ -14,9 +15,6 @@ import {normalizarResultados} from "../frontend/acessibilidade-processar-resulta
 import {CATALOGO_COMANDOS} from "../lib/catalogo-comandos.js";
 import {program} from "../sgc.js";
 
-const DIRETORIO_RAIZ: string = path.resolve(import.meta.dirname, "..", "..");
-const CAMINHO_SGC = path.join(DIRETORIO_RAIZ, "toolkit", "sgc.ts");
-const CAMINHO_TSX = path.join(DIRETORIO_RAIZ, "node_modules", ".bin", process.platform === "win32" ? "tsx.cmd" : "tsx");
 const CAMINHO_SGC_COMPILADO = path.join(DIRETORIO_RAIZ, "toolkit", "dist", "sgc.js");
 const CAMINHO_TESTES_PRIORIZAR = path.join(DIRETORIO_RAIZ, "toolkit", "backend", "testes-priorizar.ts");
 const CAMINHOS_COMANDOS_TESTES_BACKEND = [
@@ -102,25 +100,6 @@ type ChamadaComando = {
     base?: string;
     diretorio?: string;
 };
-
-interface ResultadoExecucao {
-    exitCode?: number;
-    stdout: string;
-    stderr: string;
-}
-
-async function executarSgc(args: string[], opcoes: Options = {}): Promise<ResultadoExecucao> {
-    const resultado = await execa(CAMINHO_TSX, [CAMINHO_SGC, ...args], {
-        cwd: DIRETORIO_RAIZ,
-        reject: false,
-        ...opcoes
-    });
-    return {
-        exitCode: resultado.exitCode,
-        stdout: String(resultado.stdout),
-        stderr: String(resultado.stderr)
-    };
-}
 
 async function executarScriptFrontendCobertura(args: string[], opcoes: Options = {}): Promise<ResultadoExecucao> {
     const resultado = await execa(CAMINHO_TSX, [CAMINHO_FRONTEND_COBERTURA_AUDITORIA, ...args], {
