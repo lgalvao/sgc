@@ -220,6 +220,7 @@ O arquivo exige a versão `1` e aceita uma seção `diretorios` com nomes conhec
     "backendCodigo": "backend/src/main/java",
     "backendTestes": "backend/src/test/java",
     "frontendCodigo": "frontend/src",
+    "testesIntegracao": "e2e",
     "artefatosQualidade": "toolkit/qualidade/artefatos"
   }
 }
@@ -267,6 +268,10 @@ As três listas são independentes: uma configuração que declara somente um pe
 defaults SGC para dependências e instalação. Opções explícitas da API ou da CLI têm precedência sobre a configuração;
 quando nenhuma delas existe, os defaults SGC preservam o comportamento atual. Os comandos são configuração confiável
 do projeto e não formam uma camada de segurança ou de sandbox.
+
+O comando `frontend acessibilidade crawler` deriva a especificação `a11y/crawler.spec.ts` e a configuração
+`playwright.config.ts` do diretório definido por `diretorios.testesIntegracao`. Projetos com outra estrutura podem usar
+`--especificacao` e `--configuracao` explicitamente.
 
 Os orçamentos e exceções de resíduos frontend não têm política padrão empacotada. Sem `diretorios.orcamentoResiduosFrontend`
 ou `diretorios.excecoesResiduosFrontend`, o toolkit usa uma política neutra identificada como `padrao-do-toolkit`. Ao

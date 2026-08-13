@@ -698,6 +698,40 @@ describe("CLI raiz do toolkit", () => {
         expect(() => normalizarResultados({})).toThrow("a raiz deve ser uma lista");
     });
 
+    test("deriva caminhos do crawler a partir do diretório de testes de integração configurado", async () => {
+        const diretorioBase = await mkdtemp(path.join(os.tmpdir(), "sgc-a11y-crawler-configurado-"));
+        const chamadas: ChamadaComando[] = [];
+        await fs.outputJSON(path.join(diretorioBase, "configuracao-toolkit.json"), {
+            versao: VERSAO_CONFIGURACAO,
+            diretorios: {
+                testesIntegracao: "testes-e2e"
+            }
+        });
+
+        const resultado = await executarCrawler([], {
+            base: diretorioBase,
+            executarComando: async (comando, argumentos, base) => {
+                chamadas.push({comando, argumentos, base});
+            }
+        });
+
+        expect(resultado).toMatchObject({
+            diretorioBase,
+            especificacao: "testes-e2e/a11y/crawler.spec.ts",
+            configuracao: "testes-e2e/playwright.config.ts"
+        });
+        expect(chamadas).toEqual([{
+            comando: "npx",
+            argumentos: [
+                "playwright",
+                "test",
+                "testes-e2e/a11y/crawler.spec.ts",
+                "--config=testes-e2e/playwright.config.ts"
+            ],
+            base: diretorioBase
+        }]);
+    });
+
     test("analisa cobertura frontend a partir de base e relatorio V8 externos", async () => {
         const diretorioBase = await mkdtemp(path.join(os.tmpdir(), "sgc-cobertura-frontend-"));
         const caminhoArquivo = path.join(diretorioBase, "frontend", "src", "exemplo.ts");

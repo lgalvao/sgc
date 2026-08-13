@@ -4,11 +4,12 @@ import {execa} from "execa";
 import {resolverNaRaiz} from "../lib/caminhos.js";
 import {lerOpcao} from "../lib/cli-opcoes.js";
 import {exibirAjudaComando} from "../lib/cli-ajuda.js";
+import {resolverCaminhoConfigurado} from "../lib/configuracao.js";
 import {ehEntradaPrincipal} from "../lib/execucao.js";
 import {escreverErro} from "../lib/saida.js";
 
-const CAMINHO_ESPECIFICACAO = "e2e/a11y/crawler.spec.ts";
-const CAMINHO_CONFIGURACAO = "e2e/playwright.config.ts";
+const CAMINHO_RELATIVO_ESPECIFICACAO = path.join("a11y", "crawler.spec.ts");
+const CAMINHO_RELATIVO_CONFIGURACAO = "playwright.config.ts";
 
 interface OpcoesCrawler {
     base?: string;
@@ -62,6 +63,14 @@ function caminhoRelativo(diretorioBase: string, caminho: string): string {
     return path.relative(diretorioBase, path.resolve(diretorioBase, caminho)).replaceAll("\\", "/");
 }
 
+function obterCaminhosPadrao(diretorioBase: string): {especificacao: string; configuracao: string} {
+    const diretorioTestesIntegracao = resolverCaminhoConfigurado("testesIntegracao", diretorioBase);
+    return {
+        especificacao: caminhoRelativo(diretorioBase, path.join(diretorioTestesIntegracao, CAMINHO_RELATIVO_ESPECIFICACAO)),
+        configuracao: caminhoRelativo(diretorioBase, path.join(diretorioTestesIntegracao, CAMINHO_RELATIVO_CONFIGURACAO)),
+    };
+}
+
 const executarComandoPadrao: ExecutarComando = async (comando, argumentos, diretorioBase) => {
     await execa(comando, argumentos, {
         cwd: diretorioBase,
@@ -95,8 +104,9 @@ async function executarCrawler(
     }
 
     const diretorioBase = path.resolve(opcoes.base ?? resolverNaRaiz());
-    const especificacao = caminhoRelativo(diretorioBase, opcoes.especificacao ?? CAMINHO_ESPECIFICACAO);
-    const configuracao = caminhoRelativo(diretorioBase, opcoes.configuracao ?? CAMINHO_CONFIGURACAO);
+    const caminhosPadrao = obterCaminhosPadrao(diretorioBase);
+    const especificacao = caminhoRelativo(diretorioBase, opcoes.especificacao ?? caminhosPadrao.especificacao);
+    const configuracao = caminhoRelativo(diretorioBase, opcoes.configuracao ?? caminhosPadrao.configuracao);
     const argumentosPlaywright = [
         "playwright",
         "test",
