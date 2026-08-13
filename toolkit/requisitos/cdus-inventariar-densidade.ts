@@ -1,11 +1,36 @@
 #!/usr/bin/env node
+// Inventário de densidade documental dos casos de uso CDU.
 
 import path from "node:path";
 import {ehEntradaPrincipal} from "../lib/execucao.js";
 import {escreverLinha, imprimirJson} from "../lib/saida.js";
 import {analisarArquivo, lerArquivo, listarArquivosCdu, obterOpcoesCdu} from "./cdus-lib.js";
 
-function calcularProfundidadeMaxima(linhas) {
+interface DocumentoDensidade {
+    arquivo: string;
+    palavras: number;
+    passos: number;
+    profundidadeListas: number;
+    placeholders: number;
+    elementosUi: number;
+}
+
+interface ResumoDensidade {
+    mediaPalavras: number;
+    mediaPassos: number;
+    maxPalavras: number;
+    maxPassos: number;
+    maxProfundidadeListas: number;
+}
+
+interface InventarioDensidade {
+    base: string;
+    totalArquivos: number;
+    resumo: ResumoDensidade;
+    documentos: DocumentoDensidade[];
+}
+
+function calcularProfundidadeMaxima(linhas: string[]): number {
     let maximo = 0;
     for (const linha of linhas) {
         const correspondencia = linha.match(/^(\s*)[-*]\s+/);
@@ -18,11 +43,11 @@ function calcularProfundidadeMaxima(linhas) {
     return maximo;
 }
 
-async function principal(argumentos = process.argv.slice(2)) {
+async function principal(argumentos: string[] = process.argv.slice(2)): Promise<void> {
     const {emitirJson, base} = obterOpcoesCdu(argumentos);
 
     const arquivos = await listarArquivosCdu(base);
-    const documentos = arquivos.map(caminhoArquivo => {
+    const documentos: DocumentoDensidade[] = arquivos.map(caminhoArquivo => {
         const texto = lerArquivo(caminhoArquivo);
         const analise = analisarArquivo(caminhoArquivo, texto);
         const profundidadeListas = calcularProfundidadeMaxima(analise.linhas);
@@ -38,7 +63,7 @@ async function principal(argumentos = process.argv.slice(2)) {
 
     const totalPalavras = documentos.reduce((soma, doc) => soma + doc.palavras, 0);
     const totalPassos = documentos.reduce((soma, doc) => soma + doc.passos, 0);
-    const resumo = {
+    const resumo: ResumoDensidade = {
         mediaPalavras: documentos.length > 0 ? totalPalavras / documentos.length : 0,
         mediaPassos: documentos.length > 0 ? totalPassos / documentos.length : 0,
         maxPalavras: Math.max(...documentos.map(doc => doc.palavras), 0),
@@ -46,7 +71,7 @@ async function principal(argumentos = process.argv.slice(2)) {
         maxProfundidadeListas: Math.max(...documentos.map(doc => doc.profundidadeListas), 0)
     };
 
-    const resultado = {
+    const resultado: InventarioDensidade = {
         base,
         totalArquivos: documentos.length,
         resumo,
