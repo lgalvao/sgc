@@ -150,8 +150,10 @@ npx tsx toolkit/sgc.ts projeto artefatos limpar
 npx tsx toolkit/sgc.ts projeto versao-sincronizar 1.2.3
 ```
 
-`qualidade coletar` executa os adaptadores e perfis do SGC e produz uma fotografia consolidada. `qualidade tarefas executar`
-é a orquestração adaptável: apenas executa o perfil configurado em `execucoes.qualidade`.
+`qualidade coletar` executa os adaptadores e perfis do SGC e produz uma fotografia consolidada. Seu motor interno de
+coleta não depende dos adaptadores SGC e pode ser composto programaticamente; a entrada CLI mantém somente os perfis SGC.
+`qualidade tarefas executar` é a orquestração adaptável para outros projetos: apenas executa o perfil configurado em
+`execucoes.qualidade`.
 
 `projeto dependencias auditar` reúne uso e declarações pelo Knip, versões npm desatualizadas, vulnerabilidades npm e
 atualizações Gradle. Achados são diferenciados de falhas de execução. A verificação Gradle usa `dependencyUpdates`,

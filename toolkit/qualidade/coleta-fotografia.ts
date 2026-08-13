@@ -2,7 +2,7 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import {NOME_ARQUIVO_FOTOGRAFIA} from "../biblioteca/qualidade.js";
 import {extrairPontosCriticosQualidade} from "./coleta-leitores.js";
-import type {ExecucaoQualidade} from "./coleta-execucao.js";
+import type {ExecucaoQualidade} from "./coleta-motor.js";
 
 const VERSAO_SCHEMA_FOTOGRAFIA = "3.0.0" as const;
 

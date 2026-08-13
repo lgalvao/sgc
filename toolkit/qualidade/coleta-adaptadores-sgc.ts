@@ -10,7 +10,7 @@ import type {
     OpcoesPlaywright,
     ResultadoComando,
     ResultadoJUnit
-} from "./coleta-execucao.js";
+} from "./coleta-motor.js";
 import type {PontoCriticoQualidade} from "./coleta-leitores.js";
 
 interface ResultadoResiduos {

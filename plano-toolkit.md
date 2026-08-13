@@ -101,7 +101,9 @@ quando houver contrato claro e uso horizontal plausível ou comprovado.
 ### Fronteiras já esclarecidas
 
 - `qualidade coletar` produz uma fotografia consolidada com perfis e adaptadores SGC; `qualidade tarefas executar` apenas
-  orquestra tarefas configuradas e é a entrada adaptável para outros projetos.
+  orquestra tarefas configuradas e é a entrada adaptável para outros projetos. O motor de coleta foi separado da
+  composição SGC; a CLI continua explicitamente limitada aos perfis SGC, enquanto a composição programática recebe
+  adaptadores e perfis por injeção.
 - A auditoria de dependências combina Knip, versões desatualizadas, vulnerabilidades npm e atualizações Gradle. O Knip
   está na série 6 (`^6.32.2`); o comando Gradle já usa a série 0.61 do plugin, `--no-parallel` e `-Drevision=release`.
   O plugin relata dependências declaradas pelo projeto, plugins e plataformas do build; filtrar configurações específicas
@@ -196,7 +198,8 @@ isolado funciona, mas as fronteiras ainda não estão concluídas:
   removido e a mensagem de `hotspot` foi padronizada como ponto crítico;
 - apenas cobertura Java e web está publicada como API programática horizontal;
 - defaults de Gradle, Vue, OpenAPI, Semgrep e outras políticas SGC ainda aparecem dentro de módulos adaptáveis;
-- os maiores módulos concentram análise, política, formatação, persistência e CLI, dificultando reuso seletivo.
+- a composição SGC da coleta foi separada do motor de fotografia, mas outros módulos ainda concentram análise, política,
+  formatação, persistência e CLI, dificultando reuso seletivo.
 
 ## Próximos passos
 

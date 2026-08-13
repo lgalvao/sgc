@@ -3,7 +3,7 @@ import process from "node:process";
 import {execa} from "execa";
 import {DIRETORIO_TOOLKIT} from "../biblioteca/caminhos.js";
 import {resolverCaminhoTsx} from "../biblioteca/execucao.js";
-import type {ContextoColeta, OpcoesComando, ResultadoComando} from "./coleta-execucao.js";
+import type {ContextoColeta, OpcoesComando, ResultadoComando} from "./coleta-motor.js";
 
 const CAMINHO_SGC = path.join(DIRETORIO_TOOLKIT, "sgc.ts");
 

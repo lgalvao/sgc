@@ -14,6 +14,7 @@ const CAMINHOS_COMANDOS_PROJETO = [
 ].map(nome => path.join(DIRETORIO_TOOLKIT, "projeto", nome));
 const CAMINHOS_COMANDOS_QUALIDADE = [
     "coleta.ts",
+    "coleta-motor.ts",
     "coleta-execucao.ts",
     "tarefas-executar.ts",
     "resumo.ts"
