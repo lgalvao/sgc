@@ -2,13 +2,26 @@ import os from "node:os";
 import path from "node:path";
 import {mkdtemp} from "node:fs/promises";
 import {describe, expect, test} from "vitest";
-import {DIRETORIO_RAIZ, executarSgc, criarDiretorio, escreverJson, existe} from "./apoio.js";
+import {
+    DIRETORIO_RAIZ,
+    executarSgc,
+    criarDiretorio,
+    escreverArquivo,
+    escreverJson,
+    existe
+} from "./apoio.js";
 import {VERSAO_CONFIGURACAO} from "../lib/configuracao.js";
 import {
     obterOpcoesPlaywright,
     principal as coletarFotografiaQualidade,
-    type AdaptadorQualidade
+    type AdaptadorQualidade,
+    type ContextoColeta,
+    type ExecucaoQualidade,
+    type ResultadoComando
 } from "../qualidade/coleta-execucao.js";
+import {criarAdaptadoresSgc, PERFIS_SGC} from "../qualidade/coleta-adaptadores-sgc.js";
+import {executarComando} from "../qualidade/coleta-executor.js";
+import {consolidarJUnit, extrairHotspotsQualidade, parseJsonSeguro} from "../qualidade/coleta-leitores.js";
 
 const FIXTURE_FOTOGRAFIA = path.join(DIRETORIO_RAIZ, "toolkit", "test", "fixtures", "qualidade", "fotografia.json");
 
@@ -138,5 +151,169 @@ describe("Qualidade do toolkit", () => {
         expect(await existe(caminhoFotografiaPersonalizado)).toBe(true);
         expect(await existe(diretorioArtefatos)).toBe(false);
         expect(await existe(path.join(diretorioBase, "toolkit"))).toBe(false);
+    });
+
+    test("caracteriza leitura segura de JSON, hotspots e relatorios JUnit", async () => {
+        expect(parseJsonSeguro<{status: string}>("{\"status\":\"ok\"}", {status: "falha"})).toEqual({status: "ok"});
+        expect(parseJsonSeguro("invalido", {status: "falha"})).toEqual({status: "falha"});
+        expect(extrairHotspotsQualidade({
+            hotspots: [
+                {arquivo: "src/valido.ts", score: 12},
+                {arquivo: "src/sem-score.ts"},
+                "invalido"
+            ]
+        })).toEqual([{arquivo: "src/valido.ts", score: 12}]);
+        expect(extrairHotspotsQualidade({hotspots: "invalido"})).toEqual([]);
+
+        const base = await mkdtemp(path.join(os.tmpdir(), "sgc-qualidade-leitores-"));
+        const diretorioRelatorio = path.join(base, "backend", "build", "test-results");
+        await escreverArquivo(
+            path.join(diretorioRelatorio, "TEST-primeiro.xml"),
+            "<testsuite tests=\"3\" failures=\"1\" errors=\"0\" skipped=\"1\" time=\"1.25\" />"
+        );
+        await escreverArquivo(
+            path.join(diretorioRelatorio, "TEST-segundo.xml"),
+            "<testsuite tests=\"2\" failures=\"0\" errors=\"1\" skipped=\"0\" time=\"0.75\" />"
+        );
+
+        const relatorio = await consolidarJUnit(diretorioRelatorio, base);
+        expect(relatorio).toMatchObject({
+            testes: 5,
+            falhas: 2,
+            ignorados: 1,
+            tempoSegundos: 2,
+            sucessos: 2
+        });
+        expect(relatorio.arquivosXml).toEqual([
+            "backend/build/test-results/TEST-primeiro.xml",
+            "backend/build/test-results/TEST-segundo.xml"
+        ]);
+        expect(await consolidarJUnit(path.join(base, "ausente"), base)).toMatchObject({
+            testes: 0,
+            falhas: 0,
+            ignorados: 0,
+            sucessos: 0,
+            arquivosXml: []
+        });
+    });
+
+    test("caracteriza executor de subprocessos em sucesso e falha", async () => {
+        const base = await mkdtemp(path.join(os.tmpdir(), "sgc-qualidade-executor-"));
+        const sucesso = await executarComando({
+            comando: process.execPath,
+            args: ["-e", "process.stdout.write('ok')"],
+            cwd: base
+        });
+        expect(sucesso).toMatchObject({codigoSaida: 0, saida: "ok", erro: ""});
+        expect(sucesso.duracaoMs).toBeGreaterThanOrEqual(0);
+
+        const falha = await executarComando({
+            comando: process.execPath,
+            args: ["-e", "process.stderr.write('falhou'); process.exitCode = 3"],
+            cwd: base
+        });
+        expect(falha).toMatchObject({codigoSaida: 3, saida: "", erro: "falhou"});
+
+        const comandoAusente = await executarComando({
+            comando: path.join(base, "comando-ausente"),
+            args: [],
+            cwd: base
+        });
+        expect(comandoAusente.codigoSaida).toBe(-1);
+        expect(comandoAusente.erro).not.toBe("");
+    });
+
+    test("caracteriza perfis e adaptadores SGC por composição", async () => {
+        expect(PERFIS_SGC.backend).toEqual([
+            "testesBackendUnitarios",
+            "testesBackendIntegracao",
+            "coberturaBackend"
+        ]);
+        expect(PERFIS_SGC.frontend).toContain("identificadoresTesteFrontend");
+
+        const diretorioBase = await mkdtemp(path.join(os.tmpdir(), "sgc-qualidade-adaptadores-"));
+        const contexto: ContextoColeta = {
+            base: diretorioBase,
+            diretorioArtefatos: path.join(diretorioBase, "artefatos"),
+            diretorioExecucoes: path.join(diretorioBase, "artefatos", "execucoes"),
+            diretorioMaisRecente: path.join(diretorioBase, "artefatos", "mais-recente"),
+            diretorioBackend: path.join(diretorioBase, "backend"),
+            diretorioFrontend: path.join(diretorioBase, "frontend"),
+            diretorioFrontendCodigo: path.join(diretorioBase, "frontend", "src")
+        };
+        await escreverArquivo(
+            path.join(diretorioBase, "backend", "build", "reports", "jacoco", "test", "jacocoTestReport.xml"),
+            "<report><counter type=\"LINE\" missed=\"1\" covered=\"2\"/><counter type=\"BRANCH\" missed=\"0\" covered=\"1\"/></report>"
+        );
+        await escreverJson(path.join(diretorioBase, "frontend", "coverage", "coverage-final.json"), {
+            [path.join(diretorioBase, "frontend", "src", "Exemplo.ts")]: {
+                s: {"1": 1},
+                f: {"1": 1},
+                b: {"1": [1]},
+                statementMap: {"1": {}}
+            }
+        });
+
+        const criarExecucao = (codigo: string, nome: string, categoria: "teste" | "cobertura" | "qualidade", comando: string, diretorio: string): ExecucaoQualidade => ({
+            codigo,
+            nome,
+            categoria,
+            status: "nao_executado",
+            duracaoMs: 0,
+            comando,
+            diretorio,
+            sumario: "",
+            metricas: {},
+            erros: [],
+            artefatos: []
+        });
+        const executarComandoFake = async (): Promise<ResultadoComando> => ({codigoSaida: 0, saida: "", erro: "", duracaoMs: 4});
+        const executarComandoSgcFake = async (_contexto: ContextoColeta, argumentos: string[]): Promise<ResultadoComando> => ({
+            codigoSaida: 0,
+            saida: JSON.stringify(argumentos.includes("residuos")
+                ? {status: "ok", resumo: {scoreTotal: 90, faixa: "A"}, violacoes: [], avisos: [], hotspots: []}
+                : {resumo: {scoreTotal: 95, faixa: "A", metricas: {}}, hotspots: []}),
+            erro: "",
+            duracaoMs: 3
+        });
+        const adaptadores = criarAdaptadoresSgc({
+            criarExecucao,
+            executarComando: executarComandoFake,
+            executarComandoSgc: executarComandoSgcFake,
+            consolidarJUnit: async () => ({testes: 2, falhas: 0, ignorados: 0, tempoSegundos: 0.2, sucessos: 2, arquivosXml: []}),
+            registrarResultadoExecucao: (execucao, resultado) => {
+                execucao.duracaoMs = resultado.duracaoMs;
+                if (resultado.codigoSaida !== 0) execucao.erros = [resultado.erro];
+            },
+            parseJsonSeguro: <T>(conteudo: string, fallback: T): T => {
+                try {
+                    return JSON.parse(conteudo) as T;
+                } catch {
+                    return fallback;
+                }
+            },
+            obterOpcoesPlaywright: () => ({
+                descricao: "npx playwright test --reporter=json",
+                argumentos: ["playwright", "test", "--reporter=json"]
+            })
+        });
+
+        const resultados = await Promise.all([
+            adaptadores.testesBackendUnitarios(contexto),
+            adaptadores.testesBackendIntegracao(contexto),
+            adaptadores.coberturaBackend(contexto),
+            adaptadores.coberturaFrontend(contexto),
+            adaptadores.lintFrontend(contexto),
+            adaptadores.tiposFrontend(contexto),
+            adaptadores.residuosFrontend(contexto),
+            adaptadores.arquiteturaFrontend(contexto),
+            adaptadores.identificadoresTesteFrontend(contexto),
+            adaptadores.testesIntegracaoPlaywright(contexto)
+        ]);
+
+        expect(resultados.every(resultado => resultado.status === "sucesso")).toBe(true);
+        expect(resultados.find(resultado => resultado.codigo === "backend-cobertura")?.sumario).toContain("ramificações");
+        expect(resultados.find(resultado => resultado.codigo === "frontend-cobertura")?.sumario).toContain("linhas");
+        expect(resultados.find(resultado => resultado.codigo === "e2e-playwright")?.sumario).toContain("0 testes E2E");
     });
 }, 30000);

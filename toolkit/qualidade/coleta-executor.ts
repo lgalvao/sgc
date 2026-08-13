@@ -19,7 +19,7 @@ async function executarComando({comando, args, cwd, env}: OpcoesComando): Promis
         return {
             codigoSaida: resultado.exitCode ?? -1,
             saida: resultado.stdout,
-            erro: resultado.stderr,
+            erro: resultado.stderr || (resultado.failed ? resultado.shortMessage ?? "" : ""),
             duracaoMs: Date.now() - inicio
         };
     } catch (erro: unknown) {

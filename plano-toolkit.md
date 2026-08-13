@@ -440,10 +440,10 @@ provam utilidade funcional.
 
 Nas validações desta rodada, em 13 de agosto de 2026, executadas diretamente sob Node `26.7.0`:
 
-- `npm --prefix toolkit run test`: 122 testes aprovados em 7 arquivos; o smoke de pacote é separado para não tornar a
+- `npm --prefix toolkit run test`: 125 testes aprovados em 7 arquivos; o smoke de pacote é separado para não tornar a
   suíte unitária dependente de rede ou instalação;
-- `npm --prefix toolkit run test:coverage`: aprovado com baseline informativa de 46,33% de instruções (620/1.338),
-  34,69% de ramificações (323/931), 53,33% de funções (144/270) e 46,52% de linhas (595/1.279); o script exclui
+- `npm --prefix toolkit run test:coverage`: aprovado com baseline informativa de 59,19% de instruções (792/1.338),
+  47,27% de ramificações (443/937), 66,29% de funções (179/270) e 59,34% de linhas (759/1.279); o script exclui
   `test/**` para não contar o apoio de testes como implementação e ainda não aplica threshold, porque a prioridade é
   transformar os contratos críticos em cenários explícitos;
 - `npm --prefix toolkit run test:pacote`: 1 teste aprovado, com `npm pack`, instalação isolada, auditoria no consumidor
@@ -543,10 +543,13 @@ Na rodada seguinte, o contrato interno dos resultados JaCoCo passou a usar `rami
 `BRANCH`, `mb` e `cb` permanecem somente como campos do XML externo. A suíte focada de cobertura passou a 10 cenários
 aprovados nesse recorte. Nesta rodada, o contrato interno V8 passou a usar `instrucoes`, `ramificacoes`, `funcoes` e
 `linhas`, com dois cenários focados e a suíte completa aprovados; as chaves do formato V8 externo não foram traduzidas.
-Nesta rodada, os testes deixaram de depender de `fs-extra`: os helpers nativos de arquivo foram centralizados em
+Na rodada anterior, os testes deixaram de depender de `fs-extra`: os helpers nativos de arquivo foram centralizados em
 `test/apoio.ts`, o manifesto e o lockfile foram limpos e a suíte completa permaneceu em 122 cenários. A regra ignorada
 de `qualidade/semgrep/latest` e seus dois artefatos não rastreados também foram removidos; os arquivos foram movidos para
 uma quarentena temporária recuperável, enquanto o único destino produzido continua sendo `qualidade/artefatos/semgrep/mais-recente`.
+Nesta rodada, `test/qualidade.test.ts` ganhou três cenários comportamentais para leitores, executor e adaptadores SGC.
+O executor passou a preservar a mensagem de erro de spawn do Execa quando um comando não inicia; a suíte completa chegou
+a 125 cenários e a cobertura direta da coleta confirmou 100% nos adaptadores SGC, 96,29% nos leitores e 71,42% no executor.
 
 ### 3.3 Tamanho e composição atual
 
@@ -557,7 +560,7 @@ Inventário dos arquivos rastreados do toolkit, excluindo `dist`, cobertura e ar
 - 0 arquivos JavaScript de teste e 8 arquivos TypeScript de teste (`test/sgc.test.ts`, `test/projeto.test.ts`,
   `test/configuracao.test.ts`, `test/integracao.test.ts`, `test/qualidade.test.ts`, `test/cdus.test.ts`,
   `test/externo.test.ts` e `test/pacote.test.ts`);
-- 7 arquivos de teste TypeScript concentram 122 cenários regulares, mais 1 smoke de distribuição isolada;
+- 7 arquivos de teste TypeScript concentram 125 cenários regulares, mais 1 smoke de distribuição isolada;
 - `test/apoio.ts` centraliza a raiz do toolkit, o launcher `tsx`, o contrato de execução, `executarSgc` e helpers nativos
   de arquivo, evitando cópias divergentes nos testes de projeto, integração, qualidade e CLI;
 - maior módulo atual: `frontend/arquitetura-lib.ts`, com aproximadamente 1.200 linhas;
@@ -592,6 +595,7 @@ O núcleo TypeScript de implementação foi concluído: 100% dos arquivos de imp
 | Resolvido nesta rodada | Coleta misturava motor e adaptadores SGC | `qualidade/coleta-adaptadores-sgc.ts` agora concentra perfis e adaptadores específicos; `coleta-execucao.ts` conserva contexto e agregador como fronteira de composição, enquanto o executor é separado. |
 | Resolvido nesta rodada | Agregador conhecia detalhes de subprocessos | `qualidade/coleta-executor.ts` agora encapsula `execa`, `tsx`, ambiente, diretório de execução e despacho interno do toolkit; a fotografia continua sob responsabilidade do agregador. |
 | Resolvido nesta rodada | Agregador conhecia detalhes de leitura de relatórios | `qualidade/coleta-leitores.ts` agora concentra o parsing seguro de JSON, a consolidação JUnit e a validação de hotspots; o agregador apenas compõe os resultados. |
+| Resolvido nesta rodada | Executor ocultava erro quando o processo não iniciava | `qualidade/coleta-executor.ts` agora preserva `stderr` ou a mensagem de spawn do Execa; o cenário de comando inexistente registra o diagnóstico sem lançar exceção. |
 | Resolvido nesta rodada | Agregador montava e gravava a fotografia | `qualidade/coleta-fotografia.ts` agora concentra o contrato, a agregação do resumo, a ordenação dos hotspots e a gravação nos dois destinos; o fluxo preserva a preparação antecipada dos diretórios. |
 | Resolvido nesta rodada | Contexto SGC era obrigatório e implícito | `qualidade/coleta-contexto.ts` concentra a fábrica padrão, enquanto `principal` aceita `criarContexto`; consumidores externos podem escolher seus diretórios de artefatos sem alterar os defaults SGC. |
 | Resolvido nesta rodada | Coleta Git era obrigatória e embutida no agregador | `qualidade/coleta-metadados.ts` concentra o default Git, enquanto `principal` aceita `coletarMetadados`; consumidores externos podem fornecer ou omitir sua própria origem de metadados. |
@@ -660,7 +664,7 @@ interna `silencioso` preservam o contrato de leitura e mantêm o stdout JSON vá
 Esta revisão confrontou o plano com a árvore rastreada, o manifesto do pacote, o catálogo da CLI e os testes atuais.
 Conclusões confirmadas:
 
-- a árvore possui 79 arquivos TypeScript de implementação, 8 arquivos `*.test.ts`, 122 cenários regulares e 1 smoke
+- a árvore possui 79 arquivos TypeScript de implementação, 8 arquivos `*.test.ts`, 125 cenários regulares e 1 smoke
   de pacote; `test/sgc.test.ts` ainda concentra 81 cenários e aproximadamente 2.800 linhas;
 - o catálogo declarativo contém 42 comandos que apenas despacham módulos; comandos com opções e ações próprias ainda
   são registrados diretamente em `sgc.ts`, portanto o catálogo não é ainda a fonte única de toda a superfície CLI;
@@ -670,8 +674,9 @@ Conclusões confirmadas:
 - a coleta de qualidade está de fato separada em orquestração, contexto, executor, leitores, fotografia, metadados e
   adaptadores SGC. Não faz sentido continuar fatiando arquivos apenas para reduzir tamanho; os próximos recortes devem
   ser guiados por contrato público, cobertura e um consumidor externo representativo;
-- a cobertura global atual é informativa, não um critério suficiente. Os módulos de maior risco da coleta ainda têm
-  cobertura direta baixa: adaptadores SGC, executor e leitores são exercitados principalmente por integração indireta;
+- a cobertura global atual é informativa, não um critério suficiente. A caracterização desta rodada elevou a cobertura
+  direta dos adaptadores SGC para 100%, dos leitores para 96,29% e do executor para 71,42%; o agregador e a coleta de
+  metadados ainda têm cobertura menor e devem ser tratados por contrato, não por cortes de tamanho;
 - a padronização em português dos contratos próprios avançou: destinos `latest`, nomes de relatório `*-coverage-*`,
   campos da fotografia `branch`/`commit` e os símbolos internos de cobertura JaCoCo/V8 foram removidos. Permanecem
   nomes derivados de formatos ou ferramentas externas e opções/mensagens heterogêneas que ainda exigem revisão coordenada;
@@ -819,9 +824,10 @@ do perfil.
 4. **[parcial] Padronização e simplificação**: os destinos `latest`, nomes `*-coverage-*`, campos próprios
    `branch`/`commit` e os contratos internos JaCoCo/V8 já usam nomes portugueses, sem aliases de compatibilidade. Ainda
    falta revisar opções duplicadas, helpers de uso único e camadas que não expressem uma fronteira real.
-5. **Caracterização insuficiente das áreas de risco**: adaptadores SGC, executor e leitores têm cobertura direta baixa.
-   Criar testes comportamentais focados antes de remover ou fundir código nessas áreas; cobertura não deve servir para
-   justificar a preservação de funcionalidade sem consumidor.
+5. **[resolvido nesta rodada] Caracterização insuficiente das áreas de risco**: foram adicionados testes comportamentais
+   para adaptadores SGC, executor e leitores, incluindo sucesso, falha de subprocesso, erro de spawn, JUnit, JSON,
+   hotspots e a composição dos dez adaptadores do perfil. A cobertura não substitui a evidência de consumidor, mas agora
+   existe uma base segura para revisar o agregador e a API pública.
 
 ### Prioridade média
 
@@ -840,7 +846,7 @@ do perfil.
    agora têm metadados de caminho, descrição, efeito e escopo; os callbacks especializados continuam em `sgc.ts` por
    exigirem lógica de registro própria. A próxima evolução deve evitar duplicar opções/callbacks em dados artificiais.
 10. **Testes concentrados**: `test/sgc.test.ts` ainda possui 81 cenários e cerca de 2.800 linhas. Separar primeiro runtime
-   e distribuição, backend e frontend; `test/qualidade.test.ts` já possui 7 cenários, não 4 como dizia o plano anterior.
+   e distribuição, backend e frontend; `test/qualidade.test.ts` agora possui 10 cenários.
 11. **Defaults de perfil ainda implícitos**: URL OpenAPI, tarefas Gradle, convenções Vue e caminhos de políticas devem
     ser associados explicitamente ao perfil SGC ou à configuração. Um default SGC é válido; o problema é o núcleo não
     conseguir distingui-lo de uma regra horizontal.
@@ -871,8 +877,8 @@ As fases históricas abaixo continuam úteis como registro, mas a execução dev
 4. **[parcial nesta rodada] Padronizar a superfície restante**: destinos, campos próprios e os contratos internos JaCoCo/V8
    foram corrigidos; continuam pendentes parâmetros, mensagens, códigos de saída e helpers/camadas redundantes
    encontrados no inventário.
-5. **Caracterizar áreas que serão alteradas**: acrescentar testes focados somente para funcionalidades preservadas que
-   serão simplificadas ou separadas; começar por executor, leitores e adaptadores SGC se a coleta entrar no recorte.
+5. **[concluído nesta rodada] Caracterizar áreas que serão alteradas**: executor, leitores e adaptadores SGC agora têm
+   cenários comportamentais diretos; a correção do diagnóstico de spawn foi registrada como regressão.
 6. **Externalizar o próximo recorte horizontal real**: escolher uma família com consumidor plausível — inicialmente
    cobertura Java/V8 ou OpenAPI — e provar configuração em fixture externo antes de criar novos adaptadores genéricos.
 7. **Fechar a API pública do pacote**: somente após o mapa de utilidade, exportar os subpaths horizontais confirmados e
