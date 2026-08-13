@@ -145,7 +145,8 @@ isolado funciona, mas as fronteiras ainda não estão concluídas:
 - a configuração não representa corpus, vocabulário, estilo nem extratores CDU;
 - a comparação com mensagens do código ainda depende de sete caminhos rígidos do SGC e só pode ser selecionada quando as
   fontes canônicas estão presentes;
-- os comandos `backend testes analisar` e `backend testes priorizar` escrevem relatórios por padrão;
+- `backend testes analisar` e `backend testes priorizar` já são somente leitura por padrão e persistem apenas com
+  `--gravar`, mas ainda não compartilham um contrato de opções com os demais comandos;
 - comandos encaminhados aceitam opções inexistentes sem erro;
 - `efeito` no catálogo mistura intenção funcional e efeitos reais no sistema;
 - muitos módulos interpretam argumentos manualmente e controlam `process.exitCode` dentro da implementação;
@@ -160,8 +161,8 @@ isolado funciona, mas as fronteiras ainda não estão concluídas:
 
 Prioridade imediata, porque corrige comportamento surpreendente antes de ampliar a superfície reutilizável.
 
-- fazer `backend testes analisar` e `backend testes priorizar` emitirem resultado em stdout por padrão e só persistirem
-  relatórios com `--gravar`;
+- preservar o modo somente leitura de `backend testes analisar` e `backend testes priorizar`, com resumo humano ou JSON no
+  stdout e persistência explícita por `--gravar`;
 - rejeitar opções desconhecidas e argumentos excedentes em todos os comandos, inclusive os encaminhados pelo roteador;
 - substituir o campo genérico `efeito` por metadados separados de finalidade e efeitos observáveis;
 - retirar `process.exitCode` das funções de domínio e concentrar a tradução de resultados em códigos de saída na borda;

@@ -4,7 +4,7 @@ import path from "node:path";
 import {lerOpcao} from "../lib/cli-opcoes.js";
 import {exibirAjudaComando} from "../lib/cli-ajuda.js";
 import {ehEntradaPrincipal} from "../lib/execucao.js";
-import {escreverLinha} from "../lib/saida.js";
+import {escreverErro, escreverLinha, imprimirJson} from "../lib/saida.js";
 
 type Prioridade = "P1" | "P2" | "P3";
 
@@ -13,6 +13,8 @@ interface OpcoesPriorizar {
     entradaExplicita: boolean;
     saida: string;
     ajuda: boolean;
+    gravar: boolean;
+    emitirJson: boolean;
 }
 
 interface Pendencia {
@@ -64,6 +66,8 @@ function lerArgumentos(argumentos: string[]): OpcoesPriorizar {
         entradaExplicita: argumentos.includes("--entrada") || argumentos.some((argumento) => argumento.startsWith("--entrada=")),
         saida: lerOpcao(argumentos, "--saida", "priorizacao-testes.md") ?? "priorizacao-testes.md",
         ajuda: argumentos.includes("--help") || argumentos.includes("-h"),
+        gravar: argumentos.includes("--gravar"),
+        emitirJson: argumentos.includes("--json"),
     };
     return resultado;
 }
@@ -76,6 +80,8 @@ function imprimirAjuda() {
         opcoes: [
             '--entrada <arquivo> Arquivo de entrada em JSON ou Markdown',
             '--saida <arquivo>   Arquivo de saida em Markdown',
+            '--gravar             Persiste o relatorio Markdown',
+            '--json               Emite a priorizacao estruturada no stdout',
             '--help, -h          Exibe esta ajuda'
         ],
         exemplos: [
@@ -242,11 +248,22 @@ function principal(argumentos: string[] = process.argv.slice(2)): void {
 
     const caminhoEntrada = opcoes.entradaExplicita ? opcoes.entrada : resolverEntradaPadrao(opcoes.entrada);
     const priorizadas = priorizar(caminhoEntrada);
+    if (opcoes.emitirJson) {
+        imprimirJson(priorizadas);
+    } else if (!opcoes.gravar) {
+        escreverLinha(gerarMarkdown(priorizadas).trimEnd());
+    }
+
+    if (!opcoes.gravar) {
+        return;
+    }
+
     fs.mkdirSync(path.dirname(opcoes.saida), {recursive: true});
     fs.writeFileSync(opcoes.saida, gerarMarkdown(priorizadas), 'utf-8');
-    escreverLinha(`Entrada utilizada: ${caminhoEntrada}`);
-    escreverLinha(`Priorizacao concluida. Encontrados ${priorizadas.P1.length} P1, ${priorizadas.P2.length} P2, ${priorizadas.P3.length} P3.`);
-    escreverLinha(`Plano gerado em: ${opcoes.saida}`);
+    const escreverStatus = opcoes.emitirJson ? escreverErro : escreverLinha;
+    escreverStatus(`Entrada utilizada: ${caminhoEntrada}`);
+    escreverStatus(`Priorizacao concluida. Encontrados ${priorizadas.P1.length} P1, ${priorizadas.P2.length} P2, ${priorizadas.P3.length} P3.`);
+    escreverStatus(`Plano gerado em: ${opcoes.saida}`);
 }
 
 if (ehEntradaPrincipal(import.meta.url)) {

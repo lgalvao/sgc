@@ -52,7 +52,9 @@ O desenho desejado separa:
 
 ```bash
 npx tsx toolkit/sgc.ts backend cobertura auditoria --json
-npx tsx toolkit/sgc.ts backend testes analisar
+npx tsx toolkit/sgc.ts backend testes analisar --json
+npx tsx toolkit/sgc.ts backend testes analisar --gravar --saida analise-testes.md
+npx tsx toolkit/sgc.ts backend testes priorizar --entrada analise-testes.json --gravar
 npx tsx toolkit/sgc.ts backend java corrigir-fqn
 npx tsx toolkit/sgc.ts frontend cobertura auditoria --json
 npx tsx toolkit/sgc.ts frontend residuos validar
@@ -60,6 +62,9 @@ npx tsx toolkit/sgc.ts frontend identificadores-teste listar-duplicados
 ```
 
 `backend java corrigir-fqn` simula por padrão; use `--gravar` para modificar fontes.
+
+`backend testes analisar` e `backend testes priorizar` também são somente leitura por padrão. Use `--json` para alimentar
+agentes e scripts pelo stdout; use `--gravar` para persistir relatórios.
 
 ### Código e integração
 

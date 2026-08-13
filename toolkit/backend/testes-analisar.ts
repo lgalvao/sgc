@@ -6,7 +6,7 @@ import {DIRETORIO_RAIZ} from "../lib/caminhos.js";
 import {resolverCaminhoConfigurado} from "../lib/configuracao.js";
 import {exibirAjudaComando} from "../lib/cli-ajuda.js";
 import {ehEntradaPrincipal} from "../lib/execucao.js";
-import {escreverLinha} from "../lib/saida.js";
+import {escreverErro, escreverLinha, imprimirJson} from "../lib/saida.js";
 import {extrairCoberturaJacoco, type ClasseCobertura} from "../lib/dominios/cobertura-java.js";
 import {
     CATEGORIAS_PRIORITARIAS,
@@ -97,6 +97,8 @@ interface OpcoesAnalisar {
     saidaJson: string | null;
     arquivoJacoco: string | null;
     ajuda: boolean;
+    gravar: boolean;
+    emitirJson: boolean;
 }
 
 interface OpcoesAnaliseTestes {
@@ -122,6 +124,8 @@ function lerArgumentos(argumentos: string[]): OpcoesAnalisar {
         saidaJson: lerOpcao(argumentos, "--saida-json", undefined) ?? null,
         arquivoJacoco: lerOpcao(argumentos, "--arquivo-jacoco", undefined) ?? null,
         ajuda: argumentos.includes("--help") || argumentos.includes("-h"),
+        gravar: argumentos.includes("--gravar"),
+        emitirJson: argumentos.includes("--json"),
     };
     return resultado;
 }
@@ -137,6 +141,8 @@ function imprimirAjuda(): void {
             '--saida <arquivo>       Arquivo de saida em Markdown',
             '--saida-json <arquivo>  Arquivo de saida estruturado em JSON (padrao: sidecar do Markdown)',
             '--arquivo-jacoco <arquivo> Relatorio XML do JaCoCo para classificar cobertura indireta',
+            '--gravar                Persiste os relatorios em Markdown e JSON',
+            '--json                  Emite o relatorio estruturado no stdout',
             '--help, -h              Exibe esta ajuda'
         ],
         exemplos: [
@@ -655,12 +661,21 @@ async function principal(argumentos: string[] = process.argv.slice(2)): Promise<
         caminhoJacocoXml: opcoes.arquivoJacoco,
         base: opcoes.base,
     });
+    if (opcoes.emitirJson) {
+        imprimirJson(dados);
+    } else {
+        imprimirResumoConsole(dados);
+    }
+
+    if (!opcoes.gravar) {
+        return;
+    }
+
     gravarArquivo(opcoes.saida, gerarMarkdown(dados));
     gravarArquivo(caminhoSaidaJson, JSON.stringify(dados, null, 2));
-
-    imprimirResumoConsole(dados);
-    escreverLinha(`Relatorio Markdown gerado em: ${opcoes.saida}`);
-    escreverLinha(`Relatorio JSON gerado em: ${caminhoSaidaJson}`);
+    const escreverStatus = opcoes.emitirJson ? escreverErro : escreverLinha;
+    escreverStatus(`Relatorio Markdown gerado em: ${opcoes.saida}`);
+    escreverStatus(`Relatorio JSON gerado em: ${caminhoSaidaJson}`);
 }
 
 if (ehEntradaPrincipal(import.meta.url)) {

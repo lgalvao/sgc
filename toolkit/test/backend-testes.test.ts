@@ -45,7 +45,7 @@ describe("Análise e priorização dos testes backend", () => {
         const markdown = path.join(diretorioSaida, "relatorio.md");
         const json = path.join(diretorioSaida, "relatorio.json");
 
-        const resultado = await executarSgc(["backend", "testes", "analisar", "--saida", markdown, "--saida-json", json]);
+        const resultado = await executarSgc(["backend", "testes", "analisar", "--gravar", "--saida", markdown, "--saida-json", json]);
 
         expect(resultado.exitCode).toBe(0);
         expect(resultado.stdout).toContain("Resumo:");
@@ -62,6 +62,40 @@ describe("Análise e priorização dos testes backend", () => {
         expect(typeof conteudoJson.estatisticas.classes_fora_escopo_jacoco).toBe("number");
         expect(typeof conteudoJson.estatisticas.classes_ruido_ignorado).toBe("number");
         expect(conteudoJson.categorias.Repositories.tested.length).toBeGreaterThanOrEqual(1);
+    }, 60000);
+
+    test("analisa testes sem gravar por padrao e permite JSON no stdout", async () => {
+        const base = await mkdtemp(path.join(os.tmpdir(), "sgc-testes-analisar-somente-leitura-"));
+        const fonte = path.join(base, "backend", "src", "main", "java", "com", "exemplo");
+        const testes = path.join(base, "backend", "src", "test", "java", "com", "exemplo");
+        const markdown = path.join(base, "relatorio.md");
+        const json = path.join(base, "relatorio.json");
+
+        await escreverArquivo(
+            path.join(fonte, "ExemploService.java"),
+            "package com.exemplo; public class ExemploService { public String buscar() { return \"ok\"; } }"
+        );
+        await escreverArquivo(path.join(testes, "ExemploServiceTest.java"), "package com.exemplo; class ExemploServiceTest {}");
+
+        const resultado = await executarSgc([
+            "backend",
+            "testes",
+            "analisar",
+            "--base",
+            base,
+            "--diretorio",
+            "backend",
+            "--saida",
+            markdown,
+            "--saida-json",
+            json,
+            "--json"
+        ]);
+
+        expect(resultado.exitCode).toBe(0);
+        expect(() => JSON.parse(resultado.stdout)).not.toThrow();
+        expect(await existe(markdown)).toBe(false);
+        expect(await existe(json)).toBe(false);
     }, 60000);
 
     test("analisa fontes e testes backend pelos diretorios configurados", async () => {
@@ -91,6 +125,7 @@ describe("Análise e priorização dos testes backend", () => {
             "backend",
             "testes",
             "analisar",
+            "--gravar",
             "--base",
             base,
             "--saida",
@@ -125,6 +160,7 @@ describe("Análise e priorização dos testes backend", () => {
             "backend",
             "testes",
             "analisar",
+            "--gravar",
             "--base",
             base,
             "--diretorio",
@@ -165,6 +201,7 @@ describe("Análise e priorização dos testes backend", () => {
             "backend",
             "testes",
             "analisar",
+            "--gravar",
             "--diretorio",
             backendDir,
             "--saida",
@@ -212,6 +249,7 @@ describe("Análise e priorização dos testes backend", () => {
             "backend",
             "testes",
             "analisar",
+            "--gravar",
             "--diretorio",
             backendDir,
             "--saida",
@@ -263,6 +301,7 @@ describe("Análise e priorização dos testes backend", () => {
             "backend",
             "testes",
             "analisar",
+            "--gravar",
             "--diretorio",
             backendDir,
             "--saida",
@@ -334,6 +373,7 @@ describe("Análise e priorização dos testes backend", () => {
             "backend",
             "testes",
             "analisar",
+            "--gravar",
             "--diretorio",
             backendDir,
             "--saida",
@@ -385,7 +425,7 @@ describe("Análise e priorização dos testes backend", () => {
             }
         });
 
-        const resultado = await executarScriptTestesPriorizar(["--saida", saida], {cwd: diretorioSaida});
+        const resultado = await executarScriptTestesPriorizar(["--gravar", "--saida", saida], {cwd: diretorioSaida});
 
         expect(resultado.exitCode).toBe(0);
         expect(resultado.stdout).toContain("Entrada utilizada: analise-testes.json");
@@ -394,6 +434,25 @@ describe("Análise e priorização dos testes backend", () => {
         const conteudo = await lerArquivo(saida, "utf-8");
         expect(conteudo).toContain("sgc/mapa/service/MapaCriticoService.java");
         expect(conteudo).toContain("sgc/mapa/model/CompetenciaRepo.java");
+    });
+
+    test("prioriza testes em stdout sem gravar por padrao", async () => {
+        const diretorioSaida = await mkdtemp(path.join(os.tmpdir(), "sgc-testes-priorizar-somente-leitura-"));
+        const entrada = path.join(diretorioSaida, "analise-testes.json");
+
+        await escreverJson(entrada, {
+            categorias: {
+                Services: {
+                    untested: [{caminho_relativo: "sgc/mapa/service/MapaCriticoService.java"}]
+                }
+            }
+        });
+
+        const resultado = await executarScriptTestesPriorizar(["--entrada", entrada], {cwd: diretorioSaida});
+
+        expect(resultado.exitCode).toBe(0);
+        expect(resultado.stdout).toContain("# Plano de Priorizacao de Testes Unitarios");
+        expect(await existe(path.join(diretorioSaida, "priorizacao-testes.md"))).toBe(false);
     });
 
     test("prioriza apenas backlog acionavel do JSON e preserva evidencia", async () => {
@@ -432,7 +491,7 @@ describe("Análise e priorização dos testes backend", () => {
             }
         });
 
-        const resultado = await executarScriptTestesPriorizar(["--entrada", json, "--saida", saida]);
+        const resultado = await executarScriptTestesPriorizar(["--gravar", "--entrada", json, "--saida", saida]);
 
         expect(resultado.exitCode).toBe(0);
         expect(resultado.stdout).toContain("Encontrados 1 P1, 0 P2, 1 P3");
