@@ -1,5 +1,5 @@
 import {executarNode} from "../lib/execucao.js";
-import {ehEntradaPrincipal} from "../lib/execucao.js";
+import {ehEntradaPrincipal, validarArgumentosEntradaDireta} from "../lib/execucao.js";
 import logger from "../lib/logger.js";
 import {exibirAjudaComando} from "../lib/cli-ajuda.js";
 
@@ -54,7 +54,8 @@ function normalizarArgumentosColeta(argumentos: string[] = []): string[] {
     return resultado;
 }
 
-async function executarColetaQualidade(argumentos: string[] = []): Promise<void> {
+async function executarColetaQualidade(argumentosInformados: string[] = process.argv.slice(2)): Promise<void> {
+    const argumentos = validarArgumentosEntradaDireta(import.meta.url, argumentosInformados);
     if (argumentos.includes("--help") || argumentos.includes("-h")) {
         exibirAjudaComando({
             comandoSgc: "qualidade coletar",

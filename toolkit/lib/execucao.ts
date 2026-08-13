@@ -1,7 +1,6 @@
 import {existsSync} from "node:fs";
 import path from "node:path";
-import {pathToFileURL} from "node:url";
-import {fileURLToPath} from "node:url";
+import {fileURLToPath, pathToFileURL} from "node:url";
 import {execa} from "execa";
 import {DIRETORIO_RAIZ, DIRETORIO_TOOLKIT} from "./caminhos.js";
 import {obterDefinicaoComandoArquivo} from "./catalogo-comandos.js";

@@ -17,6 +17,7 @@ const CAMINHO_FRONTEND_COBERTURA_AUDITORIA = path.join(
 const DIRETORIO_SCRIPTS_BACKEND_LEGADO = path.join(DIRETORIO_RAIZ, "backend", "etc", "scripts");
 const DIRETORIO_SCRIPTS_FRONTEND_LEGADO = path.join(DIRETORIO_RAIZ, "frontend", "etc", "scripts");
 const CAMINHO_INVENTARIO_SIMBOLOS = path.join(DIRETORIO_RAIZ, "toolkit", "codigo", "nomes-simbolos-coletar.ts");
+const CAMINHO_COLETA_QUALIDADE = path.join(DIRETORIO_RAIZ, "toolkit", "qualidade", "coleta.ts");
 
 async function executarAjudaFrontendCobertura(): Promise<{exitCode?: number; stdout: string}> {
     const resultado = await execa(CAMINHO_TSX, [CAMINHO_FRONTEND_COBERTURA_AUDITORIA, "--help"], {
@@ -93,6 +94,16 @@ describe("Superfície da CLI", () => {
 
         expect(resultado.exitCode).toBe(0);
         expect(resultado.stdout).toContain("Gera inventario completo");
+    });
+
+    test("aplica o contrato ao entrypoint direto de coleta de qualidade", async () => {
+        const resultado = await execa(CAMINHO_TSX, [CAMINHO_COLETA_QUALIDADE, "--opcao-inexistente"], {
+            cwd: DIRETORIO_RAIZ,
+            reject: false,
+        });
+
+        expect(resultado.exitCode).not.toBe(0);
+        expect(`${resultado.stdout}\n${resultado.stderr}`).toContain("Opção desconhecida");
     });
 
     test("exibe ajuda padronizada no script frontend cobertura auditoria", async () => {

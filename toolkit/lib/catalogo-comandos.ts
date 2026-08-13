@@ -24,6 +24,8 @@ type DefinicaoComandoArquivo = DefinicaoComando & Readonly<{
     arquivo: string;
 }>;
 
+type DefinicaoComandoCatalogada = DefinicaoComando | DefinicaoComandoArquivo;
+
 const CATALOGO_COMANDOS = [
     {
         caminho: ["backend", "cobertura", "auditoria"],
@@ -289,7 +291,8 @@ const CATALOGO_COMANDOS_ESPECIAIS = [
         descricao: "Coleta uma fotografia de qualidade do projeto.",
         escopo: "adaptavel",
         efeito: "orquestracao",
-        argumentos: esquema(["--perfil", "--base"])
+        argumentos: esquema(["--perfil", "--base"]),
+        arquivo: "qualidade/coleta.ts"
     },
     {
         caminho: ["qualidade", "tarefas", "executar"],
@@ -326,12 +329,17 @@ const CATALOGO_COMANDOS_ESPECIAIS = [
         efeito: "mutacao",
         argumentos: esquema(["--base"], ["--json", "--confirmar"])
     }
-] as const satisfies readonly DefinicaoComando[];
+] as const satisfies readonly (DefinicaoComando | DefinicaoComandoArquivo)[];
 
-const CATALOGO_COMANDOS_COMPLETO = [...CATALOGO_COMANDOS, ...CATALOGO_COMANDOS_ESPECIAIS] as const;
+const CATALOGO_COMANDOS_COMPLETO: readonly DefinicaoComandoCatalogada[] = [
+    ...CATALOGO_COMANDOS,
+    ...CATALOGO_COMANDOS_ESPECIAIS
+];
 
-function obterDefinicaoComandoArquivo(arquivo: string): (typeof CATALOGO_COMANDOS)[number] | undefined {
-    return CATALOGO_COMANDOS.find(definicao => definicao.arquivo === arquivo);
+function obterDefinicaoComandoArquivo(arquivo: string): DefinicaoComandoArquivo | undefined {
+    return CATALOGO_COMANDOS_COMPLETO.find(
+        (item): item is DefinicaoComandoArquivo => "arquivo" in item && item.arquivo === arquivo
+    );
 }
 
 export {
