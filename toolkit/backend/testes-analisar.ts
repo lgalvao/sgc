@@ -109,7 +109,7 @@ interface OpcoesAnaliseTestes {
 
 function lerArgumentos(argumentos: string[]): OpcoesAnalisar {
     const base = path.resolve(lerOpcao(argumentos, "--base", DIRETORIO_RAIZ) ?? DIRETORIO_RAIZ);
-    const diretorioInformado = lerOpcao(argumentos, "--dir", undefined);
+    const diretorioInformado = lerOpcao(argumentos, "--diretorio", undefined);
     const raizBackendInformada = diretorioInformado ? path.resolve(diretorioInformado) : null;
     const resultado = {
         base,
@@ -119,9 +119,9 @@ function lerArgumentos(argumentos: string[]): OpcoesAnalisar {
         diretorioTestes: raizBackendInformada
             ? path.join(raizBackendInformada, "src", "test", "java")
             : resolverCaminhoConfigurado("backendTestes", base),
-        saida: lerOpcao(argumentos, "--output", "unit-test-report.md") ?? "unit-test-report.md",
-        saidaJson: lerOpcao(argumentos, "--output-json", undefined) ?? null,
-        arquivoJacoco: lerOpcao(argumentos, "--jacoco-xml", undefined) ?? null,
+        saida: lerOpcao(argumentos, "--saida", "unit-test-report.md") ?? "unit-test-report.md",
+        saidaJson: lerOpcao(argumentos, "--saida-json", undefined) ?? null,
+        arquivoJacoco: lerOpcao(argumentos, "--arquivo-jacoco", undefined) ?? null,
         ajuda: argumentos.includes("--help") || argumentos.includes("-h"),
     };
     return resultado;
@@ -134,14 +134,14 @@ function imprimirAjuda(): void {
         descricao: 'Analisa classes sem testes correspondentes e gera relatorios em Markdown e JSON com resumo por categoria.',
         opcoes: [
             '--base <diretorio>     Base do projeto para resolver configuracao.',
-            '--dir <caminho>         Diretorio de fontes Java; substitui backendCodigo.',
-            '--output <arquivo>      Arquivo de saida em Markdown',
-            '--output-json <arquivo> Arquivo de saida estruturado em JSON (padrao: sidecar do Markdown)',
-            '--jacoco-xml <arquivo>  Relatorio XML do JaCoCo para classificar cobertura indireta',
+            '--diretorio <caminho>   Diretorio de fontes Java; substitui backendCodigo.',
+            '--saida <arquivo>       Arquivo de saida em Markdown',
+            '--saida-json <arquivo>  Arquivo de saida estruturado em JSON (padrao: sidecar do Markdown)',
+            '--arquivo-jacoco <arquivo> Relatorio XML do JaCoCo para classificar cobertura indireta',
             '--help, -h              Exibe esta ajuda'
         ],
         exemplos: [
-            "npx tsx toolkit/sgc.ts backend testes analisar --dir backend --output analise-testes.md --output-json analise-testes.json"
+            "npx tsx toolkit/sgc.ts backend testes analisar --diretorio backend --saida analise-testes.md --saida-json analise-testes.json"
         ]
     });
 }

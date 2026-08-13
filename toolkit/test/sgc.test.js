@@ -2251,7 +2251,7 @@ describe("CLI raiz do toolkit", () => {
         const markdown = path.join(diretorioSaida, "relatorio.md");
         const json = path.join(diretorioSaida, "relatorio.json");
 
-        const resultado = await executarSgc(["backend", "testes", "analisar", "--output", markdown, "--output-json", json]);
+        const resultado = await executarSgc(["backend", "testes", "analisar", "--saida", markdown, "--saida-json", json]);
 
         expect(resultado.exitCode).toBe(0);
         expect(resultado.stdout).toContain("Resumo:");
@@ -2299,9 +2299,9 @@ describe("CLI raiz do toolkit", () => {
             "analisar",
             "--base",
             base,
-            "--output",
+            "--saida",
             markdown,
-            "--output-json",
+            "--saida-json",
             json
         ]);
 
@@ -2335,11 +2335,11 @@ describe("CLI raiz do toolkit", () => {
             "backend",
             "testes",
             "analisar",
-            "--dir",
+            "--diretorio",
             backendDir,
-            "--output",
+            "--saida",
             markdown,
-            "--output-json",
+            "--saida-json",
             json
         ], {cwd: base});
 
@@ -2382,11 +2382,11 @@ describe("CLI raiz do toolkit", () => {
             "backend",
             "testes",
             "analisar",
-            "--dir",
+            "--diretorio",
             backendDir,
-            "--output",
+            "--saida",
             markdown,
-            "--output-json",
+            "--saida-json",
             json
         ], {cwd: base});
 
@@ -2433,11 +2433,11 @@ describe("CLI raiz do toolkit", () => {
             "backend",
             "testes",
             "analisar",
-            "--dir",
+            "--diretorio",
             backendDir,
-            "--output",
+            "--saida",
             markdown,
-            "--output-json",
+            "--saida-json",
             json
         ], {cwd: base});
 
@@ -2505,13 +2505,13 @@ describe("CLI raiz do toolkit", () => {
             "backend",
             "testes",
             "analisar",
-            "--dir",
+            "--diretorio",
             backendDir,
-            "--output",
+            "--saida",
             markdown,
-            "--output-json",
+            "--saida-json",
             json,
-            "--jacoco-xml",
+            "--arquivo-jacoco",
             jacoco
         ], {cwd: base});
 

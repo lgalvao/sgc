@@ -258,6 +258,8 @@ frontend e para os caminhos OpenAPI.
 - `backend/testes-analisar.ts` foi convertido para TypeScript; índices de testes, categorias, estatísticas, cobertura
   JaCoCo e relatórios Markdown/JSON agora têm contratos explícitos, mantendo a resolução configurável de `backendCodigo`
   e `backendTestes` e as classificações SGC de DTOs, models e outros.
+- `backend/testes-analisar.ts` e `backend/testes-priorizar.ts` agora expõem opções em português (`--diretorio`,
+  `--entrada`, `--saida`, `--saida-json`, `--arquivo-jacoco`), sem alterar as chaves estruturadas do relatório.
 - `backend/contratos-auditar.ts` foi convertido para TypeScript com tipos para imports, retornos de controllers, campos
   expostos, índice Java, modelos e achados; a política SGC de detectar `model.*` em DTOs permanece e agora tem fixture
   externo cobrindo JSON, `backendCodigo` configurado e gravação explícita com `--gravar`.
@@ -437,7 +439,7 @@ O núcleo TypeScript de implementação foi concluído: 100% dos arquivos de imp
 | Resolvido | Efeito colateral oculto de gravação | `codigo nomes auditar-consistencia` gerava o inventário auxiliar com gravação habilitada e contaminava `--json`; a opção `--gravar` agora é propagada e a coleta interna é silenciosa. |
 | Resolvido | Configuração sem validação | `configuracao-toolkit.json` agora exige a versão `1` e valida estrutura, chaves conhecidas e caminhos textuais antes da combinação com defaults. |
 | Resolvido nesta rodada | Políticas de resíduos apontando para legado ausente | Os defaults de orçamento e exceções frontend foram removidos; overrides continuam aceitos, a ausência usa política neutra explícita e arquivo configurado ausente ou inválido falha visivelmente. |
-| Média | Opções e efeitos divergentes | O priorizador de testes já usa `--entrada`/`--saida`; ainda há comandos legados com `--input`/`--output`, `--dir` e defaults locais, além de geradores com contratos de gravação distintos. |
+| Média | Opções e efeitos divergentes | O priorizador e o analisador de testes já usam opções em português; ainda há comandos legados com `--output`, `--dir` e defaults locais, além de geradores com contratos de gravação distintos. |
 | Resolvido nesta rodada | Testes não representam pacote externo | A suíte interna continua separada do smoke de distribuição, e `npm run test:pacote` empacota, instala em diretório isolado e executa o binário sem dependências hoisted do monorepo. |
 | Média | Cobertura funcional não medida | `@vitest/coverage-v8` está instalado, mas não há script, threshold ou relatório de cobertura do próprio toolkit. Quantidade de testes não mede contratos não exercitados. |
 | Média | Roteador monolítico e inventário duplicado | `sgc.ts` registra todos os comandos e a documentação repete a lista manualmente; é fácil haver deriva de nomes, extensões e ajuda. |
