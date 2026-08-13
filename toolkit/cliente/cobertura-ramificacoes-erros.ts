@@ -69,7 +69,7 @@ async function principal(argumentosInformados: string[] = process.argv.slice(2))
     if (exibirAjuda) {
         exibirAjudaComando({
             comandoSgc: "frontend cobertura ramificacoes-erros",
-            scriptDireto: "frontend/cobertura-ramificacoes-erros.ts",
+            scriptDireto: "cliente/cobertura-ramificacoes-erros.ts",
             descricao: "Cruza lacunas de ramificacoes do frontend com sinais de tratamento de erro suspeito.",
             opcoes: [
                 "--json          Saída estruturada em JSON.",

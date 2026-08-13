@@ -225,7 +225,7 @@ async function gravarRelatorios(relatorio: RelatorioArquitetura, diretorioSaida:
 function exibirAjuda(): void {
     exibirAjudaComando({
         comandoSgc: "backend arquitetura auditar",
-        scriptDireto: "backend/arquitetura-auditar.ts",
+        scriptDireto: "servidor/arquitetura-auditar.ts",
         descricao: "Audita Services, Facades e Controllers do backend detectando god objects por linhas, métodos e dependências.",
         opcoes: [
             "--json              Emite o relatório em JSON.",

@@ -122,7 +122,7 @@ async function auditarAssuntos(base: string): Promise<RelatorioAssuntos> {
 function exibirAjuda(): void {
     exibirAjudaComando({
         comandoSgc: "backend notificacoes auditar-assuntos",
-        scriptDireto: "backend/notificacoes-assuntos-auditar.ts",
+        scriptDireto: "servidor/notificacoes-assuntos-auditar.ts",
         descricao: "Audita literais de assunto de notificação fora de AssuntosNotificacao.",
         opcoes: [
             "--json              Emite o relatório em JSON.",

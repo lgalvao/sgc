@@ -230,7 +230,7 @@ function lerArgumentos(argumentos: string[]): OpcoesCorretorFqn {
 function exibirAjuda(): void {
     exibirAjudaComando({
         comandoSgc: "backend java corrigir-fqn",
-        scriptDireto: "backend/java-corrigir-fqn.ts",
+        scriptDireto: "servidor/java-corrigir-fqn.ts",
         descricao: "Substitui nomes totalmente qualificados por imports em arquivos Java.",
         opcoes: [
             "--gravar            Persiste as substituições nos arquivos Java.",

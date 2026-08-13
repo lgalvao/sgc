@@ -106,7 +106,7 @@ async function principal(argumentosInformados: string[] = process.argv.slice(2))
     if (exibirAjuda) {
         exibirAjudaComando({
             comandoSgc: "frontend modais validar",
-            scriptDireto: "frontend/modais-validar.ts",
+            scriptDireto: "cliente/modais-validar.ts",
             descricao: "Valida que apenas ModalPadrao abre BModal diretamente no frontend.",
             opcoes: [
                 "--json               Emite o resultado bruto em JSON.",

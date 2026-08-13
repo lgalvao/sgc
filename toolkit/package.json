@@ -12,9 +12,9 @@
   "files": [
     "binarios",
     "*.ts",
-    "backend/**/*.ts",
+    "servidor/**/*.ts",
     "codigo/**/*.ts",
-    "frontend/**/*.ts",
+    "cliente/**/*.ts",
     "integracao/**/*.ts",
     "biblioteca/**/*.ts",
     "projeto/**/*.ts",

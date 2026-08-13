@@ -271,8 +271,8 @@ toolkit horizontal pertence exclusivamente ao SGC.
 
 ### 6. Reduzir concentração de responsabilidades
 
-Tratar primeiro `frontend/arquitetura-lib.ts`, `backend/testes-analisar.ts`,
-`codigo/nomes-simbolos-coletar.ts` e `frontend/residuos-lib.ts`.
+Tratar primeiro `cliente/arquitetura-lib.ts`, `servidor/testes-analisar.ts`,
+`codigo/nomes-simbolos-coletar.ts` e `cliente/residuos-lib.ts`.
 
 - separar somente fronteiras coesas, como coleta, regras, agregação, formatação e persistência;
 - manter juntas regras que mudam pelo mesmo motivo, mesmo em arquivos extensos;

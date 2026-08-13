@@ -78,7 +78,7 @@ async function principal(argumentosInformados: string[] = process.argv.slice(2))
     if (exibirAjuda) {
         exibirAjudaComando({
             comandoSgc: "frontend identificadores-teste listar-duplicados",
-            scriptDireto: "frontend/identificadores-teste-listar-duplicados.ts",
+            scriptDireto: "cliente/identificadores-teste-listar-duplicados.ts",
             descricao: "Lista identificadores de teste duplicados nos templates Vue.",
             opcoes: [
                 "--json               Emite os duplicados em JSON.",

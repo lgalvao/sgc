@@ -395,7 +395,7 @@ async function gravarRelatorio(relatorio: RelatorioContratos, diretorioSaida: st
 function exibirAjuda(): void {
     exibirAjudaComando({
         comandoSgc: "backend contratos auditar",
-        scriptDireto: "backend/contratos-auditar.ts",
+        scriptDireto: "servidor/contratos-auditar.ts",
         descricao: "Audita DTOs e responses expostos por controllers para detectar vazamento de tipos model.* no contrato HTTP.",
         opcoes: [
             "--json              Emite o relatório em JSON.",

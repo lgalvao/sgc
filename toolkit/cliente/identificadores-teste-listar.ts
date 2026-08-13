@@ -42,7 +42,7 @@ async function principal(argumentosInformados: string[] = process.argv.slice(2))
     if (exibirAjuda) {
         exibirAjudaComando({
             comandoSgc: "frontend identificadores-teste listar",
-            scriptDireto: "frontend/identificadores-teste-listar.ts",
+            scriptDireto: "cliente/identificadores-teste-listar.ts",
             descricao: "Lista identificadores de teste declarados em templates Vue.",
             opcoes: [
                 "--json               Emite os identificadores em JSON.",

@@ -257,7 +257,7 @@ async function gravarRelatorios(relatorio: RelatorioCoesao, diretorioSaida: stri
 function exibirAjuda(): void {
     exibirAjudaComando({
         comandoSgc: "backend coesao auditar",
-        scriptDireto: "backend/coesao-auditar.ts",
+        scriptDireto: "servidor/coesao-auditar.ts",
         descricao: "Audita Services do backend detectando mistura de responsabilidades (consulta, mutação, workflow, notificação, permissão).",
         opcoes: [
             "--json              Emite o relatório em JSON.",

@@ -105,7 +105,7 @@ describe("Auditoria arquitetural do frontend", () => {
         expect(conteudo.pontosCriticos[0].pontuacao).toBeTypeOf("number");
         expect(conteudo.pontosCriticos.some((pontoCritico: PontoArquiteturalJson) => pontoCritico.hubCentral && pontoCritico.sinaisAtivos.includes("superficieAmpla"))).toBe(false);
         expect(conteudo.hotspots).toBeUndefined();
-        expect(await existe(path.join(base, "toolkit", "qualidade", "artefatos", "frontend-arquitetura"))).toBe(false);
+        expect(await existe(path.join(base, "toolkit", "qualidade", "artefatos", "arquitetura-cliente"))).toBe(false);
 
         const diretorioSaida = path.join("artefatos", "arquitetura");
         const gravacao = await executarSgc([
@@ -141,7 +141,7 @@ describe("Auditoria arquitetural do frontend", () => {
             "toolkit",
             "qualidade",
             "artefatos",
-            "frontend-arquitetura",
+            "arquitetura-cliente",
             "mais-recente",
             "fotografia.json"
         ))).toBe(true);

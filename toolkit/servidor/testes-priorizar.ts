@@ -81,7 +81,7 @@ function lerArgumentos(argumentos: string[]): OpcoesPriorizar {
 function imprimirAjuda() {
     exibirAjudaComando({
         comandoSgc: "backend testes priorizar",
-        scriptDireto: "backend/testes-priorizar.ts",
+        scriptDireto: "servidor/testes-priorizar.ts",
         descricao: 'Prioriza o backlog de testes a partir do relatorio estruturado ou Markdown.',
         opcoes: [
             '--entrada <arquivo> Arquivo de entrada em JSON ou Markdown',

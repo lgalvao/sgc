@@ -87,7 +87,7 @@ async function principal(argumentosInformados: string[] = process.argv.slice(2))
     if (exibirAjuda) {
         exibirAjudaComando({
             comandoSgc: 'frontend cobertura auditoria',
-            scriptDireto: 'frontend/cobertura-auditoria.ts',
+            scriptDireto: 'cliente/cobertura-auditoria.ts',
             descricao: 'Auditoria unificada de cobertura e risco (Frontend).',
             opcoes: [
                 '--json     Saída em formato JSON para integração com outras ferramentas.',

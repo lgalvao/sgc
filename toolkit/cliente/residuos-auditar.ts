@@ -43,7 +43,7 @@ async function principal(argumentosInformados: string[] = process.argv.slice(2))
     if (exibirAjuda) {
         exibirAjudaComando({
             comandoSgc: "frontend residuos auditar",
-            scriptDireto: "frontend/residuos-auditar.ts",
+            scriptDireto: "cliente/residuos-auditar.ts",
             descricao: "Audita sinais de residuos estruturais e defensividade acidental no frontend.",
             opcoes: [
                 "--json               Emite a fotografia em JSON.",

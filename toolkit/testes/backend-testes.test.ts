@@ -25,7 +25,7 @@ interface RelatorioAnaliseTestesJson {
     categorias: Record<string, {comTeste: ObjetoJson[]; semTeste: ObjetoJson[]}>;
 }
 
-const CAMINHO_TESTES_PRIORIZAR = path.join(DIRETORIO_RAIZ, "toolkit", "backend", "testes-priorizar.ts");
+const CAMINHO_TESTES_PRIORIZAR = path.join(DIRETORIO_RAIZ, "toolkit", "servidor", "testes-priorizar.ts");
 
 async function executarScriptTestesPriorizar(args: string[], opcoes: Options = {}): Promise<ResultadoExecucao> {
     const resultado = await execa(CAMINHO_TSX, [CAMINHO_TESTES_PRIORIZAR, ...args], {

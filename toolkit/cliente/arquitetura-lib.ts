@@ -169,7 +169,7 @@ interface OpcoesPontuacaoArquivo {
 }
 
 function resolverDiretorioSaidaArquitetura(base: string = DIRETORIO_RAIZ): string {
-    return path.join(resolverCaminhoConfigurado("artefatosQualidade", base), "frontend-arquitetura", "mais-recente");
+    return path.join(resolverCaminhoConfigurado("artefatosQualidade", base), "arquitetura-cliente", "mais-recente");
 }
 
 function normalizarCaminho(caminhoArquivo: string): string {

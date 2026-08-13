@@ -8,18 +8,18 @@ const DIRETORIO_TOOLKIT = path.join(DIRETORIO_RAIZ, "toolkit");
 const CAMINHOS_COMANDOS_TESTES_BACKEND = [
     "testes-analisar.ts",
     "testes-priorizar.ts"
-].map(nome => path.join(DIRETORIO_TOOLKIT, "backend", nome));
+].map(nome => path.join(DIRETORIO_TOOLKIT, "servidor", nome));
 const CAMINHOS_COMANDOS_COBERTURA_BACKEND = [
     "cobertura-ramificacoes.ts",
     "cobertura-auditoria.ts"
-].map(nome => path.join(DIRETORIO_TOOLKIT, "backend", nome));
+].map(nome => path.join(DIRETORIO_TOOLKIT, "servidor", nome));
 const CAMINHOS_COMANDOS_AUDITORIA_BACKEND = [
     "arquitetura-auditar.ts",
     "coesao-auditar.ts",
     "contratos-auditar.ts"
-].map(nome => path.join(DIRETORIO_TOOLKIT, "backend", nome));
-const CAMINHO_CORRIGIR_FQN = path.join(DIRETORIO_TOOLKIT, "backend", "java-corrigir-fqn.ts");
-const CAMINHO_AUDITORIA_ASSUNTOS = path.join(DIRETORIO_TOOLKIT, "backend", "notificacoes-assuntos-auditar.ts");
+].map(nome => path.join(DIRETORIO_TOOLKIT, "servidor", nome));
+const CAMINHO_CORRIGIR_FQN = path.join(DIRETORIO_TOOLKIT, "servidor", "java-corrigir-fqn.ts");
+const CAMINHO_AUDITORIA_ASSUNTOS = path.join(DIRETORIO_TOOLKIT, "servidor", "notificacoes-assuntos-auditar.ts");
 
 async function importarSemExecutar(caminho: string): Promise<{exitCode?: number; stdout: string}> {
     const urlModulo = pathToFileURL(caminho).href;

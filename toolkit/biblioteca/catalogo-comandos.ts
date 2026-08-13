@@ -56,7 +56,7 @@ const CATALOGO_COMANDOS = [
         finalidade: "auditar",
         efeitos: criarEfeitosComando("opcional"),
         argumentos: esquema(["--base", "--arquivo", "--saida", "--minimo"], ["--json", "--gravar"]),
-        arquivo: "backend/cobertura-auditoria.ts"
+        arquivo: "servidor/cobertura-auditoria.ts"
     },
     {
         caminho: ["backend", "cobertura", "ramificacoes"],
@@ -65,7 +65,7 @@ const CATALOGO_COMANDOS = [
         finalidade: "auditar",
         efeitos: criarEfeitosComando("nenhuma"),
         argumentos: esquema(["--base", "--arquivo", "--limite", "--filtro"], ["--json"]),
-        arquivo: "backend/cobertura-ramificacoes.ts"
+        arquivo: "servidor/cobertura-ramificacoes.ts"
     },
     {
         caminho: ["backend", "arquitetura", "auditar"],
@@ -74,7 +74,7 @@ const CATALOGO_COMANDOS = [
         finalidade: "auditar",
         efeitos: criarEfeitosComando("nenhuma"),
         argumentos: esquema(["--base"], ["--json", "--gravar"]),
-        arquivo: "backend/arquitetura-auditar.ts"
+        arquivo: "servidor/arquitetura-auditar.ts"
     },
     {
         caminho: ["backend", "coesao", "auditar"],
@@ -83,7 +83,7 @@ const CATALOGO_COMANDOS = [
         finalidade: "auditar",
         efeitos: criarEfeitosComando("nenhuma"),
         argumentos: esquema(["--base"], ["--json", "--gravar"]),
-        arquivo: "backend/coesao-auditar.ts"
+        arquivo: "servidor/coesao-auditar.ts"
     },
     {
         caminho: ["backend", "contratos", "auditar"],
@@ -92,7 +92,7 @@ const CATALOGO_COMANDOS = [
         finalidade: "auditar",
         efeitos: criarEfeitosComando("nenhuma"),
         argumentos: esquema(["--base"], ["--json", "--gravar"]),
-        arquivo: "backend/contratos-auditar.ts"
+        arquivo: "servidor/contratos-auditar.ts"
     },
     {
         caminho: ["backend", "testes", "analisar"],
@@ -101,7 +101,7 @@ const CATALOGO_COMANDOS = [
         finalidade: "inventariar",
         efeitos: criarEfeitosComando("opcional"),
         argumentos: esquema(["--base", "--diretorio", "--saida", "--saida-json", "--arquivo-jacoco"], ["--json", "--gravar"]),
-        arquivo: "backend/testes-analisar.ts"
+        arquivo: "servidor/testes-analisar.ts"
     },
     {
         caminho: ["backend", "testes", "priorizar"],
@@ -110,7 +110,7 @@ const CATALOGO_COMANDOS = [
         finalidade: "gerar",
         efeitos: criarEfeitosComando("opcional"),
         argumentos: esquema(["--entrada", "--saida"], ["--json", "--gravar"]),
-        arquivo: "backend/testes-priorizar.ts"
+        arquivo: "servidor/testes-priorizar.ts"
     },
     {
         caminho: ["backend", "java", "corrigir-fqn"],
@@ -119,7 +119,7 @@ const CATALOGO_COMANDOS = [
         finalidade: "transformar",
         efeitos: criarEfeitosComando("opcional"),
         argumentos: esquema(["--base"], ["--gravar"]),
-        arquivo: "backend/java-corrigir-fqn.ts"
+        arquivo: "servidor/java-corrigir-fqn.ts"
     },
     {
         caminho: ["backend", "notificacoes", "auditar-assuntos"],
@@ -128,7 +128,7 @@ const CATALOGO_COMANDOS = [
         finalidade: "auditar",
         efeitos: criarEfeitosComando("nenhuma"),
         argumentos: esquema(["--base"], ["--json"]),
-        arquivo: "backend/notificacoes-assuntos-auditar.ts"
+        arquivo: "servidor/notificacoes-assuntos-auditar.ts"
     },
     {
         caminho: ["frontend", "cobertura", "auditoria"],
@@ -137,7 +137,7 @@ const CATALOGO_COMANDOS = [
         finalidade: "auditar",
         efeitos: criarEfeitosComando("opcional"),
         argumentos: esquema(["--base", "--arquivo", "--saida", "--minimo"], ["--json", "--gravar"]),
-        arquivo: "frontend/cobertura-auditoria.ts"
+        arquivo: "cliente/cobertura-auditoria.ts"
     },
     {
         caminho: ["frontend", "cobertura", "ramificacoes"],
@@ -146,7 +146,7 @@ const CATALOGO_COMANDOS = [
         finalidade: "auditar",
         efeitos: criarEfeitosComando("nenhuma"),
         argumentos: esquema(["--base", "--arquivo", "--limite"], ["--json"]),
-        arquivo: "frontend/cobertura-ramificacoes.ts"
+        arquivo: "cliente/cobertura-ramificacoes.ts"
     },
     {
         caminho: ["frontend", "cobertura", "ramificacoes-erros"],
@@ -155,7 +155,7 @@ const CATALOGO_COMANDOS = [
         finalidade: "auditar",
         efeitos: criarEfeitosComando("nenhuma"),
         argumentos: esquema(["--base", "--arquivo", "--limite"], ["--json"]),
-        arquivo: "frontend/cobertura-ramificacoes-erros.ts"
+        arquivo: "cliente/cobertura-ramificacoes-erros.ts"
     },
     {
         caminho: ["frontend", "residuos", "auditar"],
@@ -164,7 +164,7 @@ const CATALOGO_COMANDOS = [
         finalidade: "auditar",
         efeitos: criarEfeitosComando("opcional"),
         argumentos: esquema(["--base", "--orcamento", "--saida"], ["--json", "--gravar"]),
-        arquivo: "frontend/residuos-auditar.ts"
+        arquivo: "cliente/residuos-auditar.ts"
     },
     {
         caminho: ["frontend", "residuos", "validar"],
@@ -173,7 +173,7 @@ const CATALOGO_COMANDOS = [
         finalidade: "auditar",
         efeitos: criarEfeitosComando("opcional"),
         argumentos: esquema(["--base", "--orcamento", "--excecoes", "--saida"], ["--json", "--json-resumido", "--gravar"]),
-        arquivo: "frontend/residuos-validar.ts"
+        arquivo: "cliente/residuos-validar.ts"
     },
     {
         caminho: ["frontend", "arquitetura", "auditar"],
@@ -182,7 +182,7 @@ const CATALOGO_COMANDOS = [
         finalidade: "auditar",
         efeitos: criarEfeitosComando("opcional"),
         argumentos: esquema(["--base", "--saida"], ["--json", "--gravar"]),
-        arquivo: "frontend/arquitetura-auditar.ts"
+        arquivo: "cliente/arquitetura-auditar.ts"
     },
     {
         caminho: ["frontend", "arquitetura", "validar"],
@@ -191,7 +191,7 @@ const CATALOGO_COMANDOS = [
         finalidade: "auditar",
         efeitos: criarEfeitosComando("nenhuma"),
         argumentos: esquema(["--base"], ["--json"]),
-        arquivo: "frontend/arquitetura-validar.ts"
+        arquivo: "cliente/arquitetura-validar.ts"
     },
     {
         caminho: ["frontend", "views", "templates-validar"],
@@ -200,7 +200,7 @@ const CATALOGO_COMANDOS = [
         finalidade: "auditar",
         efeitos: criarEfeitosComando("nenhuma"),
         argumentos: esquema(["--base"], ["--json"]),
-        arquivo: "frontend/views-templates-validar.ts"
+        arquivo: "cliente/views-templates-validar.ts"
     },
     {
         caminho: ["frontend", "modais", "validar"],
@@ -209,7 +209,7 @@ const CATALOGO_COMANDOS = [
         finalidade: "auditar",
         efeitos: criarEfeitosComando("nenhuma"),
         argumentos: esquema(["--base"], ["--json"]),
-        arquivo: "frontend/modais-validar.ts"
+        arquivo: "cliente/modais-validar.ts"
     },
     {
         caminho: ["frontend", "identificadores-teste", "listar"],
@@ -218,7 +218,7 @@ const CATALOGO_COMANDOS = [
         finalidade: "auditar",
         efeitos: criarEfeitosComando("nenhuma"),
         argumentos: esquema(["--base", "--diretorio"], ["--json"]),
-        arquivo: "frontend/identificadores-teste-listar.ts"
+        arquivo: "cliente/identificadores-teste-listar.ts"
     },
     {
         caminho: ["frontend", "identificadores-teste", "listar-duplicados"],
@@ -227,7 +227,7 @@ const CATALOGO_COMANDOS = [
         finalidade: "auditar",
         efeitos: criarEfeitosComando("nenhuma"),
         argumentos: esquema(["--base", "--diretorio"], ["--json"]),
-        arquivo: "frontend/identificadores-teste-listar-duplicados.ts"
+        arquivo: "cliente/identificadores-teste-listar-duplicados.ts"
     },
     {
         caminho: ["codigo", "cheiros", "auditar"],

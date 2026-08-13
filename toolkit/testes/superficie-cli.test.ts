@@ -11,7 +11,7 @@ import {
 const CAMINHO_FRONTEND_COBERTURA_AUDITORIA = path.join(
     DIRETORIO_RAIZ,
     "toolkit",
-    "frontend",
+    "cliente",
     "cobertura-auditoria.ts"
 );
 const DIRETORIO_SCRIPTS_BACKEND_LEGADO = path.join(DIRETORIO_RAIZ, "backend", "etc", "scripts");

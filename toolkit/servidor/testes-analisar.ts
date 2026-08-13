@@ -135,7 +135,7 @@ function lerArgumentos(argumentos: string[]): OpcoesAnalisar {
 function imprimirAjuda(): void {
     exibirAjudaComando({
         comandoSgc: "backend testes analisar",
-        scriptDireto: "backend/testes-analisar.ts",
+        scriptDireto: "servidor/testes-analisar.ts",
         descricao: 'Analisa classes sem testes correspondentes e gera relatorios em Markdown e JSON com resumo por categoria.',
         opcoes: [
             '--base <diretorio>     Base do projeto para resolver configuracao.',

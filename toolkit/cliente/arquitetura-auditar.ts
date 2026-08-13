@@ -34,7 +34,7 @@ async function principal(argumentosInformados: string[] = process.argv.slice(2))
     if (exibirAjuda) {
         exibirAjudaComando({
             comandoSgc: "frontend arquitetura auditar",
-            scriptDireto: "frontend/arquitetura-auditar.ts",
+            scriptDireto: "cliente/arquitetura-auditar.ts",
             descricao: "Audita vazamentos arquiteturais do frontend, incluindo estrategia de cache exposta nas views, hubs centrais sobrecarregados e server state caseiro.",
             opcoes: [
                 "--json               Emite a fotografia em JSON.",

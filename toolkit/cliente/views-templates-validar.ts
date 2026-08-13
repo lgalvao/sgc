@@ -139,7 +139,7 @@ async function principal(argumentosInformados: string[] = process.argv.slice(2))
     if (exibirAjuda) {
         exibirAjudaComando({
             comandoSgc: "frontend views templates-validar",
-            scriptDireto: "frontend/views-templates-validar.ts",
+            scriptDireto: "cliente/views-templates-validar.ts",
             descricao: "Valida previsibilidade estrutural das views do frontend (shell, header e proibicao de BModal cru).",
             opcoes: [
                 "--json               Emite o resultado bruto em JSON.",

@@ -194,7 +194,7 @@ async function principal(argumentosInformados: string[] = process.argv.slice(2))
     if (exibirAjuda) {
         exibirAjudaComando({
             comandoSgc: "frontend residuos validar",
-            scriptDireto: "frontend/residuos-validar.ts",
+            scriptDireto: "cliente/residuos-validar.ts",
             descricao: "Valida orcamentos e excecoes dos residuos do frontend para impedir regressao estrutural.",
             opcoes: [
                 "--json               Emite o resultado em JSON.",

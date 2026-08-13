@@ -14,12 +14,12 @@ const CAMINHOS_COMANDOS_ESTRUTURA_FRONTEND = [
     "identificadores-teste-listar.ts",
     "identificadores-teste-listar-duplicados.ts",
     "views-templates-validar.ts"
-].map(nome => path.join(DIRETORIO_TOOLKIT, "frontend", nome));
+].map(nome => path.join(DIRETORIO_TOOLKIT, "cliente", nome));
 const CAMINHOS_COMANDOS_COBERTURA_FRONTEND = [
     "cobertura-auditoria.ts",
     "cobertura-ramificacoes.ts",
     "cobertura-ramificacoes-erros.ts"
-].map(nome => path.join(DIRETORIO_TOOLKIT, "frontend", nome));
+].map(nome => path.join(DIRETORIO_TOOLKIT, "cliente", nome));
 async function importarSemExecutar(caminho: string): Promise<{exitCode?: number; stdout: string}> {
     const urlModulo = pathToFileURL(caminho).href;
     const resultado = await execa(process.execPath, [

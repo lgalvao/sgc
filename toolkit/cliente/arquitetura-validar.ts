@@ -155,7 +155,7 @@ async function principal(argumentosInformados: string[] = process.argv.slice(2))
     if (exibirAjuda) {
         exibirAjudaComando({
             comandoSgc: "frontend arquitetura validar",
-            scriptDireto: "frontend/arquitetura-validar.ts",
+            scriptDireto: "cliente/arquitetura-validar.ts",
             descricao: "Valida regras arquiteturais duras do frontend usando resolucao real de modulos.",
             opcoes: [
                 "--json               Emite o resultado bruto em JSON.",

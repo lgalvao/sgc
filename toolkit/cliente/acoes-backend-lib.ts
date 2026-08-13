@@ -282,8 +282,8 @@ async function auditarAcoesBackendFrontend(opcoes: OpcoesAuditoriaAcoes = {}): P
         diretorioBase,
         "toolkit",
         "qualidade",
-        "frontend-arquitetura",
-        "acoes-backend-excecoes.json",
+        "arquitetura-cliente",
+        "acoes-servidor-excecoes.json",
     );
     const excecoes = lerExcecoes(caminhoExcecoes);
     const arquivos = await listarArquivosFrontend(diretorioFrontend);

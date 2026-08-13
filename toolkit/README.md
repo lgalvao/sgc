@@ -37,8 +37,8 @@ toolkit/codigo/cheiros-auditar.ts --opcao-inexistente` falha antes de iniciar a 
 |---|---|
 | `sgc.ts` | entrada e roteamento da CLI |
 | `biblioteca/` | configuração, execução, saída, catálogo e domínios compartilhados |
-| `backend/` | cobertura, arquitetura, contratos, testes e utilidades Java |
-| `frontend/` | cobertura, arquitetura, resíduos e validações Vue |
+| `servidor/` | cobertura, arquitetura, contratos, testes e utilidades Java |
+| `cliente/` | cobertura, arquitetura, resíduos e validações Vue |
 | `codigo/` | auditorias transversais de código, nomes e Semgrep |
 | `integracao/` | contratos OpenAPI |
 | `requisitos/` | análise e auditoria de documentos CDU |
