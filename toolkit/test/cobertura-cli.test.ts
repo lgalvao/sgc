@@ -168,4 +168,31 @@ describe("Auditorias de cobertura da CLI", () => {
         expect(conteudo.totais.total).toBe(1);
         expect(conteudo.arquivos[0].arquivo).toBe(caminhoRelativo);
     });
+
+    test("ignora fontes removidas do relatório ao cruzar ramificações de erro", async () => {
+        const base = await mkdtemp(path.join(os.tmpdir(), "sgc-cobertura-erros-fonte-ausente-"));
+        const caminhoRelatorio = path.join(base, "coverage", "coverage-final.json");
+        await escreverJson(caminhoRelatorio, {
+            [path.join(base, "frontend", "src", "removido.ts")]: {
+                s: {"1": 0},
+                f: {"1": 1},
+                b: {"1": [0, 1]},
+                statementMap: {"1": {}}
+            }
+        });
+
+        const resultado = await executarSgc([
+            "frontend",
+            "cobertura",
+            "ramificacoes-erros",
+            "--json",
+            "--base",
+            base,
+            "--arquivo",
+            caminhoRelatorio
+        ]);
+
+        expect(resultado.exitCode).toBe(0);
+        expect(JSON.parse(resultado.stdout).arquivos).toEqual([]);
+    });
 });

@@ -68,7 +68,7 @@ function obterOpcoesCdu(argumentos: string[] = process.argv.slice(2)): OpcoesCdu
 }
 
 async function listarArquivosCdu(base: string = DIRETORIO_RAIZ): Promise<string[]> {
-    const padrao = normalizarCaminho(path.join(base, "specs", "cdu-*.md"));
+    const padrao = normalizarCaminho(path.join(base, "specs", "cdu", "cdu-*.md"));
     const arquivos = await globby(padrao, {absolute: true});
     return arquivos.toSorted((a, b) => a.localeCompare(b, "pt-BR", {numeric: true}));
 }

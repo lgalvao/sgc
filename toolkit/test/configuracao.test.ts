@@ -5,8 +5,7 @@ import {describe, expect, test} from "vitest";
 import {escreverJson} from "./apoio.js";
 import {carregarConfiguracao, validarConfiguracao, VERSAO_CONFIGURACAO} from "../lib/configuracao.js";
 import {resolverEscoposAuditoria} from "../projeto/dependencias-auditar.js";
-import {resolverEscoposInstalacao} from "../projeto/preparar.js";
-import {executarPerfilQualidade} from "../projeto/qualidade.js";
+import {executarTarefasQualidade} from "../qualidade/tarefas-executar.js";
 
 type ChamadaComando = {
     comando: string;
@@ -68,8 +67,7 @@ describe("Configuracao do toolkit", () => {
                         descricao: "Qualidade externa",
                         tarefas: [{titulo: "Verificar cliente", comando: "node", argumentos: ["--version"]}]
                     }
-                },
-                instalacao: [{titulo: "Instalar cliente", segmento: "cliente"}]
+                }
             }
         });
 
@@ -79,14 +77,8 @@ describe("Configuracao do toolkit", () => {
             diretorio: path.join(base, "cliente"),
             codigoNaoZeroIndicaAchados: true
         }]);
-        expect(resolverEscoposInstalacao(base)).toEqual([{
-            titulo: "Instalar cliente",
-            segmento: "cliente",
-            caminho: path.join(base, "cliente")
-        }]);
-
         const chamadas: ChamadaComando[] = [];
-        await executarPerfilQualidade("rapido", {
+        await executarTarefasQualidade("rapido", {
             base,
             executarComando: async (comando, argumentos, diretorio) => {
                 chamadas.push({comando, argumentos, diretorio});

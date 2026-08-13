@@ -211,70 +211,70 @@ const CATALOGO_COMANDOS = [
     },
     {
         caminho: ["requisitos", "cdus", "inventariar"],
-        descricao: "Inventaria formatos e convenções implícitas dos `specs/cdu-*.md`.",
+        descricao: "Inventaria formatos e convenções implícitas dos `specs/cdu/cdu-*.md`.",
         escopo: "perfil-sgc",
         efeito: "geracao",
         arquivo: "requisitos/cdus-inventariar.ts"
     },
     {
         caminho: ["requisitos", "cdus", "auditar"],
-        descricao: "Audita a estrutura canônica mínima dos `specs/cdu-*.md`.",
+        descricao: "Audita a estrutura canônica mínima dos `specs/cdu/cdu-*.md`.",
         escopo: "perfil-sgc",
         efeito: "auditoria",
         arquivo: "requisitos/cdus-auditar.ts"
     },
     {
         caminho: ["requisitos", "cdus", "auditar-estilo"],
-        descricao: "Audita convenções tipográficas de aspas simples, aspas duplas e crases nos `specs/cdu-*.md`.",
+        descricao: "Audita convenções tipográficas de aspas simples, aspas duplas e crases nos `specs/cdu/cdu-*.md`.",
         escopo: "perfil-sgc",
         efeito: "auditoria",
         arquivo: "requisitos/cdus-auditar-estilo.ts"
     },
     {
         caminho: ["requisitos", "cdus", "inventariar-vocabulario"],
-        descricao: "Inventaria perfis, situações, tipos de processo e elementos de UI recorrentes nos `specs/cdu-*.md`.",
+        descricao: "Inventaria perfis, situações, tipos de processo e elementos de UI recorrentes nos `specs/cdu/cdu-*.md`.",
         escopo: "perfil-sgc",
         efeito: "geracao",
         arquivo: "requisitos/cdus-inventariar-vocabulario.ts"
     },
     {
         caminho: ["requisitos", "cdus", "auditar-vocabulario"],
-        descricao: "Audita variações de vocabulário controlado nos `specs/cdu-*.md`.",
+        descricao: "Audita variações de vocabulário controlado nos `specs/cdu/cdu-*.md`.",
         escopo: "perfil-sgc",
         efeito: "auditoria",
         arquivo: "requisitos/cdus-auditar-vocabulario.ts"
     },
     {
         caminho: ["requisitos", "cdus", "inventariar-mensagens"],
-        descricao: "Inventaria descrições, assuntos, mensagens e toasts recorrentes nos `specs/cdu-*.md`.",
+        descricao: "Inventaria descrições, assuntos, mensagens e toasts recorrentes nos `specs/cdu/cdu-*.md`.",
         escopo: "perfil-sgc",
         efeito: "geracao",
         arquivo: "requisitos/cdus-inventariar-mensagens.ts"
     },
     {
         caminho: ["requisitos", "cdus", "auditar-mensagens"],
-        descricao: "Audita problemas mecânicos em descrições, assuntos, mensagens e toasts dos `specs/cdu-*.md`.",
+        descricao: "Audita problemas mecânicos em descrições, assuntos, mensagens e toasts dos `specs/cdu/cdu-*.md`.",
         escopo: "perfil-sgc",
         efeito: "auditoria",
         arquivo: "requisitos/cdus-auditar-mensagens.ts"
     },
     {
         caminho: ["requisitos", "cdus", "auditar-mensagens-codigo"],
-        descricao: "Compara descrições, mensagens e toasts dos `specs/cdu-*.md` com mensagens canônicas extraídas do código.",
+        descricao: "Compara descrições, mensagens e toasts dos `specs/cdu/cdu-*.md` com mensagens canônicas extraídas do código.",
         escopo: "perfil-sgc",
         efeito: "auditoria",
         arquivo: "requisitos/cdus-auditar-mensagens-codigo.ts"
     },
     {
         caminho: ["requisitos", "cdus", "inventariar-densidade"],
-        descricao: "Inventaria densidade documental dos `specs/cdu-*.md` por palavras, passos e profundidade de listas.",
+        descricao: "Inventaria densidade documental dos `specs/cdu/cdu-*.md` por palavras, passos e profundidade de listas.",
         escopo: "perfil-sgc",
         efeito: "geracao",
         arquivo: "requisitos/cdus-inventariar-densidade.ts"
     },
     {
         caminho: ["requisitos", "cdus", "inventariar-duplicacoes"],
-        descricao: "Inventaria blocos textuais duplicados nos `specs/cdu-*.md`.",
+        descricao: "Inventaria blocos textuais duplicados nos `specs/cdu/cdu-*.md`.",
         escopo: "perfil-sgc",
         efeito: "geracao",
         arquivo: "requisitos/cdus-inventariar-duplicacoes.ts"
@@ -303,6 +303,12 @@ const CATALOGO_COMANDOS_ESPECIAIS = [
         efeito: "orquestracao"
     },
     {
+        caminho: ["qualidade", "tarefas", "executar"],
+        descricao: "Executa tarefas de qualidade configuradas para o projeto.",
+        escopo: "adaptavel",
+        efeito: "orquestracao"
+    },
+    {
         caminho: ["qualidade", "resumo"],
         descricao: "Resume a fotografia de qualidade mais recente.",
         escopo: "nucleo",
@@ -325,18 +331,6 @@ const CATALOGO_COMANDOS_ESPECIAIS = [
         descricao: "Lista ou remove artefatos gerados pelo toolkit e pelas ferramentas de qualidade.",
         escopo: "adaptavel",
         efeito: "mutacao"
-    },
-    {
-        caminho: ["projeto", "qualidade"],
-        descricao: "Executa os perfis consolidados de qualidade do projeto.",
-        escopo: "adaptavel",
-        efeito: "orquestracao"
-    },
-    {
-        caminho: ["projeto", "preparar"],
-        descricao: "Prepara o ambiente do projeto com etapas opcionais.",
-        escopo: "adaptavel",
-        efeito: "orquestracao"
     }
 ] as const satisfies readonly DefinicaoComando[];
 

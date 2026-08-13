@@ -10,13 +10,12 @@ const CAMINHOS_COMANDOS_PROJETO = [
     "dependencias-auditar.ts",
     "ambiente-verificar.ts",
     "artefatos-limpar.ts",
-    "preparar.ts",
-    "qualidade.ts",
     "versao-sincronizar.ts"
 ].map(nome => path.join(DIRETORIO_TOOLKIT, "projeto", nome));
 const CAMINHOS_COMANDOS_QUALIDADE = [
     "coleta.ts",
     "coleta-execucao.ts",
+    "tarefas-executar.ts",
     "resumo.ts"
 ].map(nome => path.join(DIRETORIO_TOOLKIT, "qualidade", nome));
 const CAMINHOS_COMANDOS_CONSISTENCIA = [

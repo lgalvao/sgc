@@ -94,6 +94,9 @@ const requisitos = program.command("requisitos").description("Ferramentas de inv
 criarGrupoComando(requisitos, "cdus", "Inventario e auditoria read-only dos casos de uso.");
 
 const qualidade = program.command("qualidade").description("Ferramentas de coleta e analise da qualidade.");
+const tarefasQualidade = qualidade
+    .command("tarefas")
+    .description("Executa tarefas de qualidade configuradas para o projeto.");
 qualidade
     .command("coletar")
     .description(obterDescricaoComando(["qualidade", "coletar"]))
@@ -170,24 +173,13 @@ artefatos
         await limparArtefatos(opcoes);
     });
 
-projeto
-    .command("qualidade [perfil]")
-    .description(obterDescricaoComando(["projeto", "qualidade"]))
+tarefasQualidade
+    .command("executar [perfil]")
+    .description(obterDescricaoComando(["qualidade", "tarefas", "executar"]))
     .option("--base <diretorio>", "Sobrescreve o diretorio base do projeto.")
     .action(async (perfil = "rapido", opcoes) => {
-        const {executarPerfilQualidade} = await import("./projeto/qualidade.js");
-        await executarPerfilQualidade(perfil, opcoes);
-    });
-
-projeto
-    .command("preparar")
-    .description(obterDescricaoComando(["projeto", "preparar"]))
-    .option("--base <diretorio>", "Sobrescreve o diretório base para preparação.")
-    .option("--instalar-dependencias", "Executa npm install na raiz, no frontend e no toolkit.")
-    .option("--instalar-playwright", "Instala o Chromium do Playwright.")
-    .action(async (opcoes) => {
-        const {executarPreparacao} = await import("./projeto/preparar.js");
-        await executarPreparacao(opcoes);
+        const {executarTarefasQualidade} = await import("./qualidade/tarefas-executar.js");
+        await executarTarefasQualidade(perfil, opcoes);
     });
 
 registrarComandosCatalogados(program);

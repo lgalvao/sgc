@@ -35,15 +35,9 @@ interface PerfilQualidadeConfigurado {
     tarefas: TarefaConfigurada[];
 }
 
-interface EscopoInstalacaoConfigurado {
-    titulo: string;
-    segmento: string;
-}
-
 interface ExecucoesConfiguradas {
     dependencias?: EscopoComandoConfigurado[];
     qualidade?: Record<string, PerfilQualidadeConfigurado>;
-    instalacao?: EscopoInstalacaoConfigurado[];
 }
 
 interface ConfiguracaoToolkit {
@@ -146,31 +140,11 @@ function validarEscoposComando(valor: unknown, caminho: string): EscopoComandoCo
     });
 }
 
-function validarEscoposInstalacao(valor: unknown, caminho: string): EscopoInstalacaoConfigurado[] {
-    if (!Array.isArray(valor)) {
-        throw new Error(`${NOME_ARQUIVO_CONFIGURACAO}.${caminho} deve ser uma lista.`);
-    }
-    return valor.map((item, indice) => {
-        if (!ehObjeto(item)) {
-            throw new Error(`${NOME_ARQUIVO_CONFIGURACAO}.${caminho}[${indice}] deve ser um objeto.`);
-        }
-        const chavesPermitidas = new Set(["titulo", "segmento"]);
-        const chavesDesconhecidas = Object.keys(item).filter(chave => !chavesPermitidas.has(chave));
-        if (chavesDesconhecidas.length > 0) {
-            throw new Error(`${NOME_ARQUIVO_CONFIGURACAO}.${caminho}[${indice}] possui chave(s) desconhecida(s): ${chavesDesconhecidas.join(", ")}.`);
-        }
-        return {
-            titulo: validarTexto(item.titulo, `${caminho}[${indice}].titulo`),
-            segmento: validarTexto(item.segmento, `${caminho}[${indice}].segmento`),
-        };
-    });
-}
-
 function validarExecucoes(valor: unknown): ExecucoesConfiguradas {
     if (!ehObjeto(valor)) {
         throw new Error(`${NOME_ARQUIVO_CONFIGURACAO}.execucoes deve ser um objeto JSON.`);
     }
-    const chavesPermitidas = new Set(["dependencias", "qualidade", "instalacao"]);
+    const chavesPermitidas = new Set(["dependencias", "qualidade"]);
     const chavesDesconhecidas = Object.keys(valor).filter(chave => !chavesPermitidas.has(chave));
     if (chavesDesconhecidas.length > 0) {
         throw new Error(`${NOME_ARQUIVO_CONFIGURACAO}.execucoes possui chave(s) desconhecida(s): ${chavesDesconhecidas.join(", ")}.`);
@@ -179,9 +153,6 @@ function validarExecucoes(valor: unknown): ExecucoesConfiguradas {
     const resultado: ExecucoesConfiguradas = {};
     if (valor.dependencias !== undefined) {
         resultado.dependencias = validarEscoposComando(valor.dependencias, "execucoes.dependencias");
-    }
-    if (valor.instalacao !== undefined) {
-        resultado.instalacao = validarEscoposInstalacao(valor.instalacao, "execucoes.instalacao");
     }
     if (valor.qualidade !== undefined) {
         if (!ehObjeto(valor.qualidade)) {
@@ -351,7 +322,6 @@ export {
     validarConfiguracao,
     type NomeDiretorioConfigurado,
     type EscopoComandoConfigurado,
-    type EscopoInstalacaoConfigurado,
     type PerfilQualidadeConfigurado,
     type TarefaConfigurada
 };

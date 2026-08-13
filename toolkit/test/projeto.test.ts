@@ -8,8 +8,7 @@ import {calcularTotais, construirArvore, ehArquivoTeste, listarArquivosGit, lerO
 import {sincronizarVersao} from "../projeto/versao-sincronizar.js";
 import {executarVerificacaoAmbiente, obterRecursosAmbientePadrao} from "../projeto/ambiente-verificar.js";
 import {limparArtefatos, obterPadroesArtefatos} from "../projeto/artefatos-limpar.js";
-import {resolverEscoposInstalacao} from "../projeto/preparar.js";
-import {executarPerfilQualidade} from "../projeto/qualidade.js";
+import {executarTarefasQualidade} from "../qualidade/tarefas-executar.js";
 import {executarAuditoriaDependencias} from "../projeto/dependencias-auditar.js";
 import {VERSAO_CONFIGURACAO} from "../lib/configuracao.js";
 
@@ -306,32 +305,10 @@ describe("Comandos de projeto do toolkit", () => {
         expect(padroes).not.toContain("complexity-ranking.md");
     });
 
-    test("resolve escopos de instalação a partir da base e da política do projeto", async () => {
-        const diretorioBase = await mkdtemp(path.join(os.tmpdir(), "sgc-preparacao-base-"));
-
-        const escopos = resolverEscoposInstalacao(diretorioBase, [
-            {titulo: "Instalar dependencias do cliente", segmento: "cliente"},
-            {titulo: "Instalar dependencias do servidor", segmento: "servicos/api"}
-        ]);
-
-        expect(escopos).toEqual([
-            {
-                titulo: "Instalar dependencias do cliente",
-                segmento: "cliente",
-                caminho: path.join(diretorioBase, "cliente")
-            },
-            {
-                titulo: "Instalar dependencias do servidor",
-                segmento: "servicos/api",
-                caminho: path.join(diretorioBase, "servicos/api")
-            }
-        ]);
-    });
-
     test("executa catálogo de qualidade externo na base indicada", async () => {
         const diretorioBase = await mkdtemp(path.join(os.tmpdir(), "sgc-qualidade-base-"));
         const chamadas: ChamadaComando[] = [];
-        const resultado = await executarPerfilQualidade("verificacao", {
+        const resultado = await executarTarefasQualidade("verificacao", {
             base: diretorioBase,
             perfis: {
                 verificacao: {

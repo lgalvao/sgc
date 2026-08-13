@@ -109,7 +109,7 @@ async function executarSgc(args: string[]): Promise<ResultadoExecucao> {
 
 async function criarIntroSituacoes(dirSpecs: string): Promise<void> {
     await escreverArquivo(
-        path.join(dirSpecs, "intro_3_situacoes.md"),
+        path.join(path.dirname(dirSpecs), "intro_3_situacoes.md"),
         [
             "## Situações",
             "",
@@ -145,7 +145,7 @@ describe("Ferramentas de requisitos dos CDUs", () => {
 
     test("inventaria formatos implícitos dos CDUs", async () => {
         const base = await mkdtemp(path.join(os.tmpdir(), "sgc-cdus-inventario-"));
-        const dirSpecs = path.join(base, "specs");
+        const dirSpecs = path.join(base, "specs", "cdu");
 
         await escreverArquivo(
             path.join(dirSpecs, "cdu-01.md"),
@@ -189,7 +189,7 @@ describe("Ferramentas de requisitos dos CDUs", () => {
 
     test("audita a estrutura canônica mínima dos CDUs", async () => {
         const base = await mkdtemp(path.join(os.tmpdir(), "sgc-cdus-auditoria-"));
-        const dirSpecs = path.join(base, "specs");
+        const dirSpecs = path.join(base, "specs", "cdu");
 
         await escreverArquivo(
             path.join(dirSpecs, "cdu-01.md"),
@@ -242,7 +242,7 @@ describe("Ferramentas de requisitos dos CDUs", () => {
         expect(conteudo.resumo.totalArquivos).toBe(2);
         expect(conteudo.resumo.arquivosComErro).toBe(1);
 
-        const invalido = conteudo.relatorio.find(item => item.arquivo === "specs/cdu-02.md")!;
+        const invalido = conteudo.relatorio.find(item => item.arquivo === "specs/cdu/cdu-02.md")!;
         expect(invalido.achados.some(achado => achado.regra === "titulo_numero")).toBe(true);
         expect(invalido.achados.some(achado => achado.regra === "atores_canonicos")).toBe(true);
         expect(invalido.achados.some(achado => achado.regra === "pre_condicoes")).toBe(true);
@@ -251,7 +251,7 @@ describe("Ferramentas de requisitos dos CDUs", () => {
 
     test("audita convenções tipográficas dos CDUs", async () => {
         const base = await mkdtemp(path.join(os.tmpdir(), "sgc-cdus-estilo-"));
-        const dirSpecs = path.join(base, "specs");
+        const dirSpecs = path.join(base, "specs", "cdu");
 
         await escreverArquivo(
             path.join(dirSpecs, "cdu-01.md"),
@@ -287,7 +287,7 @@ describe("Ferramentas de requisitos dos CDUs", () => {
         expect(conteudo.resumo.totalArquivos).toBe(1);
         expect(conteudo.resumo.arquivosComAviso).toBe(1);
 
-        const arquivo = conteudo.relatorio.find(item => item.arquivo === "specs/cdu-01.md")!;
+        const arquivo = conteudo.relatorio.find(item => item.arquivo === "specs/cdu/cdu-01.md")!;
         expect(arquivo.achados.some(achado => achado.regra === "perfil_em_aspas_simples")).toBe(true);
         expect(arquivo.achados.some(achado => achado.regra === "ui_em_aspas_duplas")).toBe(true);
         expect(arquivo.achados.some(achado => achado.regra === "placeholder_legado")).toBe(true);
@@ -295,7 +295,7 @@ describe("Ferramentas de requisitos dos CDUs", () => {
 
     test("inventaria vocabulário controlado dos CDUs", async () => {
         const base = await mkdtemp(path.join(os.tmpdir(), "sgc-cdus-vocabulario-"));
-        const dirSpecs = path.join(base, "specs");
+        const dirSpecs = path.join(base, "specs", "cdu");
 
         await escreverArquivo(
             path.join(dirSpecs, "cdu-01.md"),
@@ -338,7 +338,7 @@ describe("Ferramentas de requisitos dos CDUs", () => {
 
     test("audita vocabulário controlado dos CDUs", async () => {
         const base = await mkdtemp(path.join(os.tmpdir(), "sgc-cdus-vocabulario-auditar-"));
-        const dirSpecs = path.join(base, "specs");
+        const dirSpecs = path.join(base, "specs", "cdu");
 
         await escreverArquivo(
             path.join(dirSpecs, "cdu-01.md"),
@@ -372,7 +372,7 @@ describe("Ferramentas de requisitos dos CDUs", () => {
         expect(resultado.exitCode).toBe(0);
         const conteudo = lerJson<ResultadoAuditoriaCdu>(resultado);
         expect(conteudo.resumo.arquivosComAviso).toBe(1);
-        const arquivo = conteudo.relatorio.find(item => item.arquivo === "specs/cdu-01.md")!;
+        const arquivo = conteudo.relatorio.find(item => item.arquivo === "specs/cdu/cdu-01.md")!;
         expect(arquivo.achados.some(achado => achado.regra === "perfil_fora_vocabulario")).toBe(true);
         expect(arquivo.achados.some(achado => achado.regra === "tipo_processo_variacao")).toBe(true);
         expect(arquivo.achados.some(achado => achado.regra === "situacao_variacao")).toBe(true);
@@ -380,7 +380,7 @@ describe("Ferramentas de requisitos dos CDUs", () => {
 
     test("inventaria mensagens recorrentes dos CDUs", async () => {
         const base = await mkdtemp(path.join(os.tmpdir(), "sgc-cdus-mensagens-"));
-        const dirSpecs = path.join(base, "specs");
+        const dirSpecs = path.join(base, "specs", "cdu");
         await criarIntroSituacoes(dirSpecs);
 
         await escreverArquivo(
@@ -430,7 +430,7 @@ describe("Ferramentas de requisitos dos CDUs", () => {
 
     test("audita problemas mecânicos de mensagens dos CDUs", async () => {
         const base = await mkdtemp(path.join(os.tmpdir(), "sgc-cdus-mensagens-auditar-"));
-        const dirSpecs = path.join(base, "specs");
+        const dirSpecs = path.join(base, "specs", "cdu");
         await criarIntroSituacoes(dirSpecs);
 
         await escreverArquivo(
@@ -469,14 +469,14 @@ describe("Ferramentas de requisitos dos CDUs", () => {
         expect(resultado.exitCode).toBe(0);
         const conteudo = lerJson<ResultadoAuditoriaCdu>(resultado);
         expect(conteudo.resumo.arquivosComAviso).toBe(1);
-        const arquivo = conteudo.relatorio.find(item => item.arquivo === "specs/cdu-01.md")!;
+        const arquivo = conteudo.relatorio.find(item => item.arquivo === "specs/cdu/cdu-01.md")!;
         expect(arquivo.achados.some(achado => achado.regra === "descricao_espacamento")).toBe(true);
         expect(arquivo.achados.some(achado => achado.regra === "assunto_fechamento_suspeito")).toBe(true);
     });
 
     test("compara mensagens dos CDUs com mensagens canônicas do código", async () => {
         const base = await mkdtemp(path.join(os.tmpdir(), "sgc-cdus-mensagens-codigo-"));
-        const dirSpecs = path.join(base, "specs");
+        const dirSpecs = path.join(base, "specs", "cdu");
         await criarIntroSituacoes(dirSpecs);
 
         await escreverArquivo(
@@ -575,7 +575,7 @@ describe("Ferramentas de requisitos dos CDUs", () => {
 
     test("inventaria densidade documental dos CDUs", async () => {
         const base = await mkdtemp(path.join(os.tmpdir(), "sgc-cdus-densidade-"));
-        const dirSpecs = path.join(base, "specs");
+        const dirSpecs = path.join(base, "specs", "cdu");
         await criarIntroSituacoes(dirSpecs);
 
         await escreverArquivo(
@@ -618,7 +618,7 @@ describe("Ferramentas de requisitos dos CDUs", () => {
 
     test("inventaria duplicações textuais dos CDUs", async () => {
         const base = await mkdtemp(path.join(os.tmpdir(), "sgc-cdus-duplicacoes-"));
-        const dirSpecs = path.join(base, "specs");
+        const dirSpecs = path.join(base, "specs", "cdu");
         await criarIntroSituacoes(dirSpecs);
 
         const conteudo = [

@@ -11,13 +11,13 @@ type DefinicaoPerfilQualidade = Omit<PerfilQualidadeConfigurado, "tarefas"> & {t
 
 type CatalogoPerfisQualidade = Record<string, DefinicaoPerfilQualidade>;
 
-interface OpcoesExecucaoPerfil {
+interface OpcoesExecucaoTarefas {
     base?: string;
     perfis?: CatalogoPerfisQualidade;
     executarComando?: ExecutarComando;
 }
 
-interface ResultadoPerfilQualidade {
+interface ResultadoTarefasQualidade {
     diretorioBase: string;
     perfil: string;
     tarefas: string[];
@@ -76,7 +76,7 @@ const executarComandoPadrao: ExecutarComando = async (comando, argumentos, diret
     });
 };
 
-function resolverPerfilQualidade(
+function resolverPerfilTarefasQualidade(
     perfil: string,
     perfis: CatalogoPerfisQualidade = PERFIS_QUALIDADE_SGC
 ): DefinicaoPerfilQualidade {
@@ -88,15 +88,15 @@ function resolverPerfilQualidade(
     return definicao;
 }
 
-async function executarPerfilQualidade(
+async function executarTarefasQualidade(
     perfil: string,
-    opcoes: OpcoesExecucaoPerfil = {}
-): Promise<ResultadoPerfilQualidade> {
+    opcoes: OpcoesExecucaoTarefas = {}
+): Promise<ResultadoTarefasQualidade> {
     const diretorioBase = path.resolve(opcoes.base ?? resolverNaRaiz());
     const perfis = opcoes.perfis
         ?? carregarConfiguracao(diretorioBase).execucoes?.qualidade
         ?? PERFIS_QUALIDADE_SGC;
-    const definicao = resolverPerfilQualidade(perfil, perfis);
+    const definicao = resolverPerfilTarefasQualidade(perfil, perfis);
     const executarComando = opcoes.executarComando ?? executarComandoPadrao;
 
     imprimirCabecalho("Qualidade do projeto", definicao.descricao);
@@ -126,12 +126,12 @@ async function executarPerfilQualidade(
 
 export {
     PERFIS_QUALIDADE_SGC,
-    executarPerfilQualidade,
-    resolverPerfilQualidade,
+    executarTarefasQualidade,
+    resolverPerfilTarefasQualidade,
     type CatalogoPerfisQualidade,
     type DefinicaoPerfilQualidade,
     type ExecutarComando,
-    type OpcoesExecucaoPerfil,
-    type ResultadoPerfilQualidade,
+    type OpcoesExecucaoTarefas,
+    type ResultadoTarefasQualidade,
     type TarefaQualidade
 };

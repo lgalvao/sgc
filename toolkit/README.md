@@ -3,7 +3,7 @@
 ## Papel do módulo
 
 `toolkit/` reúne a CLI de automação do repositório. Ela concentra comandos operacionais e de auditoria usados para
-qualidade, preparação, diagnóstico do projeto e utilidades de backend/frontend.
+qualidade, diagnóstico do projeto e utilidades de backend/frontend.
 
 ### Execução e build
 
@@ -59,7 +59,7 @@ graph TD
 | `codigo/`     | auditorias transversais de cheiros de código                       |
 | `integracao/` | contratos OpenAPI e fronteira backend/frontend                    |
 | `qualidade/`  | coleta e resumo de qualidade                                       |
-| `projeto/`    | preparação, verificação de ambiente e artefatos do repositório     |
+| `projeto/`    | verificação de ambiente, dependências, versões e artefatos do repositório |
 | `test/`       | testes do toolkit                                                 |
 
 ## Exemplos de comandos por domínio
@@ -176,6 +176,7 @@ npx tsx toolkit/sgc.ts requisitos cdus inventariar-duplicacoes
 
 ```bash
 npx tsx toolkit/sgc.ts qualidade coletar --perfil rapido
+npx tsx toolkit/sgc.ts qualidade tarefas executar rapido
 npx tsx toolkit/sgc.ts qualidade resumo
 npx tsx toolkit/sgc.ts qualidade resumo --limite-pontos-criticos 10
 ```
@@ -183,14 +184,16 @@ npx tsx toolkit/sgc.ts qualidade resumo --limite-pontos-criticos 10
 `qualidade resumo --base <diretorio>` informa o caminho da fotografia relativo à base auditada, inclusive quando a
 fotografia é encontrada em `artefatosQualidade/mais-recente`.
 
+`qualidade coletar` executa adaptadores e consolida uma fotografia comparável. `qualidade tarefas executar` executa
+tarefas externas configuradas em `execucoes.qualidade`, sem tentar produzir a fotografia consolidada; são superfícies
+complementares.
+
 ### Projeto
 
 ```bash
 npx tsx toolkit/sgc.ts projeto ambiente verificar
 npx tsx toolkit/sgc.ts projeto dependencias auditar
 npx tsx toolkit/sgc.ts projeto artefatos limpar --confirmar
-npx tsx toolkit/sgc.ts projeto qualidade rapido
-npx tsx toolkit/sgc.ts projeto preparar --instalar-dependencias
 npx tsx toolkit/sgc.ts projeto arvore-linhas
 npx tsx toolkit/sgc.ts projeto versao-sincronizar 1.2.3 --gravar
 ```
@@ -216,7 +219,6 @@ ser verificados quando a base contém `toolkit/sgc.ts`. Catálogos adicionais co
 - auditar residuos e duplicidade no frontend;
 - apoiar evolução da suíte de testes backend;
 - validar divergência entre Bean Validation e validação de UI;
-- preparar ambiente local de desenvolvimento;
 - produzir artefatos de qualidade para inspeção manual.
 
 Os artefatos gerados ficam em `toolkit/qualidade/artefatos/` e são organizados por execução e fotografia mais recente.
@@ -281,16 +283,13 @@ executado na base do projeto ou no segmento informado; `argumentos` deve ser sem
           }
         ]
       }
-    },
-    "instalacao": [
-      {"titulo": "Instalar cliente", "segmento": "cliente"}
-    ]
+    }
   }
 }
 ```
 
-As três listas são independentes: uma configuração que declara somente um perfil de qualidade continua usando os
-defaults SGC para dependências e instalação. Opções explícitas da API ou da CLI têm precedência sobre a configuração;
+As duas listas são independentes: uma configuração que declara somente um perfil de qualidade continua usando os
+defaults SGC para dependências. Opções explícitas da API ou da CLI têm precedência sobre a configuração;
 quando nenhuma delas existe, os defaults SGC preservam o comportamento atual. Os comandos são configuração confiável
 do projeto e não formam uma camada de segurança ou de sandbox.
 

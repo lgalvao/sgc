@@ -42,7 +42,15 @@ function calcularRamificacoesPerdidas(arquivo: ArquivoCobertura): number {
 
 async function coletarLinhasSuspeitas(caminhoRelativo: string, diretorioBase: string): Promise<LinhaSuspeita[]> {
     const caminhoAbsoluto = path.resolve(diretorioBase, caminhoRelativo);
-    const conteudo = await fs.readFile(caminhoAbsoluto, "utf8");
+    let conteudo: string;
+    try {
+        conteudo = await fs.readFile(caminhoAbsoluto, "utf8");
+    } catch (erro: unknown) {
+        if (typeof erro === "object" && erro !== null && "code" in erro && erro.code === "ENOENT") {
+            return [];
+        }
+        throw erro;
+    }
     const linhas = conteudo.split(/\r?\n/);
     return linhas
         .map((linha, indice): LinhaSuspeita => ({numero: indice + 1, texto: linha.trim()}))

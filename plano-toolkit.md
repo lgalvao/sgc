@@ -89,10 +89,9 @@ arquivos pertencem ao comando ou a uma biblioteca de domínio, não ao roteador.
 ### 2.4 Auditorias e efeitos colaterais
 
 - O estado final desejado é: auditorias são read-only por padrão.
-- O comportamento atual ainda não cumpre integralmente essa regra: cobertura e diff OpenAPI ainda têm contratos de
-  geração que precisam ser uniformizados. As famílias já migradas usam `--gravar` como ação positiva; como o SGC tem um
-  único consumidor sob nosso controle, a migração pode inverter o default diretamente, atualizando testes e documentação
-  no mesmo recorte.
+- Exportação e promoção de baseline OpenAPI continuam sendo ações explícitas de geração/mutação. Cobertura e diff OpenAPI
+  já usam leitura por padrão e `--gravar` para persistência; as famílias restantes devem seguir o mesmo contrato quando
+  houver evidência de uso e teste de efeito.
 - Gravação de fotografia, baseline, relatório ou correção deve exigir uma opção explícita e um nome de ação claro.
 - Não normalizar, renumerar ou reescrever documentos apenas durante a leitura.
 - Saída JSON deve ir para stdout sem texto decorativo; logs operacionais e diagnóstico de falha devem ir para stderr.
@@ -400,12 +399,11 @@ documentado.
 - `projeto/artefatos-limpar.ts` foi convertido para TypeScript, substituiu `fs-extra` por APIs nativas do Node e aceita uma
   política de padrões de limpeza injetável; os padrões padrão agora derivam backend, frontend e artefatos de qualidade
   da configuração da base, removendo nomes legados que já não são produzidos.
-- `projeto/preparar.ts` foi convertido para TypeScript; a base efetiva chega ao diagnóstico e aos comandos externos,
-  os escopos de instalação de dependências podem ser fornecidos por projeto e a opção obsoleta `showTimer` do Listr2
-  foi removida.
-- `projeto/qualidade.ts` foi convertido para TypeScript; o catálogo Gradle do SGC continua como default, mas a base,
-  o catálogo de perfis e o executor de comandos podem ser fornecidos por projeto externo ou teste. O catálogo também
-  pode ser declarado em `execucoes.qualidade`.
+- O antigo executor de preparação foi removido nesta rodada após a auditoria de utilidade; instalação de dependências deve
+  ficar sob responsabilidade dos scripts npm/CI, não de um comando do toolkit.
+- O executor genérico de tarefas de qualidade foi movido para `qualidade/tarefas-executar.ts`; a base, o catálogo de perfis
+  e o executor de comandos continuam substituíveis por projeto externo ou teste. O catálogo pode ser declarado em
+  `execucoes.qualidade`.
 - `projeto/dependencias-auditar.ts` foi convertido para TypeScript; os escopos de auditoria, comandos e argumentos
   agora podem ser definidos por projeto. O catálogo padrão foi ampliado para Knip, `npm outdated`, `npm audit` em todos
   os workspaces e `dependencyUpdates` do Gradle; códigos não zero esperados são classificados como achados, enquanto
@@ -415,8 +413,7 @@ documentado.
   `--no-parallel` na chamada porque o projeto ainda declara execução paralela global. O `build.gradle.kts` agora filtra
   as configurações para classpaths do projeto, processadores declarados e `developmentOnly`, excluindo as configurações
   internas de Jacoco/Pitest/SpotBugs que inflavam o relatório com dependências transitivas e ferramentas dos plugins.
-- `projeto/preparar.ts` foi convertido para TypeScript; os escopos de instalação podem ser definidos em
-  `execucoes.instalacao`, preservando raiz, frontend e toolkit como defaults do SGC.
+- A configuração exclusiva de instalação `execucoes.instalacao` foi removida junto com o executor de preparação.
 - `backend/cobertura-ramificacoes.ts` e `backend/cobertura-auditoria.ts` foram convertidos para TypeScript com
   resultados, hotspots, métricas e geração de relatório tipados; a leitura JaCoCo continua delegada ao domínio comum.
 - `frontend/cobertura-ramificacoes.ts`, `frontend/cobertura-ramificacoes-erros.ts` e
@@ -755,7 +752,7 @@ o comportamento atual; não transforma automaticamente todo comando que gera rel
 | Artefato de contrato | `integracao contratos exportar-openapi`, `integracao contratos diff` | Exportação grava OpenAPI; diff apenas grava resumo Markdown com `--gravar`; `fixar-baseline` promove uma referência somente quando chamado. |
 | Mutação de fonte ou baseline | `backend java corrigir-fqn`, `projeto versao-sincronizar`, `integracao contratos fixar-baseline` | Alteram código/configuração ou promovem arquivo. FQN e versão simulam por padrão e exigem `--gravar`; baseline copia diretamente para o destino por ser uma ação de promoção nomeada. |
 | Limpeza confirmada | `projeto artefatos limpar` | Lista em prévia por padrão e remove somente com `--confirmar`; é o modelo de confirmação explícita a preservar. |
-| Orquestração externa | `qualidade coletar`, `projeto qualidade`, `projeto dependencias auditar`, `projeto preparar` | Executam Gradle, npm, Semgrep ou Git e podem criar artefatos fora da biblioteca do toolkit. Precisam de perfil/ação explícita e limites de raiz. Playwright/Axe não pertencem a esta superfície. |
+| Orquestração externa | `qualidade coletar`, `qualidade tarefas executar`, `projeto dependencias auditar` | Executam Gradle, npm, Semgrep ou Git e podem criar artefatos fora da biblioteca do toolkit. Precisam de perfil/ação explícita e limites de raiz. Playwright/Axe não pertencem a esta superfície. |
 
 Achado corrigido nesta rodada: quando `codigo nomes auditar-consistencia` precisa gerar um inventário auxiliar ausente,
 ele só chama a coleta com gravação habilitada se a auditoria recebeu `--gravar`. A propagação de `gravar` e a opção
@@ -815,17 +812,20 @@ regra que deve continuar no toolkit, mas não deve ser apresentada como regra ho
 | Código transversal: `cheiros-auditar`, `nomes-simbolos-coletar`, `nomes-consistencia-auditar`, `semgrep-auditar`, `nomes-caminhos` | Comandos catalogados e usados por qualidade; Semgrep e inventários têm política/saída configuráveis | Manter; núcleo de análise com políticas do perfil | `adaptável` |
 | Idioma e identificadores SGC: `idioma-consistencia-auditar` | A regra de português e `codigo` é uma convenção deliberada deste repositório, não uma verdade universal | Manter no perfil SGC | `perfil-sgc` |
 | Contratos: `contratos-openapi-caminhos`, `contratos-exportar-openapi`, `contratos-diff`, `contratos-fixar-baseline` | Exportação, comparação e baseline continuam documentados e testados; somente o gerador de tipos foi removido | Manter e parametrizar URL/artefatos | `adaptável` |
-| Requisitos/CDUs: `requisitos/cdus-*` | Dez comandos são usados no catálogo e cobrem `specs/cdu-*.md`; mensagens canônicas apontam arquivos concretos do SGC | Manter no perfil SGC; promover apenas primitivas comprovadamente independentes | `perfil-sgc` |
-| Projeto: `arvore-linhas`, `artefatos-limpar`, `ambiente-verificar`, `dependencias-auditar`, `preparar`, `qualidade`, `versao-sincronizar` | Comandos têm uso em scripts/testes e execução manual; base, execuções e diretórios já são configuráveis em graus diferentes | Manter; separar orquestração e defaults SGC; auditoria de dependências cobre saúde npm/Gradle | `adaptável` |
+| Requisitos/CDUs: `requisitos/cdus-*` | Dez comandos cobrem os 55 documentos em `specs/cdu/cdu-*.md`; mensagens canônicas apontam arquivos concretos do SGC | Manter no perfil SGC; inventários são utilitários ocasionais | `perfil-sgc` |
+| Projeto: `arvore-linhas`, `artefatos-limpar`, `ambiente-verificar`, `dependencias-auditar`, `versao-sincronizar` | Comandos têm uso em scripts/testes e execução manual; base e diretórios são configuráveis | Manter; separar orquestração e defaults SGC | `adaptável` |
 | Coleta: `qualidade/coleta`, `coleta-execucao`, `coleta-executor`, `coleta-leitores`, `coleta-fotografia`, `coleta-contexto`, `coleta-metadados`, `coleta-adaptadores-sgc`, `resumo` | Coleta é usada pela CLI e por testes de composição; motor e adaptadores já estão separados | Manter; núcleo no motor, perfil nos adaptadores | `núcleo` + `perfil-sgc` |
 | Políticas: `qualidade/politicas/semgrep/sgc-qualidade.yml`, `qualidade/frontend-arquitetura/acoes-backend-excecoes.json` | São assets empacotados e consumidos como defaults SGC; não são regras horizontais | Manter no perfil SGC | `perfil-sgc` |
 | Fixtures e saídas ignoradas: `test/fixtures/qualidade/fotografia.json` e diretórios gerados em `qualidade/artefatos`/`semgrep` | Fixture é contrato de teste; saídas são geradas e não pertencem ao pacote | Manter fixture; remover saídas somente pela limpeza, não versioná-las | `núcleo` de teste / transiente |
 
-Decisões negativas desta auditoria:
+Decisões e cortes desta auditoria:
 
-- Não há comando, biblioteca ou política rastreada sem consumidor ou finalidade atual comprovável que justifique remoção
-  nesta rodada. Os antigos geradores de tipos OpenAPI, scripts legados, auditorias cruzadas e wrappers já foram removidos
-  no histórico; reabrir esses caminhos seria regressão.
+- `projeto preparar` foi removido: não havia script, fluxo documentado ou teste de comportamento que justificasse manter um
+  wrapper de `npm install` e `playwright install`; a configuração exclusiva `execucoes.instalacao` também foi eliminada.
+- O executor genérico de tarefas não foi eliminado: foi movido de `projeto/qualidade` para `qualidade tarefas executar`,
+  separando sua semântica da fotografia produzida por `qualidade coletar`.
+- Os antigos geradores de tipos OpenAPI, scripts legados, auditorias cruzadas e wrappers já removidos não serão reabertos.
+- Não se remove comando específico do SGC apenas porque o consumidor é humano ou porque não há import automático.
 - `backend cobertura ramificacoes` e `frontend cobertura ramificacoes` não são duplicatas automáticas das auditorias
   unificadas: os primeiros têm contrato de listagem focado e os segundos fazem priorização/risco. A fusão fica recusada
   até existir consumidor substituto testado.
@@ -835,13 +835,32 @@ Decisões negativas desta auditoria:
   `frontend/coverage` produzido pelo Vitest não serão traduzidos artificialmente. Os nomes próprios já corrigidos são
   `mais-recente`, `*-cobertura-*`, `metadados.controleVersao.ramo/revisao` e, nos contratos internos de cobertura,
   `instrucoes`, `ramificacoes`, `funcoes`, `linhas` e seus derivados.
+- A superfície atual também não possui mais `projeto/preparar.ts` nem `projeto/qualidade.ts`; o caminho canônico do executor
+  é `qualidade/tarefas-executar.ts`.
 
 Sobras removidas nas rodadas recentes: os shebangs `#!/usr/bin/env node` presentes em 42 fontes TypeScript, a dependência
 `fs-extra` restrita aos testes e a regra/saídas do layout antigo `qualidade/semgrep/latest`. Nenhum desses itens tinha
 consumidor atual; a fonte é chamada por `tsx` e o Semgrep usa `qualidade/artefatos/semgrep/mais-recente`.
 
-## 4. Classificação para reuso externo
+### 3.9 Confirmação dos candidatos questionados
 
+A confirmação combinou catálogo, scripts npm, ADRs, testes, artefatos existentes, execução real em 13 de agosto e
+histórico Git. “Sem consumidor automático” não foi tratado como “sem consumidor”: uso humano documentado continua sendo
+evidência válida.
+
+| Candidato | Decisão | Evidência e consequência |
+|---|---|---|
+| `qualidade coletar` versus executor de tarefas | Manter ambos, com fronteiras explícitas | O coletor agrega adaptadores em uma fotografia; o executor roda tarefas configuradas. O executor foi movido para `qualidade tarefas executar`; não há fusão semântica. |
+| Três comandos OpenAPI | Manter como utilitário ocasional adaptável | Springdoc, Swagger e o ciclo E2E continuam presentes no SGC; exportar, comparar e promover baseline formam um fluxo completo e têm testes externos. Não entram na coleta padrão e o gerador de tipos continua removido. |
+| `backend java corrigir-fqn` | Manter como utilitário ocasional adaptável | A simulação atual encontrou 114 arquivos e 685 arquivos analisados; portanto há trabalho real no SGC. O comando é mutável, exige `--gravar` e já tem teste de prévia, efeito e idempotência. |
+| `projeto preparar` | Remover | Era apenas uma combinação de verificação de ambiente, `npm install` e instalação do Chromium, sem script, CI ou teste de comportamento que justificasse outra camada. A configuração `execucoes.instalacao` foi removida com ele. |
+| Família de CDUs | Manter no perfil SGC; inventários são ocasionais | São 55 documentos e 55 cenários E2E correspondentes. Os pares inventário/auditoria respondem perguntas diferentes. A busca quebrada pelo diretório antigo foi corrigida nesta rodada para `specs/cdu/cdu-*.md`. |
+| `codigo cheiros auditar` e `codigo semgrep auditar` | Manter separados | Cheiros aplica oito heurísticas internas com pontuação e fotografia; Semgrep executa regras estruturais externas/configuráveis. Há complementaridade, não duplicação de implementação. |
+| Views, modais, notificações, coesão e ramificações de erro | Manter no perfil SGC | Templates e modais têm scripts explícitos no `frontend/package.json` e ADR de enforcement. Coesão, assuntos de notificação e tratamento de erro codificam políticas do SGC e permanecem gates manuais. |
+| Auditorias unificadas versus ramificações de cobertura | Manter separados; ramificações como utilitários focados | A auditoria unificada calcula risco/hotspots; a variante de ramificações lista lacunas objetivas. A variante de erros ainda agrega uma heurística SGC e precisa apenas tolerar fontes removidas do relatório V8. |
+
+
+## 4. Classificação para reuso externo
 ### 4.1 Horizontal com pouca adaptação
 
 Estes componentes podem formar o pacote reutilizável:
@@ -865,7 +884,7 @@ Estas capacidades são úteis em projetos Spring Boot/Vue, mas hoje carregam dec
 - auditorias de cobertura e priorização de testes Java/Gradle;
 - coleta de qualidade que coordena Gradle, npm, Playwright e auditores;
 - Semgrep, regras de nomenclatura e contratos OpenAPI;
-- diagnóstico de ambiente e preparação do projeto.
+- diagnóstico de ambiente e execução de tarefas configuradas.
 
 Elas devem receber um perfil/adaptador com:
 
@@ -884,7 +903,7 @@ Não promover diretamente ao núcleo horizontal:
 - `backend/src/main/java/sgc` e o pacote Java `sgc`;
 - `AssuntosNotificacao`, `Mensagens.java` e a lista de constantes de mensagens do SGC;
 - regras de nomenclatura `codigo` e auditoria de inglês próprias do SGC;
-- estrutura `specs/cdu-*.md`, vocabulário e convenções de CDU;
+- estrutura `specs/cdu/cdu-*.md`, vocabulário e convenções de CDU;
 - arquivos concretos de constantes e stores do frontend do SGC;
 - `ModalPadrao`, `LayoutPadrao`, `PageHeader` e exceções específicas de views do SGC;
 - tarefas Gradle e perfis E2E fixos do SGC;
@@ -967,15 +986,18 @@ do perfil.
     em `test/projeto-ambiente.test.ts` e quatro de opções em `test/opcoes-cli.test.ts`. O arquivo `test/sgc.test.ts`
 foi removido por ficar vazio; os 126 cenários regulares permanecem distribuídos por domínio e `test/qualidade.test.ts`
     possui 10 cenários.
-11. **Defaults de perfil ainda implícitos**: URL OpenAPI, tarefas Gradle, convenções Vue e caminhos de políticas devem
-    ser associados explicitamente ao perfil SGC ou à configuração. Um default SGC é válido; o problema é o núcleo não
-    conseguir distingui-lo de uma regra horizontal.
+11. **[resolvido nesta rodada] Candidatos de remoção/fusão sem decisão explícita**: a seção 3.9 registra as decisões
+    sobre coleta/tarefas, OpenAPI, FQN, preparação, CDUs, cheiros/Semgrep, gates SGC e cobertura. A decisão foi remover
+    somente `projeto preparar`; os demais foram mantidos ou rebaixados a utilitários ocasionais com base em evidência.
+12. **[pendente] Defaults de perfil ainda implícitos**: URL OpenAPI, tarefas Gradle, convenções Vue e caminhos de políticas devem
+   ser associados explicitamente ao perfil SGC ou à configuração. Um default SGC é válido; o problema é o núcleo não
+   conseguir distingui-lo de uma regra horizontal.
 
 ### Prioridade baixa
 
-12. **Artefatos e limpeza**: revisar políticas, arquivos ignorados e nomes de `mais-recente`/`execucoes` para evitar que
+13. **Artefatos e limpeza**: revisar políticas, arquivos ignorados e nomes de `mais-recente`/`execucoes` para evitar que
     saídas locais sejam confundidas com recursos do pacote.
-13. **Performance**: medir antes de otimizar. A coleta e os auditores só devem ser otimizados por gargalo observado, com
+14. **Performance**: medir antes de otimizar. A coleta e os auditores só devem ser otimizados por gargalo observado, com
     comparação antes/depois e sem sacrificar a legibilidade do relatório.
 
 ## 6. Próximos passos ordenados
@@ -986,6 +1008,10 @@ obsolescência, clareza de escopo, consistência e só então ampliação do reu
 ### 6.1 Fila executável após esta auditoria
 
 As fases históricas abaixo continuam úteis como registro, mas a execução deve seguir esta fila ativa:
+
+0. **[concluído nesta rodada] Fazer o reality check dos candidatos**: confirmar uso humano e automático, executar os
+   comandos read-only relevantes, separar utilitário ocasional de gate recorrente e registrar a decisão na seção 3.9.
+   A regra removida foi `projeto preparar`; `qualidade tarefas executar` substituiu o caminho ambíguo de projeto.
 
 1. **[concluído nesta rodada] Auditar utilidade por família**: a matriz da seção 3.8 registra consumidores, entradas,
    saídas e a decisão de manter, fundir, horizontalizar ou preservar no perfil SGC. Não houve remoção de funcionalidade
@@ -1082,8 +1108,8 @@ launcher compilado, quando exercitado no smoke opcional, continuar despachando a
    `frontend/cobertura-auditoria.ts`, `requisitos/cdus-mensagens-lib.ts`,
    `frontend/identificadores-teste-lib.ts`, `requisitos/cdus-lib.ts`, `requisitos/cdus-vocabulario-lib.ts`,
    `requisitos/cdus-mensagens-codigo-lib.ts`, `frontend/acoes-backend-lib.ts`, `frontend/residuos-lib.ts`,
-   `frontend/arquitetura-lib.ts`, `projeto/ambiente-verificar.ts`, `projeto/artefatos-limpar.ts`, `projeto/preparar.ts`,
-   `projeto/qualidade.ts`, `projeto/dependencias-auditar.ts`, `qualidade/coleta-execucao.ts`, `qualidade/coleta.ts`,
+   `frontend/arquitetura-lib.ts`, `projeto/ambiente-verificar.ts`, `projeto/artefatos-limpar.ts`,
+   `projeto/dependencias-auditar.ts`, `qualidade/tarefas-executar.ts`, `qualidade/coleta-execucao.ts`, `qualidade/coleta.ts`,
    `qualidade/resumo.ts` e os três comandos de contratos OpenAPI; os achados e comandos transversais restantes foram
    convertidos nos lotes posteriores da Fase C.
 3. **[concluído nesta rodada]** Introduzir tipos para JaCoCo, V8, regras da análise de testes backend, mensagens CDU,
@@ -1105,9 +1131,9 @@ mesmos fixtures e resultados JSON.
 
 Lotes sugeridos:
 
-1. **[concluído nesta rodada]** Projeto: diagnóstico, limpeza, preparação, perfil de qualidade e auditoria de
-   dependências convertidos. O catálogo padrão continua sendo o perfil SGC, com base e execução parametrizáveis para
-   reuso externo; `configuracao-toolkit.json` pode substituir separadamente qualidade, dependências e instalação.
+1. **[concluído nesta rodada]** Projeto: diagnóstico, limpeza e auditoria de dependências convertidos; a execução de
+   tarefas de qualidade foi movida para `qualidade/tarefas-executar.ts`. O catálogo padrão continua sendo o perfil SGC,
+   com base e execuções de qualidade/dependências parametrizáveis para reuso externo.
 2. **Backend**: cobertura, análise, priorização de testes, contratos e FQN já convertidos; o FQN já respeita as raízes
    configuradas, mas ainda falta parametrizar tarefas Gradle e categorias das demais famílias.
 3. **[parcial nesta rodada]** Frontend: cobertura V8, resíduos e identificadores de teste já convertidos; a coleta
@@ -1122,7 +1148,8 @@ Lotes sugeridos:
    para TypeScript, preservando as políticas locais e os contratos do SGC; a parametrização horizontal continua na
    Fase D.
 
-O corretor FQN foi incluído depois da cobertura de mutação e idempotência da Fase 0 estar corrigida e publicada.
+O corretor FQN foi incluído depois da cobertura de mutação e idempotência da Fase 0 estar corrigida e publicada. Nesta
+auditoria, a simulação na base real confirmou que ele ainda tem trabalho útil; permanece como utilitário ocasional.
 
 Para cada comando convertido:
 
