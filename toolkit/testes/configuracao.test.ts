@@ -3,7 +3,7 @@ import path from "node:path";
 import {mkdtemp} from "node:fs/promises";
 import {describe, expect, test} from "vitest";
 import {escreverJson} from "./apoio.js";
-import {carregarConfiguracao, validarConfiguracao, VERSAO_CONFIGURACAO} from "../lib/configuracao.js";
+import {carregarConfiguracao, validarConfiguracao, VERSAO_CONFIGURACAO} from "../biblioteca/configuracao.js";
 import {resolverEscoposAuditoria} from "../projeto/dependencias-auditar.js";
 import {executarTarefasQualidade} from "../qualidade/tarefas-executar.js";
 

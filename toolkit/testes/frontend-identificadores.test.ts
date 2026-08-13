@@ -7,7 +7,7 @@ import {
     escreverArquivo,
     escreverJson
 } from "./apoio.js";
-import {VERSAO_CONFIGURACAO} from "../lib/configuracao.js";
+import {VERSAO_CONFIGURACAO} from "../biblioteca/configuracao.js";
 
 describe("Identificadores de teste do frontend", () => {
     test("lista com sucesso identificadores de teste do frontend em recorte controlado", async () => {

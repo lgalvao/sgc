@@ -1,8 +1,8 @@
 import fs from "node:fs/promises";
 import path from "node:path";
 import {Node, Project, SyntaxKind, ts, type SourceFile} from "ts-morph";
-import {DIRETORIO_RAIZ} from "../lib/caminhos.js";
-import {resolverCaminhoConfigurado} from "../lib/configuracao.js";
+import {DIRETORIO_RAIZ} from "../biblioteca/caminhos.js";
+import {resolverCaminhoConfigurado} from "../biblioteca/configuracao.js";
 
 const VERSAO_SCHEMA = "4.0.0";
 const EXTENSOES_SUPORTADAS = new Set([".ts", ".vue"]);

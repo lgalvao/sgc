@@ -1,10 +1,10 @@
 import {pathToFileURL} from "node:url";
 import {Command} from "commander";
 import pc from "picocolors";
-import {CATALOGO_COMANDOS, CATALOGO_COMANDOS_COMPLETO} from "./lib/catalogo-comandos.js";
-import {validarArgumentos, type EsquemaArgumentos} from "./lib/cli-opcoes.js";
-import {executarTsx} from "./lib/execucao.js";
-import logger from "./lib/logger.js";
+import {CATALOGO_COMANDOS, CATALOGO_COMANDOS_COMPLETO} from "./biblioteca/catalogo-comandos.js";
+import {validarArgumentos, type EsquemaArgumentos} from "./biblioteca/cli-opcoes.js";
+import {executarTsx} from "./biblioteca/execucao.js";
+import logger from "./biblioteca/logger.js";
 
 function criarGrupoComando(pai: Command, nome: string, descricao: string): Command {
     return pai.command(nome).description(descricao);

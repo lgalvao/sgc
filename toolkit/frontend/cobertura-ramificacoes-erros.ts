@@ -1,12 +1,12 @@
 import fs from "node:fs/promises";
 import path from "node:path";
 import pc from "picocolors";
-import {DIRETORIO_RAIZ} from "../lib/caminhos.js";
-import {lerNumero, lerOpcao} from "../lib/cli-opcoes.js";
-import {ehEntradaPrincipal, validarArgumentosEntradaDireta} from "../lib/execucao.js";
-import {exibirAjudaComando} from "../lib/cli-ajuda.js";
-import {escreverLinha, imprimirCabecalho, imprimirJson} from "../lib/saida.js";
-import {extrairCoberturaFrontend, type ArquivoCobertura, type ResultadoCoberturaFrontend} from "../lib/dominios/cobertura-web.js";
+import {DIRETORIO_RAIZ} from "../biblioteca/caminhos.js";
+import {lerNumero, lerOpcao} from "../biblioteca/cli-opcoes.js";
+import {ehEntradaPrincipal, validarArgumentosEntradaDireta} from "../biblioteca/execucao.js";
+import {exibirAjudaComando} from "../biblioteca/cli-ajuda.js";
+import {escreverLinha, imprimirCabecalho, imprimirJson} from "../biblioteca/saida.js";
+import {extrairCoberturaFrontend, type ArquivoCobertura, type ResultadoCoberturaFrontend} from "../biblioteca/dominios/cobertura-web.js";
 
 const VERSAO_SCHEMA_RESULTADO = "1.0.0" as const;
 

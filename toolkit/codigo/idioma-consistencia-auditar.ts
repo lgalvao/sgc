@@ -1,9 +1,9 @@
 
 import fs from "node:fs/promises";
 import path from "node:path";
-import {ehEntradaPrincipal, validarArgumentosEntradaDireta} from "../lib/execucao.js";
-import {DIRETORIO_RAIZ} from "../lib/caminhos.js";
-import {escreverErro, escreverLinha, imprimirCabecalho, imprimirJson} from "../lib/saida.js";
+import {ehEntradaPrincipal, validarArgumentosEntradaDireta} from "../biblioteca/execucao.js";
+import {DIRETORIO_RAIZ} from "../biblioteca/caminhos.js";
+import {escreverErro, escreverLinha, imprimirCabecalho, imprimirJson} from "../biblioteca/saida.js";
 import {carregarInventario, type InventarioSimbolos} from "./nomes-simbolos-coletar.js";
 import {obterCaminhoIdioma, obterCaminhoSimbolos} from "./nomes-caminhos.js";
 import {VERSAO_AUDITORIA_IDIOMA} from "./nomes-contrato.js";

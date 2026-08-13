@@ -1,9 +1,9 @@
 // Auditoria tipográfica dos casos de uso CDU.
 
 import path from "node:path";
-import {carregarConfiguracao} from "../lib/configuracao.js";
-import {ehEntradaPrincipal} from "../lib/execucao.js";
-import {escreverLinha, imprimirJson} from "../lib/saida.js";
+import {carregarConfiguracao} from "../biblioteca/configuracao.js";
+import {ehEntradaPrincipal} from "../biblioteca/execucao.js";
+import {escreverLinha, imprimirJson} from "../biblioteca/saida.js";
 import {lerArquivo, listarArquivosCdu, obterLinhas, obterOpcoesCdu} from "./cdus-lib.js";
 
 const REGEX_ASPAS_SIMPLES = /'([^'\n]+)'/g;

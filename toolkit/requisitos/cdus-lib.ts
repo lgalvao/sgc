@@ -1,8 +1,8 @@
 import fs from "node:fs";
 import path from "node:path";
 import {globby} from "globby";
-import {DIRETORIO_RAIZ} from "../lib/caminhos.js";
-import {carregarConfiguracao} from "../lib/configuracao.js";
+import {DIRETORIO_RAIZ} from "../biblioteca/caminhos.js";
+import {carregarConfiguracao} from "../biblioteca/configuracao.js";
 
 const REGEX_TITULO = /^#\s+CDU-(\d{2})\s+-\s+(.+)$/m;
 const REGEX_SECAO_ATORES = /^##\s+Atores\s*$/m;

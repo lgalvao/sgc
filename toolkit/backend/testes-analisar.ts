@@ -1,14 +1,14 @@
 // Analisador de cobertura de testes do backend.
 import fs from "node:fs";
 import path from "node:path";
-import {lerOpcao} from "../lib/cli-opcoes.js";
-import {DIRETORIO_RAIZ} from "../lib/caminhos.js";
-import {resolverCaminhoConfigurado} from "../lib/configuracao.js";
-import {exibirAjudaComando} from "../lib/cli-ajuda.js";
-import {ehEntradaPrincipal, validarArgumentosEntradaDireta} from "../lib/execucao.js";
-import {escreverErro, escreverLinha, imprimirJson} from "../lib/saida.js";
-import {extrairCoberturaJacoco, type ClasseCobertura} from "../lib/dominios/cobertura-java.js";
-import {VERSAO_RELATORIO_TESTES} from "./lib/testes-contrato.js";
+import {lerOpcao} from "../biblioteca/cli-opcoes.js";
+import {DIRETORIO_RAIZ} from "../biblioteca/caminhos.js";
+import {resolverCaminhoConfigurado} from "../biblioteca/configuracao.js";
+import {exibirAjudaComando} from "../biblioteca/cli-ajuda.js";
+import {ehEntradaPrincipal, validarArgumentosEntradaDireta} from "../biblioteca/execucao.js";
+import {escreverErro, escreverLinha, imprimirJson} from "../biblioteca/saida.js";
+import {extrairCoberturaJacoco, type ClasseCobertura} from "../biblioteca/dominios/cobertura-java.js";
+import {VERSAO_RELATORIO_TESTES} from "./biblioteca/testes-contrato.js";
 import {
     CATEGORIAS_PRIORITARIAS,
     CATEGORIAS_SECUNDARIAS,
@@ -22,7 +22,7 @@ import {
     lerConteudoFonte,
     normalizarCaminho,
     SUFIXOS_TESTE
-} from "./lib/testes-analisar-regras.js";
+} from "./biblioteca/testes-analisar-regras.js";
 
 type Categoria = (typeof CATEGORIAS_PRIORITARIAS | typeof CATEGORIAS_SECUNDARIAS)[number];
 type PerfilFonte = "comportamental" | "estruturalContrato" | "estruturalPuro";

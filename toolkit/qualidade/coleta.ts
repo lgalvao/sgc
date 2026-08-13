@@ -1,7 +1,7 @@
-import {executarTsx} from "../lib/execucao.js";
-import {ehEntradaPrincipal, validarArgumentosEntradaDireta} from "../lib/execucao.js";
-import logger from "../lib/logger.js";
-import {exibirAjudaComando} from "../lib/cli-ajuda.js";
+import {executarTsx} from "../biblioteca/execucao.js";
+import {ehEntradaPrincipal, validarArgumentosEntradaDireta} from "../biblioteca/execucao.js";
+import logger from "../biblioteca/logger.js";
+import {exibirAjudaComando} from "../biblioteca/cli-ajuda.js";
 
 const PERFIS_VALIDOS = new Set<string>(["rapido", "completo", "backend", "frontend"]);
 

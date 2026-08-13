@@ -7,7 +7,7 @@
     "types": ["node", "vitest/globals"]
   },
   "include": [
-    "test/**/*.ts"
+    "testes/**/*.ts"
   ],
   "exclude": [
     "coverage",

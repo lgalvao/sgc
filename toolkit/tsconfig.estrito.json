@@ -12,8 +12,8 @@
     "coverage",
     "dist",
     "node_modules",
-    "test",
-    "test/fixtures",
+    "testes",
+    "testes/fixtures",
     "qualidade/artefatos"
   ]
 }

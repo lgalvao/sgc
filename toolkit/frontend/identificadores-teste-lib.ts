@@ -1,9 +1,9 @@
 import fs from "node:fs";
 import path from "node:path";
 import {globby} from "globby";
-import {lerOpcao} from "../lib/cli-opcoes.js";
-import {DIRETORIO_RAIZ} from "../lib/caminhos.js";
-import {resolverCaminhoConfigurado} from "../lib/configuracao.js";
+import {lerOpcao} from "../biblioteca/cli-opcoes.js";
+import {DIRETORIO_RAIZ} from "../biblioteca/caminhos.js";
+import {resolverCaminhoConfigurado} from "../biblioteca/configuracao.js";
 
 const PADRAO_IDENTIFICADOR = /(^|[\s<])(:?)(data-test-codigo|test-codigo|data-test-id|test-id|data-testid)=("([^"]*)"|'([^']*)')/gm;
 

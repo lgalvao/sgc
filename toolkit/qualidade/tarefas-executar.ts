@@ -1,9 +1,9 @@
 import path from "node:path";
 import {execa} from "execa";
 import {Listr} from "listr2";
-import {carregarConfiguracao, type PerfilQualidadeConfigurado, type TarefaConfigurada} from "../lib/configuracao.js";
-import {resolverNaRaiz} from "../lib/caminhos.js";
-import {imprimirCabecalho} from "../lib/saida.js";
+import {carregarConfiguracao, type PerfilQualidadeConfigurado, type TarefaConfigurada} from "../biblioteca/configuracao.js";
+import {resolverNaRaiz} from "../biblioteca/caminhos.js";
+import {imprimirCabecalho} from "../biblioteca/saida.js";
 
 type TarefaQualidade = TarefaConfigurada;
 

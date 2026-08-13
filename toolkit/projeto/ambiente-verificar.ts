@@ -5,9 +5,9 @@ import which from "which";
 import {access} from "node:fs/promises";
 import {execa} from "execa";
 import pc from "picocolors";
-import {resolverNaRaiz} from "../lib/caminhos.js";
-import {resolverCaminhoConfigurado, type NomeDiretorioConfigurado} from "../lib/configuracao.js";
-import {escreverLinha, formatarStatus, imprimirCabecalho, imprimirJson} from "../lib/saida.js";
+import {resolverNaRaiz} from "../biblioteca/caminhos.js";
+import {resolverCaminhoConfigurado, type NomeDiretorioConfigurado} from "../biblioteca/configuracao.js";
+import {escreverLinha, formatarStatus, imprimirCabecalho, imprimirJson} from "../biblioteca/saida.js";
 
 const CATEGORIAS = {
     AMBIENTE: "Ambiente e Ferramentas",

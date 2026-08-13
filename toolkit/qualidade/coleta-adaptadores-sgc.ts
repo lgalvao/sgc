@@ -1,7 +1,7 @@
 import path from "node:path";
 import process from "node:process";
-import {extrairCoberturaJacoco} from "../lib/dominios/cobertura-java.js";
-import {extrairCoberturaFrontend} from "../lib/dominios/cobertura-web.js";
+import {extrairCoberturaJacoco} from "../biblioteca/dominios/cobertura-java.js";
+import {extrairCoberturaFrontend} from "../biblioteca/dominios/cobertura-web.js";
 import type {
     CatalogoAdaptadores,
     ContextoColeta,

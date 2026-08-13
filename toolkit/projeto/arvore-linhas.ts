@@ -1,11 +1,11 @@
 import {execSync} from "node:child_process";
 import {existsSync, readFileSync} from "node:fs";
 import path from "node:path";
-import {DIRETORIO_RAIZ} from "../lib/caminhos.js";
-import {lerNumero, lerOpcao} from "../lib/cli-opcoes.js";
-import {ehEntradaPrincipal, validarArgumentosEntradaDireta} from "../lib/execucao.js";
-import logger from "../lib/logger.js";
-import {escrever, escreverLinha} from "../lib/saida.js";
+import {DIRETORIO_RAIZ} from "../biblioteca/caminhos.js";
+import {lerNumero, lerOpcao} from "../biblioteca/cli-opcoes.js";
+import {ehEntradaPrincipal, validarArgumentosEntradaDireta} from "../biblioteca/execucao.js";
+import logger from "../biblioteca/logger.js";
+import {escrever, escreverLinha} from "../biblioteca/saida.js";
 
 interface NoArvore {
     nome: string;

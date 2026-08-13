@@ -1,8 +1,8 @@
 import path from "node:path";
 import process from "node:process";
 import {execa} from "execa";
-import {DIRETORIO_TOOLKIT} from "../lib/caminhos.js";
-import {resolverCaminhoTsx} from "../lib/execucao.js";
+import {DIRETORIO_TOOLKIT} from "../biblioteca/caminhos.js";
+import {resolverCaminhoTsx} from "../biblioteca/execucao.js";
 import type {ContextoColeta, OpcoesComando, ResultadoComando} from "./coleta-execucao.js";
 
 const CAMINHO_SGC = path.join(DIRETORIO_TOOLKIT, "sgc.ts");

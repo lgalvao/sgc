@@ -1,6 +1,6 @@
 import fs from "node:fs/promises";
-import {DIRETORIO_RAIZ} from "../lib/caminhos.js";
-import {tentarResolverCaminhoConfigurado} from "../lib/configuracao.js";
+import {DIRETORIO_RAIZ} from "../biblioteca/caminhos.js";
+import {tentarResolverCaminhoConfigurado} from "../biblioteca/configuracao.js";
 
 const VERSAO_SCHEMA_POLITICAS = "1.0.0" as const;
 

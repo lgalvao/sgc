@@ -9,7 +9,7 @@ import {
     escreverJson,
     copiar
 } from "./apoio.js";
-import {VERSAO_CONFIGURACAO} from "../lib/configuracao.js";
+import {VERSAO_CONFIGURACAO} from "../biblioteca/configuracao.js";
 
 describe("Gates arquiteturais do frontend", () => {
     test("gate arquitetural falha quando view importa service diretamente", async () => {

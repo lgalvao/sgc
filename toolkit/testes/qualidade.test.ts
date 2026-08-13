@@ -10,7 +10,7 @@ import {
     escreverJson,
     existe
 } from "./apoio.js";
-import {VERSAO_CONFIGURACAO} from "../lib/configuracao.js";
+import {VERSAO_CONFIGURACAO} from "../biblioteca/configuracao.js";
 import {
     obterOpcoesPlaywright,
     principal as coletarFotografiaQualidade,
@@ -23,7 +23,7 @@ import {criarAdaptadoresSgc, PERFIS_SGC} from "../qualidade/coleta-adaptadores-s
 import {executarComando} from "../qualidade/coleta-executor.js";
 import {consolidarJUnit, extrairPontosCriticosQualidade, parseJsonSeguro} from "../qualidade/coleta-leitores.js";
 
-const FIXTURE_FOTOGRAFIA = path.join(DIRETORIO_RAIZ, "toolkit", "test", "fixtures", "qualidade", "fotografia.json");
+const FIXTURE_FOTOGRAFIA = path.join(DIRETORIO_RAIZ, "toolkit", "testes", "fixtures", "qualidade", "fotografia.json");
 
 describe("Qualidade do toolkit", () => {
     test("resume uma fotografia de qualidade a partir de fixture", async () => {

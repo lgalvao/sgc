@@ -8,7 +8,7 @@ import {
     escreverJson,
     existe
 } from "./apoio.js";
-import {VERSAO_CONFIGURACAO} from "../lib/configuracao.js";
+import {VERSAO_CONFIGURACAO} from "../biblioteca/configuracao.js";
 
 describe("Resíduos do frontend", () => {
     test("trata politicas de residuos como overrides opcionais e explicita arquivos invalidos", async () => {

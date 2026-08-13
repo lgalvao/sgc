@@ -1,10 +1,10 @@
 import path from "node:path";
 import process from "node:process";
-import {DIRETORIO_RAIZ} from "../lib/caminhos.js";
-import {resolverCaminhoConfigurado} from "../lib/configuracao.js";
-import {ehEntradaPrincipal} from "../lib/execucao.js";
-import {lerOpcao} from "../lib/cli-opcoes.js";
-import {escreverErro, escreverLinha} from "../lib/saida.js";
+import {DIRETORIO_RAIZ} from "../biblioteca/caminhos.js";
+import {resolverCaminhoConfigurado} from "../biblioteca/configuracao.js";
+import {ehEntradaPrincipal} from "../biblioteca/execucao.js";
+import {lerOpcao} from "../biblioteca/cli-opcoes.js";
+import {escreverErro, escreverLinha} from "../biblioteca/saida.js";
 import {criarAdaptadoresSgc, PERFIS_SGC} from "./coleta-adaptadores-sgc.js";
 import {criarContextoColeta, type ContextoColeta} from "./coleta-contexto.js";
 import {executarComando, executarComandoSgc} from "./coleta-executor.js";

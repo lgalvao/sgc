@@ -8,7 +8,7 @@ import {
     escreverJson,
     lerArquivo
 } from "./apoio.js";
-import {VERSAO_CONFIGURACAO} from "../lib/configuracao.js";
+import {VERSAO_CONFIGURACAO} from "../biblioteca/configuracao.js";
 
 describe("Correção de FQN backend", () => {
     test("corrige FQNs em uma raiz de backend externa no modo simulacao", async () => {

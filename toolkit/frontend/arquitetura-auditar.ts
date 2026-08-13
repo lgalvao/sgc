@@ -1,11 +1,11 @@
 import path from "node:path";
 import pc from "picocolors";
-import {DIRETORIO_RAIZ} from "../lib/caminhos.js";
+import {DIRETORIO_RAIZ} from "../biblioteca/caminhos.js";
 import {analisarArquiteturaFrontend, gravarFotografiaArquitetura, resolverDiretorioSaidaArquitetura, type FotografiaArquitetura} from "./arquitetura-lib.js";
-import {exibirAjudaComando} from "../lib/cli-ajuda.js";
-import {lerOpcao} from "../lib/cli-opcoes.js";
-import {ehEntradaPrincipal, validarArgumentosEntradaDireta} from "../lib/execucao.js";
-import {escreverLinha, imprimirCabecalho, imprimirJson} from "../lib/saida.js";
+import {exibirAjudaComando} from "../biblioteca/cli-ajuda.js";
+import {lerOpcao} from "../biblioteca/cli-opcoes.js";
+import {ehEntradaPrincipal, validarArgumentosEntradaDireta} from "../biblioteca/execucao.js";
+import {escreverLinha, imprimirCabecalho, imprimirJson} from "../biblioteca/saida.js";
 
 interface OpcoesAuditoriaArquiteturaFrontend {
     base?: string;

@@ -1,5 +1,5 @@
 import {describe, expect, test} from "vitest";
-import {lerNumero, lerOpcao, validarArgumentos} from "../lib/cli-opcoes.js";
+import {lerNumero, lerOpcao, validarArgumentos} from "../biblioteca/cli-opcoes.js";
 
 describe("Leitura de opções da CLI", () => {
     test("aceita opção separada e opção por atribuição", () => {

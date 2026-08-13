@@ -1,7 +1,7 @@
 import fs from "node:fs/promises";
 import path from "node:path";
-import {DIRETORIO_RAIZ} from "../lib/caminhos.js";
-import {resolverCaminhoConfigurado} from "../lib/configuracao.js";
+import {DIRETORIO_RAIZ} from "../biblioteca/caminhos.js";
+import {resolverCaminhoConfigurado} from "../biblioteca/configuracao.js";
 import {
     carregarOrcamento,
     resolverCaminhoOrcamentoResiduos,

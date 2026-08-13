@@ -1,5 +1,5 @@
 import path from "node:path";
-import {resolverCaminhoConfigurado} from "../lib/configuracao.js";
+import {resolverCaminhoConfigurado} from "../biblioteca/configuracao.js";
 
 function obterDiretorioSaidaNomenclatura(diretorioBase: string): string {
     return path.join(resolverCaminhoConfigurado("artefatosQualidade", diretorioBase), "nomenclatura", "mais-recente");

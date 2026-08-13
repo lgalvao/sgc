@@ -1,12 +1,12 @@
 import fs from "node:fs/promises";
 import path from "node:path";
 import pc from "picocolors";
-import {resolverNaRaiz} from "../lib/caminhos.js";
-import {lerNumero, lerOpcao} from "../lib/cli-opcoes.js";
-import {ehEntradaPrincipal, validarArgumentosEntradaDireta} from "../lib/execucao.js";
-import {extrairCoberturaJacoco, type ClasseCobertura, type ResultadoCoberturaJacoco} from "../lib/dominios/cobertura-java.js";
-import {escreverLinha, imprimirCabecalho, imprimirJson} from "../lib/saida.js";
-import {exibirAjudaComando} from "../lib/cli-ajuda.js";
+import {resolverNaRaiz} from "../biblioteca/caminhos.js";
+import {lerNumero, lerOpcao} from "../biblioteca/cli-opcoes.js";
+import {ehEntradaPrincipal, validarArgumentosEntradaDireta} from "../biblioteca/execucao.js";
+import {extrairCoberturaJacoco, type ClasseCobertura, type ResultadoCoberturaJacoco} from "../biblioteca/dominios/cobertura-java.js";
+import {escreverLinha, imprimirCabecalho, imprimirJson} from "../biblioteca/saida.js";
+import {exibirAjudaComando} from "../biblioteca/cli-ajuda.js";
 
 const CAMINHO_PADRAO_SAIDA = "backend-cobertura-auditoria.md";
 const VERSAO_SCHEMA_RESULTADO = "1.0.0" as const;

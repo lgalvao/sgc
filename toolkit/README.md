@@ -36,7 +36,7 @@ toolkit/codigo/cheiros-auditar.ts --opcao-inexistente` falha antes de iniciar a 
 | Caminho | Responsabilidade |
 |---|---|
 | `sgc.ts` | entrada e roteamento da CLI |
-| `lib/` | configuração, execução, saída, catálogo e domínios compartilhados |
+| `biblioteca/` | configuração, execução, saída, catálogo e domínios compartilhados |
 | `backend/` | cobertura, arquitetura, contratos, testes e utilidades Java |
 | `frontend/` | cobertura, arquitetura, resíduos e validações Vue |
 | `codigo/` | auditorias transversais de código, nomes e Semgrep |
@@ -44,7 +44,7 @@ toolkit/codigo/cheiros-auditar.ts --opcao-inexistente` falha antes de iniciar a 
 | `requisitos/` | análise e auditoria de documentos CDU |
 | `qualidade/` | coleta, fotografia, resumo e execução de tarefas |
 | `projeto/` | ambiente, dependências, artefatos, versão e árvore de linhas |
-| `test/` | testes e fixtures próprios do toolkit |
+| `testes/` | testes e fixtures próprios do toolkit |
 
 O desenho desejado separa:
 
@@ -315,7 +315,7 @@ npm --prefix toolkit run deps:audit
 npm --prefix toolkit run build
 ```
 
-Os testes ficam em `toolkit/test/` e são organizados por domínio. `test/pacote.test.ts` é executado separadamente porque
+Os testes ficam em `toolkit/testes/` e são organizados por domínio. `testes/pacote.test.ts` é executado separadamente porque
 instala o pacote em ambiente isolado. O build valida a compilação, mas a execução cotidiana continua usando TypeScript
 diretamente.
 

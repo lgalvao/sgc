@@ -8,7 +8,7 @@ import {
     escreverJson,
     existe
 } from "./apoio.js";
-import {VERSAO_CONFIGURACAO} from "../lib/configuracao.js";
+import {VERSAO_CONFIGURACAO} from "../biblioteca/configuracao.js";
 
 describe("Auditorias de cobertura da CLI", () => {
     test("mantem auditorias de cobertura read-only e grava sob demanda", async () => {

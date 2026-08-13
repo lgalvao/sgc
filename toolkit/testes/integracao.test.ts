@@ -5,7 +5,7 @@ import {describe, expect, test} from "vitest";
 import {execa} from "execa";
 import {pathToFileURL} from "node:url";
 import {resolverCaminhoArquivoOpenapi, resolverCaminhosOpenapi} from "../integracao/contratos-openapi-caminhos.js";
-import {VERSAO_CONFIGURACAO} from "../lib/configuracao.js";
+import {VERSAO_CONFIGURACAO} from "../biblioteca/configuracao.js";
 import {DIRETORIO_RAIZ, executarSgc, escreverJson, lerArquivo, existe} from "./apoio.js";
 
 const CAMINHOS_COMANDOS_CONTRATOS = [

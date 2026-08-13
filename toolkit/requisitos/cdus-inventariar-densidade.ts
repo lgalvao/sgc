@@ -1,8 +1,8 @@
 // Inventário de densidade documental dos casos de uso CDU.
 
 import path from "node:path";
-import {ehEntradaPrincipal} from "../lib/execucao.js";
-import {escreverLinha, imprimirJson} from "../lib/saida.js";
+import {ehEntradaPrincipal} from "../biblioteca/execucao.js";
+import {escreverLinha, imprimirJson} from "../biblioteca/saida.js";
 import {analisarArquivo, lerArquivo, listarArquivosCdu, obterOpcoesCdu} from "./cdus-lib.js";
 
 interface DocumentoDensidade {

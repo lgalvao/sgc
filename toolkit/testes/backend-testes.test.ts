@@ -14,7 +14,7 @@ import {
     existe,
     type ResultadoExecucao
 } from "./apoio.js";
-import {VERSAO_CONFIGURACAO} from "../lib/configuracao.js";
+import {VERSAO_CONFIGURACAO} from "../biblioteca/configuracao.js";
 
 type ObjetoJson = Record<string, unknown>;
 

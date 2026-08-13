@@ -1,6 +1,6 @@
 import fs from "node:fs";
 import path from "node:path";
-import {carregarConfiguracao, type FonteMensagensCodigo} from "../lib/configuracao.js";
+import {carregarConfiguracao, type FonteMensagensCodigo} from "../biblioteca/configuracao.js";
 import {lerArquivo} from "./cdus-lib.js";
 
 const PALAVRAS_VAZIAS = new Set<string>(["a", "ao", "as", "da", "das", "de", "do", "dos", "e", "em", "na", "no", "o", "os", "para"]);

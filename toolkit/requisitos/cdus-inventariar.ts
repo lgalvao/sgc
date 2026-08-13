@@ -1,8 +1,8 @@
 // Inventário dos casos de uso CDU.
 
 import path from "node:path";
-import {ehEntradaPrincipal, validarArgumentosEntradaDireta} from "../lib/execucao.js";
-import {escreverLinha, imprimirJson} from "../lib/saida.js";
+import {ehEntradaPrincipal, validarArgumentosEntradaDireta} from "../biblioteca/execucao.js";
+import {escreverLinha, imprimirJson} from "../biblioteca/saida.js";
 import {
     analisarArquivo,
     extrairCabecalhoFluxo,

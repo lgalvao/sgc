@@ -1,9 +1,9 @@
 import path from "node:path";
 import {access, rm} from "node:fs/promises";
 import {globby} from "globby";
-import {resolverNaRaiz} from "../lib/caminhos.js";
-import {resolverCaminhoConfigurado} from "../lib/configuracao.js";
-import {escreverLinha, imprimirCabecalho, imprimirJson} from "../lib/saida.js";
+import {resolverNaRaiz} from "../biblioteca/caminhos.js";
+import {resolverCaminhoConfigurado} from "../biblioteca/configuracao.js";
+import {escreverLinha, imprimirCabecalho, imprimirJson} from "../biblioteca/saida.js";
 
 interface OpcoesLimpezaArtefatos {
     base?: string;

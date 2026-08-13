@@ -1,7 +1,7 @@
 import path from "node:path";
-import {resolverNaRaiz} from "../lib/caminhos.js";
-import {resolverFotografiaQualidade} from "../lib/qualidade.js";
-import {escreverLinha, imprimirCabecalho, imprimirJson} from "../lib/saida.js";
+import {resolverNaRaiz} from "../biblioteca/caminhos.js";
+import {resolverFotografiaQualidade} from "../biblioteca/qualidade.js";
+import {escreverLinha, imprimirCabecalho, imprimirJson} from "../biblioteca/saida.js";
 import {VERSAO_SCHEMA_FOTOGRAFIA} from "./coleta-fotografia.js";
 
 interface VerificacaoQualidade {

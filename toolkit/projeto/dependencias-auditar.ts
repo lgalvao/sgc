@@ -1,8 +1,8 @@
 import {execa} from "execa";
 import path from "node:path";
-import {carregarConfiguracao, type EscopoComandoConfigurado} from "../lib/configuracao.js";
-import {resolverNaRaiz} from "../lib/caminhos.js";
-import {escreverLinha, imprimirCabecalho} from "../lib/saida.js";
+import {carregarConfiguracao, type EscopoComandoConfigurado} from "../biblioteca/configuracao.js";
+import {resolverNaRaiz} from "../biblioteca/caminhos.js";
+import {escreverLinha, imprimirCabecalho} from "../biblioteca/saida.js";
 
 type DefinicaoEscopoAuditoria = EscopoComandoConfigurado;
 

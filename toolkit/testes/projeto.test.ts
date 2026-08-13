@@ -10,7 +10,7 @@ import {executarVerificacaoAmbiente, obterRecursosAmbientePadrao} from "../proje
 import {limparArtefatos, obterPadroesArtefatos} from "../projeto/artefatos-limpar.js";
 import {executarTarefasQualidade} from "../qualidade/tarefas-executar.js";
 import {executarAuditoriaDependencias} from "../projeto/dependencias-auditar.js";
-import {VERSAO_CONFIGURACAO} from "../lib/configuracao.js";
+import {VERSAO_CONFIGURACAO} from "../biblioteca/configuracao.js";
 
 type ChamadaComando = {
     comando: string;

@@ -10,7 +10,7 @@ import {
     escreverArquivo,
     existe
 } from "./apoio.js";
-import {CATALOGO_COMANDOS_COMPLETO} from "../lib/catalogo-comandos.js";
+import {CATALOGO_COMANDOS_COMPLETO} from "../biblioteca/catalogo-comandos.js";
 import {program} from "../sgc.js";
 
 const CAMINHO_SGC_COMPILADO = path.join(DIRETORIO_RAIZ, "toolkit", "dist", "sgc.js");

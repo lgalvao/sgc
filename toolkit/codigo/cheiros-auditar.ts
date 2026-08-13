@@ -1,12 +1,12 @@
 
 import fs from "node:fs/promises";
 import path from "node:path";
-import {DIRETORIO_RAIZ} from "../lib/caminhos.js";
-import {lerOpcao} from "../lib/cli-opcoes.js";
-import {resolverCaminhoConfigurado} from "../lib/configuracao.js";
-import {exibirAjudaComando} from "../lib/cli-ajuda.js";
-import {ehEntradaPrincipal, validarArgumentosEntradaDireta} from "../lib/execucao.js";
-import {escreverErro, escreverLinha, imprimirCabecalho, imprimirJson} from "../lib/saida.js";
+import {DIRETORIO_RAIZ} from "../biblioteca/caminhos.js";
+import {lerOpcao} from "../biblioteca/cli-opcoes.js";
+import {resolverCaminhoConfigurado} from "../biblioteca/configuracao.js";
+import {exibirAjudaComando} from "../biblioteca/cli-ajuda.js";
+import {ehEntradaPrincipal, validarArgumentosEntradaDireta} from "../biblioteca/execucao.js";
+import {escreverErro, escreverLinha, imprimirCabecalho, imprimirJson} from "../biblioteca/saida.js";
 import {VERSAO_FOTOGRAFIA_CHEIROS} from "./cheiros-contrato.js";
 
 type EscopoCheiro = "backend" | "frontend" | "frontendTestes";

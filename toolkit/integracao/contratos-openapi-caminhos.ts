@@ -1,6 +1,6 @@
 import path from "node:path";
-import {DIRETORIO_RAIZ} from "../lib/caminhos.js";
-import {resolverCaminhoConfigurado} from "../lib/configuracao.js";
+import {DIRETORIO_RAIZ} from "../biblioteca/caminhos.js";
+import {resolverCaminhoConfigurado} from "../biblioteca/configuracao.js";
 
 const URL_OPENAPI_PADRAO = "http://127.0.0.1:10000/api-docs";
 

@@ -3,11 +3,11 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import {execa} from "execa";
 import pc from "picocolors";
-import {DIRETORIO_RAIZ} from "../lib/caminhos.js";
-import {exibirAjudaComando} from "../lib/cli-ajuda.js";
-import {lerOpcao} from "../lib/cli-opcoes.js";
-import {ehEntradaPrincipal, validarArgumentosEntradaDireta} from "../lib/execucao.js";
-import {escreverErro, escreverLinha, imprimirCabecalho, imprimirJson} from "../lib/saida.js";
+import {DIRETORIO_RAIZ} from "../biblioteca/caminhos.js";
+import {exibirAjudaComando} from "../biblioteca/cli-ajuda.js";
+import {lerOpcao} from "../biblioteca/cli-opcoes.js";
+import {ehEntradaPrincipal, validarArgumentosEntradaDireta} from "../biblioteca/execucao.js";
+import {escreverErro, escreverLinha, imprimirCabecalho, imprimirJson} from "../biblioteca/saida.js";
 import {resolverCaminhoArquivoOpenapi, resolverCaminhosOpenapi} from "./contratos-openapi-caminhos.js";
 
 interface OpcoesDiffContratos {

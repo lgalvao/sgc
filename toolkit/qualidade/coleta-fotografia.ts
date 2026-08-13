@@ -1,6 +1,6 @@
 import fs from "node:fs/promises";
 import path from "node:path";
-import {NOME_ARQUIVO_FOTOGRAFIA} from "../lib/qualidade.js";
+import {NOME_ARQUIVO_FOTOGRAFIA} from "../biblioteca/qualidade.js";
 import {extrairPontosCriticosQualidade} from "./coleta-leitores.js";
 import type {ExecucaoQualidade} from "./coleta-execucao.js";
 

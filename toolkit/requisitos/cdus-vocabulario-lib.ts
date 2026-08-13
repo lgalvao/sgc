@@ -1,7 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
-import {carregarConfiguracao} from "../lib/configuracao.js";
-import {DIRETORIO_RAIZ} from "../lib/caminhos.js";
+import {carregarConfiguracao} from "../biblioteca/configuracao.js";
+import {DIRETORIO_RAIZ} from "../biblioteca/caminhos.js";
 
 interface VocabularioCanonico {
     perfis: Set<string>;

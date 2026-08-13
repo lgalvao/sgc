@@ -1,6 +1,6 @@
 import fs from "node:fs";
 import path from "node:path";
-import type {ClasseCobertura} from "../../lib/dominios/cobertura-java.js";
+import type {ClasseCobertura} from "../../biblioteca/dominios/cobertura-java.js";
 
 export const EXTENSAO_JAVA = ".java" as const;
 export const CATEGORIAS_PRIORITARIAS = ["controladores", "fachadas", "servicos", "mapeadores"] as const;

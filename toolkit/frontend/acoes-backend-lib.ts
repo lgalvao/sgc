@@ -3,8 +3,8 @@ import {existsSync, readFileSync} from "node:fs";
 import {readFile} from "node:fs/promises";
 import {globby} from "globby";
 import {parse} from "@vue/compiler-sfc";
-import {DIRETORIO_RAIZ} from "../lib/caminhos.js";
-import {resolverCaminhoConfigurado} from "../lib/configuracao.js";
+import {DIRETORIO_RAIZ} from "../biblioteca/caminhos.js";
+import {resolverCaminhoConfigurado} from "../biblioteca/configuracao.js";
 
 const PREFIXO_ACAO = /^(pode|habilitar|mostrar|exibir|ocultar|desabilitar|permitir)[A-Z]/;
 const NOMES_UI_LOCAL = /(Modal|Popover|Tooltip|Detalhes|Preview|Filtro|Filtros|Busca|Resultado|Calendario|Dropdown|Menu|Toast|Alerta|Aba|Painel|Bloco)/;

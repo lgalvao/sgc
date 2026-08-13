@@ -1,12 +1,12 @@
 import path from "node:path";
 import pc from "picocolors";
-import {lerNumero, lerOpcao} from "../lib/cli-opcoes.js";
-import {resolverNaRaiz} from "../lib/caminhos.js";
-import {ehEntradaPrincipal, validarArgumentosEntradaDireta} from "../lib/execucao.js";
-import {extrairCoberturaJacoco} from "../lib/dominios/cobertura-java.js";
-import type {ClasseCobertura, ResultadoCoberturaJacoco} from "../lib/dominios/cobertura-java.js";
-import {escreverErro, escreverLinha, imprimirCabecalho, imprimirJson} from "../lib/saida.js";
-import {exibirAjudaComando} from "../lib/cli-ajuda.js";
+import {lerNumero, lerOpcao} from "../biblioteca/cli-opcoes.js";
+import {resolverNaRaiz} from "../biblioteca/caminhos.js";
+import {ehEntradaPrincipal, validarArgumentosEntradaDireta} from "../biblioteca/execucao.js";
+import {extrairCoberturaJacoco} from "../biblioteca/dominios/cobertura-java.js";
+import type {ClasseCobertura, ResultadoCoberturaJacoco} from "../biblioteca/dominios/cobertura-java.js";
+import {escreverErro, escreverLinha, imprimirCabecalho, imprimirJson} from "../biblioteca/saida.js";
+import {exibirAjudaComando} from "../biblioteca/cli-ajuda.js";
 
 const VERSAO_SCHEMA_RESULTADO = "1.0.0" as const;
 

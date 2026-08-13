@@ -1,11 +1,11 @@
 // Priorizador de testes do backend.
 import fs from "node:fs";
 import path from "node:path";
-import {lerOpcao} from "../lib/cli-opcoes.js";
-import {exibirAjudaComando} from "../lib/cli-ajuda.js";
-import {ehEntradaPrincipal, validarArgumentosEntradaDireta} from "../lib/execucao.js";
-import {escreverErro, escreverLinha, imprimirJson} from "../lib/saida.js";
-import {VERSAO_PRIORIZACAO_TESTES, VERSAO_RELATORIO_TESTES} from "./lib/testes-contrato.js";
+import {lerOpcao} from "../biblioteca/cli-opcoes.js";
+import {exibirAjudaComando} from "../biblioteca/cli-ajuda.js";
+import {ehEntradaPrincipal, validarArgumentosEntradaDireta} from "../biblioteca/execucao.js";
+import {escreverErro, escreverLinha, imprimirJson} from "../biblioteca/saida.js";
+import {VERSAO_PRIORIZACAO_TESTES, VERSAO_RELATORIO_TESTES} from "./biblioteca/testes-contrato.js";
 
 type Prioridade = "P1" | "P2" | "P3";
 

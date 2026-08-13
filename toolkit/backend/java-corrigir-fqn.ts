@@ -1,12 +1,12 @@
 // Correção explícita de nomes totalmente qualificados em fontes Java.
 import fs from "node:fs";
 import path from "node:path";
-import {DIRETORIO_RAIZ} from "../lib/caminhos.js";
-import {lerOpcao} from "../lib/cli-opcoes.js";
-import {exibirAjudaComando} from "../lib/cli-ajuda.js";
-import {NOME_ARQUIVO_CONFIGURACAO, resolverCaminhoConfigurado} from "../lib/configuracao.js";
-import {ehEntradaPrincipal, validarArgumentosEntradaDireta} from "../lib/execucao.js";
-import {escreverLinha} from "../lib/saida.js";
+import {DIRETORIO_RAIZ} from "../biblioteca/caminhos.js";
+import {lerOpcao} from "../biblioteca/cli-opcoes.js";
+import {exibirAjudaComando} from "../biblioteca/cli-ajuda.js";
+import {NOME_ARQUIVO_CONFIGURACAO, resolverCaminhoConfigurado} from "../biblioteca/configuracao.js";
+import {ehEntradaPrincipal, validarArgumentosEntradaDireta} from "../biblioteca/execucao.js";
+import {escreverLinha} from "../biblioteca/saida.js";
 
 const DIRETORIOS_ALVO = ["src/test/java", "src/main/java"];
 const PREFIXO_PACOTE = "package ";

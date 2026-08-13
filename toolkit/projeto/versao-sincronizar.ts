@@ -1,10 +1,10 @@
 import {existsSync, readFileSync, writeFileSync} from "node:fs";
 import path from "node:path";
-import {ehEntradaPrincipal, validarArgumentosEntradaDireta} from "../lib/execucao.js";
-import {resolverNaRaiz} from "../lib/caminhos.js";
-import {lerOpcao} from "../lib/cli-opcoes.js";
-import {resolverCaminhoConfigurado} from "../lib/configuracao.js";
-import {escreverErro, escreverLinha} from "../lib/saida.js";
+import {ehEntradaPrincipal, validarArgumentosEntradaDireta} from "../biblioteca/execucao.js";
+import {resolverNaRaiz} from "../biblioteca/caminhos.js";
+import {lerOpcao} from "../biblioteca/cli-opcoes.js";
+import {resolverCaminhoConfigurado} from "../biblioteca/configuracao.js";
+import {escreverErro, escreverLinha} from "../biblioteca/saida.js";
 
 interface ResultadoSincronizacao {
     novaVersao: string;

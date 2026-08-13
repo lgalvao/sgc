@@ -7,7 +7,7 @@ import {
     escreverArquivo,
     escreverJson
 } from "./apoio.js";
-import {VERSAO_CONFIGURACAO} from "../lib/configuracao.js";
+import {VERSAO_CONFIGURACAO} from "../biblioteca/configuracao.js";
 
 describe("Auditoria de notificações backend", () => {
     test("audita assuntos literais fora de AssuntosNotificacao", async () => {

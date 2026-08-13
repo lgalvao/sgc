@@ -1,8 +1,8 @@
 // Auditoria estrutural dos casos de uso CDU.
 
 import path from "node:path";
-import {ehEntradaPrincipal, validarArgumentosEntradaDireta} from "../lib/execucao.js";
-import {escreverLinha, imprimirJson} from "../lib/saida.js";
+import {ehEntradaPrincipal, validarArgumentosEntradaDireta} from "../biblioteca/execucao.js";
+import {escreverLinha, imprimirJson} from "../biblioteca/saida.js";
 import {analisarArquivo, lerArquivo, listarArquivosCdu, obterOpcoesCdu, validarLinksMarkdown} from "./cdus-lib.js";
 import {auditarMensagensCodigo} from "./cdus-auditar-mensagens-codigo.js";
 import {auditarMensagens} from "./cdus-auditar-mensagens.js";

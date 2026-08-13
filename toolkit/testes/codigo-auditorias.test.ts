@@ -11,7 +11,7 @@ import {
     existe,
     alterarPermissoes
 } from "./apoio.js";
-import {resolverCaminhoConfigurado, VERSAO_CONFIGURACAO} from "../lib/configuracao.js";
+import {resolverCaminhoConfigurado, VERSAO_CONFIGURACAO} from "../biblioteca/configuracao.js";
 import {normalizarCaminhoAchado, obterComandoSemgrep, resolverDiretoriosPadrao} from "../codigo/semgrep-auditar.js";
 import {executarAuditoria as executarAuditoriaCheiros} from "../codigo/cheiros-auditar.js";
 
