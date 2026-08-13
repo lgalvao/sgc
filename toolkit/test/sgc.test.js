@@ -7,6 +7,7 @@ import {execa, execaNode} from "execa";
 import {pathToFileURL} from "node:url";
 import {calcularTotais, construirArvore, listarArquivosGit} from "../projeto/arvore-linhas.ts";
 import {sincronizarVersao} from "../projeto/versao-sincronizar.ts";
+import {executarDiagnostico} from "../projeto/diagnostico.ts";
 import {carregarConfiguracao, validarConfiguracao, VERSAO_CONFIGURACAO} from "../lib/configuracao.ts";
 import {resolverCaminhosOpenapi} from "../integracao/contratos-openapi-caminhos.js";
 import {ADAPTADORES, PERFIS, principal as coletarFotografiaQualidade} from "../qualidade/coleta-execucao.js";
@@ -44,7 +45,7 @@ const CAMINHOS_COMANDOS_CONTRATOS = [
 ].map(nome => path.join(DIRETORIO_RAIZ, "toolkit", "integracao", nome));
 const CAMINHOS_COMANDOS_PROJETO = [
     "arvore-linhas.ts",
-    "diagnostico.js",
+    "diagnostico.ts",
     "versao-sincronizar.ts"
 ].map(nome => path.join(DIRETORIO_RAIZ, "toolkit", "projeto", nome));
 const CAMINHOS_COMANDOS_QUALIDADE = [
@@ -2256,6 +2257,28 @@ describe("CLI raiz do toolkit", () => {
         expect(["ok", "alerta"]).toContain(json.statusGeral);
         expect(Array.isArray(json.verificacoes)).toBe(true);
         expect(json.verificacoes.some((item) => item.nome === "node")).toBe(true);
+    });
+
+    test("diagnostico aceita recursos registrados por projeto externo", async () => {
+        const diretorioBase = await mkdtemp(path.join(os.tmpdir(), "sgc-diagnostico-configurado-"));
+        await fs.outputFile(path.join(diretorioBase, "package.json"), "{}\n");
+
+        const resultado = await executarDiagnostico({
+            base: diretorioBase,
+            silencioso: true,
+            recursos: [{
+                tipo: "arquivo",
+                nome: "manifesto",
+                caminho: "package.json",
+                obrigatorio: true,
+                categoria: "Configuração do Projeto"
+            }],
+            comandosRegistrados: []
+        });
+
+        expect(resultado.statusGeral).toBe("ok");
+        expect(resultado.verificacoes).toHaveLength(1);
+        expect(resultado.verificacoes[0]).toMatchObject({nome: "manifesto", status: "ok"});
     });
 
     test("audita cobertura JaCoCo a partir de arquivo e base externos", async () => {

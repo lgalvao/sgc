@@ -1,7 +1,7 @@
 import path from "node:path";
 import net from "node:net";
 import which from "which";
-import fs from "fs-extra";
+import {access} from "node:fs/promises";
 import {execa} from "execa";
 import pc from "picocolors";
 import {resolverNaRaiz} from "../lib/caminhos.js";
@@ -12,10 +12,67 @@ const CATEGORIAS = {
     CONFIGURACAO: "Configuração do Projeto",
     INFRA: "Infraestrutura e Serviços",
     DEPENDENCIAS: "Dependências"
+} as const;
+
+type Categoria = typeof CATEGORIAS[keyof typeof CATEGORIAS];
+type Status = "ok" | "alerta" | "falha";
+
+interface RecursoBase {
+    nome: string;
+    obrigatorio?: boolean;
+    categoria: Categoria;
+}
+
+interface RecursoComando extends RecursoBase {
+    tipo: "comando";
+    versaoMin?: string;
+    versaoEsperada?: string;
+}
+
+interface RecursoArquivo extends RecursoBase {
+    tipo: "arquivo" | "diretorio";
+    caminho: string;
+}
+
+interface RecursoPorta extends RecursoBase {
+    tipo: "porta";
+    porta: number;
+    portaPadrao?: boolean;
+}
+
+type Recurso = RecursoComando | RecursoArquivo | RecursoPorta;
+
+type RecursoVerificado = Recurso & {
+    status: Status;
+    detalhe: string;
 };
 
-const RECURSOS = [
-    {tipo: "comando", nome: "node", obrigatorio: true, categoria: CATEGORIAS.AMBIENTE, versaoMin: "22.0.0"},
+interface TotaisDiagnostico {
+    ok: number;
+    alerta: number;
+    falha: number;
+}
+
+interface ResultadoConsolidado {
+    statusGeral: Status;
+    totais: TotaisDiagnostico;
+}
+
+interface OpcoesDiagnostico {
+    base?: string;
+    silencioso?: boolean;
+    json?: boolean;
+    recursos?: Recurso[];
+    comandosRegistrados?: RecursoArquivo[];
+}
+
+interface ResultadoDiagnostico extends ResultadoConsolidado {
+    diretorioBase: string;
+    verificacoes: RecursoVerificado[];
+}
+
+const RECURSOS: Recurso[] = [
+    {tipo: "comando", nome: "node", obrigatorio: true, categoria: CATEGORIAS.AMBIENTE, versaoMin: "26.0.0"},
     {tipo: "comando", nome: "npm", obrigatorio: true, categoria: CATEGORIAS.AMBIENTE},
     {tipo: "comando", nome: "git", obrigatorio: true, categoria: CATEGORIAS.AMBIENTE},
     {tipo: "comando", nome: "java", obrigatorio: true, categoria: CATEGORIAS.AMBIENTE, versaoEsperada: "25"},
@@ -91,12 +148,29 @@ const RECURSOS = [
     }
 ];
 
-function determinarStatus(sucesso, obrigatorio) {
+const COMANDOS_REGISTRADOS_PADRAO: RecursoArquivo[] = [
+    {
+        tipo: "arquivo",
+        nome: "toolkit",
+        caminho: "toolkit/sgc.ts",
+        obrigatorio: true,
+        categoria: CATEGORIAS.CONFIGURACAO
+    },
+    {
+        tipo: "arquivo",
+        nome: "toolkit/package.json",
+        caminho: "toolkit/package.json",
+        obrigatorio: true,
+        categoria: CATEGORIAS.CONFIGURACAO
+    }
+];
+
+function determinarStatus(sucesso: boolean, obrigatorio: boolean | undefined): Status {
     if (sucesso) return "ok";
     return obrigatorio ? "falha" : "alerta";
 }
 
-async function verificarPorta(porta) {
+async function verificarPorta(porta: number): Promise<boolean> {
     return new Promise((resolve) => {
         const server = net.createServer();
         server.once("error", () => resolve(false));
@@ -108,7 +182,7 @@ async function verificarPorta(porta) {
     });
 }
 
-async function obterVersao(comando) {
+async function obterVersao(comando: string): Promise<string | null> {
     try {
         const {stdout} = await execa(comando, ["--version"]);
         return stdout.trim();
@@ -122,7 +196,7 @@ async function obterVersao(comando) {
     }
 }
 
-async function verificarComando(recurso) {
+async function verificarComando(recurso: RecursoComando): Promise<RecursoVerificado> {
     const encontrado = await which(recurso.nome, {nothrow: true});
     if (!encontrado) {
         return {
@@ -133,7 +207,7 @@ async function verificarComando(recurso) {
     }
 
     let detalhe = encontrado;
-    let status = "ok";
+    let status: Status = "ok";
 
     if (recurso.versaoEsperada || recurso.versaoMin) {
         const versao = await obterVersao(recurso.nome);
@@ -153,12 +227,12 @@ async function verificarComando(recurso) {
     return {...recurso, status, detalhe};
 }
 
-function extrairVersaoNumerica(texto) {
+function extrairVersaoNumerica(texto: string): number[] | null {
     const encontrada = texto.match(/\d+(?:\.\d+)+/);
     return encontrada ? encontrada[0].split(".").map(Number) : null;
 }
 
-function atendeVersaoMinima(textoVersao, textoMinimo) {
+function atendeVersaoMinima(textoVersao: string, textoMinimo: string): boolean {
     const versao = extrairVersaoNumerica(textoVersao);
     const minimo = extrairVersaoNumerica(textoMinimo);
     if (!versao || !minimo) {
@@ -176,23 +250,27 @@ function atendeVersaoMinima(textoVersao, textoMinimo) {
     return true;
 }
 
-async function verificarComandosRegistrados(diretorioBase) {
-    const comandos = [
-        ["toolkit/sgc.ts", "toolkit"],
-        ["toolkit/package.json", "toolkit"]
-    ];
-    return Promise.all(comandos.map(async ([caminho, nome]) => ({
-        tipo: "arquivo",
-        nome,
-        caminho,
-        obrigatorio: true,
-        categoria: CATEGORIAS.CONFIGURACAO,
-        status: await fs.pathExists(path.resolve(diretorioBase, caminho)) ? "ok" : "falha",
-        detalhe: caminho
+async function caminhoExiste(caminho: string): Promise<boolean> {
+    try {
+        await access(caminho);
+        return true;
+    } catch {
+        return false;
+    }
+}
+
+async function verificarComandosRegistrados(
+    diretorioBase: string,
+    comandos: RecursoArquivo[] = COMANDOS_REGISTRADOS_PADRAO
+): Promise<RecursoVerificado[]> {
+    return Promise.all(comandos.map(async (recurso) => ({
+        ...recurso,
+        status: await caminhoExiste(path.resolve(diretorioBase, recurso.caminho)) ? "ok" : "falha",
+        detalhe: recurso.caminho
     })));
 }
 
-async function verificarRecurso(recurso, diretorioBase) {
+async function verificarRecurso(recurso: Recurso, diretorioBase: string): Promise<RecursoVerificado> {
     if (recurso.tipo === "comando") {
         return verificarComando(recurso);
     }
@@ -207,12 +285,12 @@ async function verificarRecurso(recurso, diretorioBase) {
     }
 
     const caminhoAbsoluto = path.resolve(diretorioBase, recurso.caminho);
-    let existe = await fs.pathExists(caminhoAbsoluto);
+    let existe = await caminhoExiste(caminhoAbsoluto);
     let detalhe = existe ? caminhoAbsoluto : `${recurso.caminho} ausente`;
 
     if (!existe && recurso.tipo === "diretorio" && recurso.caminho.endsWith("node_modules") && recurso.caminho !== "node_modules") {
         const raizNodeModules = path.resolve(diretorioBase, "node_modules");
-        if (await fs.pathExists(raizNodeModules)) {
+        if (await caminhoExiste(raizNodeModules)) {
             existe = true;
             detalhe = "gerenciado por workspaces na raiz";
         }
@@ -225,14 +303,14 @@ async function verificarRecurso(recurso, diretorioBase) {
     };
 }
 
-function calcularStatusGeral(totais) {
+function calcularStatusGeral(totais: TotaisDiagnostico): Status {
     if (totais.falha > 0) return "falha";
     if (totais.alerta > 0) return "alerta";
     return "ok";
 }
 
-function consolidar(resultado) {
-    const totais = {
+function consolidar(resultado: RecursoVerificado[]): ResultadoConsolidado {
+    const totais: TotaisDiagnostico = {
         ok: resultado.filter((item) => item.status === "ok").length,
         alerta: resultado.filter((item) => item.status === "alerta").length,
         falha: resultado.filter((item) => item.status === "falha").length
@@ -244,11 +322,11 @@ function consolidar(resultado) {
     };
 }
 
-function imprimirHumano(resultado, consolidado) {
+function imprimirHumano(resultado: RecursoVerificado[], consolidado: ResultadoConsolidado): void {
     imprimirCabecalho("Diagnostico do SGC", "Valida comandos, arquivos e infraestrutura do sistema.");
     escreverLinha("");
 
-    const porCategoria = {};
+    const porCategoria: Record<string, RecursoVerificado[]> = {};
     for (const item of resultado) {
         if (!porCategoria[item.categoria]) porCategoria[item.categoria] = [];
         porCategoria[item.categoria].push(item);
@@ -266,11 +344,11 @@ function imprimirHumano(resultado, consolidado) {
     escreverLinha(`Totais: ${consolidado.totais.ok} ok, ${consolidado.totais.alerta} alertas, ${consolidado.totais.falha} falhas`);
 }
 
-async function executarDiagnostico(opcoes = {}) {
+async function executarDiagnostico(opcoes: OpcoesDiagnostico = {}): Promise<ResultadoDiagnostico> {
     const diretorioBase = opcoes.base ? path.resolve(opcoes.base) : resolverNaRaiz();
     const verificacoes = [
-        ...(await Promise.all(RECURSOS.map((recurso) => verificarRecurso(recurso, diretorioBase)))),
-        ...(await verificarComandosRegistrados(diretorioBase))
+        ...(await Promise.all((opcoes.recursos ?? RECURSOS).map((recurso) => verificarRecurso(recurso, diretorioBase)))),
+        ...(await verificarComandosRegistrados(diretorioBase, opcoes.comandosRegistrados))
     ];
     const consolidado = consolidar(verificacoes);
     const saida = {

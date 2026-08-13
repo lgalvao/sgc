@@ -32,7 +32,7 @@
     "integracao/contratos-fixar-baseline.js",
     "projeto/arvore-linhas.ts",
     "projeto/dependencias-auditar.js",
-    "projeto/diagnostico.js",
+    "projeto/diagnostico.ts",
     "projeto/limpar.js",
     "projeto/preparar.js",
     "projeto/qualidade.js",
