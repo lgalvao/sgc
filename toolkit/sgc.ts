@@ -41,7 +41,7 @@ criarComandoScript(backendContratos, "auditar", "Audita vazamentos de model.* em
 
 const backendTestes = backend.command("testes").description("Ferramentas de testes do backend.");
 criarComandoScript(backendTestes, "analisar", "Detecta classes sem testes e gera Markdown/JSON.", "toolkit/backend/testes-analisar.js");
-criarComandoScript(backendTestes, "priorizar", "Prioriza backlog de testes do backend.", "toolkit/backend/testes-priorizar.js");
+criarComandoScript(backendTestes, "priorizar", "Prioriza backlog de testes do backend.", "toolkit/backend/testes-priorizar.ts");
 
 const backendJava = backend.command("java").description("Utilitarios Java do backend.");
 criarComandoScript(backendJava, "corrigir-fqn", "Substitui FQNs por imports em arquivos Java.", "toolkit/backend/java-corrigir-fqn.js");

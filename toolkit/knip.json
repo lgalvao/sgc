@@ -8,7 +8,7 @@
     "backend/java-corrigir-fqn.js",
     "backend/notificacoes-assuntos-auditar.js",
     "backend/testes-analisar.js",
-    "backend/testes-priorizar.js",
+    "backend/testes-priorizar.ts",
     "codigo/cheiros-auditar.js",
     "codigo/idioma-consistencia-auditar.js",
     "codigo/nomes-consistencia-auditar.js",

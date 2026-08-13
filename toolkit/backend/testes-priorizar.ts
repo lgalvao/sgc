@@ -1,10 +1,32 @@
 #!/usr/bin/env node
+// Priorizador de testes do backend.
 import fs from "node:fs";
 import path from "node:path";
 import {lerOpcao} from "../lib/cli-opcoes.js";
 import {exibirAjudaComando} from "../lib/cli-ajuda.js";
 import {ehEntradaPrincipal} from "../lib/execucao.js";
 import {escreverLinha} from "../lib/saida.js";
+
+type Prioridade = "P1" | "P2" | "P3";
+
+interface OpcoesPriorizar {
+    entrada: string;
+    entradaExplicita: boolean;
+    saida: string;
+    ajuda: boolean;
+}
+
+interface Pendencia {
+    caminho_relativo: string;
+    evidencia_qualidade: string;
+}
+
+type PendenciaEntrada = Pendencia | string;
+type PendenciasPriorizadas = Record<Prioridade, Pendencia[]>;
+
+interface RegistroJson {
+    [chave: string]: unknown;
+}
 
 const PADROES_P1 = [
     /Service\.java$/,
@@ -37,11 +59,11 @@ const PADROES_ESTRUTURAIS = [
     /Erro.*\.java$/
 ];
 
-function lerArgumentos(argumentos) {
+function lerArgumentos(argumentos: string[]): OpcoesPriorizar {
     const resultado = {
-        entrada: lerOpcao(argumentos, "--input", "unit-test-report.md"),
+        entrada: lerOpcao(argumentos, "--input", "unit-test-report.md") ?? "unit-test-report.md",
         entradaExplicita: argumentos.includes("--input") || argumentos.some((argumento) => argumento.startsWith("--input=")),
-        saida: lerOpcao(argumentos, "--output", "prioritized-tests.md"),
+        saida: lerOpcao(argumentos, "--output", "prioritized-tests.md") ?? "prioritized-tests.md",
         ajuda: argumentos.includes("--help") || argumentos.includes("-h"),
     };
     return resultado;
@@ -50,7 +72,7 @@ function lerArgumentos(argumentos) {
 function imprimirAjuda() {
     exibirAjudaComando({
         comandoSgc: "backend testes priorizar",
-        scriptDireto: "backend/testes-priorizar.js",
+        scriptDireto: "backend/testes-priorizar.ts",
         descricao: 'Prioriza o backlog de testes a partir do relatorio estruturado ou Markdown.',
         opcoes: [
             '--input <arquivo>   Arquivo de entrada em JSON ou Markdown',
@@ -63,7 +85,7 @@ function imprimirAjuda() {
     });
 }
 
-function resolverEntradaPadrao(caminhoMarkdown) {
+function resolverEntradaPadrao(caminhoMarkdown: string): string {
     const diretorio = path.dirname(caminhoMarkdown);
     const nomeArquivo = `${path.parse(caminhoMarkdown).name}.json`;
     const jsonSidecar = diretorio === '.' ? nomeArquivo : path.join(diretorio, nomeArquivo);
@@ -75,7 +97,7 @@ function resolverEntradaPadrao(caminhoMarkdown) {
     return caminhoMarkdown;
 }
 
-function classificarArquivo(caminhoArquivo) {
+function classificarArquivo(caminhoArquivo: string): Prioridade | null {
     if (PADROES_IGNORADOS.some(pattern => pattern.test(caminhoArquivo))) {
         return null;
     }
@@ -91,47 +113,66 @@ function classificarArquivo(caminhoArquivo) {
     return 'P3';
 }
 
-function extrairPendenciasDeJson(caminhoEntrada) {
-    const dados = JSON.parse(fs.readFileSync(caminhoEntrada, 'utf-8'));
-    const pendencias = [];
-    Object.values(dados.categorias || {}).forEach(categoria => {
-        (categoria.untested || []).forEach(item => {
-            const ignorado = item.dto_ruido_ignorado || item.model_ruido_ignorado || item.other_ruido_ignorado;
-            if (ignorado || item.evidencia_qualidade === 'fora_escopo_jacoco') {
-                return;
+function ehRegistroJson(valor: unknown): valor is RegistroJson {
+    return typeof valor === "object" && valor !== null && !Array.isArray(valor);
+}
+
+function extrairPendenciasDeJson(caminhoEntrada: string): Pendencia[] {
+    const dados: unknown = JSON.parse(fs.readFileSync(caminhoEntrada, "utf-8"));
+    if (!ehRegistroJson(dados) || !ehRegistroJson(dados.categorias)) {
+        return [];
+    }
+
+    const pendencias: Pendencia[] = [];
+    for (const categoria of Object.values(dados.categorias)) {
+        if (!ehRegistroJson(categoria) || !Array.isArray(categoria.untested)) {
+            continue;
+        }
+
+        for (const item of categoria.untested) {
+            if (!ehRegistroJson(item) || typeof item.caminho_relativo !== "string") {
+                continue;
             }
+
+            const ignorado = item.dto_ruido_ignorado || item.model_ruido_ignorado || item.other_ruido_ignorado;
+            if (ignorado || item.evidencia_qualidade === "fora_escopo_jacoco") {
+                continue;
+            }
+
             pendencias.push({
                 caminho_relativo: item.caminho_relativo,
-                evidencia_qualidade: item.evidencia_qualidade
+                evidencia_qualidade: typeof item.evidencia_qualidade === "string"
+                    ? item.evidencia_qualidade
+                    : "desconhecida"
             });
-        });
-    });
+        }
+    }
     return pendencias;
 }
 
-function extrairPendenciasDeMarkdown(caminhoEntrada) {
+function extrairPendenciasDeMarkdown(caminhoEntrada: string): string[] {
     const linhas = fs.readFileSync(caminhoEntrada, 'utf-8').split(/\r?\n/);
     return linhas
         .filter(linha => linha.trim().startsWith('- `'))
         .map(linha => linha.trim().replace('- `', '').replace(/`/g, ''));
 }
 
-function carregarPendencias(caminhoEntrada) {
+function carregarPendencias(caminhoEntrada: string): Pendencia[] {
     if (!fs.existsSync(caminhoEntrada)) {
         throw new Error(`Arquivo de entrada nao encontrado: ${caminhoEntrada}`);
     }
     const pendencias = caminhoEntrada.endsWith('.json')
         ? extrairPendenciasDeJson(caminhoEntrada)
         : extrairPendenciasDeMarkdown(caminhoEntrada);
-    return pendencias.map(item => typeof item === 'string' ? {
+    return pendencias.map((item: PendenciaEntrada): Pendencia => typeof item === 'string' ? {
         caminho_relativo: item,
-        evidencia_qualidade: 'desconhecida'
+        evidencia_qualidade: "desconhecida"
     } : item);
 }
 
-function priorizar(caminhoEntrada) {
+function priorizar(caminhoEntrada: string): PendenciasPriorizadas {
     const pendencias = carregarPendencias(caminhoEntrada);
-    const priorizadas = {P1: [], P2: [], P3: []};
+    const priorizadas: PendenciasPriorizadas = {P1: [], P2: [], P3: []};
 
     pendencias.forEach(({caminho_relativo, evidencia_qualidade}) => {
         const prioridade = classificarArquivo(caminho_relativo);
@@ -143,7 +184,7 @@ function priorizar(caminhoEntrada) {
         }
     });
 
-    Object.keys(priorizadas).forEach(chave => priorizadas[chave].sort((a, b) => {
+    (Object.keys(priorizadas) as Prioridade[]).forEach(chave => priorizadas[chave].sort((a, b) => {
         const pesoA = a.evidencia_qualidade === 'sem_evidencia_no_escopo' ? 0 : 1;
         const pesoB = b.evidencia_qualidade === 'sem_evidencia_no_escopo' ? 0 : 1;
         return pesoA - pesoB || a.caminho_relativo.localeCompare(b.caminho_relativo, 'pt-BR');
@@ -151,7 +192,7 @@ function priorizar(caminhoEntrada) {
     return priorizadas;
 }
 
-function descricaoEvidencia(item) {
+function descricaoEvidencia(item: Pendencia): string {
     if (item.evidencia_qualidade === 'cobertura_indireta') {
         return 'cobertura indireta';
     }
@@ -161,7 +202,7 @@ function descricaoEvidencia(item) {
     return 'pendência';
 }
 
-function gerarMarkdown(priorizadas) {
+function gerarMarkdown(priorizadas: PendenciasPriorizadas): string {
     const linhas = [
         '# Plano de Priorizacao de Testes Unitarios\n',
         '## P1: Criticos (Logica de Negocio e Seguranca)\n',
@@ -193,7 +234,7 @@ function gerarMarkdown(priorizadas) {
     return `${linhas.join('\n')}\n`;
 }
 
-function principal(argumentos = process.argv.slice(2)) {
+function principal(argumentos: string[] = process.argv.slice(2)): void {
     const opcoes = lerArgumentos(argumentos);
     if (opcoes.ajuda) {
         imprimirAjuda();
