@@ -92,6 +92,9 @@ a descoberta tradicional de `src/main/java` e `src/test/java`.
 `backend testes analisar` gera `analise-testes.md` e `analise-testes.json` por padrão; `backend testes priorizar` consome
 esse sidecar e grava `priorizacao-testes.md` por padrão.
 
+Em `backend testes analisar`, `--diretorio` pode ser absoluto ou relativo a `--base`; quando omitido, os diretórios
+configurados `backendCodigo` e `backendTestes` são usados.
+
 ### Frontend
 
 ```bash

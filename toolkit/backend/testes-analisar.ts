@@ -110,7 +110,7 @@ interface OpcoesAnaliseTestes {
 function lerArgumentos(argumentos: string[]): OpcoesAnalisar {
     const base = path.resolve(lerOpcao(argumentos, "--base", DIRETORIO_RAIZ) ?? DIRETORIO_RAIZ);
     const diretorioInformado = lerOpcao(argumentos, "--diretorio", undefined);
-    const raizBackendInformada = diretorioInformado ? path.resolve(diretorioInformado) : null;
+    const raizBackendInformada = diretorioInformado ? path.resolve(base, diretorioInformado) : null;
     const resultado = {
         base,
         diretorio: raizBackendInformada

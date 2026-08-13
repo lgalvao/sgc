@@ -264,6 +264,8 @@ frontend e para os caminhos OpenAPI.
   `--entrada`, `--saida`, `--saida-json`, `--arquivo-jacoco`), sem alterar as chaves estruturadas do relatório.
 - `backend/testes-analisar.ts` agora usa `lib/saida.ts` também para o resumo humano; a emissão não bypassa mais a
   fronteira comum com `console.log`, sem alterar o Markdown, o JSON ou os textos produzidos.
+- `backend/testes-analisar.ts` agora resolve `--diretorio` relativo a `--base`, preservando caminhos absolutos e
+  evitando que a pasta de execução do processo determine a raiz de um projeto externo.
 - `projeto/dependencias-auditar.ts` agora usa `escreverLinha` para separar e nomear os escopos, eliminando o último
   `process.stdout.write` de produção identificado na auditoria de saída humana.
 - Cobertura, Semgrep e identificadores de teste frontend também adotaram `--saida`/`--diretorio`; a CLI não mantém
@@ -391,7 +393,7 @@ frontend e para os caminhos OpenAPI.
 
 Nas validações desta rodada, em 13 de agosto de 2026, executadas diretamente sob Node `26.7.0`:
 
-- `npm --prefix toolkit run test`: 118 testes aprovados em 7 arquivos; o smoke de pacote é separado para não tornar a
+- `npm --prefix toolkit run test`: 119 testes aprovados em 7 arquivos; o smoke de pacote é separado para não tornar a
   suíte unitária dependente de rede ou instalação;
 - `npm --prefix toolkit run test:coverage`: aprovado com baseline informativa de 45,27% de statements (594/1.312),
   33,29% de branches (304/913), 51,90% de funções (136/262) e 45,49% de linhas (571/1.255); o script exclui
@@ -452,7 +454,8 @@ Na rodada seguinte, o corretor FQN passou a usar `backendCodigo` e `backendTeste
 testes Java externos; a suíte chega a 117 cenários regulares e `test/sgc.test.ts` passa a ter 79. Na rodada seguinte,
 os relatórios backend passaram a usar os nomes portugueses `analise-testes.md/json` e `priorizacao-testes.md`; a limpeza
 passou a derivar backend, frontend e artefatos da configuração e a suíte chega a 118 cenários regulares, com
-`test/projeto.test.ts` em 17.
+`test/projeto.test.ts` em 17. Na rodada seguinte, `backend testes analisar` passou a resolver `--diretorio` relativo a
+`--base`, com regressão em uma base externa; a suíte chega a 119 cenários regulares e `test/sgc.test.ts` passa a ter 80.
 
 ### 3.3 Tamanho e composição atual
 
@@ -463,7 +466,7 @@ Inventário dos arquivos rastreados do toolkit, excluindo `dist`, cobertura e ar
 - 0 arquivos JavaScript de teste e 8 arquivos TypeScript de teste (`test/sgc.test.ts`, `test/projeto.test.ts`,
   `test/configuracao.test.ts`, `test/integracao.test.ts`, `test/qualidade.test.ts`, `test/cdus.test.ts`,
   `test/externo.test.ts` e `test/pacote.test.ts`);
-- 7 arquivos de teste TypeScript concentram 118 cenários regulares, mais 1 smoke de distribuição isolada;
+- 7 arquivos de teste TypeScript concentram 119 cenários regulares, mais 1 smoke de distribuição isolada;
 - `test/apoio.ts` centraliza a raiz do toolkit, o launcher `tsx`, o contrato de execução e `executarSgc`, evitando
   cópias divergentes nos testes de projeto, integração, qualidade e CLI;
 - maior módulo atual: `frontend/arquitetura-lib.ts`, com aproximadamente 1.200 linhas;
@@ -485,13 +488,14 @@ O núcleo TypeScript de implementação foi concluído: 100% dos arquivos de imp
 | Resolvido nesta rodada | Auditores gravam por padrão | `codigo cheiros auditar`, `frontend arquitetura auditar`, `backend arquitetura auditar`, `backend coesao auditar`, `backend contratos auditar`, `frontend residuos auditar/validar`, `codigo semgrep auditar`, toda a família `codigo nomes`, `integracao contratos diff` e as duas auditorias unificadas de cobertura agora só persistem com `--gravar`. Geração de relatórios, coleta e mutações continuam classificadas separadamente. |
 | Resolvido | Cobertura insuficiente de mutação | O corretor `backend/java-corrigir-fqn.ts` agora tem fixture de escrita, verificação de conteúdo sem duplicação e segunda execução idempotente. |
 | Resolvido nesta rodada | Corretor FQN ignorava raízes Java configuradas | `backend/java-corrigir-fqn` agora usa `diretorios.backendCodigo` e `diretorios.backendTestes` quando a base possui configuração; a heurística anterior continua para uma base backend isolada sem configuração. |
+| Resolvido nesta rodada | Análise de testes ignorava a base para diretório explícito | `backend testes analisar --diretorio servidor --base <base>` agora procura `servidor` dentro da base informada; caminhos absolutos continuam inalterados. |
 | Resolvido | Efeito colateral oculto de gravação | `codigo nomes auditar-consistencia` gerava o inventário auxiliar com gravação habilitada e contaminava `--json`; a opção `--gravar` agora é propagada e a coleta interna é silenciosa. |
 | Resolvido | Configuração sem validação | `configuracao-toolkit.json` agora exige a versão `1` e valida estrutura, chaves conhecidas e caminhos textuais antes da combinação com defaults. |
 | Resolvido nesta rodada | Políticas de resíduos apontando para legado ausente | Os defaults de orçamento e exceções frontend foram removidos; overrides continuam aceitos, a ausência usa política neutra explícita e arquivo configurado ausente ou inválido falha visivelmente. |
 | Média | Opções e efeitos divergentes | Os comandos principais já usam opções em português; ainda há defaults de nomes de artefatos e alguns contratos de geração que precisam ser uniformizados, além de mutações sem prévia uniforme. |
 | Resolvido nesta rodada | Testes não representam pacote externo | A suíte interna continua separada do smoke de distribuição, e `npm run test:pacote` empacota, instala em diretório isolado e executa o binário sem dependências hoisted do monorepo. |
 | Resolvido nesta rodada | Cobertura funcional não medida | `npm run test:coverage` agora gera a baseline informativa do próprio toolkit com `@vitest/coverage-v8`; threshold fica para depois da divisão dos testes por domínio e da análise dos contratos críticos. |
-| Resolvido nesta rodada | Testes de projeto misturados ao teste da CLI | Os 17 cenários de versão, árvore, diagnóstico, limpeza, preparação, qualidade e dependências agora estão em `test/projeto.test.ts`; o teste principal concentra 79 cenários e a suíte permite execução focada por domínio. |
+| Resolvido nesta rodada | Testes de projeto misturados ao teste da CLI | Os 17 cenários de versão, árvore, diagnóstico, limpeza, preparação, qualidade e dependências agora estão em `test/projeto.test.ts`; o teste principal concentra 80 cenários e a suíte permite execução focada por domínio. |
 | Resolvido nesta rodada | Nomenclatura e limpeza de relatórios divergentes | O pipeline backend agora usa `analise-testes.md/json` -> `priorizacao-testes.md`; `projeto/limpar` deriva diretórios configurados e remove apenas padrões ainda produzidos, descartando caminhos legados sem referências. |
 | Resolvido nesta rodada | Configuração misturada à validação da CLI | Os 3 cenários de carregamento, validação e execução parametrizada agora estão em `test/configuracao.test.ts`; o teste principal caiu para 83 cenários e a configuração pode ser validada sem importar o roteador. |
 | Resolvido nesta rodada | Integração OpenAPI misturada à validação da CLI | Os 2 cenários de importação e artefatos OpenAPI agora estão em `test/integracao.test.ts`; o teste principal caiu para 81 cenários e a persistência de diff continua coberta com `--gravar`. |
@@ -519,7 +523,7 @@ O núcleo TypeScript de implementação foi concluído: 100% dos arquivos de imp
 - Parametrização parcial não significa generalização concluída.
 - Build aprovado prova que a árvore pode ser emitida; não prova que o pacote emitido contém assets, configuração e
   resolução de raiz adequados para distribuição.
-- Knip aprovado, 118 testes unitários verdes e o smoke de pacote aprovado são gates úteis, mas ainda insuficientes para afirmar ausência de código morto fora
+- Knip aprovado, 119 testes unitários verdes e o smoke de pacote aprovado são gates úteis, mas ainda insuficientes para afirmar ausência de código morto fora
   do grafo declarado, segurança de todos os comandos mutáveis ou portabilidade. O grafo do Knip agora é uma evidência
   útil de exports não consumidos; não substitui testes de pacote externo.
 
@@ -635,7 +639,7 @@ do perfil.
 
 ### Prioridade média
 
-9. **Testes ainda parcialmente concentrados**: `test/sgc.test.ts` ainda concentra 79 cenários, embora os 17 cenários
+9. **Testes ainda parcialmente concentrados**: `test/sgc.test.ts` ainda concentra 80 cenários, embora os 17 cenários
    de projeto, os 3 de configuração, os 2 de integração e os 4 de qualidade já tenham sido extraídos para arquivos
    próprios. Dividir os cenários restantes por domínio continua recomendado para localizar contratos, reduzir o custo de
    execução focada e permitir fixtures mais independentes.
