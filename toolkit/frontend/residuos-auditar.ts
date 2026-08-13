@@ -7,12 +7,20 @@ import {
     resolverCaminhoOrcamentoResiduos,
     resolverDiretorioSaidaResiduos
 } from "./residuos-lib.js";
+import type {FotografiaResiduos} from "./residuos-lib.js";
 import {escreverLinha, imprimirCabecalho, imprimirJson} from "../lib/saida.js";
 import {exibirAjudaComando} from "../lib/cli-ajuda.js";
 import {lerOpcao} from "../lib/cli-opcoes.js";
 import {ehEntradaPrincipal} from "../lib/execucao.js";
 
-async function executarAuditoriaFrontendResiduos(opcoes = {}) {
+interface OpcoesAuditoriaFrontendResiduos {
+    base?: string;
+    orcamento?: string;
+    saida?: string;
+    semGravar?: boolean;
+}
+
+async function executarAuditoriaFrontendResiduos(opcoes: OpcoesAuditoriaFrontendResiduos = {}): Promise<FotografiaResiduos> {
     const fotografia = await analisarResiduosFrontend({
         base: opcoes.base,
         caminhoOrcamento: opcoes.orcamento,
@@ -25,14 +33,14 @@ async function executarAuditoriaFrontendResiduos(opcoes = {}) {
     return fotografia;
 }
 
-async function principal(argumentos = process.argv.slice(2)) {
+async function principal(argumentos: string[] = process.argv.slice(2)): Promise<void> {
     const emitirJson = argumentos.includes("--json");
     const exibirAjuda = argumentos.includes("--help") || argumentos.includes("-h");
 
     if (exibirAjuda) {
         exibirAjudaComando({
             comandoSgc: "frontend residuos auditar",
-            scriptDireto: "frontend/residuos-auditar.js",
+            scriptDireto: "frontend/residuos-auditar.ts",
             descricao: "Audita sinais de residuos estruturais e defensividade acidental no frontend.",
             opcoes: [
                 "--json               Emite a fotografia em JSON.",
@@ -84,7 +92,7 @@ async function principal(argumentos = process.argv.slice(2)) {
     });
 
     if (!argumentos.includes("--sem-gravar")) {
-        const diretorio = lerOpcao(argumentos, "--saida", resolverDiretorioSaidaResiduos(fotografia.base));
+        const diretorio = lerOpcao(argumentos, "--saida", resolverDiretorioSaidaResiduos(fotografia.base)) ?? resolverDiretorioSaidaResiduos(fotografia.base);
         escreverLinha("");
         escreverLinha(`${pc.green("✓")} Fotografia salva em ${path.relative(process.cwd(), diretorio).replaceAll("\\", "/")}`);
     }

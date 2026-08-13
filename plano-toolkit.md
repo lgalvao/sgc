@@ -235,6 +235,8 @@ frontend e para os caminhos OpenAPI.
 - `frontend/cobertura-ramificacoes.ts`, `frontend/cobertura-ramificacoes-erros.ts` e
   `frontend/cobertura-auditoria.ts` foram convertidos para TypeScript com tipos para métricas V8, hotspots, linhas
   suspeitas e relatórios; os filtros de arquivos e heurísticas de erro do perfil SGC foram preservados.
+- `frontend/residuos-auditar.ts` e `frontend/residuos-validar.ts` foram convertidos para TypeScript; fotografia,
+  violações, avisos, exceções e opções de persistência agora têm contratos explícitos, mantendo os budgets do SGC.
 - `integracao/contratos-openapi-caminhos.ts` foi convertido para TypeScript com o contrato explícito dos caminhos
   atual, de referência e de relatório; ele permanece independente do gerador de tipos removido.
 - `integracao/contratos-exportar-openapi.ts`, `integracao/contratos-diff.ts` e
@@ -284,15 +286,15 @@ para 100 cenários.
 
 Inventário dos arquivos rastreados do toolkit, excluindo `dist`, cobertura e artefatos ignorados:
 
-- 39 arquivos TypeScript de implementação;
-- 33 arquivos JavaScript de implementação ainda pendentes;
+- 41 arquivos TypeScript de implementação;
+- 31 arquivos JavaScript de implementação ainda pendentes;
 - 2 arquivos JavaScript de teste (`test/sgc.test.js` e `test/cdus.test.js`);
 - 2 arquivos de teste concentrando 100 cenários;
 - maior módulo atual: `frontend/arquitetura-lib.ts`, com aproximadamente 1.200 linhas;
 - outros hotspots: `codigo/nomes-simbolos-coletar.js`, `backend/testes-analisar.js`,
   `frontend/residuos-lib.ts`, `backend/contratos-auditar.js` e `qualidade/coleta-execucao.ts`.
 
-O núcleo TypeScript está adiantado, mas a migração do toolkit como um todo ainda não terminou: aproximadamente 54% dos
+O núcleo TypeScript está adiantado, mas a migração do toolkit como um todo ainda não terminou: aproximadamente 57% dos
 arquivos de implementação rastreados são TypeScript.
 
 ### 3.4 Achados da auditoria crítica
@@ -537,7 +539,7 @@ Lotes sugeridos:
    catálogo padrão continua sendo o perfil SGC, com base e execução parametrizáveis para reuso externo.
 2. **Backend**: cobertura, análise/priorização de testes, contratos e FQN; parametrizar raiz Java, tarefas Gradle e
    categorias.
-3. **[parcial nesta rodada]** Frontend: cobertura V8 já convertida; faltam resíduos, acessibilidade e identificadores
+3. **[parcial nesta rodada]** Frontend: cobertura V8 e resíduos já convertidos; faltam acessibilidade e identificadores
    de teste. Parametrizar raiz Vue, globs e convenções de componentes.
 4. **[concluído nesta rodada]** Integração: exportação, diff e baseline OpenAPI; o módulo permanece independente do
    gerador de tipos removido.

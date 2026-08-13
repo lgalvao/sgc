@@ -10,12 +10,47 @@ import {
     resolverCaminhoOrcamentoResiduos,
     resolverDiretorioSaidaResiduos
 } from "./residuos-lib.js";
+import type {ExcecaoResiduo, FotografiaResiduos} from "./residuos-lib.js";
 import {escreverLinha, imprimirCabecalho, imprimirJson} from "../lib/saida.js";
 import {exibirAjudaComando} from "../lib/cli-ajuda.js";
 import {lerOpcao} from "../lib/cli-opcoes.js";
 import {ehEntradaPrincipal} from "../lib/execucao.js";
 
-function criarViolacao(tipo, mensagem, detalhes = {}) {
+interface ViolacaoResiduoValidacao {
+    tipo: string;
+    mensagem: string;
+    [chave: string]: unknown;
+}
+
+interface ResultadoValidacaoResiduos {
+    status: "ok" | "falha";
+    geradoEm: string;
+    resumo: {
+        scoreTotal: number;
+        faixa: FotografiaResiduos["resumo"]["faixa"];
+        violacoes: number;
+        avisos: number;
+    };
+    orcamento: string;
+    excecoes: string;
+    fotografia: FotografiaResiduos;
+    violacoes: ViolacaoResiduoValidacao[];
+    avisos: ViolacaoResiduoValidacao[];
+}
+
+interface ResumoValidacaoResiduos extends Omit<ResultadoValidacaoResiduos, "fotografia"> {
+    hotspots: FotografiaResiduos["hotspots"];
+}
+
+interface OpcoesValidacaoFrontendResiduos {
+    base?: string;
+    orcamento?: string;
+    excecoes?: string;
+    saida?: string;
+    semGravar?: boolean;
+}
+
+function criarViolacao(tipo: string, mensagem: string, detalhes: Record<string, unknown> = {}): ViolacaoResiduoValidacao {
     return {
         tipo,
         mensagem,
@@ -23,11 +58,11 @@ function criarViolacao(tipo, mensagem, detalhes = {}) {
     };
 }
 
-function indexarExcecoes(excecoes) {
+function indexarExcecoes(excecoes: ExcecaoResiduo[]): Map<string, ExcecaoResiduo> {
     return new Map(excecoes.map((excecao) => [excecao.arquivo, excecao]));
 }
 
-function resumirResultado(resultado) {
+function resumirResultado(resultado: ResultadoValidacaoResiduos): ResumoValidacaoResiduos {
     return {
         status: resultado.status,
         geradoEm: resultado.geradoEm,
@@ -40,7 +75,9 @@ function resumirResultado(resultado) {
     };
 }
 
-async function executarValidacaoFrontendResiduos(opcoes = {}) {
+async function executarValidacaoFrontendResiduos(
+    opcoes: OpcoesValidacaoFrontendResiduos = {}
+): Promise<ResultadoValidacaoResiduos> {
     const base = path.resolve(opcoes.base ?? DIRETORIO_RAIZ);
     const caminhoOrcamento = path.resolve(opcoes.orcamento ?? resolverCaminhoOrcamentoResiduos(base));
     const caminhoExcecoes = path.resolve(opcoes.excecoes ?? resolverCaminhoExcecoesResiduos(base));
@@ -50,15 +87,15 @@ async function executarValidacaoFrontendResiduos(opcoes = {}) {
     });
     const excecoes = await carregarExcecoes(caminhoExcecoes);
     const excecoesPorArquivo = indexarExcecoes(excecoes.excecoes);
-    const violacoes = [];
-    const avisos = [];
+    const violacoes: ViolacaoResiduoValidacao[] = [];
+    const avisos: ViolacaoResiduoValidacao[] = [];
 
     const maximos = fotografia.orcamento.metricas?.maximosProducao ?? {};
     for (const [chave, maximo] of Object.entries(maximos)) {
-        if (chave === "arquivosAcimaMetaPorCamada") {
+        if (chave === "arquivosAcimaMetaPorCamada" || typeof maximo !== "number") {
             continue;
         }
-        const valorAtual = fotografia.contagens.producao[chave];
+        const valorAtual = fotografia.contagens.producao[chave as keyof typeof fotografia.contagens.producao];
         if (typeof valorAtual !== "number" || typeof maximo !== "number") {
             continue;
         }
@@ -71,7 +108,8 @@ async function executarValidacaoFrontendResiduos(opcoes = {}) {
         }
     }
 
-    const maximosCamada = fotografia.orcamento.metricas?.maximosProducao?.arquivosAcimaMetaPorCamada ?? {};
+    const maximosCamadaValor = fotografia.orcamento.metricas?.maximosProducao?.arquivosAcimaMetaPorCamada;
+    const maximosCamada = maximosCamadaValor && typeof maximosCamadaValor === "object" ? maximosCamadaValor : {};
     for (const [camada, maximo] of Object.entries(maximosCamada)) {
         const valorAtual = fotografia.contagens.producao.arquivosAcimaMeta[camada] ?? 0;
         if (valorAtual > maximo) {
@@ -122,7 +160,7 @@ async function executarValidacaoFrontendResiduos(opcoes = {}) {
         await gravarFotografiaAuditoria(fotografia, opcoes.saida ?? resolverDiretorioSaidaResiduos(base));
     }
 
-    return {
+    const resultado: ResultadoValidacaoResiduos = {
         status: violacoes.length === 0 ? "ok" : "falha",
         geradoEm: new Date().toISOString(),
         resumo: {
@@ -137,9 +175,11 @@ async function executarValidacaoFrontendResiduos(opcoes = {}) {
         violacoes,
         avisos,
     };
+
+    return resultado;
 }
 
-async function principal(argumentos = process.argv.slice(2)) {
+async function principal(argumentos: string[] = process.argv.slice(2)): Promise<void> {
     const emitirJson = argumentos.includes("--json");
     const emitirJsonResumido = argumentos.includes("--json-resumido");
     const exibirAjuda = argumentos.includes("--help") || argumentos.includes("-h");
@@ -147,7 +187,7 @@ async function principal(argumentos = process.argv.slice(2)) {
     if (exibirAjuda) {
         exibirAjudaComando({
             comandoSgc: "frontend residuos validar",
-            scriptDireto: "frontend/residuos-validar.js",
+            scriptDireto: "frontend/residuos-validar.ts",
             descricao: "Valida orcamentos e excecoes dos residuos do frontend para impedir regressao estrutural.",
             opcoes: [
                 "--json               Emite o resultado em JSON.",
@@ -169,13 +209,13 @@ async function principal(argumentos = process.argv.slice(2)) {
 
     const base = lerOpcao(argumentos, "--base", undefined);
     const baseResolvida = path.resolve(base ?? DIRETORIO_RAIZ);
-    const orcamento = path.resolve(lerOpcao(argumentos, "--orcamento", resolverCaminhoOrcamentoResiduos(baseResolvida)));
-    const excecoes = path.resolve(lerOpcao(argumentos, "--excecoes", resolverCaminhoExcecoesResiduos(baseResolvida)));
+    const orcamento = path.resolve(lerOpcao(argumentos, "--orcamento", resolverCaminhoOrcamentoResiduos(baseResolvida)) ?? resolverCaminhoOrcamentoResiduos(baseResolvida));
+    const excecoes = path.resolve(lerOpcao(argumentos, "--excecoes", resolverCaminhoExcecoesResiduos(baseResolvida)) ?? resolverCaminhoExcecoesResiduos(baseResolvida));
     const resultado = await executarValidacaoFrontendResiduos({
         base: baseResolvida,
         orcamento,
         excecoes,
-        saida: path.resolve(lerOpcao(argumentos, "--saida", resolverDiretorioSaidaResiduos(baseResolvida))),
+        saida: path.resolve(lerOpcao(argumentos, "--saida", resolverDiretorioSaidaResiduos(baseResolvida)) ?? resolverDiretorioSaidaResiduos(baseResolvida)),
         semGravar: argumentos.includes("--sem-gravar"),
     });
 
@@ -218,7 +258,7 @@ async function principal(argumentos = process.argv.slice(2)) {
     escreverLinha("");
     escreverLinha(`Orcamento: ${resultado.orcamento}`);
     escreverLinha(`Excecoes: ${resultado.excecoes}`);
-    escreverLinha(`Fotografia mais recente: ${path.relative(process.cwd(), path.resolve(lerOpcao(argumentos, "--saida", resolverDiretorioSaidaResiduos(baseResolvida)))).replaceAll("\\", "/")}`);
+    escreverLinha(`Fotografia mais recente: ${path.relative(process.cwd(), path.resolve(lerOpcao(argumentos, "--saida", resolverDiretorioSaidaResiduos(baseResolvida)) ?? resolverDiretorioSaidaResiduos(baseResolvida))).replaceAll("\\", "/")}`);
 
     if (resultado.status !== "ok") process.exitCode = 1;
 }

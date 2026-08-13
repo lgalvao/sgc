@@ -587,4 +587,6 @@ export {
     resolverCaminhoExcecoesResiduos,
     resolverCaminhoOrcamentoResiduos,
     resolverDiretorioSaidaResiduos,
+    type ExcecaoResiduo,
+    type FotografiaResiduos,
 };

@@ -70,8 +70,8 @@ const CAMINHOS_COMANDOS_ESTRUTURA_FRONTEND = [
     "arquitetura-auditar.js",
     "arquitetura-validar.js",
     "modais-validar.js",
-    "residuos-auditar.js",
-    "residuos-validar.js",
+    "residuos-auditar.ts",
+    "residuos-validar.ts",
     "identificadores-teste-listar.js",
     "identificadores-teste-listar-duplicados.js",
     "views-templates-validar.js"
