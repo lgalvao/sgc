@@ -191,6 +191,8 @@ frontend e para os caminhos OpenAPI.
   parsing. Os dois domínios puros de cobertura agora têm entrada tipada e não fazem I/O durante a importação.
 - `backend/lib/testes-analisar-regras.ts` foi convertido para TypeScript com tipos internos para categorias, perfis,
   correspondências, evidências e itens de relatório; as regras SGC e as chaves JSON permaneceram inalteradas.
+- `requisitos/cdus-mensagens-lib.ts` foi convertido para TypeScript; os extratores Markdown e o mapa de contagens são
+  agora tipados e continuam compartilhados pelos auditores e inventários de mensagens.
 - A configuração já aceita alguns caminhos diferentes do layout do SGC; auditores de cobertura, arquitetura, coesão,
   contratos, resíduos e coleta possuem parametrização parcial por `--base`, `--arquivo`, `--saida` ou configuração.
   Arquitetura, resíduos, OpenAPI e coleta já resolvem seus defaults após a base; outros comandos ainda têm defaults
@@ -458,8 +460,8 @@ roteador fonte/compilado possuir testes de smoke equivalentes.
 
 1. **[concluído nesta rodada]** Migrar `lib/dominios/cobertura-java.ts` e `lib/dominios/cobertura-web.ts`, mantendo os
    contratos de métricas, os caminhos relativos à base auditada e os fixtures existentes.
-2. **[parcial nesta rodada]** Migrar `backend/lib/testes-analisar-regras.ts`; ainda faltam as bibliotecas puras de
-   frontend e requisitos.
+2. **[parcial nesta rodada]** Migrar `backend/lib/testes-analisar-regras.ts` e `requisitos/cdus-mensagens-lib.ts`; ainda
+   faltam as bibliotecas puras de frontend, o parser CDU e as bibliotecas de vocabulário/mensagens de código.
 3. **[parcial nesta rodada]** Introduzir tipos para JaCoCo, V8 e regras da análise de testes backend; ainda faltam
    fotografia de qualidade, achados de auditoria e diagnósticos.
 4. Substituir `any` implícito por `unknown` na entrada JSON e validar apenas o que o consumidor realmente exige.
