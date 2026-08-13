@@ -111,6 +111,7 @@ describe("Qualidade do toolkit", () => {
         const fotografia = await coletarFotografiaQualidade(["--perfil", "externo", "--base", diretorioBase], {
             perfis: {externo: ["checagemExterna"]},
             adaptadores: {checagemExterna: adaptador},
+            coletarMetadados: async () => ({origem: "externa"}),
             criarContexto: base => {
                 baseRecebida = base;
                 return {
@@ -126,6 +127,7 @@ describe("Qualidade do toolkit", () => {
         });
 
         expect(baseRecebida).toBe(diretorioBase);
+        expect(fotografia.metadados.git).toEqual({origem: "externa"});
         expect(fotografia.verificacoes).toHaveLength(1);
         expect(await fs.pathExists(path.join(diretorioArtefatos, "mais-recente", "fotografia.json"))).toBe(true);
         expect(await fs.pathExists(path.join(diretorioBase, "toolkit"))).toBe(false);

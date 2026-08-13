@@ -1,6 +1,5 @@
 import path from "node:path";
 import process from "node:process";
-import {execa} from "execa";
 import {DIRETORIO_RAIZ} from "../lib/caminhos.js";
 import {resolverCaminhoConfigurado} from "../lib/configuracao.js";
 import {ehEntradaPrincipal} from "../lib/execucao.js";
@@ -16,6 +15,7 @@ import {
     type FotografiaColeta
 } from "./coleta-fotografia.js";
 import {consolidarJUnit, parseJsonSeguro} from "./coleta-leitores.js";
+import {coletarMetadadosGit} from "./coleta-metadados.js";
 
 const VERSAO_SCHEMA = "1.0.0" as const;
 
@@ -29,6 +29,7 @@ interface OpcoesColeta {
     adaptadores?: CatalogoAdaptadores;
     perfis?: CatalogoPerfisColeta;
     criarContexto?: (base: string) => ContextoColeta;
+    coletarMetadados?: (base: string) => Promise<Record<string, string>>;
 }
 
 interface ExecucaoQualidade {
@@ -164,12 +165,6 @@ const ADAPTADORES: CatalogoAdaptadores = criarAdaptadoresSgc({
     obterOpcoesPlaywright
 });
 
-async function coletarGit(base: string): Promise<Record<string, string>> {
-    const branch = (await execa("git", ["rev-parse", "--abbrev-ref", "HEAD"], {cwd: base})).stdout.trim();
-    const commit = (await execa("git", ["rev-parse", "HEAD"], {cwd: base})).stdout.trim();
-    return {branch, commit};
-}
-
 async function principal(
     argumentos: string[] = process.argv.slice(2),
     opcoes: OpcoesColeta = {}
@@ -216,7 +211,7 @@ async function principal(
         perfilExecucao: perfilInformado,
         inicio,
         verificacoes,
-        git: await coletarGit(contexto.base).catch(() => ({}))
+        git: await (opcoes.coletarMetadados ?? coletarMetadadosGit)(contexto.base).catch(() => ({}))
     });
     const caminhoFotografia = await persistirFotografia(fotografia, {
         diretorioExecucao,
