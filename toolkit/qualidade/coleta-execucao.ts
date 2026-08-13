@@ -3,7 +3,7 @@ import path from "node:path";
 import process from "node:process";
 import {execa} from "execa";
 import {DIRETORIO_RAIZ, DIRETORIO_TOOLKIT} from "../lib/caminhos.js";
-import {CAMINHO_TSX, ehEntradaPrincipal} from "../lib/execucao.js";
+import {ehEntradaPrincipal, resolverCaminhoTsx} from "../lib/execucao.js";
 import {lerOpcao} from "../lib/cli-opcoes.js";
 import {resolverCaminhoConfigurado} from "../lib/configuracao.js";
 import {NOME_ARQUIVO_FOTOGRAFIA, obterDiretorioArtefatos} from "../lib/qualidade.js";
@@ -211,7 +211,7 @@ async function executarComando({comando, args, cwd, env}: OpcoesComando): Promis
 
 async function executarComandoSgc(contexto: ContextoColeta, argumentos: string[], incluirBase: boolean = true): Promise<ResultadoComando> {
     return executarComando({
-        comando: CAMINHO_TSX,
+        comando: resolverCaminhoTsx(),
         args: [CAMINHO_SGC, ...argumentos, ...(incluirBase ? ["--base", contexto.base] : [])],
         cwd: contexto.base,
     });

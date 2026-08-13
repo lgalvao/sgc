@@ -664,8 +664,9 @@ roteador fonte/compilado possuir testes de smoke equivalentes.
 4. Substituir `any` implícito por `unknown` na entrada JSON e validar apenas o que o consumidor realmente exige.
 5. **[concluído nesta rodada]** Criar `tsconfig.estrito.json` com `strict` e `noImplicitOverride`, aplicá-lo a toda a
    implementação TypeScript, zerar os diagnósticos e incorporá-lo ao `typecheck` principal.
-6. Eliminar defaults de caminho calculados durante import; expor funções que resolvam caminhos a partir da base e da
-   configuração efetivas.
+6. **[parcial nesta rodada]** Eliminar defaults de caminho calculados durante import; `lib/execucao.ts` agora resolve
+   o executável `tsx` somente ao executar um comando, removendo a sondagem `existsSync` do carregamento. Ainda faltam
+   revisar constantes de política e caminhos específicos de perfil, que não devem ser confundidas com I/O acidental.
 
 Critério de aceite: as bibliotecas convertidas não fazem I/O durante import, têm tipos públicos documentados e mantêm os
 mesmos fixtures e resultados JSON.
