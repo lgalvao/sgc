@@ -51,7 +51,7 @@ const CAMINHOS_COMANDOS_PROJETO = [
 const CAMINHOS_COMANDOS_QUALIDADE = [
     "coleta.ts",
     "coleta-execucao.ts",
-    "resumo.js"
+    "resumo.ts"
 ].map(nome => path.join(DIRETORIO_RAIZ, "toolkit", "qualidade", nome));
 const CAMINHOS_COMANDOS_CONSISTENCIA = [
     "nomes-simbolos-coletar.js",
@@ -2085,6 +2085,28 @@ describe("CLI raiz do toolkit", () => {
         const json = JSON.parse(resultado.stdout);
         expect(json.resumo.statusGeral).toBe("verde");
         expect(json.hotspots).toHaveLength(2);
+    });
+
+    test("resume a fotografia mais recente a partir da base externa", async () => {
+        const diretorioBase = await mkdtemp(path.join(os.tmpdir(), "sgc-qualidade-resumo-base-"));
+        const caminhoFotografia = path.join(diretorioBase, "toolkit", "qualidade", "artefatos", "mais-recente", "fotografia.json");
+        await fs.ensureDir(path.dirname(caminhoFotografia));
+        await fs.writeJson(caminhoFotografia, {
+            resumo: {
+                statusGeral: "verde",
+                indiceSaude: 98,
+                totais: {verificacoes: 1}
+            },
+            verificacoes: [],
+            hotspots: []
+        });
+
+        const resultado = await executarSgc(["qualidade", "resumo", "--json", "--base", diretorioBase]);
+
+        expect(resultado.exitCode).toBe(0);
+        const json = JSON.parse(resultado.stdout);
+        expect(json.resumo.statusGeral).toBe("verde");
+        expect(json.resumo.indiceSaude).toBe(98);
     });
 
     test("exibe ajuda de coleta de fotografia com opcao de perfil", async () => {

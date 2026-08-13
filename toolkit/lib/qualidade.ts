@@ -6,9 +6,9 @@ import {resolverCaminhoConfigurado} from "./configuracao.js";
 
 type FotografiaQualidade = Record<string, unknown>;
 
-interface ResultadoFotografiaQualidade {
+interface ResultadoFotografiaQualidade<TFotografia = FotografiaQualidade> {
     caminho: string;
-    fotografia: FotografiaQualidade;
+    fotografia: TFotografia;
 }
 
 const NOME_ARQUIVO_FOTOGRAFIA = "fotografia.json";
@@ -21,8 +21,8 @@ function obterCaminhoUltimaFotografia(diretorioBase = resolverNaRaiz()): string 
     return path.join(obterDiretorioArtefatos(diretorioBase), "mais-recente", NOME_ARQUIVO_FOTOGRAFIA);
 }
 
-async function lerFotografia(caminho: string): Promise<FotografiaQualidade> {
-    return JSON.parse(await readFile(caminho, "utf8")) as FotografiaQualidade;
+async function lerFotografia<TFotografia>(caminho: string): Promise<TFotografia> {
+    return JSON.parse(await readFile(caminho, "utf8")) as TFotografia;
 }
 
 async function existeArquivo(caminho: string): Promise<boolean> {
@@ -34,17 +34,17 @@ async function existeArquivo(caminho: string): Promise<boolean> {
     }
 }
 
-async function resolverFotografiaQualidade(
+async function resolverFotografiaQualidade<TFotografia = FotografiaQualidade>(
     caminhoInformado: string | null = null,
     diretorioBase = resolverNaRaiz()
-): Promise<ResultadoFotografiaQualidade> {
+): Promise<ResultadoFotografiaQualidade<TFotografia>> {
     if (caminhoInformado) {
         const caminhoAbsoluto = path.isAbsolute(caminhoInformado)
             ? caminhoInformado
             : path.resolve(diretorioBase, caminhoInformado);
         return {
             caminho: caminhoAbsoluto,
-            fotografia: await lerFotografia(caminhoAbsoluto)
+            fotografia: await lerFotografia<TFotografia>(caminhoAbsoluto)
         };
     }
 
@@ -52,7 +52,7 @@ async function resolverFotografiaQualidade(
     if (await existeArquivo(caminhoUltimaFotografia)) {
         return {
             caminho: caminhoUltimaFotografia,
-            fotografia: await lerFotografia(caminhoUltimaFotografia)
+            fotografia: await lerFotografia<TFotografia>(caminhoUltimaFotografia)
         };
     }
 
@@ -69,7 +69,7 @@ async function resolverFotografiaQualidade(
 
     return {
         caminho: maisRecente,
-        fotografia: await lerFotografia(maisRecente)
+        fotografia: await lerFotografia<TFotografia>(maisRecente)
     };
 }
 

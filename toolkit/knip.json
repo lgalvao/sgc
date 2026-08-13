@@ -39,7 +39,7 @@
     "projeto/versao-sincronizar.ts",
     "qualidade/coleta-execucao.ts",
     "qualidade/coleta.ts",
-    "qualidade/resumo.js",
+    "qualidade/resumo.ts",
     "requisitos/cdus-auditar-estilo.js",
     "requisitos/cdus-auditar-mensagens-codigo.js",
     "requisitos/cdus-auditar-mensagens.js",

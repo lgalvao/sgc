@@ -2,11 +2,43 @@ import path from "node:path";
 import {resolverFotografiaQualidade} from "../lib/qualidade.js";
 import {escreverLinha, imprimirCabecalho, imprimirJson} from "../lib/saida.js";
 
-function formatarVerificacao(verificacao) {
+interface VerificacaoQualidade {
+    codigo: string;
+    status: string;
+    sumario?: string;
+}
+
+interface FotografiaResumo {
+    resumo?: {
+        statusGeral?: string;
+        indiceSaude?: number | string;
+        totais?: {verificacoes?: number};
+    };
+    verificacoes?: VerificacaoQualidade[];
+    confiabilidade?: {suitesLentas?: unknown[]};
+    hotspots?: Array<{nome: string; risco: number}>;
+}
+
+interface OpcoesResumo {
+    arquivo?: string;
+    base?: string;
+    json?: boolean;
+    limitePontosCriticos?: number;
+}
+
+interface ResultadoResumo {
+    caminho: string;
+    resumo: FotografiaResumo["resumo"];
+    verificacoes: VerificacaoQualidade[];
+    confiabilidade: NonNullable<FotografiaResumo["confiabilidade"]>;
+    hotspots: NonNullable<FotografiaResumo["hotspots"]>;
+}
+
+function formatarVerificacao(verificacao: VerificacaoQualidade): string {
     return `${verificacao.codigo} [${verificacao.status}] ${verificacao.sumario || ""}`.trim();
 }
 
-function imprimirHumano(caminho, fotografia, limitePontosCriticos) {
+function imprimirHumano(caminho: string, fotografia: FotografiaResumo, limitePontosCriticos: number): void {
     imprimirCabecalho("Resumo da qualidade", `Fotografia: ${caminho}`);
     escreverLinha("");
     escreverLinha(`- Status geral: ${fotografia.resumo?.statusGeral ?? "-"}`);
@@ -31,20 +63,21 @@ function imprimirHumano(caminho, fotografia, limitePontosCriticos) {
     }
 }
 
-async function executarResumoQualidade(opcoes = {}) {
-    const resolvido = await resolverFotografiaQualidade(opcoes.arquivo);
-    const saida = {
+async function executarResumoQualidade(opcoes: OpcoesResumo = {}): Promise<ResultadoResumo> {
+    const resolvido = await resolverFotografiaQualidade<FotografiaResumo>(opcoes.arquivo ?? null, opcoes.base);
+    const fotografia = resolvido.fotografia;
+    const saida: ResultadoResumo = {
         caminho: path.relative(process.cwd(), resolvido.caminho).replaceAll("\\", "/"),
-        resumo: resolvido.fotografia.resumo,
-        verificacoes: resolvido.fotografia.verificacoes ?? [],
-        confiabilidade: resolvido.fotografia.confiabilidade ?? {},
-        hotspots: resolvido.fotografia.hotspots ?? []
+        resumo: fotografia.resumo,
+        verificacoes: fotografia.verificacoes ?? [],
+        confiabilidade: fotografia.confiabilidade ?? {},
+        hotspots: fotografia.hotspots ?? []
     };
 
     if (opcoes.json) {
         imprimirJson(saida);
     } else {
-        imprimirHumano(saida.caminho, resolvido.fotografia, opcoes.limitePontosCriticos ?? 5);
+        imprimirHumano(saida.caminho, fotografia, opcoes.limitePontosCriticos ?? 5);
     }
 
     return saida;
