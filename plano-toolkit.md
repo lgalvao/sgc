@@ -229,6 +229,9 @@ frontend e para os caminhos OpenAPI.
 - `backend/arquitetura-auditar.ts` foi convertido para TypeScript com tipos para limiares, tipos de alvo, severidade,
   hotspots e relatório; um fixture externo valida a classificação de um service com múltiplos sinais, a configuração de
   `backendCodigo` e o modo `--sem-gravar`.
+- `backend/notificacoes-assuntos-auditar.ts` foi convertido para TypeScript; regras de achado, itens de arquivo, resumo
+  e relatório estão tipados, mantendo as exceções específicas de `AssuntosNotificacao`/`E2eController` e o exit code de
+  violação do perfil SGC.
 - `projeto/diagnostico.ts` foi convertido para TypeScript, deixou de depender de `fs-extra` e aceita catálogos
   configuráveis de recursos e comandos registrados; o catálogo padrão continua sendo o perfil SGC e o mínimo local do
   Node foi alinhado à major 26 (`26.0.0`).
@@ -317,15 +320,15 @@ esta rodada chega a 103 com o teste comportamental do auditor de arquitetura bac
 
 Inventário dos arquivos rastreados do toolkit, excluindo `dist`, cobertura e artefatos ignorados:
 
-- 55 arquivos TypeScript de implementação;
-- 17 arquivos JavaScript de implementação ainda pendentes;
+- 56 arquivos TypeScript de implementação;
+- 16 arquivos JavaScript de implementação ainda pendentes;
 - 2 arquivos JavaScript de teste (`test/sgc.test.js` e `test/cdus.test.js`);
 - 2 arquivos de teste concentrando 103 cenários;
 - maior módulo atual: `frontend/arquitetura-lib.ts`, com aproximadamente 1.200 linhas;
 - outros hotspots: `codigo/nomes-simbolos-coletar.js`, `frontend/residuos-lib.ts` e
   `qualidade/coleta-execucao.ts`.
 
-O núcleo TypeScript está adiantado, mas a migração do toolkit como um todo ainda não terminou: aproximadamente 76% dos
+O núcleo TypeScript está adiantado, mas a migração do toolkit como um todo ainda não terminou: aproximadamente 78% dos
 arquivos de implementação rastreados são TypeScript.
 
 ### 3.4 Achados da auditoria crítica

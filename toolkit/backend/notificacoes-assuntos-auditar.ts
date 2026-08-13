@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+// Auditoria de assuntos de notificação do perfil SGC.
 
 import fs from "node:fs/promises";
 import path from "node:path";
@@ -10,12 +11,35 @@ import {exibirAjudaComando} from "../lib/cli-ajuda.js";
 import {ehEntradaPrincipal} from "../lib/execucao.js";
 import {escreverLinha, imprimirCabecalho, imprimirJson} from "../lib/saida.js";
 
-function normalizarCaminho(caminho) {
+type RegraAssunto = "literal_sgc" | "assunto_literal" | "titulo_literal" | "builder_assunto_literal";
+
+interface AchadoAssunto {
+    linha: number;
+    regra: RegraAssunto;
+    trecho: string;
+}
+
+interface RelatorioArquivoAssuntos {
+    arquivo: string;
+    achados: AchadoAssunto[];
+}
+
+interface RelatorioAssuntos {
+    base: string;
+    resumo: {
+        arquivosAnalisados: number;
+        arquivosComViolacao: number;
+        violacoes: number;
+    };
+    relatorio: RelatorioArquivoAssuntos[];
+}
+
+function normalizarCaminho(caminho: string): string {
     return caminho.replaceAll(path.sep, "/");
 }
 
-function extrairAchados(conteudo) {
-    const achados = [];
+function extrairAchados(conteudo: string): AchadoAssunto[] {
+    const achados: AchadoAssunto[] = [];
     const linhas = conteudo.split(/\r?\n/);
 
     for (const [indice, linha] of linhas.entries()) {
@@ -59,7 +83,7 @@ function extrairAchados(conteudo) {
     return achados;
 }
 
-async function auditarAssuntos(base) {
+async function auditarAssuntos(base: string): Promise<RelatorioAssuntos> {
     const diretorioBackend = resolverCaminhoConfigurado("backendCodigo", base);
     const arquivos = await globby(path.join(diretorioBackend, "**/*.java").replaceAll("\\", "/"), {absolute: true});
     const ignorados = new Set([
@@ -67,7 +91,7 @@ async function auditarAssuntos(base) {
         normalizarCaminho(path.join(diretorioBackend, "e2e", "E2eController.java"))
     ]);
 
-    const relatorio = [];
+    const relatorio: RelatorioArquivoAssuntos[] = [];
     for (const arquivo of arquivos) {
         const caminhoNormalizado = normalizarCaminho(arquivo);
         if (ignorados.has(caminhoNormalizado)) {
@@ -95,10 +119,10 @@ async function auditarAssuntos(base) {
     };
 }
 
-function exibirAjuda() {
+function exibirAjuda(): void {
     exibirAjudaComando({
         comandoSgc: "backend notificacoes auditar-assuntos",
-        scriptDireto: "backend/notificacoes-assuntos-auditar.js",
+        scriptDireto: "backend/notificacoes-assuntos-auditar.ts",
         descricao: "Audita literais de assunto de notificação fora de AssuntosNotificacao.",
         opcoes: [
             "--json              Emite o relatório em JSON.",
@@ -112,14 +136,14 @@ function exibirAjuda() {
     });
 }
 
-async function principal(argumentos = process.argv.slice(2)) {
+async function principal(argumentos: string[] = process.argv.slice(2)): Promise<void> {
     if (argumentos.includes("--help") || argumentos.includes("-h")) {
         exibirAjuda();
         return;
     }
 
     const emitirJson = argumentos.includes("--json");
-    const base = path.resolve(lerOpcao(argumentos, "--base", process.cwd()));
+    const base = path.resolve(lerOpcao(argumentos, "--base", process.cwd()) ?? process.cwd());
     const resultado = await auditarAssuntos(base);
 
     if (emitirJson) {
