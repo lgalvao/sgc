@@ -4,7 +4,7 @@ import {Node, Project, SyntaxKind, ts, type SourceFile} from "ts-morph";
 import {DIRETORIO_RAIZ} from "../lib/caminhos.js";
 import {resolverCaminhoConfigurado} from "../lib/configuracao.js";
 
-const VERSAO_SCHEMA = "3.0.0";
+const VERSAO_SCHEMA = "4.0.0";
 const EXTENSOES_SUPORTADAS = new Set([".ts", ".vue"]);
 const EXTENSOES_RESOLUCAO = [".ts", ".vue", ".js", "/index.ts", "/index.vue", "/index.js"];
 const CATEGORIAS_ACOPLAMENTO = ["store", "composable", "service", "router"] as const;
@@ -33,7 +33,7 @@ const LIMITE_FAMILIA_PULVERIZADA = 4;
 
 type Camada = "view" | "composable" | "store" | "component" | "service" | "router" | "outro";
 type CategoriaImportacao = keyof ImportacoesPorCategoria | "externo";
-type FaixaScore = "excelente" | "bom" | "atencao" | "critico";
+type FaixaPontuacao = "excelente" | "bom" | "atencao" | "critico";
 
 interface ImportacoesPorCategoria {
     store: Set<string>;
@@ -122,7 +122,7 @@ interface ArquivoAnalisado {
     arquivo: string;
     camada: Camada;
     linhas: number;
-    score: number;
+    pontuacao: number;
     sinaisLexicais: SinaisLexicais;
     metricasAst: MetricasAst;
     sinaisAtivos: string[];
@@ -146,11 +146,11 @@ interface FotografiaArquitetura {
     geradoEm: string;
     resumo: {
         arquivosProducao: number;
-        scoreTotal: number;
-        faixa: FaixaScore;
+        pontuacaoTotal: number;
+        faixa: FaixaPontuacao;
         metricas: MetricasResumo;
     };
-    hotspots: ArquivoAnalisado[];
+    pontosCriticos: ArquivoAnalisado[];
     familias: Record<string, FamiliaComposables>;
     excecoesDocumentadas: ExcecaoDocumentada[];
 }
@@ -159,7 +159,7 @@ interface OpcoesAnaliseArquitetura {
     base?: string;
 }
 
-interface OpcoesScoreArquivo {
+interface OpcoesPontuacaoArquivo {
     camada: Camada;
     sinaisLexicais: SinaisLexicais;
     analiseAst: AnaliseAst;
@@ -765,7 +765,7 @@ function detectarArquivoMinusculo(caminhoRelativo: string, linhas: number, hubCe
         && path.basename(caminhoRelativo).startsWith("use");
 }
 
-function calcularScoreArquivo({camada, sinaisLexicais, analiseAst, hubCentral, fachadaPura, arquivoMinusculo}: OpcoesScoreArquivo): number {
+function calcularPontuacaoArquivo({camada, sinaisLexicais, analiseAst, hubCentral, fachadaPura, arquivoMinusculo}: OpcoesPontuacaoArquivo): number {
     const camadaEfetiva = (camada === "store" && !analiseAst.usaDefineStore) ? "outro" : camada;
     const ehFacadeDeStore = camadaEfetiva === "composable"
         && analiseAst.importsPorCategoria.store.size === 1
@@ -815,10 +815,10 @@ function calcularScoreArquivo({camada, sinaisLexicais, analiseAst, hubCentral, f
     return total;
 }
 
-function calcularFaixa(score: number): FaixaScore {
-    if (score === 0) return "excelente";
-    if (score <= 15) return "bom";
-    if (score <= 50) return "atencao";
+function calcularFaixa(pontuacao: number): FaixaPontuacao {
+    if (pontuacao === 0) return "excelente";
+    if (pontuacao <= 15) return "bom";
+    if (pontuacao <= 50) return "atencao";
     return "critico";
 }
 
@@ -826,7 +826,7 @@ function criarResumoMarkdown(fotografia: FotografiaArquitetura): string {
     const linhas: string[] = [
         "# Auditoria Arquitetural do Frontend",
         "",
-        `- Score total: **${fotografia.resumo.scoreTotal}** (${fotografia.resumo.faixa})`,
+        `- Pontuacao total: **${fotografia.resumo.pontuacaoTotal}** (${fotografia.resumo.faixa})`,
         `- Arquivos de producao: **${fotografia.resumo.arquivosProducao}**`,
         `- Views com vazamento de estrategia de cache: **${fotografia.resumo.metricas.viewsComVazamentoCache}**`,
         `- Views com chamadas diretas a service: **${fotografia.resumo.metricas.viewsComServiceDireto}**`,
@@ -843,18 +843,18 @@ function criarResumoMarkdown(fotografia: FotografiaArquitetura): string {
         `- Composables minúsculos (< ${LIMITE_LINHAS_ARQUIVO_MINUSCULO}L): **${fotografia.resumo.metricas.composablesMinusculos}**`,
         `- Famílias pulverizadas (>= ${LIMITE_FAMILIA_PULVERIZADA} membros): **${fotografia.resumo.metricas.familiasPulverizadas}**`,
         "",
-        "## Hotspots",
+        "## Principais pontos criticos",
         "",
     ];
 
-    if (fotografia.hotspots.length === 0) {
-        linhas.push("Nenhum hotspot arquitetural detectado.");
+    if (fotografia.pontosCriticos.length === 0) {
+        linhas.push("Nenhum ponto critico arquitetural detectado.");
     } else {
-        fotografia.hotspots.slice(0, 10).forEach((hotspot, indice) => {
-            linhas.push(`${indice + 1}. \`${hotspot.arquivo}\` [${hotspot.camada}]`);
-            linhas.push(`   - score: ${hotspot.score}`);
-            linhas.push(`   - sinais: ${hotspot.sinaisAtivos.join(", ")}`);
-            linhas.push(`   - fan-out: ${hotspot.metricasAst.categoriasAcoplamento} categorias / ${hotspot.metricasAst.importacoesArquiteturais} imports arquiteturais`);
+        fotografia.pontosCriticos.slice(0, 10).forEach((pontoCritico, indice) => {
+            linhas.push(`${indice + 1}. \`${pontoCritico.arquivo}\` [${pontoCritico.camada}]`);
+            linhas.push(`   - pontuacao: ${pontoCritico.pontuacao}`);
+            linhas.push(`   - sinais: ${pontoCritico.sinaisAtivos.join(", ")}`);
+            linhas.push(`   - fan-out: ${pontoCritico.metricasAst.categoriasAcoplamento} categorias / ${pontoCritico.metricasAst.importacoesArquiteturais} imports arquiteturais`);
         });
     }
 
@@ -1074,7 +1074,7 @@ async function analisarArquiteturaFrontend({base = DIRETORIO_RAIZ}: OpcoesAnalis
             && analiseAst.importsPorCategoria.composable.size === 0
             && analiseAst.importsPorCategoria.service.size === 0;
         const arquivoMinusculo = !fachadaPura && !ehFacadeDeStore && !sinaisExcetos.has("arquivoMinusculo") && detectarArquivoMinusculo(caminhoRelativo, linhas, hubCentral, prefixoCodigo);
-        const score = calcularScoreArquivo({
+        const pontuacao = calcularPontuacaoArquivo({
             camada,
             sinaisLexicais,
             analiseAst,
@@ -1148,7 +1148,7 @@ async function analisarArquiteturaFrontend({base = DIRETORIO_RAIZ}: OpcoesAnalis
             arquivo: caminhoRelativo,
             camada,
             linhas,
-            score,
+            pontuacao,
             sinaisLexicais,
             metricasAst: {
                 chamadasStore: analiseAst.chamadasStore,
@@ -1170,16 +1170,16 @@ async function analisarArquiteturaFrontend({base = DIRETORIO_RAIZ}: OpcoesAnalis
         });
     }
 
-    const hotspots = analisados
-        .filter((arquivo) => arquivo.score > 0)
-        .toSorted((a, b) => b.score - a.score || b.metricasAst.importacoesArquiteturais - a.metricasAst.importacoesArquiteturais || b.linhas - a.linhas || a.arquivo.localeCompare(b.arquivo));
+    const pontosCriticos = analisados
+        .filter((arquivo) => arquivo.pontuacao > 0)
+        .toSorted((a, b) => b.pontuacao - a.pontuacao || b.metricasAst.importacoesArquiteturais - a.metricasAst.importacoesArquiteturais || b.linhas - a.linhas || a.arquivo.localeCompare(b.arquivo));
 
     const familias = calcularFamilias(analisados, prefixoCodigo);
     metricas.familiasPulverizadas = Object.values(familias).filter(
         (f) => f.arquivos.length >= LIMITE_FAMILIA_PULVERIZADA,
     ).length;
 
-    const scoreTotal = hotspots.reduce((total, item) => total + item.score, 0);
+    const pontuacaoTotal = pontosCriticos.reduce((total, item) => total + item.pontuacao, 0);
 
     return {
         base: baseResolvida,
@@ -1187,11 +1187,11 @@ async function analisarArquiteturaFrontend({base = DIRETORIO_RAIZ}: OpcoesAnalis
         geradoEm: new Date().toISOString(),
         resumo: {
             arquivosProducao: analisados.length,
-            scoreTotal,
-            faixa: calcularFaixa(scoreTotal),
+            pontuacaoTotal,
+            faixa: calcularFaixa(pontuacaoTotal),
             metricas,
         },
-        hotspots,
+        pontosCriticos,
         familias,
         excecoesDocumentadas,
     };

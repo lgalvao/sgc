@@ -158,7 +158,6 @@ async function carregarExcecoes(caminhoExcecoes?: string): Promise<ResultadoExce
 }
 
 export {
-    VERSAO_SCHEMA_POLITICAS,
     carregarExcecoes,
     carregarOrcamento,
     resolverCaminhoExcecoesResiduos,

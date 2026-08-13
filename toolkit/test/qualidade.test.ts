@@ -318,7 +318,7 @@ describe("Qualidade do toolkit", () => {
             codigoSaida: 0,
             saida: JSON.stringify(argumentos.includes("residuos")
                 ? {status: "ok", resumo: {pontuacaoTotal: 90, faixa: "A"}, violacoes: [], avisos: [], pontosCriticos: []}
-                : {resumo: {scoreTotal: 95, faixa: "A", metricas: {}}, hotspots: []}),
+                : {resumo: {pontuacaoTotal: 95, faixa: "A", metricas: {}}, pontosCriticos: []}),
             erro: "",
             duracaoMs: 3
         });

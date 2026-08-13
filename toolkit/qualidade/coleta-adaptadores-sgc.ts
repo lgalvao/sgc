@@ -26,11 +26,11 @@ interface ResultadoResiduos {
 
 interface ResultadoArquitetura {
     resumo?: {
-        scoreTotal?: number;
+        pontuacaoTotal?: number;
         faixa?: string;
         metricas?: Record<string, unknown>;
     };
-    hotspots?: Array<{arquivo?: unknown; score?: unknown}>;
+    pontosCriticos?: PontoCriticoQualidade[];
 }
 
 interface ResultadoPlaywright extends Record<string, unknown> {
@@ -196,7 +196,7 @@ function criarAdaptadoresSgc(dependencias: DependenciasAdaptadoresSgc): Catalogo
             execucao.status = saida.codigoSaida === 0 ? "sucesso" : "falha";
             registrarResultadoExecucao(execucao, saida);
             execucao.metricas = {
-                pontuacaoTotal: resultado.resumo?.scoreTotal ?? null,
+                pontuacaoTotal: resultado.resumo?.pontuacaoTotal ?? null,
                 faixa: resultado.resumo?.faixa ?? null,
                 viewsComVazamentoCache: resultado.resumo?.metricas?.viewsComVazamentoCache ?? null,
                 viewsComServiceDireto: resultado.resumo?.metricas?.viewsComServiceDireto ?? null,
@@ -208,14 +208,10 @@ function criarAdaptadoresSgc(dependencias: DependenciasAdaptadoresSgc): Catalogo
                 arquivosComSuperficieAmpla: resultado.resumo?.metricas?.arquivosComSuperficieAmpla ?? null,
                 arquivosComMisturaCamadas: resultado.resumo?.metricas?.arquivosComMisturaCamadas ?? null,
                 hubsCentraisComSinais: resultado.resumo?.metricas?.hubsCentraisComSinais ?? null,
-                pontosCriticos: (resultado.hotspots ?? []).flatMap((ponto) =>
-                    typeof ponto.arquivo === "string" && typeof ponto.score === "number"
-                        ? [{arquivo: ponto.arquivo, pontuacao: ponto.score}]
-                        : []
-                ),
+                pontosCriticos: resultado.pontosCriticos ?? [],
             };
             execucao.sumario = resultado.resumo
-                ? `Pontuacao arquitetural: ${resultado.resumo.scoreTotal} (${resultado.resumo.faixa}).`
+                ? `Pontuacao arquitetural: ${resultado.resumo.pontuacaoTotal} (${resultado.resumo.faixa}).`
                 : "Auditoria arquitetural executada.";
             return execucao;
         },

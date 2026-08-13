@@ -175,8 +175,8 @@ isolado funciona, mas as fronteiras ainda não estão concluídas:
 - o contrato da fotografia consolidada de qualidade foi promovido para `versaoSchema: "2.0.0"`: `pontosCriticos` e
   `pontuacao` substituem `hotspots` e `score` nos resultados próprios, sem aliases de compatibilidade;
 - `qualidade resumo` valida a estrutura completa da fotografia e rejeita versões ou campos obrigatórios incompatíveis;
-- o adaptador de qualidade normaliza o formato ainda antigo do auditor arquitetural na fronteira, sem reintroduzir seus
-  nomes ingleses no contrato consolidado;
+- a fotografia própria de `frontend arquitetura auditar` foi promovida para `versaoSchema: "4.0.0"`, com
+  `pontosCriticos`, `pontuacao` e `pontuacaoTotal`; o adaptador de qualidade agora consome diretamente esse contrato;
 - apenas cobertura Java e web está publicada como API programática horizontal;
 - defaults de Gradle, Vue, OpenAPI, Semgrep e políticas SGC ainda aparecem dentro de módulos adaptáveis;
 - os maiores módulos concentram análise, política, formatação, persistência e CLI, dificultando reuso seletivo.

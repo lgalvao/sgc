@@ -12,6 +12,7 @@ import {VERSAO_CONFIGURACAO} from "../lib/configuracao.js";
 
 interface PontoArquiteturalJson {
     arquivo: string;
+    pontuacao: number;
     sinaisAtivos: string[];
     hubCentral?: boolean;
 }
@@ -97,9 +98,13 @@ describe("Auditoria arquitetural do frontend", () => {
         expect(conteudo.resumo.metricas.arquivosComSuperficieAmpla).toBe(1);
         expect(conteudo.resumo.metricas.arquivosComMisturaCamadas).toBe(1);
         expect(conteudo.resumo.metricas.arquivosComServerStateCaseiro).toBe(1);
-        expect(conteudo.hotspots[0].arquivo).toBe("frontend/src/views/UnidadeView.vue");
-        expect(conteudo.hotspots[0].sinaisAtivos).toContain("serverStateCaseiro");
-        expect(conteudo.hotspots.some((hotspot: PontoArquiteturalJson) => hotspot.hubCentral && hotspot.sinaisAtivos.includes("superficieAmpla"))).toBe(false);
+        expect(conteudo.versaoSchema).toBe("4.0.0");
+        expect(conteudo.resumo.pontuacaoTotal).toBeTypeOf("number");
+        expect(conteudo.pontosCriticos[0].arquivo).toBe("frontend/src/views/UnidadeView.vue");
+        expect(conteudo.pontosCriticos[0].sinaisAtivos).toContain("serverStateCaseiro");
+        expect(conteudo.pontosCriticos[0].pontuacao).toBeTypeOf("number");
+        expect(conteudo.pontosCriticos.some((pontoCritico: PontoArquiteturalJson) => pontoCritico.hubCentral && pontoCritico.sinaisAtivos.includes("superficieAmpla"))).toBe(false);
+        expect(conteudo.hotspots).toBeUndefined();
         expect(await existe(path.join(base, "toolkit", "qualidade", "artefatos", "frontend-arquitetura"))).toBe(false);
 
         const diretorioSaida = path.join("artefatos", "arquitetura");
@@ -171,7 +176,7 @@ describe("Auditoria arquitetural do frontend", () => {
         const fotografia = JSON.parse(resultado.stdout);
         expect(fotografia.resumo.arquivosProducao).toBe(2);
         expect(fotografia.resumo.metricas.viewsComServiceDireto).toBe(1);
-        expect(fotografia.hotspots[0].arquivo).toBe("cliente/codigo/views/ExemploView.vue");
+        expect(fotografia.pontosCriticos[0].arquivo).toBe("cliente/codigo/views/ExemploView.vue");
     });
 
     test("tipos internos de store nao disparam bolsaDependenciasLarga", async () => {
@@ -229,8 +234,8 @@ describe("Auditoria arquitetural do frontend", () => {
 
         expect(resultado.exitCode).toBe(0);
         const conteudo = JSON.parse(resultado.stdout);
-        const hotspot = conteudo.hotspots.find((item: Pick<PontoArquiteturalJson, "arquivo">) => item.arquivo === "frontend/src/stores/perfil.ts");
-        expect(hotspot).toBeUndefined();
+        const pontoCritico = conteudo.pontosCriticos.find((item: Pick<PontoArquiteturalJson, "arquivo">) => item.arquivo === "frontend/src/stores/perfil.ts");
+        expect(pontoCritico).toBeUndefined();
     });
 
     test("composable fachada de store não é penalizado por chamadasStore >= 8", async () => {
@@ -274,9 +279,9 @@ describe("Auditoria arquitetural do frontend", () => {
 
         expect(resultado.exitCode).toBe(0);
         const conteudo = JSON.parse(resultado.stdout);
-        const hotspot = conteudo.hotspots.find((ponto: Pick<PontoArquiteturalJson, "arquivo">) => ponto.arquivo.endsWith("usePerfil.ts"));
+        const pontoCritico = conteudo.pontosCriticos.find((ponto: Pick<PontoArquiteturalJson, "arquivo">) => ponto.arquivo.endsWith("usePerfil.ts"));
         // Fachada de store: acessar a store muitas vezes é esperado — sem penalidade
-        expect(hotspot).toBeUndefined();
+        expect(pontoCritico).toBeUndefined();
     });
 
     test("módulo em stores/ sem defineStore não é penalizado como store Pinia", async () => {
@@ -305,9 +310,9 @@ describe("Auditoria arquitetural do frontend", () => {
 
         expect(resultado.exitCode).toBe(0);
         const conteudo = JSON.parse(resultado.stdout);
-        const hotspot = conteudo.hotspots.find((ponto: Pick<PontoArquiteturalJson, "arquivo">) => ponto.arquivo.endsWith("autenticacao.ts"));
-        // Orquestração sem defineStore: chamar serviços é esperado — sem score nem sinal serviceDireto
-        expect(hotspot).toBeUndefined();
+        const pontoCritico = conteudo.pontosCriticos.find((ponto: Pick<PontoArquiteturalJson, "arquivo">) => ponto.arquivo.endsWith("autenticacao.ts"));
+        // Orquestracao sem defineStore: chamar servicos e esperado — sem pontuacao nem sinal serviceDireto
+        expect(pontoCritico).toBeUndefined();
     });
 
     test("composable que chama serviço diretamente não recebe sinal serviceDireto", async () => {
@@ -320,7 +325,7 @@ describe("Auditoria arquitetural do frontend", () => {
         );
 
         // Composable com superfície exportada ampla E chamada de serviço direta
-        // → deve aparecer em hotspots pelo superficieAmpla, mas NÃO pelo serviceDireto
+        // → deve aparecer em pontos criticos pelo superficieAmpla, mas NAO pelo serviceDireto
         await escreverArquivo(
             path.join(frontendDir, "composables", "useItens.ts"),
             [
@@ -340,10 +345,10 @@ describe("Auditoria arquitetural do frontend", () => {
 
         expect(resultado.exitCode).toBe(0);
         const conteudo = JSON.parse(resultado.stdout);
-        const hotspot = conteudo.hotspots.find((ponto: Pick<PontoArquiteturalJson, "arquivo">) => ponto.arquivo.endsWith("useItens.ts"));
+        const pontoCritico = conteudo.pontosCriticos.find((ponto: Pick<PontoArquiteturalJson, "arquivo">) => ponto.arquivo.endsWith("useItens.ts"));
         // Composable aparece por superficieAmpla, mas chamar serviços não é sinalizado
-        expect(hotspot).toBeDefined();
-        expect(hotspot.sinaisAtivos).toContain("superficieAmpla");
-        expect(hotspot.sinaisAtivos).not.toContain("serviceDireto");
+        expect(pontoCritico).toBeDefined();
+        expect(pontoCritico.sinaisAtivos).toContain("superficieAmpla");
+        expect(pontoCritico.sinaisAtivos).not.toContain("serviceDireto");
     });
 });

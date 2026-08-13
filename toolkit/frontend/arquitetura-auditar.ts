@@ -67,7 +67,7 @@ async function principal(argumentosInformados: string[] = process.argv.slice(2))
     }
 
     imprimirCabecalho("AUDITORIA ARQUITETURAL DO FRONTEND");
-    escreverLinha(`Score total: ${pc.bold(String(fotografia.resumo.scoreTotal))} (${fotografia.resumo.faixa})`);
+    escreverLinha(`Pontuacao total: ${pc.bold(String(fotografia.resumo.pontuacaoTotal))} (${fotografia.resumo.faixa})`);
     escreverLinha(`Arquivos de producao: ${fotografia.resumo.arquivosProducao}`);
     escreverLinha(`Views com vazamento de cache: ${fotografia.resumo.metricas.viewsComVazamentoCache}`);
     escreverLinha(`Views com service direto: ${fotografia.resumo.metricas.viewsComServiceDireto}`);
@@ -86,11 +86,11 @@ async function principal(argumentosInformados: string[] = process.argv.slice(2))
     escreverLinha(`Composables minúsculos: ${fotografia.resumo.metricas.composablesMinusculos}`);
     escreverLinha(`Famílias pulverizadas: ${fotografia.resumo.metricas.familiasPulverizadas}`);
     escreverLinha("");
-    escreverLinha(pc.bold("Top 5 hotspots:"));
-    fotografia.hotspots.slice(0, 5).forEach((hotspot, indice) => {
-        escreverLinha(`${indice + 1}. ${hotspot.arquivo} [${hotspot.camada}]`);
-        escreverLinha(`   Score: ${hotspot.score} | Sinais: ${hotspot.sinaisAtivos.join(", ")}`);
-        escreverLinha(`   Fan-out: ${hotspot.metricasAst.categoriasAcoplamento} categorias / ${hotspot.metricasAst.importacoesArquiteturais} imports`);
+    escreverLinha(pc.bold("5 principais pontos criticos:"));
+    fotografia.pontosCriticos.slice(0, 5).forEach((pontoCritico, indice) => {
+        escreverLinha(`${indice + 1}. ${pontoCritico.arquivo} [${pontoCritico.camada}]`);
+        escreverLinha(`   Pontuacao: ${pontoCritico.pontuacao} | Sinais: ${pontoCritico.sinaisAtivos.join(", ")}`);
+        escreverLinha(`   Fan-out: ${pontoCritico.metricasAst.categoriasAcoplamento} categorias / ${pontoCritico.metricasAst.importacoesArquiteturais} imports`);
     });
 
     if (argumentos.includes("--gravar")) {

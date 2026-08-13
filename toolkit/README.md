@@ -101,6 +101,9 @@ memória quando o comando não usa `--gravar`.
 As chaves próprias da fotografia usam camelCase em português, e uma fotografia anterior incompatível é rejeitada em vez
 de ser tratada como se não existisse.
 
+`frontend arquitetura auditar` produz uma fotografia `versaoSchema: "4.0.0"`; seus resultados próprios usam
+`pontosCriticos`, `pontuacao` e `pontuacaoTotal`. O formato anterior não é carregado nem traduzido.
+
 `qualidade resumo` lê fotografias `versaoSchema: "2.0.0"` produzidas pelo coletor, projeta apenas verificações e pontos
 críticos atuais e rejeita fotografias incompatíveis. O coletor e os adaptadores usam `pontosCriticos` e `pontuacao` nos
 contratos próprios; campos antigos não são aceitos.
