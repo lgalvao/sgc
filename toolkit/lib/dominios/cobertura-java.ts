@@ -4,7 +4,95 @@ import {parseStringPromise} from "xml2js";
 import {DIRETORIO_RAIZ} from "../caminhos.js";
 import {resolverCaminhoConfigurado} from "../configuracao.js";
 
-const PADROES_EXCLUSAO = [
+interface AtributosXml {
+    [nome: string]: string;
+}
+
+interface ContadorXml {
+    $: AtributosXml;
+}
+
+interface LinhaXml {
+    $: AtributosXml;
+}
+
+interface ArquivoFonteXml {
+    $: {name: string};
+    line?: LinhaXml[];
+    counter?: ContadorXml[];
+}
+
+interface PacoteXml {
+    $: {name: string};
+    sourcefile?: ArquivoFonteXml[];
+}
+
+interface RelatorioJacocoXml {
+    report: {
+        counter?: ContadorXml[];
+        package?: PacoteXml[];
+    };
+}
+
+interface ResumoContador {
+    cobertos: number;
+    perdidos: number;
+    percentual: number;
+}
+
+interface MetricasGlobais {
+    linhas: ResumoContador;
+    branches: ResumoContador;
+    instrucoes: ResumoContador;
+    metodos: ResumoContador;
+    complexidade: ResumoContador;
+}
+
+interface TotaisCobertura {
+    totalArquivos: number;
+    totalLinhas: number;
+    linhasCobertas: number;
+    totalBranches: number;
+    branchesCobertos: number;
+    coberturaGlobalLinhas: number;
+    coberturaGlobalBranches: number;
+}
+
+interface ClasseCobertura {
+    nomePacote: string;
+    nomeArquivo: string;
+    nomeClasse: string;
+    nome: string;
+    totalLinhas: number;
+    linhasCobertas: number;
+    linhasPerdidas: number;
+    linhasPerdidasLista: number[];
+    linhasPercentual: number;
+    coberturaLinhas: number;
+    totalBranches: number;
+    branchesCobertos: number;
+    branchesPerdidos: number;
+    branchesPerdidosLista: string[];
+    branchesPercentual: number;
+    coberturaBranches: number;
+    complexidade: number;
+    contadoresGlobais: MetricasGlobais;
+}
+
+interface OpcoesCoberturaJacoco {
+    diretorioBase?: string;
+    incluirSemLacunas?: boolean;
+    aplicarExclusoes?: boolean;
+    padroesExclusao?: RegExp[];
+    filtro?: string | null;
+}
+
+interface ResultadoCoberturaJacoco extends MetricasGlobais {
+    totais: TotaisCobertura;
+    classes: ClasseCobertura[];
+}
+
+const PADROES_EXCLUSAO: RegExp[] = [
     /MapperImpl$/,
     /\.Sgc$/,
     /(?:^|\.).*Config(?:\..*)?$/,
@@ -24,22 +112,22 @@ const PADROES_EXCLUSAO = [
     /(?:^|\.).*Situacao.+$/
 ];
 
-function deveExcluirClasse(nomeClasse, padroesExclusao = PADROES_EXCLUSAO) {
+function deveExcluirClasse(nomeClasse: string, padroesExclusao: RegExp[] = PADROES_EXCLUSAO): boolean {
     return padroesExclusao.some((pattern) => pattern.test(nomeClasse));
 }
 
-function calcularPercentual(cobertos, perdidos) {
+function calcularPercentual(cobertos: number, perdidos: number): number {
     const total = cobertos + perdidos;
     if (total <= 0) return 0;
     return Number(((cobertos / total) * 100).toFixed(2));
 }
 
-function extrairInteiroCounter(counter, campo) {
+function extrairInteiroCounter(counter: ContadorXml, campo: string): number {
     return Number.parseInt(counter?.$?.[campo] ?? "0", 10);
 }
 
-function extrairContadoresGlobais(counters = []) {
-    const resumo = {};
+function extrairContadoresGlobais(counters: ContadorXml[] = []): MetricasGlobais {
+    const resumo: Record<string, ResumoContador> = {};
     for (const counter of counters) {
         const type = counter.$.type;
         const cobertos = extrairInteiroCounter(counter, "covered");
@@ -59,16 +147,19 @@ function extrairContadoresGlobais(counters = []) {
     };
 }
 
-async function lerRelatorioJacoco(caminhoAbsoluto) {
+async function lerRelatorioJacoco(caminhoAbsoluto: string): Promise<RelatorioJacocoXml | null> {
     try {
         const conteudo = await fs.readFile(caminhoAbsoluto, "utf-8");
-        return await parseStringPromise(conteudo);
+        return await parseStringPromise(conteudo) as RelatorioJacocoXml;
     } catch {
         return null;
     }
 }
 
-async function extrairCoberturaJacoco(caminhoRelativo = null, opcoes = {}) {
+async function extrairCoberturaJacoco(
+    caminhoRelativo: string | null = null,
+    opcoes: OpcoesCoberturaJacoco = {}
+): Promise<ResultadoCoberturaJacoco> {
     const diretorioBase = opcoes.diretorioBase ?? DIRETORIO_RAIZ;
     const caminhoPadrao = resolverCaminhoConfigurado("coberturaBackend", diretorioBase);
     const caminhoXml = caminhoRelativo
@@ -90,12 +181,14 @@ async function extrairCoberturaJacoco(caminhoRelativo = null, opcoes = {}) {
     const counters = relatorio.report.counter ?? [];
     const metricasGlobais = extrairContadoresGlobais(counters);
 
-    let totais = {
+    const totais: TotaisCobertura = {
         totalArquivos: 0,
         totalLinhas: 0,
         linhasCobertas: 0,
         totalBranches: 0,
-        branchesCobertos: 0
+        branchesCobertos: 0,
+        coberturaGlobalLinhas: 0,
+        coberturaGlobalBranches: 0,
     };
 
     for (const pacote of relatorio.report.package ?? []) {
@@ -122,10 +215,10 @@ async function extrairCoberturaJacoco(caminhoRelativo = null, opcoes = {}) {
             const branchesParciais = [];
 
             for (const line of linhas) {
-                const numeroLinha = Number.parseInt(line.$.nr || 0, 10);
-                const instrucoesCobertas = Number.parseInt(line.$.ci || 0, 10);
-                const branchesPerdidosLinha = Number.parseInt(line.$.mb || 0, 10);
-                const branchesCobertosLinha = Number.parseInt(line.$.cb || 0, 10);
+                const numeroLinha = Number.parseInt(line.$.nr ?? "0", 10);
+                const instrucoesCobertas = Number.parseInt(line.$.ci ?? "0", 10);
+                const branchesPerdidosLinha = Number.parseInt(line.$.mb ?? "0", 10);
+                const branchesCobertosLinha = Number.parseInt(line.$.cb ?? "0", 10);
                 const branchesLinha = branchesPerdidosLinha + branchesCobertosLinha;
 
                 totalLinhas++;
@@ -201,9 +294,5 @@ async function extrairCoberturaJacoco(caminhoRelativo = null, opcoes = {}) {
 }
 
 export {
-    PADROES_EXCLUSAO,
-    calcularPercentual,
-    deveExcluirClasse,
-    extrairCoberturaJacoco,
-    lerRelatorioJacoco
+    extrairCoberturaJacoco
 };

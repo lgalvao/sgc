@@ -186,6 +186,8 @@ frontend e para os caminhos OpenAPI.
   imports, aliases `@/`, composables e famílias; os hubs e heurísticas específicos do SGC continuam explícitos.
 - A leitura de cobertura V8 frontend agora normaliza caminhos em relação à base auditada, sem procurar o literal
   `frontend/src`; relatórios de layouts externos mantêm seus caminhos relativos.
+- `lib/dominios/cobertura-java.ts` foi convertido para TypeScript com tipos explícitos para XML JaCoCo, métricas, classes
+  e opções; `@types/xml2js` documenta a dependência de parsing. A biblioteca V8 ainda permanece JavaScript.
 - A configuração já aceita alguns caminhos diferentes do layout do SGC; auditores de cobertura, arquitetura, coesão,
   contratos, resíduos e coleta possuem parametrização parcial por `--base`, `--arquivo`, `--saida` ou configuração.
   Arquitetura, resíduos, OpenAPI e coleta já resolvem seus defaults após a base; outros comandos ainda têm defaults
@@ -451,7 +453,8 @@ roteador fonte/compilado possuir testes de smoke equivalentes.
 
 ### Fase B — converter bibliotecas puras e contratos de dados
 
-1. Migrar `lib/dominios/cobertura-java.js` e `lib/dominios/cobertura-web.js`.
+1. **[parcial nesta rodada]** Migrar `lib/dominios/cobertura-java.js` para `lib/dominios/cobertura-java.ts`; a biblioteca
+   V8 `cobertura-web.js` continua sendo o próximo recorte.
 2. Migrar `backend/lib/testes-analisar-regras.js` e bibliotecas puras de frontend/requisitos.
 3. Introduzir tipos para JaCoCo, V8, fotografia de qualidade, achados de auditoria e diagnóstico.
 4. Substituir `any` implícito por `unknown` na entrada JSON e validar apenas o que o consumidor realmente exige.
