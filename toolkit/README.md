@@ -423,6 +423,7 @@ O diretório `test/` contém:
 - `sgc.test.ts`: testes da CLI principal
 - `execucao-cli.test.ts`: testes de catálogo, launcher, importação e distribuição da CLI
 - `backend-fqn.test.ts`: testes de simulação, escrita e idempotência do corretor FQN Java
+- `backend-testes.test.ts`: testes de análise, classificação e priorização dos testes backend
 - `backend-importacao.test.ts`: testes de importação segura dos comandos e auditores backend
 - `frontend-importacao.test.ts`: testes de importação segura dos comandos e auditores frontend
 - `frontend-acessibilidade.test.ts`: testes do processamento e da execução configurada de acessibilidade
