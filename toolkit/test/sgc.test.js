@@ -1203,6 +1203,39 @@ describe("CLI raiz do toolkit", () => {
         ))).toBe(true);
     });
 
+    test("analisa arquitetura usando frontendCodigo configurado", async () => {
+        const base = await mkdtemp(path.join(os.tmpdir(), "sgc-arquitetura-codigo-configurado-"));
+        const frontendDir = path.join(base, "cliente", "codigo");
+        await fs.outputJSON(path.join(base, "configuracao-toolkit.json"), {
+            versao: VERSAO_CONFIGURACAO,
+            diretorios: {frontendCodigo: "cliente/codigo"},
+        });
+        await fs.outputFile(
+            path.join(frontendDir, "services", "exemploService.ts"),
+            "export async function buscarExemplo() { return null; }"
+        );
+        await fs.outputFile(
+            path.join(frontendDir, "views", "ExemploView.vue"),
+            "<script setup lang=\"ts\">import {buscarExemplo} from '@/services/exemploService'; void buscarExemplo();</script>"
+        );
+
+        const resultado = await executarSgc([
+            "frontend",
+            "arquitetura",
+            "auditar",
+            "--json",
+            "--sem-gravar",
+            "--base",
+            base,
+        ]);
+
+        expect(resultado.exitCode).toBe(0);
+        const fotografia = JSON.parse(resultado.stdout);
+        expect(fotografia.resumo.arquivosProducao).toBe(2);
+        expect(fotografia.resumo.metricas.viewsComServiceDireto).toBe(1);
+        expect(fotografia.hotspots[0].arquivo).toBe("cliente/codigo/views/ExemploView.vue");
+    });
+
     test("tipos internos de store nao disparam bolsaDependenciasLarga", async () => {
         const base = await mkdtemp(path.join(os.tmpdir(), "sgc-arquitetura-contexto-store-"));
         await fs.outputFile(
