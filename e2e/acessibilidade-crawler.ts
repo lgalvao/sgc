@@ -1,14 +1,8 @@
 import path from "node:path";
-import {execa} from "execa";
-import {resolverNaRaiz} from "../lib/caminhos.js";
-import {lerOpcao} from "../lib/cli-opcoes.js";
-import {exibirAjudaComando} from "../lib/cli-ajuda.js";
-import {resolverCaminhoConfigurado} from "../lib/configuracao.js";
-import {ehEntradaPrincipal} from "../lib/execucao.js";
-import {escreverErro} from "../lib/saida.js";
+import {caminhoRaizProjeto, ehEntradaPrincipal, executarComandoPadrao, exibirAjuda, lerOpcao, removerOpcoesLocais} from "./lib/cli.js";
 
-const CAMINHO_RELATIVO_ESPECIFICACAO = path.join("a11y", "crawler.spec.ts");
-const CAMINHO_RELATIVO_CONFIGURACAO = "playwright.config.ts";
+const CAMINHO_RELATIVO_ESPECIFICACAO = path.join("e2e", "a11y", "crawler.spec.ts");
+const CAMINHO_RELATIVO_CONFIGURACAO = path.join("e2e", "playwright.config.ts");
 
 interface OpcoesCrawler {
     base?: string;
@@ -24,7 +18,7 @@ interface ResultadoCrawler {
     argumentos: string[];
 }
 
-type ExecutarComando = (comando: string, argumentos: readonly string[], diretorioBase: string) => Promise<void>;
+type ExecutarComando = (comando: string, argumentos: readonly string[], diretorioBase: string) => Promise<{codigoSaida: number}>;
 
 function normalizarArgumentosPlaywright(argumentos: string[]): string[] {
     return argumentos.map((argumento) => {
@@ -41,51 +35,24 @@ function normalizarArgumentosPlaywright(argumentos: string[]): string[] {
     });
 }
 
-function removerOpcoesLocais(argumentos: string[]): string[] {
-    const nomes = new Set(["--base", "--especificacao", "--configuracao"]);
-    const resultado: string[] = [];
-    for (let indice = 0; indice < argumentos.length; indice += 1) {
-        const argumento = argumentos[indice];
-        const nome = argumento.split("=", 1)[0];
-        if (!nomes.has(nome)) {
-            resultado.push(argumento);
-            continue;
-        }
-        if (!argumento.includes("=")) {
-            indice += 1;
-        }
-    }
-    return resultado;
-}
-
 function caminhoRelativo(diretorioBase: string, caminho: string): string {
     return path.relative(diretorioBase, path.resolve(diretorioBase, caminho)).replaceAll("\\", "/");
 }
 
 function obterCaminhosPadrao(diretorioBase: string): {especificacao: string; configuracao: string} {
-    const diretorioTestesIntegracao = resolverCaminhoConfigurado("testesIntegracao", diretorioBase);
     return {
-        especificacao: caminhoRelativo(diretorioBase, path.join(diretorioTestesIntegracao, CAMINHO_RELATIVO_ESPECIFICACAO)),
-        configuracao: caminhoRelativo(diretorioBase, path.join(diretorioTestesIntegracao, CAMINHO_RELATIVO_CONFIGURACAO)),
+        especificacao: caminhoRelativo(diretorioBase, CAMINHO_RELATIVO_ESPECIFICACAO),
+        configuracao: caminhoRelativo(diretorioBase, CAMINHO_RELATIVO_CONFIGURACAO),
     };
 }
-
-const executarComandoPadrao: ExecutarComando = async (comando, argumentos, diretorioBase) => {
-    await execa(comando, argumentos, {
-        cwd: diretorioBase,
-        stdio: "inherit",
-        shell: process.platform === "win32"
-    });
-};
 
 async function executarCrawler(
     argumentos: string[] = [],
     opcoes: OpcoesCrawler = {}
 ): Promise<ResultadoCrawler | undefined> {
     if (argumentos.includes("--help") || argumentos.includes("-h")) {
-        exibirAjudaComando({
-            comandoSgc: "e2e acessibilidade crawler",
-            scriptDireto: "e2e/acessibilidade-crawler.ts",
+        exibirAjuda({
+            uso: "npx tsx e2e/acessibilidade-crawler.ts",
             descricao: "Executa o crawler de acessibilidade usando o executor do Playwright.",
             opcoes: [
                 "--projeto <nome>   Projeto Playwright a ser executado.",
@@ -95,14 +62,14 @@ async function executarCrawler(
                 "--configuracao <arquivo> Configuracao Playwright alternativa."
             ],
             exemplos: [
-                "npx tsx toolkit/sgc.ts e2e acessibilidade crawler",
-                "npx tsx toolkit/sgc.ts e2e acessibilidade crawler --projeto chromium"
+                "npx tsx e2e/acessibilidade-crawler.ts",
+                "npx tsx e2e/acessibilidade-crawler.ts --projeto chromium"
             ]
         });
         return;
     }
 
-    const diretorioBase = path.resolve(opcoes.base ?? resolverNaRaiz());
+    const diretorioBase = path.resolve(opcoes.base ?? caminhoRaizProjeto());
     const caminhosPadrao = obterCaminhosPadrao(diretorioBase);
     const especificacao = caminhoRelativo(diretorioBase, opcoes.especificacao ?? caminhosPadrao.especificacao);
     const configuracao = caminhoRelativo(diretorioBase, opcoes.configuracao ?? caminhosPadrao.configuracao);
@@ -111,10 +78,13 @@ async function executarCrawler(
         "test",
         especificacao,
         `--config=${configuracao}`,
-        ...normalizarArgumentosPlaywright(removerOpcoesLocais(argumentos))
+        ...normalizarArgumentosPlaywright(removerOpcoesLocais(argumentos, new Set(["--base", "--especificacao", "--configuracao"])))
     ];
 
-    await (opcoes.executarComando ?? executarComandoPadrao)("npx", argumentosPlaywright, diretorioBase);
+    const resultadoExecucao = await (opcoes.executarComando ?? executarComandoPadrao)("npx", argumentosPlaywright, diretorioBase);
+    if (resultadoExecucao.codigoSaida !== 0) {
+        process.exitCode = resultadoExecucao.codigoSaida;
+    }
     return {diretorioBase, especificacao, configuracao, argumentos: argumentosPlaywright};
 }
 
@@ -129,7 +99,7 @@ async function principal(argumentos: string[] = process.argv.slice(2)): Promise<
 if (ehEntradaPrincipal(import.meta.url)) {
     principal().catch((erro) => {
         const mensagem = erro instanceof Error ? erro.message : String(erro);
-        escreverErro(`Erro ao executar crawler de acessibilidade: ${mensagem}\n`);
+        console.error(`Erro ao executar crawler de acessibilidade: ${mensagem}`);
         process.exitCode = 1;
     });
 }

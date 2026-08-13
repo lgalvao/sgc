@@ -56,11 +56,10 @@ graph TD
 | `lib/`        | catálogo de comandos, infraestrutura compartilhada, execução, caminhos, saída e utilidades |
 | `backend/`    | comandos de cobertura, testes e higiene Java                      |
 | `frontend/`   | comandos de cobertura, resíduos e validações                      |
-| `e2e/`        | comandos Playwright/Axe de auditoria dos testes de integração     |
 | `codigo/`     | auditorias transversais de cheiros de código                       |
 | `integracao/` | contratos OpenAPI e fronteira backend/frontend                    |
 | `qualidade/`  | coleta e resumo de qualidade                                       |
-| `projeto/`    | preparação, diagnóstico, limpeza e qualidade do repositório        |
+| `projeto/`    | preparação, verificação de ambiente e artefatos do repositório     |
 | `test/`       | testes do toolkit                                                 |
 
 ## Exemplos de comandos por domínio
@@ -104,9 +103,10 @@ npx tsx toolkit/sgc.ts frontend residuos auditar
 npx tsx toolkit/sgc.ts frontend residuos validar
 npx tsx toolkit/sgc.ts frontend identificadores-teste listar
 npx tsx toolkit/sgc.ts frontend identificadores-teste listar-duplicados
-npx tsx toolkit/sgc.ts e2e acessibilidade crawler
-npx tsx toolkit/sgc.ts e2e acessibilidade processar
 ```
+
+A auditoria Axe do SGC pertence ao workspace `e2e/`, não ao toolkit. Execute-a diretamente com
+`npm --prefix e2e run acessibilidade:crawler` e gere o relatório com `npm --prefix e2e run acessibilidade:processar`.
 
 ### Código transversal
 
@@ -186,9 +186,9 @@ fotografia é encontrada em `artefatosQualidade/mais-recente`.
 ### Projeto
 
 ```bash
-npx tsx toolkit/sgc.ts projeto diagnostico
+npx tsx toolkit/sgc.ts projeto ambiente verificar
 npx tsx toolkit/sgc.ts projeto dependencias auditar
-npx tsx toolkit/sgc.ts projeto limpar --confirmar
+npx tsx toolkit/sgc.ts projeto artefatos limpar --confirmar
 npx tsx toolkit/sgc.ts projeto qualidade rapido
 npx tsx toolkit/sgc.ts projeto preparar --instalar-dependencias
 npx tsx toolkit/sgc.ts projeto arvore-linhas
@@ -202,13 +202,13 @@ de testes reconhece padrões comuns de JavaScript, Vue, Playwright e Java, inclu
 `gradle.properties` e o `package.json` do diretório definido por `diretorios.frontend` em
 `configuracao-toolkit.json` (o padrão do SGC é `frontend`).
 
-`projeto limpar` mantém a prévia por padrão, resolve `diretorios.backend`, `diretorios.frontend` e
+`projeto artefatos limpar` mantém a prévia por padrão, resolve `diretorios.backend`, `diretorios.frontend` e
 `diretorios.artefatosQualidade` da configuração da base e não inclui nomes de relatórios legados removidos.
 
-`projeto diagnostico` resolve os arquivos de backend, frontend e integração pelos diretórios configurados. Em uma base
+`projeto ambiente verificar` resolve os arquivos de backend, frontend e integração pelos diretórios configurados. Em uma base
 externa, não exige arquivos do próprio toolkit nem as portas e o `.env.e2e` específicos do SGC; esses recursos voltam a
 ser verificados quando a base contém `toolkit/sgc.ts`. Catálogos adicionais continuam disponíveis pela API
-`executarDiagnostico`.
+`executarVerificacaoAmbiente`.
 
 ## Casos de uso típicos
 
@@ -294,9 +294,9 @@ defaults SGC para dependências e instalação. Opções explícitas da API ou d
 quando nenhuma delas existe, os defaults SGC preservam o comportamento atual. Os comandos são configuração confiável
 do projeto e não formam uma camada de segurança ou de sandbox.
 
-O comando `e2e acessibilidade crawler` deriva a especificação `a11y/crawler.spec.ts` e a configuração
-`playwright.config.ts` do diretório definido por `diretorios.testesIntegracao`. Projetos com outra estrutura podem usar
-`--especificacao` e `--configuracao` explicitamente.
+O toolkit não registra comandos Playwright/Axe. A coleta de qualidade pode executar uma tarefa E2E configurada pelo
+projeto, mas o crawler e o processamento de acessibilidade do SGC vivem no workspace `e2e/` e são executados
+diretamente por ele.
 
 Os orçamentos e exceções de resíduos frontend não têm política padrão empacotada. Sem `diretorios.orcamentoResiduosFrontend`
 ou `diretorios.excecoesResiduosFrontend`, o toolkit usa uma política neutra identificada como `padrao-do-toolkit`. Ao
@@ -338,7 +338,8 @@ adaptadores SGC, não no núcleo. A função
 serviços externos por composição, sem mutar os defaults globais;
 essa é a fronteira de composição reutilizável atualmente. O perfil SGC continua sendo o default da CLI, mas um consumidor
 externo pode fornecer seus próprios perfis, adaptadores, contexto, metadados e persistência. Mesmo no perfil SGC, a
-montagem dos argumentos Playwright usa `diretorios.testesIntegracao`, a mesma convenção do crawler de acessibilidade.
+montagem de uma tarefa Playwright usa `diretorios.testesIntegracao`; o crawler de acessibilidade do SGC é mantido
+separadamente no workspace `e2e/`.
 
 Os comandos `codigo nomes` também resolvem `simbolos.json`, `consistencia.json` e `idioma.json` relativos ao `--base`
 informado. Assim, a auditoria de outro projeto não lê nem grava silenciosamente no diretório de artefatos do SGC.
@@ -418,7 +419,8 @@ npx tsx toolkit/sgc.ts projeto dependencias auditar
 
 `projeto dependencias auditar` reúne quatro verificações: uso e declaração com Knip, pacotes npm desatualizados,
 vulnerabilidades npm e atualizações de dependências Gradle. O npm cobre todos os workspaces; o Gradle usa o wrapper
-local e desativa somente a execução paralela exigida pela tarefa `dependencyUpdates`. Achados de `outdated` e `audit`
+local, desativa somente a execução paralela exigida pela tarefa `dependencyUpdates` e filtra suas configurações para
+classpaths e declarações diretas do projeto, sem percorrer as configurações internas dos plugins. Achados de `outdated` e `audit`
 ficam classificados como `achados` — não são confundidos com falha de execução —, mas ainda produzem código de saída
 não zero para uso em CI. Um projeto pode substituir os escopos em `execucoes.dependencias`; nesses escopos,
 `codigoNaoZeroIndicaAchados: true` declara que código não zero representa resultado encontrado, não erro de infraestrutura.
@@ -439,8 +441,6 @@ O diretório `test/` contém:
 - `frontend-validadores.test.ts`: testes dos validadores estruturais de views, modais e diretórios configurados
 - `frontend-identificadores.test.ts`: testes de listagem e detecção de identificadores de teste duplicados
 - `frontend-importacao.test.ts`: testes de importação segura dos comandos e auditores frontend
-- `e2e-acessibilidade.test.ts`: testes do processamento e da execução configurada de acessibilidade
-- `e2e-importacao.test.ts`: testes de importação segura dos comandos de acessibilidade E2E
 - `cobertura-cli.test.ts`: testes de leitura, gravação explícita e caminhos externos de cobertura
 - `opcoes-cli.test.ts`: testes da leitura, conversão estrita e limites das opções numéricas
 - `consistencia.test.ts`: testes das auditorias de símbolos, nomenclatura e idioma
@@ -450,7 +450,7 @@ O diretório `test/` contém:
 - `codigo-auditorias.test.ts`: testes de auditoria de cheiros, políticas Semgrep e diretórios de código configurados
 - `projeto.test.ts`: testes dos comandos de projeto (versão, árvore de linhas, limpeza, preparação,
   qualidade e dependências)
-- `projeto-diagnostico.test.ts`: testes do diagnóstico de arquivos essenciais em uma base vazia
+- `projeto-ambiente.test.ts`: testes da verificação de arquivos essenciais em uma base vazia
 - `configuracao.test.ts`: testes da configuração versionada e das execuções parametrizadas do projeto
 - `integracao.test.ts`: testes de importação segura e dos artefatos OpenAPI em uma base externa
 - `qualidade.test.ts`: testes de resumo, coleta e validação de perfis de qualidade

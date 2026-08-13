@@ -49,18 +49,18 @@ type RecursoVerificado = Recurso & {
     detalhe: string;
 };
 
-interface TotaisDiagnostico {
+interface TotaisVerificacaoAmbiente {
     ok: number;
     alerta: number;
     falha: number;
 }
 
-interface ResultadoConsolidado {
+interface ResultadoConsolidadoAmbiente {
     statusGeral: Status;
-    totais: TotaisDiagnostico;
+    totais: TotaisVerificacaoAmbiente;
 }
 
-interface OpcoesDiagnostico {
+interface OpcoesVerificacaoAmbiente {
     base?: string;
     silencioso?: boolean;
     json?: boolean;
@@ -68,7 +68,7 @@ interface OpcoesDiagnostico {
     comandosRegistrados?: RecursoArquivo[];
 }
 
-interface ResultadoDiagnostico extends ResultadoConsolidado {
+interface ResultadoVerificacaoAmbiente extends ResultadoConsolidadoAmbiente {
     diretorioBase: string;
     verificacoes: RecursoVerificado[];
 }
@@ -115,7 +115,7 @@ function ehPerfilSgc(diretorioBase: string): boolean {
     return existsSync(path.join(diretorioBase, "toolkit", "sgc.ts"));
 }
 
-function obterRecursosPadrao(diretorioBase: string): Recurso[] {
+function obterRecursosAmbientePadrao(diretorioBase: string): Recurso[] {
     const diretorioFrontend = caminhoDiretorioConfigurado(diretorioBase, "frontend");
     const diretorioBackend = caminhoDiretorioConfigurado(diretorioBase, "backend");
     const diretorioTestesIntegracao = caminhoDiretorioConfigurado(diretorioBase, "testesIntegracao");
@@ -322,14 +322,14 @@ async function verificarRecurso(recurso: Recurso, diretorioBase: string): Promis
     };
 }
 
-function calcularStatusGeral(totais: TotaisDiagnostico): Status {
+function calcularStatusGeral(totais: TotaisVerificacaoAmbiente): Status {
     if (totais.falha > 0) return "falha";
     if (totais.alerta > 0) return "alerta";
     return "ok";
 }
 
-function consolidar(resultado: RecursoVerificado[]): ResultadoConsolidado {
-    const totais: TotaisDiagnostico = {
+function consolidar(resultado: RecursoVerificado[]): ResultadoConsolidadoAmbiente {
+    const totais: TotaisVerificacaoAmbiente = {
         ok: resultado.filter((item) => item.status === "ok").length,
         alerta: resultado.filter((item) => item.status === "alerta").length,
         falha: resultado.filter((item) => item.status === "falha").length
@@ -341,8 +341,8 @@ function consolidar(resultado: RecursoVerificado[]): ResultadoConsolidado {
     };
 }
 
-function imprimirHumano(resultado: RecursoVerificado[], consolidado: ResultadoConsolidado): void {
-    imprimirCabecalho("Diagnostico do projeto", "Valida comandos, arquivos e infraestrutura do sistema.");
+function imprimirHumano(resultado: RecursoVerificado[], consolidado: ResultadoConsolidadoAmbiente): void {
+    imprimirCabecalho("Verificacao do ambiente", "Valida pre-requisitos, arquivos e infraestrutura do projeto auditado.");
     escreverLinha("");
 
     const porCategoria: Record<string, RecursoVerificado[]> = {};
@@ -363,10 +363,10 @@ function imprimirHumano(resultado: RecursoVerificado[], consolidado: ResultadoCo
     escreverLinha(`Totais: ${consolidado.totais.ok} ok, ${consolidado.totais.alerta} alertas, ${consolidado.totais.falha} falhas`);
 }
 
-async function executarDiagnostico(opcoes: OpcoesDiagnostico = {}): Promise<ResultadoDiagnostico> {
+async function executarVerificacaoAmbiente(opcoes: OpcoesVerificacaoAmbiente = {}): Promise<ResultadoVerificacaoAmbiente> {
     const diretorioBase = opcoes.base ? path.resolve(opcoes.base) : resolverNaRaiz();
     const verificacoes = [
-        ...(await Promise.all((opcoes.recursos ?? obterRecursosPadrao(diretorioBase)).map((recurso) => verificarRecurso(recurso, diretorioBase)))),
+        ...(await Promise.all((opcoes.recursos ?? obterRecursosAmbientePadrao(diretorioBase)).map((recurso) => verificarRecurso(recurso, diretorioBase)))),
         ...(await verificarComandosRegistrados(diretorioBase, opcoes.comandosRegistrados))
     ];
     const consolidado = consolidar(verificacoes);
@@ -388,10 +388,10 @@ async function executarDiagnostico(opcoes: OpcoesDiagnostico = {}): Promise<Resu
 }
 
 export {
-    executarDiagnostico,
-    obterRecursosPadrao,
-    type OpcoesDiagnostico,
+    executarVerificacaoAmbiente,
+    obterRecursosAmbientePadrao,
+    type OpcoesVerificacaoAmbiente,
     type Recurso,
     type RecursoArquivo,
-    type ResultadoDiagnostico
+    type ResultadoVerificacaoAmbiente
 };

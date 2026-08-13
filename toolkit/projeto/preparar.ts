@@ -3,7 +3,7 @@ import {execa} from "execa";
 import {Listr, type ListrTask} from "listr2";
 import {carregarConfiguracao, type EscopoInstalacaoConfigurado} from "../lib/configuracao.js";
 import {resolverNaRaiz} from "../lib/caminhos.js";
-import {executarDiagnostico, type Recurso, type RecursoArquivo, type ResultadoDiagnostico} from "./diagnostico.js";
+import {executarVerificacaoAmbiente, type Recurso, type RecursoArquivo, type ResultadoVerificacaoAmbiente} from "./ambiente-verificar.js";
 
 type DefinicaoEscopoInstalacao = EscopoInstalacaoConfigurado;
 
@@ -16,17 +16,17 @@ interface OpcoesPreparacao {
     instalarDependencias?: boolean;
     instalarPlaywright?: boolean;
     escoposInstalacao?: readonly DefinicaoEscopoInstalacao[];
-    recursosDiagnostico?: Recurso[];
-    comandosRegistradosDiagnostico?: RecursoArquivo[];
+    recursosVerificacaoAmbiente?: Recurso[];
+    comandosRegistradosVerificacaoAmbiente?: RecursoArquivo[];
 }
 
 interface ContextoPreparacao {
-    diagnostico?: ResultadoDiagnostico;
+    verificacaoAmbiente?: ResultadoVerificacaoAmbiente;
 }
 
 interface ResultadoPreparacao {
     diretorioBase: string;
-    diagnostico: ResultadoDiagnostico;
+    verificacaoAmbiente: ResultadoVerificacaoAmbiente;
 }
 
 const ESCOPOS_INSTALACAO_SGC: readonly DefinicaoEscopoInstalacao[] = [
@@ -55,17 +55,17 @@ async function executarPreparacao(opcoes: OpcoesPreparacao = {}): Promise<Result
         {
             title: "Validar ambiente do projeto",
             task: async (ctx, task) => {
-                const diagnostico = await executarDiagnostico({
+                const verificacaoAmbiente = await executarVerificacaoAmbiente({
                     base: diretorioBase,
                     silencioso: true,
-                    recursos: opcoes.recursosDiagnostico,
-                    comandosRegistrados: opcoes.comandosRegistradosDiagnostico
+                    recursos: opcoes.recursosVerificacaoAmbiente,
+                    comandosRegistrados: opcoes.comandosRegistradosVerificacaoAmbiente
                 });
-                ctx.diagnostico = diagnostico;
-                task.output = `status ${diagnostico.statusGeral}`;
+                ctx.verificacaoAmbiente = verificacaoAmbiente;
+                task.output = `status ${verificacaoAmbiente.statusGeral}`;
 
-                if (diagnostico.statusGeral === "falha") {
-                    throw new Error("Ambiente incompleto. Corrija as falhas do diagnostico antes de continuar.");
+                if (verificacaoAmbiente.statusGeral === "falha") {
+                    throw new Error("Ambiente incompleto. Corrija as falhas da verificacao do ambiente antes de continuar.");
                 }
             }
         },
@@ -99,13 +99,13 @@ async function executarPreparacao(opcoes: OpcoesPreparacao = {}): Promise<Result
     });
 
     const contexto = await tarefas.run();
-    if (!contexto.diagnostico) {
-        throw new Error("Preparacao terminou sem executar o diagnostico do ambiente.");
+    if (!contexto.verificacaoAmbiente) {
+        throw new Error("Preparacao terminou sem executar a verificacao do ambiente.");
     }
 
     return {
         diretorioBase,
-        diagnostico: contexto.diagnostico
+        verificacaoAmbiente: contexto.verificacaoAmbiente
     };
 }
 

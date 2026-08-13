@@ -33,7 +33,7 @@ describe("Superfície da CLI", () => {
         const resultado = await executarSgc(["--help"]);
         expect(resultado.exitCode).toBe(0);
         expect(resultado.stdout).toContain("Toolkit do SGC");
-        expect(resultado.stdout).toContain("projeto diagnostico");
+        expect(resultado.stdout).toContain("projeto ambiente");
     });
 
     test("despacha ajuda de um comando de auditoria do backend", async () => {

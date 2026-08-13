@@ -154,20 +154,6 @@ const CATALOGO_COMANDOS = [
         arquivo: "frontend/identificadores-teste-listar-duplicados.ts"
     },
     {
-        caminho: ["e2e", "acessibilidade", "crawler"],
-        descricao: "Executa o crawler Axe-core em todas as rotas principais.",
-        escopo: "adaptavel",
-        efeito: "orquestracao",
-        arquivo: "e2e/acessibilidade-crawler.ts"
-    },
-    {
-        caminho: ["e2e", "acessibilidade", "processar"],
-        descricao: "Processa os resultados do crawler em um relatorio Markdown.",
-        escopo: "adaptavel",
-        efeito: "geracao",
-        arquivo: "e2e/acessibilidade-processar-resultados.ts"
-    },
-    {
         caminho: ["codigo", "cheiros", "auditar"],
         descricao: "Gera fotografia de sinais de complexidade acidental e codigo defensivo.",
         escopo: "adaptavel",
@@ -329,14 +315,14 @@ const CATALOGO_COMANDOS_ESPECIAIS = [
         efeito: "orquestracao"
     },
     {
-        caminho: ["projeto", "diagnostico"],
-        descricao: "Valida comandos e arquivos essenciais do ambiente.",
+        caminho: ["projeto", "ambiente", "verificar"],
+        descricao: "Verifica pre-requisitos, comandos e arquivos essenciais do projeto auditado.",
         escopo: "adaptavel",
         efeito: "auditoria"
     },
     {
-        caminho: ["projeto", "limpar"],
-        descricao: "Lista ou remove artefatos transientes de qualidade e do toolkit.",
+        caminho: ["projeto", "artefatos", "limpar"],
+        descricao: "Lista ou remove artefatos gerados pelo toolkit e pelas ferramentas de qualidade.",
         escopo: "adaptavel",
         efeito: "mutacao"
     },

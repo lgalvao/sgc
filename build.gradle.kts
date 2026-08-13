@@ -1,4 +1,5 @@
 import com.github.gradle.node.npm.task.NpmTask
+import com.github.benmanes.gradle.versions.updates.DependencyUpdatesTask
 
 plugins {
     alias(libs.plugins.spring.boot) apply false
@@ -46,6 +47,22 @@ subprojects {
             }
             sourceCompatibility = JavaVersion.VERSION_25
             targetCompatibility = JavaVersion.VERSION_25
+        }
+    }
+}
+
+allprojects {
+    tasks.withType<DependencyUpdatesTask>().configureEach {
+        filterConfigurations = org.gradle.api.specs.Spec { configuracao ->
+            configuracao.name in setOf(
+                "compileClasspath",
+                "runtimeClasspath",
+                "testCompileClasspath",
+                "testRuntimeClasspath",
+                "annotationProcessor",
+                "testAnnotationProcessor",
+                "developmentOnly"
+            )
         }
     }
 }

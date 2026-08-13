@@ -5,14 +5,14 @@ import {resolverNaRaiz} from "../lib/caminhos.js";
 import {resolverCaminhoConfigurado} from "../lib/configuracao.js";
 import {escreverLinha, imprimirCabecalho, imprimirJson} from "../lib/saida.js";
 
-interface OpcoesLimpeza {
+interface OpcoesLimpezaArtefatos {
     base?: string;
     confirmar?: boolean;
     json?: boolean;
     padroes?: readonly string[];
 }
 
-interface ResultadoLimpeza {
+interface ResultadoLimpezaArtefatos {
     diretorioBase: string;
     modo: "simular" | "executar";
     total: number;
@@ -23,7 +23,7 @@ function relativo(base: string, absoluto: string): string {
     return path.relative(base, absoluto).replaceAll("\\", "/");
 }
 
-function obterPadroesLimpezaPadrao(base: string): string[] {
+function obterPadroesArtefatos(base: string): string[] {
     const diretorioBackend = resolverCaminhoConfigurado("backend", base);
     const diretorioFrontend = resolverCaminhoConfigurado("frontend", base);
     const diretorioArtefatos = resolverCaminhoConfigurado("artefatosQualidade", base);
@@ -79,8 +79,8 @@ async function resolverItens(base: string, padroes: readonly string[]): Promise<
     return [...encontrados].toSorted((a, b) => a.localeCompare(b));
 }
 
-function imprimirHumano(base: string, itens: string[], modo: ResultadoLimpeza["modo"]): void {
-    imprimirCabecalho("Limpeza do projeto", modo === "executar"
+function imprimirHumano(base: string, itens: string[], modo: ResultadoLimpezaArtefatos["modo"]): void {
+    imprimirCabecalho("Limpeza de artefatos", modo === "executar"
         ? "Removendo artefatos gerados pelo toolkit e ferramentas de qualidade."
         : "Prévia dos artefatos gerados pelo toolkit e ferramentas de qualidade.");
     escreverLinha("");
@@ -98,10 +98,10 @@ function imprimirHumano(base: string, itens: string[], modo: ResultadoLimpeza["m
     escreverLinha(`Total: ${itens.length} item(ns).`);
 }
 
-async function executarLimpeza(opcoes: OpcoesLimpeza = {}): Promise<ResultadoLimpeza> {
+async function limparArtefatos(opcoes: OpcoesLimpezaArtefatos = {}): Promise<ResultadoLimpezaArtefatos> {
     const base = opcoes.base ? path.resolve(opcoes.base) : resolverNaRaiz();
-    const itens = await resolverItens(base, opcoes.padroes ?? obterPadroesLimpezaPadrao(base));
-    const modo: ResultadoLimpeza["modo"] = opcoes.confirmar ? "executar" : "simular";
+    const itens = await resolverItens(base, opcoes.padroes ?? obterPadroesArtefatos(base));
+    const modo: ResultadoLimpezaArtefatos["modo"] = opcoes.confirmar ? "executar" : "simular";
 
     if (opcoes.confirmar) {
         for (const item of itens) {
@@ -129,6 +129,8 @@ async function executarLimpeza(opcoes: OpcoesLimpeza = {}): Promise<ResultadoLim
 }
 
 export {
-    executarLimpeza,
-    obterPadroesLimpezaPadrao
+    limparArtefatos,
+    obterPadroesArtefatos,
+    type OpcoesLimpezaArtefatos,
+    type ResultadoLimpezaArtefatos
 };

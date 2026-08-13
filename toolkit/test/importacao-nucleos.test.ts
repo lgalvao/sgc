@@ -8,8 +8,8 @@ const DIRETORIO_TOOLKIT = path.join(DIRETORIO_RAIZ, "toolkit");
 const CAMINHOS_COMANDOS_PROJETO = [
     "arvore-linhas.ts",
     "dependencias-auditar.ts",
-    "diagnostico.ts",
-    "limpar.ts",
+    "ambiente-verificar.ts",
+    "artefatos-limpar.ts",
     "preparar.ts",
     "qualidade.ts",
     "versao-sincronizar.ts"

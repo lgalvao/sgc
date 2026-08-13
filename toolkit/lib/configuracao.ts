@@ -288,7 +288,7 @@ function combinarConfiguracoes(
         ...configuracaoSobreposta,
         diretorios: {
             ...configuracaoBase.diretorios,
-            ...configuracaoSobreposta.diretorios ?? {}
+            ...configuracaoSobreposta.diretorios
         },
         ...(Object.keys(execucoes).some(chave => chave !== "qualidade") || Object.keys(execucoes.qualidade ?? {}).length > 0
             ? {execucoes}

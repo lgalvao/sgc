@@ -6,8 +6,8 @@ import {execa} from "execa";
 import {executarSgc, escreverArquivo, escreverJson, lerArquivo, lerJson, existe, criarDiretorio} from "./apoio.js";
 import {calcularTotais, construirArvore, ehArquivoTeste, listarArquivosGit, lerOpcoes} from "../projeto/arvore-linhas.js";
 import {sincronizarVersao} from "../projeto/versao-sincronizar.js";
-import {executarDiagnostico, obterRecursosPadrao} from "../projeto/diagnostico.js";
-import {executarLimpeza, obterPadroesLimpezaPadrao} from "../projeto/limpar.js";
+import {executarVerificacaoAmbiente, obterRecursosAmbientePadrao} from "../projeto/ambiente-verificar.js";
+import {limparArtefatos, obterPadroesArtefatos} from "../projeto/artefatos-limpar.js";
 import {resolverEscoposInstalacao} from "../projeto/preparar.js";
 import {executarPerfilQualidade} from "../projeto/qualidade.js";
 import {executarAuditoriaDependencias} from "../projeto/dependencias-auditar.js";
@@ -20,7 +20,7 @@ type ChamadaComando = {
     diretorio?: string;
 };
 
-interface VerificacaoDiagnosticoJson {
+interface VerificacaoAmbienteJson {
     nome: string;
     status?: string;
     detalhe?: string;
@@ -141,21 +141,21 @@ describe("Comandos de projeto do toolkit", () => {
         expect(ehArquivoTeste("aplicacao/src/main/java/Exemplo.java")).toBe(false);
     });
 
-    test("executa o diagnostico em JSON", async () => {
-        const resultado = await executarSgc(["projeto", "diagnostico", "--json"]);
+    test("executa a verificacao do ambiente em JSON", async () => {
+        const resultado = await executarSgc(["projeto", "ambiente", "verificar", "--json"]);
         expect(resultado.exitCode).toBe(0);
 
         const json = JSON.parse(resultado.stdout);
         expect(["ok", "alerta"]).toContain(json.statusGeral);
         expect(Array.isArray(json.verificacoes)).toBe(true);
-        expect(json.verificacoes.some((item: Pick<VerificacaoDiagnosticoJson, "nome">) => item.nome === "node")).toBe(true);
+        expect(json.verificacoes.some((item: Pick<VerificacaoAmbienteJson, "nome">) => item.nome === "node")).toBe(true);
     });
 
-    test("diagnostico aceita recursos registrados por projeto externo", async () => {
-        const diretorioBase = await mkdtemp(path.join(os.tmpdir(), "sgc-diagnostico-configurado-"));
+    test("verificacao do ambiente aceita recursos registrados por projeto externo", async () => {
+        const diretorioBase = await mkdtemp(path.join(os.tmpdir(), "sgc-ambiente-configurado-"));
         await escreverArquivo(path.join(diretorioBase, "package.json"), "{}\n");
 
-        const resultado = await executarDiagnostico({
+        const resultado = await executarVerificacaoAmbiente({
             base: diretorioBase,
             silencioso: true,
             recursos: [{
@@ -173,8 +173,8 @@ describe("Comandos de projeto do toolkit", () => {
         expect(resultado.verificacoes[0]).toMatchObject({nome: "manifesto", status: "ok"});
     });
 
-    test("diagnostico deriva recursos estruturais dos diretorios configurados", async () => {
-        const diretorioBase = await mkdtemp(path.join(os.tmpdir(), "sgc-diagnostico-diretorios-"));
+    test("verificacao do ambiente deriva recursos estruturais dos diretorios configurados", async () => {
+        const diretorioBase = await mkdtemp(path.join(os.tmpdir(), "sgc-ambiente-diretorios-"));
         await escreverJson(path.join(diretorioBase, "configuracao-toolkit.json"), {
             versao: VERSAO_CONFIGURACAO,
             diretorios: {
@@ -184,7 +184,7 @@ describe("Comandos de projeto do toolkit", () => {
             }
         });
 
-        const caminhos = obterRecursosPadrao(diretorioBase).flatMap(recurso => "caminho" in recurso ? [recurso.caminho] : []);
+        const caminhos = obterRecursosAmbientePadrao(diretorioBase).flatMap(recurso => "caminho" in recurso ? [recurso.caminho] : []);
         expect(caminhos).toContain("servidor/build.gradle.kts");
         expect(caminhos).toContain("cliente/package.json");
         expect(caminhos).toContain("testes-e2e/package.json");
@@ -192,15 +192,15 @@ describe("Comandos de projeto do toolkit", () => {
         expect(caminhos).not.toContain("frontend/package.json");
         expect(caminhos).not.toContain("toolkit/package.json");
 
-        const diagnostico = await executarDiagnostico({
+        const verificacaoAmbiente = await executarVerificacaoAmbiente({
             base: diretorioBase,
             silencioso: true,
             comandosRegistrados: []
         });
-        expect(diagnostico.verificacoes.some(verificacao => verificacao.nome === "toolkit/package.json")).toBe(false);
+        expect(verificacaoAmbiente.verificacoes.some(verificacao => verificacao.nome === "toolkit/package.json")).toBe(false);
 
         await escreverArquivo(path.join(diretorioBase, "toolkit", "sgc.ts"), "");
-        const caminhosSgc = obterRecursosPadrao(diretorioBase).flatMap(recurso => "caminho" in recurso ? [recurso.caminho] : []);
+        const caminhosSgc = obterRecursosAmbientePadrao(diretorioBase).flatMap(recurso => "caminho" in recurso ? [recurso.caminho] : []);
         expect(caminhosSgc).toContain("toolkit/package.json");
     });
 
@@ -250,14 +250,14 @@ describe("Comandos de projeto do toolkit", () => {
         await escreverArquivo(path.join(diretorioBase, "backend-cobertura-auditoria.md"), "# teste");
         await escreverArquivo(path.join(diretorioBase, "toolkit", "qualidade", "artefatos", "mais-recente", "resumo.md"), "ok");
 
-        const previa = await executarSgc(["projeto", "limpar", "--json", "--base", diretorioBase]);
+        const previa = await executarSgc(["projeto", "artefatos", "limpar", "--json", "--base", diretorioBase]);
         expect(previa.exitCode).toBe(0);
         const jsonPrevia = JSON.parse(previa.stdout);
         expect(jsonPrevia.modo).toBe("simular");
         expect(jsonPrevia.itens).toContain("backend/build");
         expect(await existe(path.join(diretorioBase, "backend", "build"))).toBe(true);
 
-        const execucao = await executarSgc(["projeto", "limpar", "--json", "--confirmar", "--base", diretorioBase]);
+        const execucao = await executarSgc(["projeto", "artefatos", "limpar", "--json", "--confirmar", "--base", diretorioBase]);
         expect(execucao.exitCode).toBe(0);
         const jsonExecucao = JSON.parse(execucao.stdout);
         expect(jsonExecucao.modo).toBe("executar");
@@ -270,7 +270,7 @@ describe("Comandos de projeto do toolkit", () => {
         await escreverArquivo(path.join(diretorioBase, "artefatos-projeto", "saida.txt"), "temporario");
         await escreverArquivo(path.join(diretorioBase, "nao-listado.txt"), "preservar");
 
-        const resultado = await executarLimpeza({
+        const resultado = await limparArtefatos({
             base: diretorioBase,
             padroes: ["artefatos-projeto"]
         });
@@ -296,7 +296,7 @@ describe("Comandos de projeto do toolkit", () => {
             }
         });
 
-        const padroes = obterPadroesLimpezaPadrao(diretorioBase);
+        const padroes = obterPadroesArtefatos(diretorioBase);
         expect(padroes).toContain("servidor/build");
         expect(padroes).toContain("cliente/coverage");
         expect(padroes).toContain("artefatos");

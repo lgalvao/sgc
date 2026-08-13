@@ -1,11 +1,6 @@
 import fs from "node:fs/promises";
 import path from "node:path";
-import {DIRETORIO_RAIZ} from "../lib/caminhos.js";
-import {resolverCaminhoConfigurado} from "../lib/configuracao.js";
-import {lerOpcao} from "../lib/cli-opcoes.js";
-import {exibirAjudaComando} from "../lib/cli-ajuda.js";
-import {ehEntradaPrincipal} from "../lib/execucao.js";
-import {escreverErro, escreverLinha} from "../lib/saida.js";
+import {caminhoRaizProjeto, ehEntradaPrincipal, exibirAjuda, lerOpcao} from "./lib/cli.js";
 
 interface NoAcessibilidade {
     target: string[];
@@ -139,9 +134,8 @@ async function processarResultadosAcessibilidade({entrada, saida}: OpcoesProcess
 
 async function principal(argumentos: string[] = process.argv.slice(2)): Promise<ResultadoProcessamentoAcessibilidade | undefined> {
     if (argumentos.includes("--help") || argumentos.includes("-h")) {
-        exibirAjudaComando({
-            comandoSgc: "e2e acessibilidade processar",
-            scriptDireto: "e2e/acessibilidade-processar-resultados.ts",
+        exibirAjuda({
+            uso: "npx tsx e2e/acessibilidade-processar-resultados.ts",
             descricao: "Consolida os resultados JSON do Axe em um relatorio Markdown.",
             opcoes: [
                 "--entrada <arquivo> Arquivo JSON produzido pelo crawler.",
@@ -152,23 +146,19 @@ async function principal(argumentos: string[] = process.argv.slice(2)): Promise<
         return;
     }
 
-    const diretorioBase = path.resolve(lerOpcao(argumentos, "--base", DIRETORIO_RAIZ) ?? DIRETORIO_RAIZ);
+    const diretorioBase = path.resolve(lerOpcao(argumentos, "--base", caminhoRaizProjeto()) ?? caminhoRaizProjeto());
     const entrada = path.resolve(diretorioBase, lerOpcao(argumentos, "--entrada", "a11y-scan-results.json") ?? "a11y-scan-results.json");
-    const saidaPadrao = path.join(
-        resolverCaminhoConfigurado("artefatosQualidade", diretorioBase),
-        "acessibilidade",
-        "relatorio.md"
-    );
+    const saidaPadrao = path.join(diretorioBase, "e2e", "artefatos", "acessibilidade", "relatorio.md");
     const saida = path.resolve(diretorioBase, lerOpcao(argumentos, "--saida", saidaPadrao) ?? saidaPadrao);
     const resultado = await processarResultadosAcessibilidade({entrada, saida});
-    escreverLinha(`Relatorio de acessibilidade gerado em: ${resultado.saida}`);
+    console.log(`Relatorio de acessibilidade gerado em: ${resultado.saida}`);
     return resultado;
 }
 
 if (ehEntradaPrincipal(import.meta.url)) {
     principal().catch((erro) => {
         const mensagem = erro instanceof Error ? erro.message : String(erro);
-        escreverErro(`Erro ao processar acessibilidade: ${mensagem}\n`);
+        console.error(`Erro ao processar acessibilidade: ${mensagem}`);
         process.exitCode = 1;
     });
 }

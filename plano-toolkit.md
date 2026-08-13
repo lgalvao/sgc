@@ -147,6 +147,8 @@ frontend e para os caminhos OpenAPI.
 Cada comando, biblioteca, política ou artefato suspeito deve ser avaliado por evidência, não apenas por estar referenciado:
 
 - consumidor atual no roteador, scripts npm, configuração, CI ou outro módulo;
+- consumidor humano também conta: comando documentado para execução manual, fluxo operacional ou procedimento de
+  manutenção é contrato de uso, mesmo que nenhuma outra parte do código o importe;
 - entrada real ainda produzida e saída real ainda consumida;
 - regra que representa requisito atual do SGC ou capacidade horizontal identificável;
 - sobreposição com outro comando que já resolve o mesmo problema;
@@ -155,7 +157,8 @@ Cada comando, biblioteca, política ou artefato suspeito deve ser avaliado por e
 
 As decisões permitidas são: `remover`, `fundir`, `manter-horizontal`, `manter-adaptável` ou `manter-sgc`. “Modernizar
 agora e decidir depois” não é uma decisão válida. Knip, cobertura e referências estáticas ajudam a investigação, mas não
-provam utilidade funcional.
+provam utilidade funcional; ausência de referências automáticas nunca basta para remover um comando com uso humano
+documentado.
 
 ## 3. Situação atual — 13 de agosto de 2026
 
@@ -373,7 +376,7 @@ provam utilidade funcional.
   do `sgc.js` compilado continua delegando a execução dos comandos ao `tsx` sobre a fonte `.ts`.
 - Foi criado `tsconfig.estrito.json`, cobrindo toda a implementação TypeScript com `strict` e `noImplicitOverride`; o
   gate passou e tornou-se o `typecheck` oficial.
-- `projeto/diagnostico.ts` foi convertido para TypeScript, deixou de depender de `fs-extra` e aceita catálogos
+- `projeto/ambiente-verificar.ts` foi convertido para TypeScript, deixou de depender de `fs-extra` e aceita catálogos
   configuráveis de recursos e comandos registrados; o catálogo padrão resolve backend, frontend e integração pela
   configuração da base, enquanto recursos exclusivos do SGC só entram quando a base contém `toolkit/sgc.ts`. A
   política mínima local do Node é a major 26 (`26.7.0`).
@@ -387,14 +390,14 @@ provam utilidade funcional.
   coleta aceita catálogos externos e uma fábrica de contexto externa por composição, sem mutar os defaults globais. A
   coleta Git padrão foi isolada em `qualidade/coleta-metadados.ts` e também pode ser substituída; preparação e persistência
   de fotografia também são injetáveis na opção de coleta. A montagem do comando Playwright continua sendo uma função pura
-  e resolve
-  `diretorios.testesIntegracao`, compartilhando a mesma convenção do crawler de acessibilidade.
+  e resolve `diretorios.testesIntegracao`; o crawler de acessibilidade do SGC não é parte dessa coleta nem do toolkit e
+  permanece no workspace raiz `e2e/`.
 - `qualidade/coleta.ts` foi convertido para TypeScript; a validação de perfis/opções e o wrapper que delega ao coletor
   agora compartilham a fronteira tipada do runtime.
 - `qualidade/resumo.ts` foi convertido para TypeScript; o carregador de fotografias passou a aceitar um tipo genérico e
   o comando `qualidade resumo` agora resolve a fotografia mais recente pela opção `--base` e relativiza o caminho de
   saída contra a base auditada, não contra o diretório do processo.
-- `projeto/limpar.ts` foi convertido para TypeScript, substituiu `fs-extra` por APIs nativas do Node e aceita uma
+- `projeto/artefatos-limpar.ts` foi convertido para TypeScript, substituiu `fs-extra` por APIs nativas do Node e aceita uma
   política de padrões de limpeza injetável; os padrões padrão agora derivam backend, frontend e artefatos de qualidade
   da configuração da base, removendo nomes legados que já não são produzidos.
 - `projeto/preparar.ts` foi convertido para TypeScript; a base efetiva chega ao diagnóstico e aos comandos externos,
@@ -409,7 +412,9 @@ provam utilidade funcional.
   falhas de execução continuam distinguíveis.
 - O plugin Gradle de atualizações foi promovido do ID legado `com.github.ben-manes.versions` 0.54.0 para
   `io.github.ben-manes.versions` 0.61.0, a série compatível com configuration cache; o toolkit mantém somente
-  `--no-parallel` na chamada porque o projeto ainda declara execução paralela global.
+  `--no-parallel` na chamada porque o projeto ainda declara execução paralela global. O `build.gradle.kts` agora filtra
+  as configurações para classpaths do projeto, processadores declarados e `developmentOnly`, excluindo as configurações
+  internas de Jacoco/Pitest/SpotBugs que inflavam o relatório com dependências transitivas e ferramentas dos plugins.
 - `projeto/preparar.ts` foi convertido para TypeScript; os escopos de instalação podem ser definidos em
   `execucoes.instalacao`, preservando raiz, frontend e toolkit como defaults do SGC.
 - `backend/cobertura-ramificacoes.ts` e `backend/cobertura-auditoria.ts` foram convertidos para TypeScript com
@@ -422,9 +427,9 @@ provam utilidade funcional.
   contrato de integração do agregador de qualidade.
 - `frontend/residuos-auditar.ts` e `frontend/residuos-validar.ts` foram convertidos para TypeScript; fotografia,
   violações, avisos, exceções e opções de persistência agora têm contratos explícitos, mantendo os budgets do SGC.
-- `e2e/acessibilidade-crawler.ts` e `e2e/acessibilidade-processar-resultados.ts` foram convertidos para
-  TypeScript; o processador valida o JSON externo antes de gerar Markdown e o crawler aceita base, spec, configuração e
-  executor Playwright parametrizados, mantendo os defaults SGC.
+- Os wrappers `e2e/acessibilidade-crawler.ts` e `e2e/acessibilidade-processar-resultados.ts` foram retirados do
+  toolkit nesta rodada. Eles são integração específica do SGC e agora vivem no workspace raiz `e2e/`, com scripts e
+  testes próprios; a CLI e o pacote reutilizável não registram nem empacotam acessibilidade.
 - `frontend/identificadores-teste-listar.ts` e `frontend/identificadores-teste-listar-duplicados.ts` foram convertidos
   para TypeScript; os resultados de coleta/duplicação são tipados e o agrupamento usa `Map`, preservando as regras e a
   saída dos identificadores de teste do perfil SGC.
@@ -452,10 +457,10 @@ provam utilidade funcional.
 
 Nas validações desta rodada, em 13 de agosto de 2026, executadas diretamente sob Node `26.7.0`:
 
-- `npm --prefix toolkit run test`: 130 testes aprovados em 29 arquivos; o smoke de pacote é separado para não tornar a
+- `npm --prefix toolkit run test`: 126 testes aprovados em 27 arquivos; o smoke de pacote é separado para não tornar a
   suíte unitária dependente de rede ou instalação;
-- `npm --prefix toolkit run test:coverage`: aprovado com baseline informativa de 60,44% de instruções (822/1.360),
-  49,48% de ramificações (481/972), 67,15% de funções (184/274) e 60,50% de linhas (786/1.299); o script exclui
+- `npm --prefix toolkit run test:coverage`: aprovado com baseline informativa de 62,50% de instruções (787/1.259),
+  50,99% de ramificações (461/904), 70,23% de funções (177/252) e 62,61% de linhas (752/1.201); o script exclui
   `test/**` para não contar o apoio de testes como implementação e ainda não aplica threshold, porque a prioridade é
   transformar os contratos críticos em cenários explícitos;
 - `npm --prefix toolkit run test:pacote`: 2 testes aprovados, com `npm pack`, instalação isolada, auditoria no consumidor,
@@ -503,8 +508,9 @@ Na rodada seguinte, os 4 cenários de resumo e coleta foram extraídos para `tes
 no teste principal e mantendo a validação dos perfis sem depender dos testes de auditoria de backend ou frontend.
 Nesta rodada, o projeto externo ganhou um cenário de sincronização de versão usando `diretorios.frontend`, chegando a
 113 cenários regulares e 78 cenários restantes no teste principal.
-Nesta rodada, o crawler de acessibilidade passou a derivar seus defaults de `diretorios.testesIntegracao`, com regressão
-para uma base externa configurada; a suíte chega a 114 cenários regulares e o teste principal permanece com 78.
+Nesta rodada histórica, o crawler de acessibilidade passou a derivar seus defaults de `diretorios.testesIntegracao`, com
+regressão para uma base externa configurada; essa implementação foi depois movida para o workspace raiz `e2e/`, fora do
+toolkit. A suíte do toolkit não conta mais esses cenários.
 Na rodada seguinte, a coleta consolidada passou a montar o comando Playwright pela mesma configuração, com teste focado
 na função pura de opções; a suíte chega a 115 cenários regulares e `test/qualidade.test.ts` passa a ter 5 cenários.
 Na rodada seguinte, o diagnóstico passou a separar recursos estruturais configuráveis do perfil SGC, com regressão para
@@ -576,9 +582,9 @@ separando o contrato de não execução dos testes de comportamento.
 Nesta rodada, três cenários de importação segura dos comandos frontend foram extraídos para
 `test/frontend-importacao.test.ts`; `test/sgc.test.ts` caiu de 69 para 66 cenários, mantendo a contagem total e
 separando validadores estruturais, cobertura e acessibilidade dos cenários que executam essas auditorias.
-Nesta rodada, três cenários comportamentais de acessibilidade foram extraídos para
-`test/e2e-acessibilidade.test.ts`; `test/sgc.test.ts` caiu de 66 para 63 cenários, mantendo a contagem total e
-separando processamento de resultados, composição do crawler e defaults configurados.
+Nesta rodada histórica, três cenários comportamentais de acessibilidade foram extraídos para
+`test/e2e-acessibilidade.test.ts`; eles foram posteriormente movidos para `e2e/testes/acessibilidade.test.ts` quando a
+acessibilidade deixou de ser considerada parte do toolkit.
 Nesta rodada, três cenários de cobertura da CLI foram extraídos para `test/cobertura-cli.test.ts`; `test/sgc.test.ts`
 caiu de 63 para 60 cenários, mantendo a contagem total e separando o contrato read-only/gravação dos relatórios V8.
 Nesta rodada, três cenários de consistência e nomenclatura foram extraídos para `test/consistencia.test.ts`;
@@ -626,31 +632,33 @@ Nesta rodada, dois cenários de notificações backend foram extraídos para `te
 principal caiu de 4 para 2 cenários, mantendo a contagem total e isolando literals centralizados e diretórios configurados.
 Em seguida, o cenário de fotografia de qualidade externa foi extraído para `test/qualidade-externa.test.ts`; o teste
 principal caiu de 2 para 1 cenário, mantendo a cobertura de adaptadores parametrizados.
-Por fim, o cenário de diagnóstico de projeto foi extraído para `test/projeto-diagnostico.test.ts`; o arquivo
+Por fim, o cenário de verificação do ambiente foi extraído para `test/projeto-ambiente.test.ts`; o arquivo
 `test/sgc.test.ts` ficou vazio e foi removido, concluindo a divisão por domínio sem alterar os 125 cenários totais.
 Nesta rodada, `lib/cli-opcoes.ts` passou a fornecer `lerNumero`, com validação estrita compartilhada por cobertura,
 ramificações e árvore de linhas; quatro regressões cobrem defaults, atribuição, frações, valores parciais e intervalos.
-Os defaults diretos de `process.cwd()` restantes também foram alinhados à resolução comum. A suíte passou a 130 cenários
-regulares em 29 arquivos, e a baseline de cobertura ficou em 60,44% de instruções, 49,48% de ramificações, 67,15% de
-funções e 60,50% de linhas.
+Os defaults diretos de `process.cwd()` restantes também foram alinhados à resolução comum. A suíte do toolkit passou a
+126 cenários regulares em 27 arquivos, e a baseline de cobertura ficou em 62,50% de instruções, 50,99% de ramificações,
+70,23% de funções e 62,61% de linhas; os quatro cenários de acessibilidade agora são validados separadamente pelo
+workspace raiz `e2e/`.
 
 ### 3.3 Tamanho e composição atual
 
 Inventário dos arquivos rastreados do toolkit, excluindo `dist`, cobertura e artefatos ignorados:
 
-- 79 arquivos TypeScript de implementação;
+- 77 arquivos TypeScript de implementação;
 - 0 arquivos JavaScript de implementação; o único CJS é o launcher mínimo do binário;
-- 0 arquivos JavaScript de teste e 30 arquivos TypeScript de teste (`test/execucao-cli.test.ts`, `test/backend-fqn.test.ts`,
+- 0 arquivos JavaScript de teste e 29 arquivos TypeScript de teste (`test/execucao-cli.test.ts`, `test/backend-fqn.test.ts`,
   `test/backend-testes.test.ts`, `test/backend-auditorias.test.ts`, `test/backend-importacao.test.ts`,
   `test/backend-notificacoes.test.ts`, `test/frontend-residuos.test.ts`, `test/frontend-arquitetura.test.ts`,
   `test/frontend-arquitetura-gates.test.ts`, `test/frontend-validadores.test.ts`, `test/frontend-identificadores.test.ts`,
-  `test/frontend-importacao.test.ts`, `test/e2e-acessibilidade.test.ts`, `test/e2e-importacao.test.ts`, `test/cobertura-cli.test.ts`,
+  `test/frontend-importacao.test.ts`, `test/cobertura-cli.test.ts`,
   `test/consistencia.test.ts`, `test/opcoes-cli.test.ts`, `test/superficie-cli.test.ts`, `test/importacao-nucleos.test.ts`,
   `test/codigo-importacao.test.ts`, `test/codigo-auditorias.test.ts`, `test/projeto.test.ts`,
-  `test/projeto-diagnostico.test.ts`, `test/configuracao.test.ts`, `test/integracao.test.ts`, `test/qualidade.test.ts`,
+  `test/projeto-ambiente.test.ts`, `test/configuracao.test.ts`, `test/integracao.test.ts`, `test/qualidade.test.ts`,
   `test/qualidade-externa.test.ts`, `test/cdus.test.ts`, `test/externo.test.ts` e `test/pacote.test.ts`);
-- 29 arquivos de teste TypeScript concentram 130 cenários regulares; `test/pacote.test.ts` contém 2 cenários de distribuição
-  isolada;
+- 28 arquivos `*.test.ts` TypeScript concentram os cenários do toolkit (27 na suíte regular); `test/pacote.test.ts` contém
+  2 cenários de distribuição isolada. Os quatro cenários dos wrappers de acessibilidade ficam em `e2e/testes/` e não
+  entram nos gates do toolkit;
 - `test/apoio.ts` centraliza a raiz do toolkit, o launcher `tsx`, o contrato de execução, `executarSgc` e helpers nativos
   de arquivo, evitando cópias divergentes nos testes de projeto, integração, qualidade e CLI;
 - maior módulo atual: `frontend/arquitetura-lib.ts`, com aproximadamente 1.200 linhas;
@@ -670,7 +678,7 @@ O núcleo TypeScript de implementação foi concluído: 100% dos arquivos de imp
 | Resolvido nesta rodada | Raiz acoplada à posição física | `lib/caminhos.ts` usa `process.cwd()` como raiz padrão e mantém `DIRETORIO_TOOLKIT` para recursos do próprio pacote; o smoke isolado confirmou que o consumidor é a base auditada. |
 | Resolvido nesta rodada | Semgrep acoplado ao ambiente local | A política padrão vinha da raiz do consumidor e o executável era fixado em `~/.local/bin/semgrep`; ambos agora usam a instalação do toolkit e o `PATH`, com testes de override e consumidor isolado. |
 | Resolvido | Configuração permissiva do Knip | A configuração anterior tratava praticamente todos os arquivos como entrypoints. A nova lista os comandos reais, inclui JS/TS e encontrou e removeu 13 exports internos não consumidos em rodadas sucessivas. |
-| Resolvido parcialmente | Base externa é parcialmente ignorada | Arquitetura, resíduos, OpenAPI, coleta, Semgrep, cheiros, assuntos de notificação, sincronização de versão, crawler de acessibilidade e diagnóstico agora respeitam a base/configuração; outros comandos ainda precisam da mesma correção. |
+| Resolvido parcialmente | Base externa é parcialmente ignorada | Arquitetura, resíduos, OpenAPI, coleta, Semgrep, cheiros, assuntos de notificação, sincronização de versão e diagnóstico agora respeitam a base/configuração; outros comandos do toolkit ainda precisam da mesma correção. A acessibilidade E2E foi excluída do toolkit e mantém sua própria base no workspace raiz. |
 | Resolvido nesta rodada | Auditores gravam por padrão | `codigo cheiros auditar`, `frontend arquitetura auditar`, `backend arquitetura auditar`, `backend coesao auditar`, `backend contratos auditar`, `frontend residuos auditar/validar`, `codigo semgrep auditar`, toda a família `codigo nomes`, `integracao contratos diff` e as duas auditorias unificadas de cobertura agora só persistem com `--gravar`. Geração de relatórios, coleta e mutações continuam classificadas separadamente. |
 | Resolvido | Cobertura insuficiente de mutação | O corretor `backend/java-corrigir-fqn.ts` agora tem fixture de escrita, verificação de conteúdo sem duplicação e segunda execução idempotente. |
 | Resolvido nesta rodada | Corretor FQN ignorava raízes Java configuradas | `backend/java-corrigir-fqn` agora usa `diretorios.backendCodigo` e `diretorios.backendTestes` quando a base possui configuração; a heurística anterior continua para uma base backend isolada sem configuração. |
@@ -700,16 +708,16 @@ O núcleo TypeScript de implementação foi concluído: 100% dos arquivos de imp
 | Resolvido nesta rodada | API programática não comprovada | `package.json` agora expõe a raiz CLI e somente os subpaths horizontais `cobertura-java` e `cobertura-web`; o wildcard e os exports internos `lib/*` foram removidos e um consumidor TypeScript instalado pelo tarball importa e executa ambos. |
 | Resolvido nesta rodada | Cobertura funcional não medida | `npm run test:coverage` agora gera a baseline informativa do próprio toolkit com `@vitest/coverage-v8`; threshold fica para depois da divisão dos testes por domínio e da análise dos contratos críticos. |
 | Resolvido nesta rodada | Testes de projeto misturados ao teste da CLI | Os 17 cenários de versão, árvore, diagnóstico, limpeza, preparação, qualidade e dependências agora estão em `test/projeto.test.ts`; o teste principal concentra 81 cenários e a suíte permite execução focada por domínio. |
-| Resolvido nesta rodada | Nomenclatura e limpeza de relatórios divergentes | O pipeline backend agora usa `analise-testes.md/json` -> `priorizacao-testes.md`; `projeto/limpar` deriva diretórios configurados e remove apenas padrões ainda produzidos, descartando caminhos legados sem referências. |
+| Resolvido nesta rodada | Nomenclatura e limpeza de relatórios divergentes | O pipeline backend agora usa `analise-testes.md/json` -> `priorizacao-testes.md`; `projeto/artefatos-limpar` deriva diretórios configurados e remove apenas padrões ainda produzidos, descartando caminhos legados sem referências. |
 | Resolvido nesta rodada | Configuração misturada à validação da CLI | Os 3 cenários de carregamento, validação e execução parametrizada agora estão em `test/configuracao.test.ts`; o teste principal caiu para 83 cenários e a configuração pode ser validada sem importar o roteador. |
 | Resolvido nesta rodada | Integração OpenAPI misturada à validação da CLI | Os 2 cenários de importação e artefatos OpenAPI agora estão em `test/integracao.test.ts`; o teste principal caiu para 81 cenários e a persistência de diff continua coberta com `--gravar`. |
 | Resolvido nesta rodada | Qualidade misturada à validação da CLI | Os 4 cenários iniciais de resumo e coleta foram extraídos para `test/qualidade.test.ts`; o teste principal caiu para 77 cenários e o arquivo agora cobre também a montagem configurada do Playwright. |
 | Resolvido nesta rodada | Apoio de execução duplicado entre testes | `test/apoio.ts` passou a ser a fonte única da raiz do toolkit, do `tsx` e do contrato `ResultadoExecucao`; os quatro testes que executam a CLI não mantêm cópias locais desse mecanismo. |
 | Resolvido nesta rodada | Apoio de testes contaminava a cobertura | `test:coverage` agora exclui `test/**`; a baseline permanece focada na implementação e não conta `test/apoio.ts` como código produtivo. |
 | Resolvido nesta rodada | Sincronização de versão fixava o frontend do SGC | `projeto/versao-sincronizar` agora resolve `diretorios.frontend` pela configuração da base; o fallback continua sendo `frontend` e o teste externo cobre `cliente/package.json`. |
-| Resolvido nesta rodada | Crawler fixava a raiz de integração do SGC | `e2e/acessibilidade-crawler` agora deriva os defaults de `diretorios.testesIntegracao`; opções explícitas continuam substituindo a convenção e o teste externo cobre a base configurada. |
+| Corrigido nesta rodada | Acessibilidade foi classificada como comando do toolkit | Os wrappers Playwright/Axe foram movidos para `e2e/` na raiz do SGC, com scripts/testes próprios; a CLI, o catálogo, o Knip e o pacote do toolkit não os registram mais. |
 | Resolvido nesta rodada | Coleta Playwright divergia do crawler | `qualidade/coleta-execucao` agora centraliza a montagem de descrição e argumentos Playwright em função pura que resolve `diretorios.testesIntegracao`; o contrato tem teste de base externa. |
-| Resolvido nesta rodada | Diagnóstico exigia artefatos do próprio toolkit em qualquer base | `projeto/diagnostico` agora monta recursos estruturais com `backend`, `frontend` e `testesIntegracao` configurados; recursos de `toolkit`, portas e `.env.e2e` continuam no perfil SGC e não contaminam bases externas. |
+| Resolvido nesta rodada | Diagnóstico exigia artefatos do próprio toolkit em qualquer base | `projeto ambiente verificar` agora monta recursos estruturais com `backend`, `frontend` e `testesIntegracao` configurados; recursos de `toolkit`, portas e `.env.e2e` continuam no perfil SGC e não contaminam bases externas. |
 | Resolvido nesta rodada | Resumo de análise bypassava a saída comum | `backend/testes-analisar.ts` agora usa `escreverLinha` em todas as linhas humanas; stdout continua igual e não há mistura com o JSON gravado. |
 | Resolvido nesta rodada | Auditoria de dependências era apenas Knip e confundia achados com falhas | `projeto/dependencias-auditar.ts` agora coordena Knip, `npm outdated`, `npm audit` e `dependencyUpdates` Gradle; o resultado separa `ok`, `achados` e `falha`, preservando código não zero para CI. |
 | Resolvido nesta rodada | Roteador monolítico e inventário duplicado | Os 42 comandos que apenas despacham scripts agora vêm de `lib/catalogo-comandos.ts`, com teste de unicidade, descrição, rota e arquivo existente. A documentação passou a tratar `sgc --help` como catálogo canônico e mantém apenas exemplos; comandos com ações/opções próprias continuam explícitos em `sgc.ts`. |
@@ -730,7 +738,7 @@ O núcleo TypeScript de implementação foi concluído: 100% dos arquivos de imp
 - Parametrização parcial não significa generalização concluída.
 - Build aprovado prova que a árvore pode ser emitida; não prova que o pacote emitido contém assets, configuração e
   resolução de raiz adequados para distribuição.
-- Knip aprovado, 130 testes unitários verdes e os 2 cenários de pacote aprovados são gates úteis, mas ainda insuficientes para afirmar ausência de código morto fora
+- Knip aprovado, 126 testes unitários verdes e os 2 cenários de pacote aprovados são gates úteis, mas ainda insuficientes para afirmar ausência de código morto fora
   do grafo declarado, segurança de todos os comandos mutáveis ou portabilidade. O grafo do Knip agora é uma evidência
   útil de exports não consumidos; não substitui testes de pacote externo.
 
@@ -741,13 +749,13 @@ o comportamento atual; não transforma automaticamente todo comando que gera rel
 
 | Classe atual | Comandos ou famílias | Efeito observado e controle existente |
 |---|---|---|
-| Auditoria read-only | `requisitos cdus *`, `backend cobertura auditoria/ramificacoes`, `frontend cobertura auditoria/ramificacoes`, `frontend arquitetura validar`, `frontend modais validar`, `frontend views templates-validar`, `frontend identificadores-teste *`, `codigo nomes coletar-simbolos/auditar-consistencia/auditar-idioma`, `projeto diagnostico` | Leem código/relatórios e escrevem somente stdout/JSON por padrão; não criam artefatos próprios. Dependências externas podem fazer leitura adicional. |
+| Auditoria read-only | `requisitos cdus *`, `backend cobertura auditoria/ramificacoes`, `frontend cobertura auditoria/ramificacoes`, `frontend arquitetura validar`, `frontend modais validar`, `frontend views templates-validar`, `frontend identificadores-teste *`, `codigo nomes coletar-simbolos/auditar-consistencia/auditar-idioma`, `projeto ambiente verificar` | Leem código/relatórios e escrevem somente stdout/JSON por padrão; não criam artefatos próprios. Dependências externas podem fazer leitura adicional. |
 | Auditoria read-only com persistência explícita | `backend cobertura auditoria`, `frontend cobertura auditoria` | Calculam a análise e exibem stdout/JSON por padrão; só criam o relatório Markdown indicado por `--saida` quando recebem `--gravar`. |
-| Geração de relatório indicado | `backend testes analisar/priorizar`, `e2e acessibilidade processar` | Criam arquivos Markdown/JSON definidos por `--saida`, `--saida-json` ou defaults. São geradores explícitos, não auditores read-only. |
+| Geração de relatório indicado | `backend testes analisar/priorizar` | Criam arquivos Markdown/JSON definidos por `--saida`, `--saida-json` ou defaults. São geradores explícitos, não auditores read-only. O relatório Axe é responsabilidade do workspace raiz `e2e/`, fora do toolkit. |
 | Artefato de contrato | `integracao contratos exportar-openapi`, `integracao contratos diff` | Exportação grava OpenAPI; diff apenas grava resumo Markdown com `--gravar`; `fixar-baseline` promove uma referência somente quando chamado. |
 | Mutação de fonte ou baseline | `backend java corrigir-fqn`, `projeto versao-sincronizar`, `integracao contratos fixar-baseline` | Alteram código/configuração ou promovem arquivo. FQN e versão simulam por padrão e exigem `--gravar`; baseline copia diretamente para o destino por ser uma ação de promoção nomeada. |
-| Limpeza confirmada | `projeto limpar` | Lista em prévia por padrão e remove somente com `--confirmar`; é o modelo de confirmação explícita a preservar. |
-| Orquestração externa | `qualidade coletar`, `projeto qualidade`, `projeto dependencias auditar`, `projeto preparar`, `e2e acessibilidade crawler` | Executam Gradle, npm, Playwright, Semgrep ou Git e podem criar artefatos fora da biblioteca do toolkit. Precisam de perfil/ação explícita e limites de raiz. |
+| Limpeza confirmada | `projeto artefatos limpar` | Lista em prévia por padrão e remove somente com `--confirmar`; é o modelo de confirmação explícita a preservar. |
+| Orquestração externa | `qualidade coletar`, `projeto qualidade`, `projeto dependencias auditar`, `projeto preparar` | Executam Gradle, npm, Semgrep ou Git e podem criar artefatos fora da biblioteca do toolkit. Precisam de perfil/ação explícita e limites de raiz. Playwright/Axe não pertencem a esta superfície. |
 
 Achado corrigido nesta rodada: quando `codigo nomes auditar-consistencia` precisa gerar um inventário auxiliar ausente,
 ele só chama a coleta com gravação habilitada se a auditoria recebeu `--gravar`. A propagação de `gravar` e a opção
@@ -758,7 +766,7 @@ interna `silencioso` preservam o contrato de leitura e mantêm o stdout JSON vá
 Esta revisão confrontou o plano com a árvore rastreada, o manifesto do pacote, o catálogo da CLI e os testes atuais.
 Conclusões confirmadas:
 
-- a árvore possui 79 arquivos TypeScript de implementação, 29 arquivos `*.test.ts`, 130 cenários regulares e 2 cenários
+- a árvore possui 77 arquivos TypeScript de implementação, 28 arquivos `*.test.ts`, 126 cenários regulares e 2 cenários
   de pacote; o antigo `test/sgc.test.ts` foi removido depois que seus últimos cenários foram distribuídos por domínio;
 - o catálogo declarativo contém 42 comandos que apenas despacham módulos; comandos com opções e ações próprias ainda
   são registrados diretamente em `sgc.ts`, portanto o catálogo não é ainda a fonte única de toda a superfície CLI;
@@ -803,12 +811,12 @@ regra que deve continuar no toolkit, mas não deve ser apresentada como regra ho
 | Frontend cobertura e identificadores: `cobertura-auditoria`, `cobertura-ramificacoes`, `cobertura-ramificacoes-erros`, `identificadores-teste-*` | Recebem base/arquivo/diretório e têm fixture externa; os relatórios de ramificação e de risco não são equivalentes | Manter e parametrizar | `adaptável` |
 | Frontend arquitetura/resíduos: `arquitetura-lib`, `arquitetura-auditar`, `arquitetura-validar`, `residuos-lib`, `residuos-auditar`, `residuos-validar` | Coleta, fotografias, budgets e gate usam esses módulos; fixture Java/Vue externa já cobre parte do motor | Manter; políticas SGC devem ficar explícitas | `adaptável` |
 | Frontend específico: `acoes-backend-lib`, `views-templates-validar`, `modais-validar` | Detecta `ModalPadrao`, `LayoutPadrao`, ações e exceções concretas do SGC; é usado por gates do frontend | Manter no perfil SGC até existir política externa equivalente | `perfil-sgc` |
-| Acessibilidade E2E: `acessibilidade-crawler`, `acessibilidade-processar-resultados` | Executa Playwright/Axe e processa resultados; diretório de integração é configurável | Manter em `e2e/` e separar tarefa/configuração do motor | `adaptável` |
+| Acessibilidade E2E (`e2e/` raiz, fora do toolkit) | Executa Playwright/Axe e processa resultados específicos das rotas e fixtures do SGC | Manter no workspace E2E; não empacotar nem registrar no toolkit | `fora do escopo` |
 | Código transversal: `cheiros-auditar`, `nomes-simbolos-coletar`, `nomes-consistencia-auditar`, `semgrep-auditar`, `nomes-caminhos` | Comandos catalogados e usados por qualidade; Semgrep e inventários têm política/saída configuráveis | Manter; núcleo de análise com políticas do perfil | `adaptável` |
 | Idioma e identificadores SGC: `idioma-consistencia-auditar` | A regra de português e `codigo` é uma convenção deliberada deste repositório, não uma verdade universal | Manter no perfil SGC | `perfil-sgc` |
 | Contratos: `contratos-openapi-caminhos`, `contratos-exportar-openapi`, `contratos-diff`, `contratos-fixar-baseline` | Exportação, comparação e baseline continuam documentados e testados; somente o gerador de tipos foi removido | Manter e parametrizar URL/artefatos | `adaptável` |
 | Requisitos/CDUs: `requisitos/cdus-*` | Dez comandos são usados no catálogo e cobrem `specs/cdu-*.md`; mensagens canônicas apontam arquivos concretos do SGC | Manter no perfil SGC; promover apenas primitivas comprovadamente independentes | `perfil-sgc` |
-| Projeto: `arvore-linhas`, `limpar`, `diagnostico`, `dependencias-auditar`, `preparar`, `qualidade`, `versao-sincronizar` | Comandos têm uso em scripts/testes e execução manual; base, execuções e diretórios já são configuráveis em graus diferentes | Manter; separar orquestração e defaults SGC; auditoria de dependências cobre saúde npm/Gradle | `adaptável` |
+| Projeto: `arvore-linhas`, `artefatos-limpar`, `ambiente-verificar`, `dependencias-auditar`, `preparar`, `qualidade`, `versao-sincronizar` | Comandos têm uso em scripts/testes e execução manual; base, execuções e diretórios já são configuráveis em graus diferentes | Manter; separar orquestração e defaults SGC; auditoria de dependências cobre saúde npm/Gradle | `adaptável` |
 | Coleta: `qualidade/coleta`, `coleta-execucao`, `coleta-executor`, `coleta-leitores`, `coleta-fotografia`, `coleta-contexto`, `coleta-metadados`, `coleta-adaptadores-sgc`, `resumo` | Coleta é usada pela CLI e por testes de composição; motor e adaptadores já estão separados | Manter; núcleo no motor, perfil nos adaptadores | `núcleo` + `perfil-sgc` |
 | Políticas: `qualidade/politicas/semgrep/sgc-qualidade.yml`, `qualidade/frontend-arquitetura/acoes-backend-excecoes.json` | São assets empacotados e consumidos como defaults SGC; não são regras horizontais | Manter no perfil SGC | `perfil-sgc` |
 | Fixtures e saídas ignoradas: `test/fixtures/qualidade/fotografia.json` e diretórios gerados em `qualidade/artefatos`/`semgrep` | Fixture é contrato de teste; saídas são geradas e não pertencem ao pacote | Manter fixture; remover saídas somente pela limpeza, não versioná-las | `núcleo` de teste / transiente |
@@ -945,8 +953,7 @@ do perfil.
 10. **[concluído nesta rodada] Divisão do teste monolítico**: os quatro cenários de execução/distribuição estão em
     `test/execucao-cli.test.ts`, os três cenários de mutação FQN em `test/backend-fqn.test.ts`, cinco cenários de
     importação backend em `test/backend-importacao.test.ts`, três de importação frontend em
-    `test/frontend-importacao.test.ts`, três de acessibilidade em `test/e2e-acessibilidade.test.ts` e um de importação em
-    `test/e2e-importacao.test.ts`, além de três de
+    `test/frontend-importacao.test.ts`, além de três de
     cobertura em `test/cobertura-cli.test.ts`, além de três de consistência em `test/consistencia.test.ts`;
     seis de superfície em `test/superficie-cli.test.ts`, três de importação de núcleos em `test/importacao-nucleos.test.ts`,
     dois de importação de código em `test/codigo-importacao.test.ts`, nove de análise/priorização backend em
@@ -957,8 +964,8 @@ do perfil.
     `test/codigo-auditorias.test.ts`, quatro de identificadores frontend em `test/frontend-identificadores.test.ts`,
     três auditorias backend em `test/backend-auditorias.test.ts`, dois de notificações em
     `test/backend-notificacoes.test.ts`, um de qualidade externa em `test/qualidade-externa.test.ts`, um de diagnóstico
-    em `test/projeto-diagnostico.test.ts` e quatro de opções em `test/opcoes-cli.test.ts`. O arquivo `test/sgc.test.ts`
-foi removido por ficar vazio; os 130 cenários regulares permanecem distribuídos por domínio e `test/qualidade.test.ts`
+    em `test/projeto-ambiente.test.ts` e quatro de opções em `test/opcoes-cli.test.ts`. O arquivo `test/sgc.test.ts`
+foi removido por ficar vazio; os 126 cenários regulares permanecem distribuídos por domínio e `test/qualidade.test.ts`
     possui 10 cenários.
 11. **Defaults de perfil ainda implícitos**: URL OpenAPI, tarefas Gradle, convenções Vue e caminhos de políticas devem
     ser associados explicitamente ao perfil SGC ou à configuração. Um default SGC é válido; o problema é o núcleo não
@@ -1001,8 +1008,7 @@ As fases históricas abaixo continuam úteis como registro, mas a execução dev
 8. **[concluído nesta rodada] Dividir testes por risco e domínio**: os quatro cenários de runtime/distribuição foram
    extraídos para `test/execucao-cli.test.ts`, os três cenários de mutação FQN para `test/backend-fqn.test.ts`, cinco
    cenários de importação backend para `test/backend-importacao.test.ts`, três de importação frontend para
-   `test/frontend-importacao.test.ts`, três de acessibilidade para `test/e2e-acessibilidade.test.ts` e um de importação em
-   `test/e2e-importacao.test.ts`, além de três de
+   `test/frontend-importacao.test.ts`, além de três de
    cobertura para `test/cobertura-cli.test.ts`, três de consistência para `test/consistencia.test.ts`, seis de superfície
    para `test/superficie-cli.test.ts`, três de importação de núcleos para `test/importacao-nucleos.test.ts` e dois de
    importação de código para `test/codigo-importacao.test.ts`, nove de análise/priorização backend para
@@ -1014,7 +1020,7 @@ As fases históricas abaixo continuam úteis como registro, mas a execução dev
    de parsing numérico em `test/opcoes-cli.test.ts`, três auditorias backend em `test/backend-auditorias.test.ts`, dois de
    notificações em `test/backend-notificacoes.test.ts`,
    um de qualidade externa em `test/qualidade-externa.test.ts` e um de diagnóstico em
-   `test/projeto-diagnostico.test.ts`. O arquivo `test/sgc.test.ts` foi removido depois de ficar vazio; não há mais um
+   `test/projeto-ambiente.test.ts`. O arquivo `test/sgc.test.ts` foi removido depois de ficar vazio; não há mais um
    agrupamento monolítico pendente.
 9. **Formalizar resultados consumidos**: começar pelos JSON usados por coleta, resumo ou CI; acrescentar versão e
    validação de entrada por família, sem envelope universal obrigatório.
@@ -1076,7 +1082,7 @@ launcher compilado, quando exercitado no smoke opcional, continuar despachando a
    `frontend/cobertura-auditoria.ts`, `requisitos/cdus-mensagens-lib.ts`,
    `frontend/identificadores-teste-lib.ts`, `requisitos/cdus-lib.ts`, `requisitos/cdus-vocabulario-lib.ts`,
    `requisitos/cdus-mensagens-codigo-lib.ts`, `frontend/acoes-backend-lib.ts`, `frontend/residuos-lib.ts`,
-   `frontend/arquitetura-lib.ts`, `projeto/diagnostico.ts`, `projeto/limpar.ts`, `projeto/preparar.ts`,
+   `frontend/arquitetura-lib.ts`, `projeto/ambiente-verificar.ts`, `projeto/artefatos-limpar.ts`, `projeto/preparar.ts`,
    `projeto/qualidade.ts`, `projeto/dependencias-auditar.ts`, `qualidade/coleta-execucao.ts`, `qualidade/coleta.ts`,
    `qualidade/resumo.ts` e os três comandos de contratos OpenAPI; os achados e comandos transversais restantes foram
    convertidos nos lotes posteriores da Fase C.
@@ -1104,9 +1110,10 @@ Lotes sugeridos:
    reuso externo; `configuracao-toolkit.json` pode substituir separadamente qualidade, dependências e instalação.
 2. **Backend**: cobertura, análise, priorização de testes, contratos e FQN já convertidos; o FQN já respeita as raízes
    configuradas, mas ainda falta parametrizar tarefas Gradle e categorias das demais famílias.
-3. **[parcial nesta rodada]** Frontend: cobertura V8, resíduos, acessibilidade e identificadores de teste já
-   convertidos; o crawler e a coleta Playwright respeitam `testesIntegracao`, mas faltam parametrizar completamente raiz
-   Vue, globs e convenções de componentes.
+3. **[parcial nesta rodada]** Frontend: cobertura V8, resíduos e identificadores de teste já convertidos; a coleta
+   Playwright do perfil SGC respeita `testesIntegracao`, mas faltam parametrizar completamente raiz Vue, globs e
+   convenções de componentes. A acessibilidade E2E é um fluxo específico do workspace raiz e não entra na migração do
+   toolkit.
 4. **[concluído nesta rodada]** Integração: exportação, diff e baseline OpenAPI; o módulo permanece independente do
    gerador de tipos removido.
 5. **[concluído nesta rodada]** Requisitos: o motor Markdown, as bibliotecas de mensagens e os dez comandos CDU foram

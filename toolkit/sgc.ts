@@ -82,9 +82,6 @@ criarGrupoComando(frontend, "views", "Auditorias especificas de views.");
 criarGrupoComando(frontend, "modais", "Auditorias especificas de modais.");
 criarGrupoComando(frontend, "identificadores-teste", "Ferramentas para identificadores de teste.");
 
-const e2e = program.command("e2e").description("Ferramentas de testes de integracao e acessibilidade.");
-criarGrupoComando(e2e, "acessibilidade", "Auditorias de acessibilidade executadas no E2E.");
-
 const codigo = program.command("codigo").description("Ferramentas de manutencao e higiene do código.");
 criarGrupoComando(codigo, "cheiros", "Auditorias de cheiros de codigo.");
 criarGrupoComando(codigo, "semgrep", "Auditorias estruturais com Semgrep OSS.");
@@ -143,28 +140,34 @@ projeto
         }
     });
 
-projeto
-    .command("diagnostico")
-    .description(obterDescricaoComando(["projeto", "diagnostico"]))
+const ambiente = projeto
+    .command("ambiente")
+    .description("Ferramentas para verificar o ambiente do projeto auditado.");
+ambiente
+    .command("verificar")
+    .description(obterDescricaoComando(["projeto", "ambiente", "verificar"]))
     .option("--json", "Emite saida estruturada em JSON.")
-    .option("--base <diretorio>", "Sobrescreve o diretório base para diagnostico.")
+    .option("--base <diretorio>", "Sobrescreve o diretório base para verificação.")
     .action(async (opcoes) => {
-        const {executarDiagnostico} = await import("./projeto/diagnostico.js");
-        const resultado = await executarDiagnostico(opcoes);
+        const {executarVerificacaoAmbiente} = await import("./projeto/ambiente-verificar.js");
+        const resultado = await executarVerificacaoAmbiente(opcoes);
         if (resultado.statusGeral === "falha") {
             process.exitCode = 1;
         }
     });
 
-projeto
+const artefatos = projeto
+    .command("artefatos")
+    .description("Ferramentas para inspecionar e limpar artefatos gerados.");
+artefatos
     .command("limpar")
-    .description(obterDescricaoComando(["projeto", "limpar"]))
+    .description(obterDescricaoComando(["projeto", "artefatos", "limpar"]))
     .option("--json", "Emite saida estruturada em JSON.")
     .option("--confirmar", "Remove de fato os artefatos elegiveis.")
     .option("--base <diretorio>", "Sobrescreve o diretório base para limpeza.")
     .action(async (opcoes) => {
-        const {executarLimpeza} = await import("./projeto/limpar.js");
-        await executarLimpeza(opcoes);
+        const {limparArtefatos} = await import("./projeto/artefatos-limpar.js");
+        await limparArtefatos(opcoes);
     });
 
 projeto
@@ -191,7 +194,7 @@ registrarComandosCatalogados(program);
 
 program.addHelpText(
     "after",
-    `\nExemplos:\n  ${pc.dim("npx tsx toolkit/sgc.ts backend cobertura auditoria")}\n  ${pc.dim("npx tsx toolkit/sgc.ts frontend cobertura auditoria")}\n  ${pc.dim("npx tsx toolkit/sgc.ts qualidade coletar --perfil rapido")}\n  ${pc.dim("npx tsx toolkit/sgc.ts qualidade resumo")}\n  ${pc.dim("npx tsx toolkit/sgc.ts projeto diagnostico --json")}\n  ${pc.dim("npx tsx toolkit/sgc.ts codigo cheiros auditar --json")}`
+    `\nExemplos:\n  ${pc.dim("npx tsx toolkit/sgc.ts backend cobertura auditoria")}\n  ${pc.dim("npx tsx toolkit/sgc.ts frontend cobertura auditoria")}\n  ${pc.dim("npx tsx toolkit/sgc.ts qualidade coletar --perfil rapido")}\n  ${pc.dim("npx tsx toolkit/sgc.ts qualidade resumo")}\n  ${pc.dim("npx tsx toolkit/sgc.ts projeto ambiente verificar --json")}\n  ${pc.dim("npx tsx toolkit/sgc.ts codigo cheiros auditar --json")}`
 );
 
 async function executar(argumentos = process.argv) {
