@@ -206,8 +206,8 @@ isolado funciona, mas as fronteiras ainda não estão concluídas:
   `pontuacaoImpacto`; os vocabulários externos de JaCoCo e V8 permanecem somente na fronteira de leitura;
 - os três comandos de ramificações agora também possuem `versaoSchema: "1.0.0"` e `geradoEm`; o `timestamp` próprio foi
   removido e a mensagem de `hotspot` foi padronizada como ponto crítico;
-- cobertura Java e web estão publicadas como APIs programáticas horizontais; os motores CDU agora estão isolados da
-  borda CLI, mas o subpath público ainda depende de um contrato deliberado e de smoke no tarball;
+- cobertura Java, web e casos de uso estão publicadas como APIs programáticas horizontais; a fachada CDU recebe apenas
+  `{base, secoes}` e delega para motores isolados da borda CLI;
 - os agregadores CDU ficaram reduzidos a bordas de comando; parser, descoberta do corpus, inventário e auditoria não
   importam mais `process.argv`, execução de processo ou saída textual;
 - defaults de Gradle, Vue, OpenAPI, Semgrep e outras políticas SGC ainda aparecem dentro de módulos adaptáveis;
@@ -255,8 +255,8 @@ permite determinar efeitos sem ler a implementação.
   perfil SGC;
 - manter a fixture de segundo projeto com caminho, vocabulário e política de mensagens próprios e preservar o SGC por
   regressão;
-- publicar um subpath com `inventariarCasosDeUso` e `auditarCasosDeUso`, importando somente os motores isolados; o
-  contrato deve ser testado no tarball e não deve arrastar formatação ou execução de processo;
+- manter o subpath `casos-de-uso` pequeno, versionado pelos resultados dos motores e validado no tarball; ele não pode
+  arrastar formatação ou execução de processo;
 - remover ou remodelar diretamente qualquer export interno que não seja necessário ao novo contrato; não criar aliases de
   compatibilidade para os nomes anteriores.
 

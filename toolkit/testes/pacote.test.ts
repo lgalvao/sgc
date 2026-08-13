@@ -188,19 +188,41 @@ test("pacote fonte expõe cobertura parametrizável para consumidor TypeScript",
             }
         })
     );
+    await escreverArquivo(
+        path.join(diretorioConsumidor, "specs", "cdu", "cdu-01.md"),
+        [
+            "# CDU-01 - Exemplo",
+            "",
+            "## Atores",
+            "",
+            "- OPERADOR",
+            "",
+            "## Pré-condições",
+            "",
+            "- Sistema disponível.",
+            "",
+            "## Fluxo principal",
+            "",
+            "1. O operador acessa o `Painel`."
+        ].join("\n")
+    );
     const caminhoConsumidor = path.join(diretorioConsumidor, "consumidor.mts");
     await escreverArquivo(
         caminhoConsumidor,
         [
             'import {extrairCoberturaJacoco} from "ferramentas-projeto/cobertura-java";',
             'import {extrairCoberturaCliente} from "ferramentas-projeto/cobertura-web";',
+            'import {auditarCasosDeUso, inventariarCasosDeUso} from "ferramentas-projeto/casos-de-uso";',
             "",
             "const diretorioBase = process.argv[2];",
             "const jacoco = await extrairCoberturaJacoco(\"relatorios/jacoco.xml\", {diretorioBase});",
             "const coberturaCliente = await extrairCoberturaCliente(\"cliente/coverage/coverage-final.json\", {diretorioBase});",
+            "const inventario = await inventariarCasosDeUso({base: diretorioBase, secoes: [\"formatos\"]});",
+            "const auditoria = await auditarCasosDeUso({base: diretorioBase, secoes: [\"estrutura\"]});",
             "console.log(JSON.stringify({",
             "    jacoco: {linhas: jacoco.linhas.percentual, arquivos: jacoco.totais.totalArquivos},",
-            "    cliente: {linhas: coberturaCliente.linhas.percentual, arquivos: coberturaCliente.arquivos.length}",
+            "    cliente: {linhas: coberturaCliente.linhas.percentual, arquivos: coberturaCliente.arquivos.length},",
+            "    cdu: {arquivos: inventario.totalArquivos, erros: auditoria.resumo.erros}",
             "}));",
             ""
         ].join("\n")
@@ -218,6 +240,7 @@ test("pacote fonte expõe cobertura parametrizável para consumidor TypeScript",
 
     expect(JSON.parse(String(resultado.stdout))).toEqual({
         jacoco: {linhas: 66.67, arquivos: 1},
-        cliente: {linhas: 50, arquivos: 1}
+        cliente: {linhas: 50, arquivos: 1},
+        cdu: {arquivos: 1, erros: 0}
     });
 }, 60000);

@@ -336,14 +336,17 @@ As APIs programáticas públicas atuais são deliberadamente pequenas:
 ```ts
 import {extrairCoberturaJacoco} from "ferramentas-projeto/cobertura-java";
 import {extrairCoberturaCliente} from "ferramentas-projeto/cobertura-web";
+import {auditarCasosDeUso, inventariarCasosDeUso} from "ferramentas-projeto/casos-de-uso";
 
 const coberturaServidor = await extrairCoberturaJacoco("relatorios/jacoco.xml", {diretorioBase});
 const coberturaCliente = await extrairCoberturaCliente("cliente/coverage/coverage-final.json", {diretorioBase});
+const inventario = await inventariarCasosDeUso({base: diretorioBase, secoes: ["formatos"]});
+const auditoria = await auditarCasosDeUso({base: diretorioBase, secoes: ["estrutura"]});
 ```
 
-Módulos internos não fazem parte da API pública. Novos subpaths devem ser publicados quando representarem uma fronteira
-estável e útil para composição por scripts, humanos ou agentes; o smoke usa um projeto temporário instalado para validar o
-contrato, mesmo quando não existe consumidor prévio no código.
+Módulos internos não fazem parte da API pública. O subpath `casos-de-uso` é a fachada horizontal dos dois motores CDU; ele
+recebe a raiz do projeto e as seções desejadas, sem depender da CLI ou do workspace de desenvolvimento. O smoke usa um
+projeto temporário instalado para validar esse contrato.
 
 ## Desenvolvimento e validação
 

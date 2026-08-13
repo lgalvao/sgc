@@ -29,7 +29,8 @@
   "exports": {
     ".": "./ferramentas.ts",
     "./cobertura-java": "./biblioteca/dominios/cobertura-java.ts",
-    "./cobertura-web": "./biblioteca/dominios/cobertura-web.ts"
+    "./cobertura-web": "./biblioteca/dominios/cobertura-web.ts",
+    "./casos-de-uso": "./requisitos/casos-de-uso.ts"
   },
   "scripts": {
     "ferramentas": "tsx ./ferramentas.ts",
