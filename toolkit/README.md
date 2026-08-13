@@ -336,9 +336,9 @@ fica centralizada no próprio módulo. Os formatos JSON específicos de resíduo
 adaptadores SGC, não no núcleo. A função
 `principal(argumentos, {perfis, adaptadores, criarContexto, coletarMetadados, persistirFotografia})` aceita catálogos e
 serviços externos por composição, sem mutar os defaults globais;
-essa é a fronteira experimental de reuso até que os adaptadores de ferramentas sejam separados do agregador. Mesmo no
-perfil SGC, a montagem dos argumentos Playwright usa `diretorios.testesIntegracao`, a mesma convenção do crawler de
-acessibilidade.
+essa é a fronteira de composição reutilizável atualmente. O perfil SGC continua sendo o default da CLI, mas um consumidor
+externo pode fornecer seus próprios perfis, adaptadores, contexto, metadados e persistência. Mesmo no perfil SGC, a
+montagem dos argumentos Playwright usa `diretorios.testesIntegracao`, a mesma convenção do crawler de acessibilidade.
 
 Os comandos `codigo nomes` também resolvem `simbolos.json`, `consistencia.json` e `idioma.json` relativos ao `--base`
 informado. Assim, a auditoria de outro projeto não lê nem grava silenciosamente no diretório de artefatos do SGC.

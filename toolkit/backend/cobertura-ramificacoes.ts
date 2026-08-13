@@ -1,4 +1,3 @@
-#!/usr/bin/env node
 import path from "node:path";
 import pc from "picocolors";
 import {lerOpcao} from "../lib/cli-opcoes.js";

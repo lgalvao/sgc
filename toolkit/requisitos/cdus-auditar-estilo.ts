@@ -1,4 +1,3 @@
-#!/usr/bin/env node
 // Auditoria tipográfica dos casos de uso CDU.
 
 import path from "node:path";

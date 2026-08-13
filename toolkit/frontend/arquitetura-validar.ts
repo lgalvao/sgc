@@ -1,4 +1,3 @@
-#!/usr/bin/env node
 import path from "node:path";
 import {createRequire} from "node:module";
 import {realpathSync} from "node:fs";

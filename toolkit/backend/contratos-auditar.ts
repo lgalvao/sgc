@@ -1,4 +1,3 @@
-#!/usr/bin/env node
 // Auditoria de contratos HTTP expostos pelo backend.
 
 import fs from "node:fs/promises";

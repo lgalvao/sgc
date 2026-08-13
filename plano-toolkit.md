@@ -670,6 +670,53 @@ Conclusões confirmadas:
 - o plano anterior acumulava histórico, backlog e itens resolvidos sob as mesmas prioridades. A partir desta revisão,
   a seção de lacunas lista somente trabalho ativo; o histórico permanece nas fases e na situação atual.
 
+### 3.8 Matriz funcional e decisões da auditoria
+
+A investigação desta rodada cruzou o catálogo da CLI, imports, scripts e documentação, testes comportamentais, políticas
+empacotadas e histórico de remoções. A decisão abaixo é por família de responsabilidade; arquivos auxiliares listados na
+mesma linha seguem a decisão da família, salvo a exceção explícita. `núcleo` significa reutilizável sem regra do SGC;
+`adaptável` significa motor útil que ainda recebe convenções, diretórios ou tarefas do projeto; `perfil-sgc` significa
+regra que deve continuar no toolkit, mas não deve ser apresentada como regra horizontal.
+
+| Família e módulos | Evidência de utilidade atual | Decisão | Escopo |
+|---|---|---|---|
+| Infraestrutura: `lib/caminhos`, `cli-ajuda`, `cli-opcoes`, `configuracao`, `execucao`, `logger`, `saida`, `qualidade` | Consumida por praticamente todos os comandos; testes de CLI, configuração, base externa e pacote | Manter e tornar núcleo | `núcleo` |
+| Domínios puros: `lib/dominios/cobertura-java`, `lib/dominios/cobertura-web` | Consumidos pelos comandos de cobertura e pela coleta; recebem arquivo/base por argumento | Manter horizontal | `núcleo` |
+| Catálogo e entrada: `lib/catalogo-comandos`, `sgc.ts`, `bin/sgc.cjs` | Catálogo despacha 42 folhas; entrada especializada registra qualidade/projeto; smoke do pacote usa o binário | Manter; explicitar metadados | `núcleo` + `perfil-sgc` na entrada |
+| Backend cobertura: `cobertura-auditoria`, `cobertura-ramificacoes` | Ambos usam JaCoCo, mas entregam relatórios diferentes: risco priorizado versus lacunas de ramificação | Manter; não fundir sem consumidor substituto | `adaptável` |
+| Backend arquitetura, contratos, testes e FQN: `arquitetura-auditar`, `contratos-auditar`, `testes-analisar`, `testes-priorizar`, `java-corrigir-fqn`, `lib/testes-analisar-regras` | Usados pelo catálogo, coleta ou fluxo manual; layouts Java/Spring são parametrizáveis parcialmente | Manter e separar políticas/tarefas do motor | `adaptável` |
+| Backend SGC: `coesao-auditar`, `notificacoes-assuntos-auditar` | Regras e símbolos referem responsabilidades e assuntos do SGC; testes e documentação preservam esses diagnósticos | Manter no perfil SGC | `perfil-sgc` |
+| Frontend cobertura e identificadores: `cobertura-auditoria`, `cobertura-ramificacoes`, `cobertura-ramificacoes-erros`, `identificadores-teste-*` | Recebem base/arquivo/diretório e têm fixture externa; os relatórios de ramificação e de risco não são equivalentes | Manter e parametrizar | `adaptável` |
+| Frontend arquitetura/resíduos: `arquitetura-lib`, `arquitetura-auditar`, `arquitetura-validar`, `residuos-lib`, `residuos-auditar`, `residuos-validar` | Coleta, fotografias, budgets e gate usam esses módulos; fixture Java/Vue externa já cobre parte do motor | Manter; políticas SGC devem ficar explícitas | `adaptável` |
+| Frontend específico: `acoes-backend-lib`, `views-templates-validar`, `modais-validar` | Detecta `ModalPadrao`, `LayoutPadrao`, ações e exceções concretas do SGC; é usado por gates do frontend | Manter no perfil SGC até existir política externa equivalente | `perfil-sgc` |
+| Acessibilidade: `acessibilidade-crawler`, `acessibilidade-processar-resultados` | Executa Playwright/Axe e processa resultados; diretório de integração é configurável | Manter e separar tarefa/configuração do motor | `adaptável` |
+| Código transversal: `cheiros-auditar`, `nomes-simbolos-coletar`, `nomes-consistencia-auditar`, `semgrep-auditar`, `nomes-caminhos` | Comandos catalogados e usados por qualidade; Semgrep e inventários têm política/saída configuráveis | Manter; núcleo de análise com políticas do perfil | `adaptável` |
+| Idioma e identificadores SGC: `idioma-consistencia-auditar` | A regra de português e `codigo` é uma convenção deliberada deste repositório, não uma verdade universal | Manter no perfil SGC | `perfil-sgc` |
+| Contratos: `contratos-openapi-caminhos`, `contratos-exportar-openapi`, `contratos-diff`, `contratos-fixar-baseline` | Exportação, comparação e baseline continuam documentados e testados; somente o gerador de tipos foi removido | Manter e parametrizar URL/artefatos | `adaptável` |
+| Requisitos/CDUs: `requisitos/cdus-*` | Dez comandos são usados no catálogo e cobrem `specs/cdu-*.md`; mensagens canônicas apontam arquivos concretos do SGC | Manter no perfil SGC; promover apenas primitivas comprovadamente independentes | `perfil-sgc` |
+| Projeto: `arvore-linhas`, `limpar`, `diagnostico`, `dependencias-auditar`, `preparar`, `qualidade`, `versao-sincronizar` | Comandos têm uso em scripts/testes; base, execuções e diretórios já são configuráveis em graus diferentes | Manter; separar orquestração e defaults SGC | `adaptável` |
+| Coleta: `qualidade/coleta`, `coleta-execucao`, `coleta-executor`, `coleta-leitores`, `coleta-fotografia`, `coleta-contexto`, `coleta-metadados`, `coleta-adaptadores-sgc`, `resumo` | Coleta é usada pela CLI e por testes de composição; motor e adaptadores já estão separados | Manter; núcleo no motor, perfil nos adaptadores | `núcleo` + `perfil-sgc` |
+| Políticas: `qualidade/politicas/semgrep/sgc-qualidade.yml`, `qualidade/frontend-arquitetura/acoes-backend-excecoes.json` | São assets empacotados e consumidos como defaults SGC; não são regras horizontais | Manter no perfil SGC | `perfil-sgc` |
+| Fixtures e saídas ignoradas: `test/fixtures/qualidade/fotografia.json` e diretórios gerados em `qualidade/artefatos`/`semgrep` | Fixture é contrato de teste; saídas são geradas e não pertencem ao pacote | Manter fixture; remover saídas somente pela limpeza, não versioná-las | `núcleo` de teste / transiente |
+
+Decisões negativas desta auditoria:
+
+- Não há comando, biblioteca ou política rastreada sem consumidor ou finalidade atual comprovável que justifique remoção
+  nesta rodada. Os antigos geradores de tipos OpenAPI, scripts legados, auditorias cruzadas e wrappers já foram removidos
+  no histórico; reabrir esses caminhos seria regressão.
+- `backend cobertura ramificacoes` e `frontend cobertura ramificacoes` não são duplicatas automáticas das auditorias
+  unificadas: os primeiros têm contrato de listagem focado e os segundos fazem priorização/risco. A fusão fica recusada
+  até existir consumidor substituto testado.
+- `fs-extra` não é dependência de runtime e só aparece nos testes. Sua substituição por `node:fs/promises` é uma
+  simplificação possível, mas não é evidência de obsolescência funcional e fica para uma rodada própria.
+- Campos de entrada externos como `BRANCH` do JaCoCo e mapas V8 não serão traduzidos artificialmente. Já nomes próprios
+  do toolkit — diretórios `latest`, arquivos `*-coverage-*` e metadados Git `branch`/`commit` — permanecem pendentes de
+  padronização explícita, com atualização coordenada de testes, limpeza e documentação.
+
+Sobra confirmada para remoção imediata: os shebangs `#!/usr/bin/env node` presentes em 42 fontes TypeScript. Nenhum
+consumidor executa esses arquivos como binários; a fonte é chamada por `tsx` e o binário npm é o launcher CJS. Eles serão
+removidos junto com a atualização do mapa de classificação, sem alterar comandos ou resultados.
+
 ## 4. Classificação para reuso externo
 
 ### 4.1 Horizontal com pouca adaptação
@@ -744,15 +791,15 @@ do perfil.
 
 ### Prioridade alta
 
-1. **Inventário de utilidade ainda incompleto**: os 79 módulos estão no grafo técnico, mas ainda não existe uma decisão
-   funcional por comando, biblioteca e asset: manter, remover, fundir, horizontalizar ou preservar no perfil SGC. Knip
-   detecta ausência de referências; não detecta uma funcionalidade inteira ainda conectada, porém obsoleta.
-2. **Código temporal pode ter sido modernizado em vez de questionado**: antes de novas abstrações, confrontar cada
-   família com consumidores atuais, artefatos produzidos, documentação, configuração e histórico recente. Ausência de
-   finalidade atual leva à remoção completa, inclusive testes, opções, políticas e limpeza associada.
-3. **Mapa explícito núcleo/perfil**: classificar cada comando e política como horizontal, adaptável ou SGC. A coleta já
-   possui essa fronteira, mas arquitetura Vue, nomenclatura, CDU, OpenAPI e tarefas Gradle ainda misturam defaults do
-   perfil com capacidades horizontais em graus diferentes.
+1. **[resolvido nesta rodada] Inventário de utilidade**: a matriz da seção 3.8 registra a decisão funcional por família
+   de comandos, bibliotecas, políticas e assets. O grafo do Knip continua sendo apenas evidência técnica; a decisão
+   também considerou catálogo, testes, documentação, configuração e histórico.
+2. **[parcial, com primeiro corte concluído] Código temporal**: os 42 shebangs `#!/usr/bin/env node` sem consumidor
+   foram removidos como sobra objetiva da migração para TypeScript. A revisão dos nomes `latest`, `coverage`, `branch` e
+   `commit` e das dependências de teste ainda precisa ser executada antes de concluir a limpeza temporal.
+3. **[resolvido na superfície de comandos] Mapa explícito núcleo/perfil**: `lib/catalogo-comandos.ts` agora classifica
+   todas as 49 folhas da CLI, inclusive as sete registradas com callbacks em `sgc.ts`, por escopo e efeito. Políticas e
+   regras internas ainda precisam migrar gradualmente para adaptadores, sem reorganização antecipada.
 4. **Padronização e simplificação incompletas**: substituir `latest`, nomes `*-coverage-*` e símbolos próprios
    `branch`/`commit` por contratos portugueses. Não criar aliases de compatibilidade; atualizar fixtures, consumidores e
    documentação no mesmo recorte. Também eliminar opções duplicadas, helpers de uso único e camadas que não expressem
@@ -774,9 +821,9 @@ do perfil.
    `--diretorio`, `--arquivo`, `--base` e opções de domínio em português; a busca não encontrou `--input`, `--output`,
    `--dir` ou `--directory` como contratos próprios. Falta documentar quando uma violação gera código não zero, quando
    JSON continua disponível em falha e quais comandos exigem `--gravar` ou `--confirmar`.
-9. **Catálogo ainda parcial**: os 42 despachadores estão em `lib/catalogo-comandos.ts`, mas os comandos de registro
-   especializado continuam em `sgc.ts`. Centralizar metadados comuns — caminho, descrição, classe de efeito e perfil —
-   sem tentar representar callbacks complexos como dados artificiais.
+9. **Catálogo parcialmente executável**: os 42 despachadores estão em `lib/catalogo-comandos.ts` e todas as 49 folhas
+   agora têm metadados de caminho, descrição, efeito e escopo; os callbacks especializados continuam em `sgc.ts` por
+   exigirem lógica de registro própria. A próxima evolução deve evitar duplicar opções/callbacks em dados artificiais.
 10. **Testes concentrados**: `test/sgc.test.ts` ainda possui 81 cenários e cerca de 2.800 linhas. Separar primeiro runtime
    e distribuição, backend e frontend; `test/qualidade.test.ts` já possui 7 cenários, não 4 como dizia o plano anterior.
 11. **Defaults de perfil ainda implícitos**: URL OpenAPI, tarefas Gradle, convenções Vue e caminhos de políticas devem
@@ -799,15 +846,14 @@ obsolescência, clareza de escopo, consistência e só então ampliação do reu
 
 As fases históricas abaixo continuam úteis como registro, mas a execução deve seguir esta fila ativa:
 
-1. **Auditar utilidade por família**: para cada comando, biblioteca, política e artefato, registrar consumidores atuais,
-   entradas, saídas e decisão `manter/remover/fundir/horizontalizar/perfil-sgc`. Começar pelos módulos e políticas com
-   origem temporária suspeita, não pela coleta já modernizada.
-2. **Remover o primeiro lote obsoleto**: apagar integralmente funcionalidades sem finalidade atual comprovada, incluindo
-   roteamento, testes, configuração, documentação, padrões de limpeza e dependências exclusivas. Não deixar aliases ou
-   stubs de compatibilidade.
-3. **Criar o mapa de perfil**: adicionar ao catálogo metadados de classe de efeito e classificação
-   horizontal/adaptável/SGC; usar teste para garantir que todos os comandos registrados estejam classificados.
-4. **Padronizar a superfície restante**: corrigir nomes `latest`, `coverage`, `branch` e `commit`, revisar parâmetros,
+1. **[concluído nesta rodada] Auditar utilidade por família**: a matriz da seção 3.8 registra consumidores, entradas,
+   saídas e a decisão de manter, fundir, horizontalizar ou preservar no perfil SGC. Não houve remoção de funcionalidade
+   com consumidor atual.
+2. **[concluído nesta rodada] Remover o primeiro lote obsoleto**: os shebangs de Node em fontes TypeScript foram
+   removidos; não havia roteamento, teste, configuração ou dependência exclusiva associada a eles.
+3. **[concluído nesta rodada] Criar o mapa de perfil**: o catálogo completo classifica todas as folhas por escopo e
+   efeito, e o teste de sincronização confere descrição, presença do arquivo quando aplicável e unicidade dos caminhos.
+4. **[em andamento] Padronizar a superfície restante**: corrigir nomes `latest`, `coverage`, `branch` e `commit`, revisar parâmetros,
    mensagens e códigos de saída e fundir helpers/camadas redundantes encontrados no inventário.
 5. **Caracterizar áreas que serão alteradas**: acrescentar testes focados somente para funcionalidades preservadas que
    serão simplificadas ou separadas; começar por executor, leitores e adaptadores SGC se a coleta entrar no recorte.

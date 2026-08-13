@@ -1,4 +1,3 @@
-#!/usr/bin/env node
 // Correção explícita de nomes totalmente qualificados em fontes Java.
 import fs from "node:fs";
 import path from "node:path";

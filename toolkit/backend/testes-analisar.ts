@@ -1,4 +1,3 @@
-#!/usr/bin/env node
 // Analisador de cobertura de testes do backend.
 import fs from "node:fs";
 import path from "node:path";

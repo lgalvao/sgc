@@ -1,4 +1,3 @@
-#!/usr/bin/env node
 // Auditoria de arquitetura dos componentes Java do backend.
 
 import fs from "node:fs/promises";

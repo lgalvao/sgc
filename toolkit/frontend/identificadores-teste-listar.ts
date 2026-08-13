@@ -1,4 +1,3 @@
-#!/usr/bin/env node
 import pc from "picocolors";
 import path from "node:path";
 import {DIRETORIO_RAIZ} from "../lib/caminhos.js";

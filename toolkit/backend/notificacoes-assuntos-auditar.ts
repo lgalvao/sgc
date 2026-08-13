@@ -1,4 +1,3 @@
-#!/usr/bin/env node
 // Auditoria de assuntos de notificação do perfil SGC.
 
 import fs from "node:fs/promises";

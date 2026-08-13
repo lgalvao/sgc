@@ -1,4 +1,3 @@
-#!/usr/bin/env node
 import {executarNode} from "../lib/execucao.js";
 import {ehEntradaPrincipal} from "../lib/execucao.js";
 import logger from "../lib/logger.js";

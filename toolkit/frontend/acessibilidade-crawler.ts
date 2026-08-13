@@ -1,4 +1,3 @@
-#!/usr/bin/env node
 import path from "node:path";
 import {execa} from "execa";
 import {resolverNaRaiz} from "../lib/caminhos.js";

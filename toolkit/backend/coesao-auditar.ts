@@ -1,4 +1,3 @@
-#!/usr/bin/env node
 // Auditoria de coesão dos services do backend.
 
 import fs from "node:fs/promises";

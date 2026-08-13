@@ -1,4 +1,3 @@
-#!/usr/bin/env node
 // Inventário de duplicações textuais nos casos de uso CDU.
 
 import path from "node:path";

@@ -1,4 +1,3 @@
-#!/usr/bin/env node
 // Priorizador de testes do backend.
 import fs from "node:fs";
 import path from "node:path";

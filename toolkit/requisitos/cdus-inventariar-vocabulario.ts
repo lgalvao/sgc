@@ -1,4 +1,3 @@
-#!/usr/bin/env node
 // Inventário de vocabulário controlado dos casos de uso CDU.
 
 import path from "node:path";

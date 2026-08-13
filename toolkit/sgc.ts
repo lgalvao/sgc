@@ -1,8 +1,7 @@
-#!/usr/bin/env node
 import {pathToFileURL} from "node:url";
 import {Command} from "commander";
 import pc from "picocolors";
-import {CATALOGO_COMANDOS} from "./lib/catalogo-comandos.js";
+import {CATALOGO_COMANDOS, CATALOGO_COMANDOS_COMPLETO} from "./lib/catalogo-comandos.js";
 import {executarNode} from "./lib/execucao.js";
 import logger from "./lib/logger.js";
 
@@ -34,6 +33,14 @@ function obterComandoPai(programa: Command, caminho: readonly string[]): Command
         atual = proximo;
     }
     return atual;
+}
+
+function obterDescricaoComando(caminho: readonly string[]): string {
+    const definicao = CATALOGO_COMANDOS_COMPLETO.find(item => item.caminho.join(" ") === caminho.join(" "));
+    if (!definicao) {
+        throw new Error(`Comando sem classificação no catálogo: ${caminho.join(" ")}`);
+    }
+    return definicao.descricao;
 }
 
 function registrarComandosCatalogados(programa: Command): void {
@@ -90,7 +97,7 @@ criarGrupoComando(requisitos, "cdus", "Inventario e auditoria read-only dos caso
 const qualidade = program.command("qualidade").description("Ferramentas de coleta e analise da qualidade.");
 qualidade
     .command("coletar")
-    .description("Coleta uma fotografia de qualidade do projeto.")
+    .description(obterDescricaoComando(["qualidade", "coletar"]))
     .allowUnknownOption(true)
     .option("--perfil <perfil>", "Perfil de execucao (rapido, completo, backend, frontend).", "rapido")
     .option("--base <diretorio>", "Sobrescreve o diretorio base do projeto auditado.")
@@ -106,7 +113,7 @@ qualidade
     });
 qualidade
     .command("resumo")
-    .description("Resume a fotografia de qualidade mais recente.")
+    .description(obterDescricaoComando(["qualidade", "resumo"]))
     .option("--arquivo <caminho>", "Usa uma fotografia especifica em vez da mais recente.")
     .option("--base <diretorio>", "Resolve a fotografia mais recente a partir da base do projeto.")
     .option("--json", "Emite saida estruturada em JSON.")
@@ -124,7 +131,7 @@ projeto
     .command("dependencias")
     .description("Ferramentas para auditar uso e declaracao de dependencias.")
     .command("auditar")
-    .description("Executa o knip na raiz, no frontend e no toolkit.")
+    .description(obterDescricaoComando(["projeto", "dependencias", "auditar"]))
     .option("--base <diretorio>", "Sobrescreve o diretório base para auditoria.")
     .action(async (opcoes) => {
         const {executarAuditoriaDependencias} = await import("./projeto/dependencias-auditar.js");
@@ -133,7 +140,7 @@ projeto
 
 projeto
     .command("diagnostico")
-    .description("Valida comandos e arquivos essenciais do ambiente.")
+    .description(obterDescricaoComando(["projeto", "diagnostico"]))
     .option("--json", "Emite saida estruturada em JSON.")
     .option("--base <diretorio>", "Sobrescreve o diretório base para diagnostico.")
     .action(async (opcoes) => {
@@ -146,7 +153,7 @@ projeto
 
 projeto
     .command("limpar")
-    .description("Lista ou remove artefatos transientes de qualidade e do toolkit.")
+    .description(obterDescricaoComando(["projeto", "limpar"]))
     .option("--json", "Emite saida estruturada em JSON.")
     .option("--confirmar", "Remove de fato os artefatos elegiveis.")
     .option("--base <diretorio>", "Sobrescreve o diretório base para limpeza.")
@@ -157,7 +164,7 @@ projeto
 
 projeto
     .command("qualidade [perfil]")
-    .description("Executa os perfis consolidados de qualidade do projeto.")
+    .description(obterDescricaoComando(["projeto", "qualidade"]))
     .option("--base <diretorio>", "Sobrescreve o diretorio base do projeto.")
     .action(async (perfil = "rapido", opcoes) => {
         const {executarPerfilQualidade} = await import("./projeto/qualidade.js");
@@ -166,7 +173,7 @@ projeto
 
 projeto
     .command("preparar")
-    .description("Prepara o ambiente do projeto com etapas opcionais.")
+    .description(obterDescricaoComando(["projeto", "preparar"]))
     .option("--base <diretorio>", "Sobrescreve o diretório base para preparação.")
     .option("--instalar-dependencias", "Executa npm install na raiz, no frontend e no toolkit.")
     .option("--instalar-playwright", "Instala o Chromium do Playwright.")

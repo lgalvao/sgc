@@ -12,7 +12,7 @@ import {normalizarCaminhoAchado, obterComandoSemgrep, resolverDiretoriosPadrao} 
 import {executarAuditoria as executarAuditoriaCheiros} from "../codigo/cheiros-auditar.js";
 import {executarCrawler, normalizarArgumentosPlaywright} from "../frontend/acessibilidade-crawler.js";
 import {normalizarResultados} from "../frontend/acessibilidade-processar-resultados.js";
-import {CATALOGO_COMANDOS} from "../lib/catalogo-comandos.js";
+import {CATALOGO_COMANDOS_COMPLETO} from "../lib/catalogo-comandos.js";
 import {program} from "../sgc.js";
 
 const CAMINHO_SGC_COMPILADO = path.join(DIRETORIO_RAIZ, "toolkit", "dist", "sgc.js");
@@ -129,10 +129,10 @@ async function executarScriptTestesPriorizar(args: string[], opcoes: Options = {
 
 describe("CLI raiz do toolkit", () => {
     test("mantem o catalogo de scripts sincronizado com a arvore da CLI", async () => {
-        const caminhos = CATALOGO_COMANDOS.map(definicao => definicao.caminho.join(" "));
+        const caminhos = CATALOGO_COMANDOS_COMPLETO.map(definicao => definicao.caminho.join(" "));
         expect(new Set(caminhos).size).toBe(caminhos.length);
 
-        for (const definicao of CATALOGO_COMANDOS) {
+        for (const definicao of CATALOGO_COMANDOS_COMPLETO) {
             let comando = program;
             for (const segmento of definicao.caminho) {
                 const proximo = comando.commands.find(item => item.name() === segmento);
@@ -144,7 +144,10 @@ describe("CLI raiz do toolkit", () => {
             }
 
             expect(comando.description()).toBe(definicao.descricao);
-            expect(await fs.pathExists(path.join(DIRETORIO_RAIZ, "toolkit", definicao.arquivo))).toBe(true);
+            const arquivoExiste = "arquivo" in definicao
+                ? await fs.pathExists(path.join(DIRETORIO_RAIZ, "toolkit", definicao.arquivo))
+                : true;
+            expect(arquivoExiste).toBe(true);
         }
     });
 
