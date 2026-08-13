@@ -1,264 +1,160 @@
-# Toolkit de Scripts do SGC
+# Toolkit de scripts do SGC
 
-## Papel do módulo
+CLI TypeScript para auditoria, qualidade e manutenção de projetos Java/Spring Boot/Vue. O SGC é o perfil padrão, mas as
+capacidades horizontais podem ser usadas em outros projetos por configuração e composição.
 
-`toolkit/` reúne a CLI de automação do repositório. Ela concentra comandos operacionais e de auditoria usados para
-qualidade, diagnóstico do projeto e utilidades de backend/frontend.
+## Execução
 
-### Execução e build
-
-O toolkit executa a árvore-fonte diretamente. O build é uma verificação opcional do artefato compilado e não faz parte do
-fluxo normal de desenvolvimento:
+Requisitos: Node 26.7 ou superior e dependências do workspace `toolkit` instaladas.
 
 ```bash
-npm --prefix toolkit run build
-```
-
-Ponto de entrada principal:
-
-```bash
-npx tsx toolkit/sgc.ts
-```
-
-Quando um comando importar módulos TypeScript, o toolkit usa `tsx` automaticamente. Também é possível executar um
-script diretamente:
-
-```bash
+npm --prefix toolkit install
 npx tsx toolkit/sgc.ts --help
-npx tsx toolkit/projeto/arvore-linhas.ts --help
 ```
 
-## Visão arquitetural
+O toolkit executa a fonte TypeScript diretamente com `tsx`. `dist/` é gerado apenas pelo gate de build e não participa
+do fluxo normal.
 
-O toolkit é um módulo Node.js em ESM, separado do backend/frontend, com dependências próprias e testes próprios.
-
-```mermaid
-graph TD
-    CLI[sgc.ts] --> Backend[backend/]
-    CLI --> Frontend[frontend/]
-    CLI --> Codigo[codigo/]
-    CLI --> Integracao[integracao/]
-    CLI --> Qualidade[qualidade/]
-    CLI --> Projeto[projeto/]
-    Backend --> Lib[lib/]
-    Frontend --> Lib
-    Codigo --> Lib
-    Integracao --> Lib
-    Qualidade --> Lib
-    Projeto --> Lib
-```
-
-## Estrutura do diretório
-
-| Caminho       | Papel                                                             |
-|---------------|-------------------------------------------------------------------|
-| `sgc.ts`      | roteador principal da CLI                                         |
-| `lib/`        | catálogo de comandos, infraestrutura compartilhada, execução, caminhos, saída e utilidades |
-| `backend/`    | comandos de cobertura, testes e higiene Java                      |
-| `frontend/`   | comandos de cobertura, resíduos e validações                      |
-| `codigo/`     | auditorias transversais de cheiros de código                       |
-| `integracao/` | contratos OpenAPI e fronteira backend/frontend                    |
-| `qualidade/`  | coleta e resumo de qualidade                                       |
-| `projeto/`    | verificação de ambiente, dependências, versões e artefatos do repositório |
-| `test/`       | testes do toolkit                                                 |
-
-## Exemplos de comandos por domínio
-
-O catálogo canônico de comandos e descrições é a própria ajuda da CLI; consulte-a antes de procurar um comando:
+A ajuda da CLI é a fonte canônica para comandos, opções e descrições:
 
 ```bash
-npx tsx toolkit/sgc.ts --help
 npx tsx toolkit/sgc.ts backend --help
 npx tsx toolkit/sgc.ts frontend --help
+npx tsx toolkit/sgc.ts requisitos --help
+npx tsx toolkit/sgc.ts qualidade --help
+npx tsx toolkit/sgc.ts projeto --help
 ```
 
-Os exemplos abaixo são intencionalmente representativos. A lista completa não é repetida nesta documentação para evitar
-que o roteador e o README se tornem duas fontes de verdade.
+## Organização
 
-### Backend
+| Caminho | Responsabilidade |
+|---|---|
+| `sgc.ts` | entrada e roteamento da CLI |
+| `lib/` | configuração, execução, saída, catálogo e domínios compartilhados |
+| `backend/` | cobertura, arquitetura, contratos, testes e utilidades Java |
+| `frontend/` | cobertura, arquitetura, resíduos e validações Vue |
+| `codigo/` | auditorias transversais de código, nomes e Semgrep |
+| `integracao/` | contratos OpenAPI |
+| `requisitos/` | análise e auditoria de documentos CDU |
+| `qualidade/` | coleta, fotografia, resumo e execução de tarefas |
+| `projeto/` | ambiente, dependências, artefatos, versão e árvore de linhas |
+| `test/` | testes e fixtures próprios do toolkit |
+
+O desenho desejado separa:
+
+- núcleo horizontal, sem regras do SGC;
+- adaptadores de Java/Gradle, Vue/npm, OpenAPI e ferramentas externas;
+- perfil SGC, com seus defaults e políticas específicas.
+
+## Comandos representativos
+
+### Backend e frontend
 
 ```bash
-npx tsx toolkit/sgc.ts backend cobertura auditoria
+npx tsx toolkit/sgc.ts backend cobertura auditoria --json
 npx tsx toolkit/sgc.ts backend testes analisar
-npx tsx toolkit/sgc.ts backend testes priorizar
-npx tsx toolkit/sgc.ts backend java corrigir-fqn --gravar
-npx tsx toolkit/sgc.ts backend notificacoes auditar-assuntos
-```
-
-`backend java corrigir-fqn` apenas lista as substituições por padrão; use `--gravar` para alterar os arquivos Java. Com
-`configuracao-toolkit.json`, ele usa `diretorios.backendCodigo` e `diretorios.backendTestes`; sem configuração, conserva
-a descoberta tradicional de `src/main/java` e `src/test/java`.
-
-`backend testes analisar` gera `analise-testes.md` e `analise-testes.json` por padrão; `backend testes priorizar` consome
-esse sidecar e grava `priorizacao-testes.md` por padrão.
-
-Em `backend testes analisar`, `--diretorio` pode ser absoluto ou relativo a `--base`; quando omitido, os diretórios
-configurados `backendCodigo` e `backendTestes` são usados.
-
-### Frontend
-
-```bash
-npx tsx toolkit/sgc.ts frontend cobertura auditoria
-npx tsx toolkit/sgc.ts frontend residuos auditar
+npx tsx toolkit/sgc.ts backend java corrigir-fqn
+npx tsx toolkit/sgc.ts frontend cobertura auditoria --json
 npx tsx toolkit/sgc.ts frontend residuos validar
-npx tsx toolkit/sgc.ts frontend identificadores-teste listar
 npx tsx toolkit/sgc.ts frontend identificadores-teste listar-duplicados
 ```
 
-A auditoria Axe do SGC pertence ao workspace `e2e/`, não ao toolkit. Execute-a diretamente com
-`npm --prefix e2e run acessibilidade:crawler` e gere o relatório com `npm --prefix e2e run acessibilidade:processar`.
+`backend java corrigir-fqn` simula por padrão; use `--gravar` para modificar fontes.
 
-### Código transversal
-
-```bash
-npx tsx toolkit/sgc.ts codigo cheiros auditar
-npx tsx toolkit/sgc.ts codigo semgrep auditar
-npx tsx toolkit/sgc.ts codigo nomes coletar-simbolos
-npx tsx toolkit/sgc.ts codigo nomes auditar-consistencia
-```
-
-As auditorias de cheiros são somente leitura por padrão e emitem a fotografia em JSON no stdout. Para atualizar os
-artefatos `fotografia.json` e `resumo.md`, use a ação explícita `--gravar`:
+### Código e integração
 
 ```bash
 npx tsx toolkit/sgc.ts codigo cheiros auditar --json
-npx tsx toolkit/sgc.ts codigo cheiros auditar --gravar
+npx tsx toolkit/sgc.ts codigo semgrep auditar
+npx tsx toolkit/sgc.ts codigo nomes auditar-consistencia
+npx tsx toolkit/sgc.ts integracao contratos diff
 ```
 
-`frontend arquitetura auditar` segue a mesma regra: a fotografia sai no stdout sem gravação; use `--gravar` para
-persistir os artefatos. O coletor consolidado de qualidade já informa essa opção quando precisa manter o artefato
-intermediário do perfil SGC.
+Cheiros e Semgrep são complementares: o primeiro aplica heurísticas internas, enquanto o segundo executa regras
+estruturais configuráveis.
 
-`backend arquitetura auditar` também é somente leitura por padrão. Use `--gravar` para atualizar os relatórios
-Markdown e JSON no diretório de artefatos configurado.
+OpenAPI mantém exportação, comparação e promoção de baseline. O toolkit não gera tipos TypeScript a partir do contrato.
 
-`backend coesao auditar` segue o mesmo contrato e só grava os relatórios quando recebe `--gravar`.
-
-`backend contratos auditar` também é somente leitura por padrão; `--gravar` persiste o relatório Markdown sem alterar
-o código Java.
-
-`frontend residuos auditar` e `frontend residuos validar` seguem o mesmo contrato. A fotografia, o resumo e a fotografia
-mais recente da validação só são atualizados com `--gravar`; sem essa opção, os resultados ficam no stdout.
-
-`codigo semgrep auditar` também só grava `resultado.json` e `resumo.md` com `--gravar`; a política padrão continua
-vindo do pacote e políticas locais podem ser informadas por `--regra` ou pela configuração.
-
-Os caminhos dos achados Semgrep são normalizados em relação a `--base`, independentemente de a ferramenta externa
-retornar caminhos relativos ou absolutos.
-
-`codigo nomes coletar-simbolos`, `codigo nomes auditar-consistencia` e `codigo nomes auditar-idioma` também são
-somente leitura por padrão. Use `--gravar` para persistir o inventário ou os relatórios de nomenclatura; quando uma
-auditoria precisar criar o inventário auxiliar, a mesma opção é propagada explicitamente para essa coleta interna.
-
-`integracao contratos diff` compara os documentos OpenAPI sem gravar por padrão. Use `--gravar` para persistir o resumo
-Markdown; `exportar-openapi` e `fixar-baseline` continuam sendo ações de geração/promoção explícitas.
-
-`backend cobertura auditoria` e `frontend cobertura auditoria` também só persistem o relatório Markdown com `--gravar`.
-O modo `--json` continua adequado para integração sem criar arquivos. Use `--minimo <percentual>` para transformar
-cobertura abaixo da meta em código de saída de falha.
-
-### Requisitos
+### Casos de uso CDU
 
 ```bash
-npx tsx toolkit/sgc.ts requisitos cdus inventariar
-npx tsx toolkit/sgc.ts requisitos cdus auditar
+npx tsx toolkit/sgc.ts requisitos cdus auditar --json
 npx tsx toolkit/sgc.ts requisitos cdus auditar-estilo
-npx tsx toolkit/sgc.ts requisitos cdus inventariar-vocabulario
 npx tsx toolkit/sgc.ts requisitos cdus auditar-vocabulario
-npx tsx toolkit/sgc.ts requisitos cdus inventariar-mensagens
 npx tsx toolkit/sgc.ts requisitos cdus auditar-mensagens
 npx tsx toolkit/sgc.ts requisitos cdus auditar-mensagens-codigo
+npx tsx toolkit/sgc.ts requisitos cdus inventariar
 npx tsx toolkit/sgc.ts requisitos cdus inventariar-densidade
 npx tsx toolkit/sgc.ts requisitos cdus inventariar-duplicacoes
 ```
 
-### Qualidade
+A auditoria estrutural verifica título, seções obrigatórias, ordem, atores, pré-condições, passos numerados e links. Os
+inventários descrevem o corpus e são utilitários ocasionais, não gates automáticos.
+
+O formato CDU é uma capacidade horizontal em evolução. O perfil atual do SGC usa `specs/cdu/cdu-*.md` e fornece seu
+vocabulário, situações, mensagens e extratores de código. Esses elementos serão parametrizados para outros projetos.
+
+### Qualidade e projeto
 
 ```bash
 npx tsx toolkit/sgc.ts qualidade coletar --perfil rapido
 npx tsx toolkit/sgc.ts qualidade tarefas executar rapido
 npx tsx toolkit/sgc.ts qualidade resumo
-npx tsx toolkit/sgc.ts qualidade resumo --limite-pontos-criticos 10
-```
-
-`qualidade resumo --base <diretorio>` informa o caminho da fotografia relativo à base auditada, inclusive quando a
-fotografia é encontrada em `artefatosQualidade/mais-recente`.
-
-`qualidade coletar` executa adaptadores e consolida uma fotografia comparável. `qualidade tarefas executar` executa
-tarefas externas configuradas em `execucoes.qualidade`, sem tentar produzir a fotografia consolidada; são superfícies
-complementares.
-
-### Projeto
-
-```bash
 npx tsx toolkit/sgc.ts projeto ambiente verificar
 npx tsx toolkit/sgc.ts projeto dependencias auditar
-npx tsx toolkit/sgc.ts projeto artefatos limpar --confirmar
-npx tsx toolkit/sgc.ts projeto arvore-linhas
-npx tsx toolkit/sgc.ts projeto versao-sincronizar 1.2.3 --gravar
+npx tsx toolkit/sgc.ts projeto artefatos limpar
+npx tsx toolkit/sgc.ts projeto versao-sincronizar 1.2.3
 ```
 
-`projeto arvore-linhas` usa as opções `--profundidade`, `--minimo-linhas`, `--excluir-testes` e `--base`. O filtro
-de testes reconhece padrões comuns de JavaScript, Vue, Playwright e Java, incluindo qualquer caminho `src/test`.
+`qualidade coletar` executa adaptadores e produz uma fotografia consolidada. `qualidade tarefas executar` apenas executa
+o perfil configurado em `execucoes.qualidade`.
 
-`projeto versao-sincronizar` apenas simula por padrão. Use `--base` para outra raiz e `--gravar` para atualizar
-`gradle.properties` e o `package.json` do diretório definido por `diretorios.frontend` em
-`configuracao-toolkit.json` (o padrão do SGC é `frontend`).
+`projeto dependencias auditar` reúne uso e declarações pelo Knip, versões npm desatualizadas, vulnerabilidades npm e
+atualizações Gradle. Achados são diferenciados de falhas de execução.
 
-`projeto artefatos limpar` mantém a prévia por padrão, resolve `diretorios.backend`, `diretorios.frontend` e
-`diretorios.artefatosQualidade` da configuração da base e não inclui nomes de relatórios legados removidos.
+`projeto artefatos limpar` mostra uma prévia e só remove com `--confirmar`. `projeto versao-sincronizar` simula e só
+altera arquivos com `--gravar`.
 
-`projeto ambiente verificar` resolve os arquivos de backend, frontend e integração pelos diretórios configurados. Em uma base
-externa, não exige arquivos do próprio toolkit nem as portas e o `.env.e2e` específicos do SGC; esses recursos voltam a
-ser verificados quando a base contém `toolkit/sgc.ts`. Catálogos adicionais continuam disponíveis pela API
-`executarVerificacaoAmbiente`.
+## Contrato de efeitos colaterais
 
-## Casos de uso típicos
+- Auditorias e inventários são somente leitura por padrão.
+- Persistência de fotografias e relatórios exige `--gravar`.
+- Remoção exige `--confirmar`.
+- Ações explicitamente geradoras ou promotoras, como exportar OpenAPI e fixar baseline, gravam como parte do seu contrato.
+- `--json` escreve dados em stdout; mensagens operacionais e erros devem permanecer fora do JSON.
+- Caminhos relativos são resolvidos contra `--base` quando a opção estiver disponível.
 
-- gerar fotografia consolidada de qualidade para revisão técnica;
-- auditar residuos e duplicidade no frontend;
-- apoiar evolução da suíte de testes backend;
-- validar divergência entre Bean Validation e validação de UI;
-- produzir artefatos de qualidade para inspeção manual.
+A acessibilidade Playwright/Axe do SGC não pertence ao toolkit. Ela é executada diretamente pelo workspace `e2e/`.
 
-Os artefatos gerados ficam em `toolkit/qualidade/artefatos/` e são organizados por execução e fotografia mais recente.
+## Configuração por projeto
 
-### Contrato OpenAPI
-
-O Springdoc continua no backend porque o ciclo E2E usa a documentação OpenAPI/Swagger para aguardar a aplicação nos
-ambientes `e2e` e `hom`. No toolkit, a integração mantém exportação, comparação e fixação de referência do contrato.
-O gerador de tipos TypeScript foi removido enquanto não houver consumidor de tipos gerados no frontend e enquanto a
-ferramenta de geração exigir uma versão anterior do TypeScript.
-
-## Configuração e migração para TypeScript
-
-Os diretórios variáveis do projeto podem ser sobrescritos em `configuracao-toolkit.json` na raiz. Os valores padrão
-cobrem o layout atual do SGC, enquanto a configuração permite reutilizar o toolkit em outros projetos sem editar os
-auditores.
-
-O arquivo exige a versão `1` e aceita uma seção `diretorios` com nomes conhecidos pelo toolkit:
+Crie `configuracao-toolkit.json` na raiz auditada. O schema atual exige `versao: 1` e rejeita chaves desconhecidas ou
+caminhos vazios.
 
 ```json
 {
   "versao": 1,
   "diretorios": {
-    "backendCodigo": "backend/src/main/java",
-    "backendTestes": "backend/src/test/java",
-    "frontendCodigo": "frontend/src",
+    "backend": "servidor",
+    "frontend": "cliente",
+    "backendCodigo": "servidor/src/main/java",
+    "backendTestes": "servidor/src/test/java",
+    "frontendCodigo": "cliente/src",
     "testesIntegracao": "e2e",
-    "artefatosQualidade": "toolkit/qualidade/artefatos"
+    "coberturaBackend": "servidor/build/reports/jacoco/test/jacocoTestReport.xml",
+    "coberturaFrontend": "cliente/coverage/coverage-final.json",
+    "artefatosQualidade": ".qualidade"
   }
 }
 ```
 
-Chaves desconhecidas, versões não suportadas e caminhos vazios falham na borda de configuração, antes de um auditor
-iniciar.
-O contrato TypeScript também restringe os nomes de diretório ao mesmo conjunto aceito pelo schema; componentes que
-resolvem caminhos recebem uma chave conhecida, reduzindo typos antes da execução.
+Diretórios reconhecidos:
 
-Além dos diretórios, um projeto pode declarar as execuções que substituem os catálogos padrão do perfil SGC. A seção
-`execucoes` aceita escopos de auditoria de dependências, escopos de instalação e perfis de qualidade. Cada comando é
-executado na base do projeto ou no segmento informado; `argumentos` deve ser sempre uma lista de textos:
+- `backend`, `frontend`, `backendCodigo`, `backendTestes`, `frontendCodigo` e `testesIntegracao`;
+- `artefatosQualidade`, `coberturaBackend`, `coberturaFrontend` e `contratosOpenapi`;
+- `regrasSemgrep`, `orcamentoResiduosFrontend` e `excecoesResiduosFrontend`.
+
+Execuções de dependências e qualidade também podem ser substituídas:
 
 ```json
 {
@@ -269,17 +165,18 @@ executado na base do projeto ou no segmento informado; `argumentos` deve ser sem
         "titulo": "Auditar cliente",
         "segmento": "cliente",
         "comando": "npm",
-        "argumentos": ["run", "auditar-dependencias"]
+        "argumentos": ["audit"],
+        "codigoNaoZeroIndicaAchados": true
       }
     ],
     "qualidade": {
       "rapido": {
-        "descricao": "Verificações rápidas do projeto",
+        "descricao": "Verificações rápidas",
         "tarefas": [
           {
-            "titulo": "Verificar projeto",
+            "titulo": "Verificar cliente",
             "comando": "npm",
-            "argumentos": ["run", "qualidade"]
+            "argumentos": ["--prefix", "cliente", "run", "check"]
           }
         ]
       }
@@ -288,192 +185,55 @@ executado na base do projeto ou no segmento informado; `argumentos` deve ser sem
 }
 ```
 
-As duas listas são independentes: uma configuração que declara somente um perfil de qualidade continua usando os
-defaults SGC para dependências. Opções explícitas da API ou da CLI têm precedência sobre a configuração;
-quando nenhuma delas existe, os defaults SGC preservam o comportamento atual. Os comandos são configuração confiável
-do projeto e não formam uma camada de segurança ou de sandbox.
+Opções explícitas da API ou CLI têm precedência sobre o arquivo. Categorias não configuradas usam os defaults do perfil
+SGC. A configuração é considerada confiável e não funciona como sandbox.
 
-O toolkit não registra comandos Playwright/Axe. A coleta de qualidade pode executar uma tarefa E2E configurada pelo
-projeto, mas o crawler e o processamento de acessibilidade do SGC vivem no workspace `e2e/` e são executados
-diretamente por ele.
+A política Semgrep padrão vem do pacote; um override em `diretorios.regrasSemgrep` é resolvido contra a raiz auditada.
+Orçamentos e exceções de resíduos são opcionais; quando configurados, os arquivos precisam existir e conter JSON válido.
 
-Os orçamentos e exceções de resíduos frontend não têm política padrão empacotada. Sem `diretorios.orcamentoResiduosFrontend`
-ou `diretorios.excecoesResiduosFrontend`, o toolkit usa uma política neutra identificada como `padrao-do-toolkit`. Ao
-declarar um desses caminhos, o arquivo passa a ser obrigatório e precisa conter JSON válido; arquivo ausente ou inválido
-interrompe a validação.
+## Uso como pacote
 
-A regra Semgrep padrão é a política do perfil SGC fornecida pelo próprio pacote. Em outro projeto, informe
-`diretorios.regrasSemgrep` para usar uma política local; o toolkit resolve o override relativo à raiz auditada.
-
-Nos comandos de inspeção de frontend, `--base` representa a raiz do projeto e resolve `frontendCodigo`; use `--diretorio`
-quando a intenção for apontar diretamente para outro diretório de código.
-
-Nos comandos frontend que geram fotografias ou relatórios, caminhos relativos de `--saida`, `--orcamento` e `--excecoes`
-também são resolvidos contra `--base`; os caminhos exibidos no resumo permanecem relativos à base auditada.
-
-O toolkit executa a árvore-fonte com `tsx`; toda a implementação e todos os testes estão em TypeScript estrito. Os
-testes não participam da implementação distribuída.
-
-Os comandos de requisitos/CDUs e de contratos OpenAPI são módulos importáveis: só executam quando chamados diretamente
-pela CLI. Isso permite reutilizar suas funções `principal(argumentos)` em outras automações sem iniciar auditorias ou
-integrações durante o carregamento.
-`npm run typecheck` executa `tsconfig.estrito.json` com `strict` e `noImplicitOverride` sobre todos os módulos de
-implementação TypeScript. `npm run typecheck:testes` aplica o mesmo rigor aos vinte e nove arquivos de teste TypeScript;
-a divisão por domínio segue reduzindo o teste principal sem manter testes JavaScript ou uma migração parcial de linguagem.
-
-Os comandos de projeto seguem a mesma fronteira. A árvore de linhas aceita `--base <diretorio>` para analisar outro
-repositório Git, e a sincronização de versão aceita um diretório base nas funções reutilizáveis sem alterar o projeto
-atual por padrão.
-
-Na camada de qualidade, `coleta.ts` e `resumo.ts` têm fronteira reutilizável e não executam trabalho durante o `import`.
-`coleta-adaptadores-sgc.ts` mantém os adaptadores Gradle, npm, Playwright e os auditores locais específicos do SGC como
-defaults da CLI; `coleta-executor.ts` concentra subprocessos, `coleta-leitores.ts` concentra leitura de JSON/JUnit e
-validação de hotspots, `coleta-fotografia.ts` concentra o contrato e a persistência da fotografia,
-`coleta-contexto.ts` concentra a fábrica de contexto SGC substituível, e `coleta-execucao.ts` concentra agregação e
-orquestração; `coleta-metadados.ts` mantém a coleta Git como default substituível, e a versão do schema da fotografia
-fica centralizada no próprio módulo. Os formatos JSON específicos de resíduos, arquitetura e Playwright ficam nos
-adaptadores SGC, não no núcleo. A função
-`principal(argumentos, {perfis, adaptadores, criarContexto, coletarMetadados, persistirFotografia})` aceita catálogos e
-serviços externos por composição, sem mutar os defaults globais;
-essa é a fronteira de composição reutilizável atualmente. O perfil SGC continua sendo o default da CLI, mas um consumidor
-externo pode fornecer seus próprios perfis, adaptadores, contexto, metadados e persistência. Mesmo no perfil SGC, a
-montagem de uma tarefa Playwright usa `diretorios.testesIntegracao`; o crawler de acessibilidade do SGC é mantido
-separadamente no workspace `e2e/`.
-
-Os comandos `codigo nomes` também resolvem `simbolos.json`, `consistencia.json` e `idioma.json` relativos ao `--base`
-informado. Assim, a auditoria de outro projeto não lê nem grava silenciosamente no diretório de artefatos do SGC.
-
-Os comandos `backend cobertura auditoria` e `backend cobertura ramificacoes` aceitam `--base` e `--arquivo` para
-reutilizar relatórios JaCoCo de outro projeto Spring/Gradle. A antiga auditoria cruzada manual foi removida da CLI por
-duplicar a leitura do XML sem contrato JSON ou testes próprios; o histórico Git preserva sua implementação.
-
-## Dependências e execução
-
-`toolkit/package.json` define dependências próprias, separadas do restante do repositório.
-
-Instalação:
+O pacote usa o modelo fonte + `tsx`. O smoke de distribuição instala o tarball em um consumidor temporário para impedir
+dependências acidentais do workspace.
 
 ```bash
-npm --prefix toolkit install
-```
-
-Execução dos testes do toolkit:
-
-```bash
-npm --prefix toolkit run test
-```
-
-Para medir a cobertura do próprio toolkit sem impor threshold prematuro:
-
-```bash
-npm --prefix toolkit run test:coverage
-```
-
-O relatório exclui `test/**` para medir somente a implementação distribuível, sem contar o apoio ou os próprios testes.
-
-O smoke de distribuição instala o tarball em um consumidor temporário, sem usar dependências hoisted do monorepo:
-
-```bash
-npm --prefix toolkit run test:pacote
-```
-
-O modelo de distribuição é fonte + `tsx`. Para consumir uma versão empacotada em outro projeto, instale o tarball e
-execute o binário pelo `npx`:
-
-```bash
+npm --prefix toolkit pack
 npm install --save-dev ./sgc-scripts-0.1.0.tgz
 npx sgc --help
 ```
 
-As primitivas horizontais de leitura de cobertura também podem ser consumidas programaticamente. Elas recebem a base e
-o arquivo explicitamente, portanto não dependem do layout do SGC:
+As APIs programáticas públicas atuais são deliberadamente pequenas:
 
 ```ts
 import {extrairCoberturaJacoco} from "sgc-scripts/cobertura-java";
 import {extrairCoberturaFrontend} from "sgc-scripts/cobertura-web";
 
-const jacoco = await extrairCoberturaJacoco("relatorios/jacoco.xml", {diretorioBase});
+const backend = await extrairCoberturaJacoco("relatorios/jacoco.xml", {diretorioBase});
 const frontend = await extrairCoberturaFrontend("cliente/coverage/coverage-final.json", {diretorioBase});
 ```
 
-Os subpaths públicos são deliberados; módulos internos em `lib/` não fazem parte da API programática. Os formatos
-externos continuam com os nomes próprios do JaCoCo e do V8, enquanto os resultados entregues pelo toolkit usam os
-contratos em português.
+Módulos internos não fazem parte da API pública. Novos subpaths só devem ser publicados depois de comprovados em um
+consumidor externo instalado.
 
-Por padrão, a raiz auditada é o diretório de trabalho do processo. Use `--base` ou `configuracao-toolkit.json` quando
-o projeto auditado estiver em outro caminho; o local de instalação do toolkit não é usado como raiz do consumidor.
-
-Lint do toolkit:
+## Desenvolvimento e validação
 
 ```bash
+npm --prefix toolkit run test -- --maxWorkers=1
+npm --prefix toolkit run test:coverage -- --maxWorkers=1
+npm --prefix toolkit run test:pacote
+npm --prefix toolkit run typecheck
+npm --prefix toolkit run typecheck:testes
 npm --prefix toolkit run lint
-```
-
-Auditoria de dependências:
-
-```bash
 npm --prefix toolkit run deps:audit
-npx tsx toolkit/sgc.ts projeto dependencias auditar
+npm --prefix toolkit run build
 ```
 
-`projeto dependencias auditar` reúne quatro verificações: uso e declaração com Knip, pacotes npm desatualizados,
-vulnerabilidades npm e atualizações de dependências Gradle. O npm cobre todos os workspaces; o Gradle usa o wrapper
-local, desativa somente a execução paralela exigida pela tarefa `dependencyUpdates` e filtra suas configurações para
-classpaths e declarações diretas do projeto, sem percorrer as configurações internas dos plugins. Achados de `outdated` e `audit`
-ficam classificados como `achados` — não são confundidos com falha de execução —, mas ainda produzem código de saída
-não zero para uso em CI. Um projeto pode substituir os escopos em `execucoes.dependencias`; nesses escopos,
-`codigoNaoZeroIndicaAchados: true` declara que código não zero representa resultado encontrado, não erro de infraestrutura.
+Os testes ficam em `toolkit/test/` e são organizados por domínio. `test/pacote.test.ts` é executado separadamente porque
+instala o pacote em ambiente isolado. O build valida a compilação, mas a execução cotidiana continua usando TypeScript
+diretamente.
 
-## Organização dos testes
+## Limites
 
-O diretório `test/` contém:
-
-- `execucao-cli.test.ts`: testes de catálogo, launcher, importação e distribuição da CLI
-- `backend-fqn.test.ts`: testes de simulação, escrita e idempotência do corretor FQN Java
-- `backend-testes.test.ts`: testes de análise, classificação e priorização dos testes backend
-- `backend-auditorias.test.ts`: testes de coesão, arquitetura e contratos do backend
-- `backend-importacao.test.ts`: testes de importação segura dos comandos e auditores backend
-- `backend-notificacoes.test.ts`: testes de auditoria de assuntos de notificação e diretórios backend configurados
-- `frontend-residuos.test.ts`: testes de políticas, auditoria, gravação e validação de resíduos do frontend
-- `frontend-arquitetura.test.ts`: testes da auditoria de hotspots, defaults e persistência arquitetural do frontend
-- `frontend-arquitetura-gates.test.ts`: testes dos gates dependency-cruiser e diretórios frontend configurados
-- `frontend-validadores.test.ts`: testes dos validadores estruturais de views, modais e diretórios configurados
-- `frontend-identificadores.test.ts`: testes de listagem e detecção de identificadores de teste duplicados
-- `frontend-importacao.test.ts`: testes de importação segura dos comandos e auditores frontend
-- `cobertura-cli.test.ts`: testes de leitura, gravação explícita e caminhos externos de cobertura
-- `opcoes-cli.test.ts`: testes da leitura, conversão estrita e limites das opções numéricas
-- `consistencia.test.ts`: testes das auditorias de símbolos, nomenclatura e idioma
-- `superficie-cli.test.ts`: testes de ajuda, roteamento e remoção de diretórios legados
-- `importacao-nucleos.test.ts`: testes de importação segura dos comandos de projeto, qualidade e consistência
-- `codigo-importacao.test.ts`: testes de importação segura dos auditores Semgrep e cheiros
-- `codigo-auditorias.test.ts`: testes de auditoria de cheiros, políticas Semgrep e diretórios de código configurados
-- `projeto.test.ts`: testes dos comandos de projeto (versão, árvore de linhas, limpeza, preparação,
-  qualidade e dependências)
-- `projeto-ambiente.test.ts`: testes da verificação de arquivos essenciais em uma base vazia
-- `configuracao.test.ts`: testes da configuração versionada e das execuções parametrizadas do projeto
-- `integracao.test.ts`: testes de importação segura e dos artefatos OpenAPI em uma base externa
-- `qualidade.test.ts`: testes de resumo, coleta e validação de perfis de qualidade
-- `qualidade-externa.test.ts`: teste de fotografia de qualidade com adaptadores de uma base externa
-- `cdus.test.ts`: testes TypeScript das regras CDU específicas do perfil SGC
-- `externo.test.ts`: fixture TypeScript de reuso em projeto Java/Vue externo
-- `pacote.test.ts`: smoke de empacotamento e instalação em consumidor isolado
-- `apoio.ts`: raiz, launcher `tsx` e execução comum da CLI compartilhados pelos testes
-- `fixtures/`: dados auxiliares para simular cenários de execução
-
-Esses testes garantem que a CLI continue roteando comandos, produzindo saídas e respeitando contratos básicos de
-operação.
-
-## Relação com o restante do repositório
-
-O toolkit não substitui os comandos nativos de Gradle, npm ou Playwright; ele os complementa com:
-
-- automação padronizada;
-- relatórios agregados;
-- auditorias específicas do SGC;
-- comandos de produtividade difíceis de expressar apenas com scripts simples.
-
-## Referências
-
-- [README raiz](../../README.md)
-- [Backend do SGC](../../backend/README.md)
-- [Frontend do SGC](../../frontend/README.md)
+O toolkit complementa Gradle, npm, Playwright e ferramentas de análise; não substitui seus comandos nativos. Políticas
+específicas do SGC devem continuar funcionando, mas precisam permanecer identificadas como perfil local quando não forem
+universais.
