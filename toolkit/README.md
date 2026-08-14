@@ -243,6 +243,8 @@ ferramentas projeto versao-sincronizar 1.2.3
 coleta não depende dos adaptadores SGC e pode ser composto programaticamente; a entrada CLI mantém somente os perfis SGC.
 `qualidade tarefas executar` é a orquestração adaptável para outros projetos: apenas executa o perfil configurado em
 `execucoes.qualidade`.
+Na coleta SGC, `eslint` e Playwright são resolvidos pelos binários locais instalados no projeto; a fotografia não recorre a
+download implícito de ferramentas.
 
 `projeto dependencias auditar` reúne uso e declarações pelo Knip, versões npm desatualizadas, vulnerabilidades npm e
 atualizações Gradle. Achados são diferenciados de falhas de execução. A verificação Gradle usa `dependencyUpdates`,

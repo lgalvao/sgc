@@ -12,6 +12,7 @@ import type {
     ResultadoJUnit
 } from "./coleta-motor.js";
 import type {PontoCriticoQualidade} from "./coleta-leitores.js";
+import {resolverExecutavelLocal} from "./coleta-executor.js";
 
 interface ResultadoResiduos {
     status?: string;
@@ -148,10 +149,10 @@ function criarAdaptadoresSgc(dependencias: DependenciasAdaptadoresSgc): Catalogo
             return execucao;
         },
         async lintCliente(contexto: ContextoColeta): Promise<ExecucaoQualidade> {
-            const execucao = criarExecucao("cliente-lint", "Lint do cliente", "qualidade", "npx eslint .", "frontend");
+            const execucao = criarExecucao("cliente-lint", "Lint do cliente", "qualidade", "eslint . --max-warnings 0", "frontend");
             const saida = await executarComando({
-                comando: "npx",
-                args: ["eslint", ".", "--max-warnings", "0"],
+                comando: resolverExecutavelLocal("eslint", contexto.diretorioCliente),
+                args: [".", "--max-warnings", "0"],
                 cwd: contexto.diretorioCliente
             });
             execucao.status = saida.codigoSaida === 0 ? "sucesso" : "falha";
@@ -233,7 +234,7 @@ function criarAdaptadoresSgc(dependencias: DependenciasAdaptadoresSgc): Catalogo
             const opcoesPlaywright = obterOpcoesPlaywright(contexto.base);
             const execucao = criarExecucao("e2e-playwright", "E2E Playwright", "teste", opcoesPlaywright.descricao, ".");
             const saida = await executarComando({
-                comando: "npx",
+                comando: resolverExecutavelLocal(opcoesPlaywright.comando, contexto.base),
                 args: opcoesPlaywright.argumentos,
                 cwd: contexto.base,
                 env: {CI: "1"}

@@ -51,6 +51,7 @@ interface OpcoesComando {
 }
 
 interface OpcoesPlaywright {
+    comando: string;
     descricao: string;
     argumentos: string[];
 }
@@ -72,8 +73,9 @@ function obterOpcoesPlaywright(diretorioBase: string): OpcoesPlaywright {
     const diretorioTestesIntegracao = resolverCaminhoConfigurado("testesIntegracao", diretorioBase);
     const configuracao = caminhoRelativo(path.join(diretorioTestesIntegracao, "playwright.config.ts"), diretorioBase);
     return {
-        descricao: `npx playwright test --config=${configuracao}`,
-        argumentos: ["playwright", "test", `--config=${configuracao}`, "--reporter=json"]
+        comando: "playwright",
+        descricao: `playwright test --config=${configuracao}`,
+        argumentos: ["test", `--config=${configuracao}`, "--reporter=json"]
     };
 }
 

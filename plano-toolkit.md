@@ -73,6 +73,8 @@ do SGC.
 ## Situação atual
 
 - A implementação do toolkit é TypeScript e executa diretamente com `tsx` em Node 26.
+- A coleta de qualidade resolve `eslint`, Playwright e demais ferramentas locais pelos binários instalados; não há
+  `npx` no código ou na documentação do toolkit.
 - A CLI possui catálogo, preflight comum, opções em português e metadados separados de finalidade, decisão e efeitos.
 - O pacote e o binário têm identidade neutra e o tarball é testado fora do workspace.
 - Casos de uso foram reduzidos a `requisitos cdus inventariar` e `requisitos cdus auditar`; corpus, vocabulário, tipos,

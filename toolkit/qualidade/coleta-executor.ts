@@ -1,11 +1,23 @@
 import path from "node:path";
 import process from "node:process";
+import {existsSync} from "node:fs";
 import {execa} from "execa";
-import {DIRETORIO_TOOLKIT} from "../biblioteca/caminhos.js";
+import {DIRETORIO_RAIZ, DIRETORIO_TOOLKIT} from "../biblioteca/caminhos.js";
 import {resolverCaminhoTsx} from "../biblioteca/execucao.js";
 import type {ContextoColeta, OpcoesComando, ResultadoComando} from "./coleta-motor.js";
 
 const CAMINHO_FERRAMENTAS = path.join(DIRETORIO_TOOLKIT, "ferramentas.ts");
+
+function resolverExecutavelLocal(nome: string, diretorioBase: string): string {
+    const nomeExecutavel = process.platform === "win32" ? `${nome}.cmd` : nome;
+    const diretorioResolvido = path.resolve(diretorioBase);
+    const candidatos = [
+        path.join(diretorioResolvido, "node_modules", ".bin", nomeExecutavel),
+        path.join(diretorioResolvido, "..", "node_modules", ".bin", nomeExecutavel),
+        path.join(DIRETORIO_RAIZ, "node_modules", ".bin", nomeExecutavel)
+    ];
+    return candidatos.find(caminho => existsSync(caminho)) ?? nome;
+}
 
 async function executarComando({comando, args, cwd, env}: OpcoesComando): Promise<ResultadoComando> {
     const inicio = Date.now();
@@ -44,4 +56,4 @@ async function executarComandoSgc(
     });
 }
 
-export {executarComando, executarComandoSgc};
+export {executarComando, executarComandoSgc, resolverExecutavelLocal};

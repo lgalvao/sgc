@@ -20,7 +20,7 @@ import {
     type ResultadoComando
 } from "../qualidade/coleta-execucao.js";
 import {criarAdaptadoresSgc, PERFIS_SGC} from "../qualidade/coleta-adaptadores-sgc.js";
-import {executarComando} from "../qualidade/coleta-executor.js";
+import {executarComando, resolverExecutavelLocal} from "../qualidade/coleta-executor.js";
 import {consolidarJUnit, extrairPontosCriticosQualidade, parseJsonSeguro} from "../qualidade/coleta-leitores.js";
 
 const FIXTURE_FOTOGRAFIA = path.join(DIRETORIO_RAIZ, "toolkit", "testes", "fixtures", "qualidade", "fotografia.json");
@@ -127,14 +127,20 @@ describe("Qualidade do toolkit", () => {
         });
 
         expect(obterOpcoesPlaywright(diretorioBase)).toEqual({
-            descricao: "npx playwright test --config=testes-e2e/playwright.config.ts",
+            comando: "playwright",
+            descricao: "playwright test --config=testes-e2e/playwright.config.ts",
             argumentos: [
-                "playwright",
                 "test",
                 "--config=testes-e2e/playwright.config.ts",
                 "--reporter=json"
             ]
         });
+    });
+
+    test("resolve binarios locais sem recorrer a download implicito", () => {
+        const caminhoTsx = resolverExecutavelLocal("tsx", DIRETORIO_RAIZ);
+        expect(caminhoTsx).toContain(`${path.sep}node_modules${path.sep}.bin${path.sep}`);
+        expect(resolverExecutavelLocal("comando-inexistente", DIRETORIO_RAIZ)).toBe("comando-inexistente");
     });
 
     test("rejeita adaptador ausente antes de criar artefatos da coleta", async () => {
@@ -339,8 +345,9 @@ describe("Qualidade do toolkit", () => {
                 }
             },
             obterOpcoesPlaywright: () => ({
-                descricao: "npx playwright test --reporter=json",
-                argumentos: ["playwright", "test", "--reporter=json"]
+                comando: "playwright",
+                descricao: "playwright test --reporter=json",
+                argumentos: ["test", "--reporter=json"]
             })
         });
 
