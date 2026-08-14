@@ -42,6 +42,19 @@ Para detalhes técnicos, consulte:
 
 * **Backend:** `./gradlew :backend:test` (JUnit 6 + Mockito + H2).
 * **Frontend:** `npm run typecheck` (inclui e2e), `npm run lint` (inclui e2e), `npm run test:unit` (Vitest).
+* **Gradle no workspace compartilhado:** Execute tarefas Gradle em série. Não inicie em paralelo comandos como
+  `./gradlew test`, `./gradlew qualityCheckFast`, `./gradlew :backend:test`, `./gradlew :frontend:test` ou tarefas de
+  cobertura/qualidade que compartilhem `backend/build`, `frontend/build`, `frontend/coverage` ou o daemon Gradle.
+    * Não use `Promise.all`, múltiplas sessões do terminal ou agentes concorrentes para rodar essas tarefas na mesma
+      worktree.
+    * Antes de repetir uma tarefa que parece ter travado ou expirado, verifique se ainda existem processos Gradle, JVM,
+      Vitest ou Node filhos da execução anterior (`ps`/`pgrep`). Uma nova execução só começa depois que a anterior
+      terminou; se necessário, encerre apenas os PIDs exatos da execução conhecida.
+    * Não use `--parallel` para acelerar validações neste workspace. Paralelismo só é permitido em worktrees ou cópias
+      isoladas, cada uma com seus próprios diretórios de build e artefatos.
+    * Se tarefas concorrentes já tiverem sido iniciadas, pare e aguarde a limpeza antes de interpretar resultados. Uma
+      falha de teste ou relatório produzido durante essa colisão não é evidência confiável e deve ser repetida
+      sequencialmente.
 * **E2E:** Playwright `npm run test:e2e`.
     * Sempre redirecione a saída para arquivo: `npm run test:e2e e2e/cdu-28.spec.ts > sgc-e2e.log 2>&1`
     * Não leia o log inteiro. Comece com `tail -n 40 sgc-e2e.log` e só depois use `rg` no trecho do erro.
