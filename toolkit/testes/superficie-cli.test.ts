@@ -41,7 +41,7 @@ describe("Superfície da CLI", () => {
     test("despacha ajuda de um comando de auditoria do servidor", async () => {
         const resultado = await executarSgc(["servidor", "cobertura", "auditoria", "--help"]);
         expect(resultado.exitCode).toBe(0);
-        expect(resultado.stdout).toContain("Auditoria unificada de cobertura e risco (Servidor).");
+        expect(resultado.stdout).toContain("Auditoria unificada de cobertura e risco do servidor segundo as exclusoes do perfil SGC.");
         expect(resultado.stdout).toContain("--minimo <percentual>");
     });
 

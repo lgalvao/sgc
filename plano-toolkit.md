@@ -73,11 +73,13 @@ do SGC.
 ## Situação atual
 
 - A implementação do toolkit é TypeScript e executa diretamente com `tsx` em Node 26.
-- A CLI possui catálogo, preflight comum, opções em português e metadados separados de finalidade e efeitos.
+- A CLI possui catálogo, preflight comum, opções em português e metadados separados de finalidade, decisão e efeitos.
 - O pacote e o binário têm identidade neutra e o tarball é testado fora do workspace.
 - Casos de uso foram reduzidos a `requisitos cdus inventariar` e `requisitos cdus auditar`; corpus, vocabulário, tipos,
   situações e fontes de mensagens são configuráveis, e há regressão com um segundo projeto.
 - Cobertura Java/web e casos de uso possuem APIs horizontais publicadas.
+- O domínio JaCoCo é horizontal; os entrypoints Java de cobertura foram identificados como perfil SGC porque aplicam
+  exclusões locais sem receber uma política pela CLI. O uso externo continua disponível pela API com padrões explícitos.
 - Motores de Semgrep, OpenAPI e sincronização de versão recebem entradas explícitas; defaults do SGC ficam nas bordas.
 - O analisador de testes Java aceita política externa validada; as heurísticas de domínio SGC estão em política própria.
 - Fotografias e relatórios próprios prioritários usam contratos versionados e campos em português/camelCase.
@@ -111,23 +113,20 @@ exigida apenas para capacidades que permanecerem declaradas como adaptáveis.
 
 ## Escopo restante obrigatório
 
-### Recorte 1 — fechar o inventário funcional
+### Recorte 1 — inventário funcional (concluído)
 
-Revisar uma única vez todos os comandos públicos e registrar no catálogo e no README:
+O catálogo e o README agora registram finalidade, camada, efeitos e decisão para as 38 folhas da CLI. A revisão confirmou:
 
-- finalidade permanente em uma frase;
-- classificação como núcleo, adaptador ou perfil SGC;
-- efeitos de arquivo, remoção, rede e subprocessos;
-- decisão explícita de manter, fundir ou remover.
+- o corretor FQN é útil como utilitário ocasional e funciona em raiz Java externa configurada;
+- inventários de símbolos, identificadores, árvore de linhas, CDU e OpenAPI têm valor sob demanda e não devem ser gates
+  permanentes;
+- Semgrep executa regras estruturais configuráveis, enquanto cheiros mede tendências heurísticas; cobertura unificada e
+  ramificações respondem a perguntas diferentes e permanecem complementares;
+- não há módulos ou exports órfãos segundo o Knip, e todos os arquivos catalogados existem;
+- os entrypoints Java de cobertura são perfil SGC por aplicarem exclusões locais; o domínio JaCoCo permanece horizontal;
+- a execução documentada usa scripts npm no workspace, o binário `ferramentas` no pacote e não usa `npx tsx`.
 
-Resolver nessa revisão as dúvidas remanescentes, sem abrir novas famílias de comandos:
-
-- confirmar se o corretor FQN e os inventários ainda têm finalidade ocasional clara;
-- verificar se Semgrep e cobertura/ramificações continuam complementares na saída atual;
-- recomendar scripts npm no workspace e o binário `ferramentas` após instalação, removendo `npx tsx` da documentação;
-- remover módulos e exports órfãos revelados pelas decisões.
-
-Critério de saída: todo comando do catálogo tem finalidade e camada inequívocas; não resta decisão funcional marcada como
+Critério de saída atendido: todo comando tem finalidade e camada inequívocas, e nenhuma decisão funcional ficou marcada como
 “avaliar”, “revisar” ou “confirmar”.
 
 ### Recorte 2 — fechar somente as fronteiras aprovadas
@@ -142,8 +141,9 @@ Corrigir apenas violações encontradas no recorte 1:
 - substituir testes que apenas reproduzem a implementação por testes semânticos das decisões aprovadas;
 - atualizar contratos públicos deliberados sem aliases de compatibilidade.
 
-Critério de saída: nenhuma capacidade classificada como núcleo ou adaptador depende de vocabulário, caminho ou regra de
-negócio SGC; capacidades locais continuam executáveis contra o workspace do SGC.
+Critério de saída: nenhum motor classificado como núcleo ou adaptador depende de vocabulário, caminho ou regra de negócio
+SGC; entrypoints adaptáveis podem oferecer uma conveniência SGC somente quando aceitam configuração explícita para outro
+projeto. Capacidades locais continuam executáveis contra o workspace do SGC.
 
 ### Recorte 3 — auditoria final e encerramento
 

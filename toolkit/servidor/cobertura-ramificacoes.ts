@@ -45,7 +45,7 @@ async function principal(argumentosInformados: string[] = process.argv.slice(2))
     if (exibirAjuda) {
         exibirAjudaComando({
             comandoToolkit: "servidor cobertura ramificacoes",
-            descricao: "Lista classes do servidor com ramificacoes perdidas no relatorio JaCoCo.",
+            descricao: "Lista classes com lacunas de ramificacoes no servidor segundo as exclusoes do perfil SGC.",
             opcoes: [
                 "--json            Saída estruturada em JSON.",
                 "--limite <n>      Limita a quantidade de classes exibidas. Padrão: 20.",

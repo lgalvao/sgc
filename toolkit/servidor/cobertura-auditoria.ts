@@ -104,7 +104,7 @@ async function principal(argumentosInformados: string[] = process.argv.slice(2))
     if (exibirAjuda) {
         exibirAjudaComando({
             comandoToolkit: "servidor cobertura auditoria",
-            descricao: "Auditoria unificada de cobertura e risco (Servidor).",
+                descricao: "Auditoria unificada de cobertura e risco do servidor segundo as exclusoes do perfil SGC.",
             opcoes: [
                 "--json              Saída em formato JSON para integração com outras ferramentas.",
                 "--saida <arquivo>    Caminho do arquivo Markdown a ser gerado.",

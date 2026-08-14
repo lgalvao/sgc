@@ -43,6 +43,8 @@ describe("Execução e distribuição da CLI", () => {
         for (const definicao of CATALOGO_COMANDOS_COMPLETO) {
             expect(["auditar", "inventariar", "gerar", "transformar", "orquestrar"])
                 .toContain(definicao.finalidade);
+            expect(["manter", "manter-ocasional", "manter-tendencia"])
+                .toContain(definicao.decisao);
             expect(definicao.efeitos).toEqual({
                 persistencia: expect.stringMatching(/^(nenhuma|opcional|intrinseca)$/),
                 remocao: expect.any(Boolean),
@@ -56,6 +58,11 @@ describe("Execução e distribuição da CLI", () => {
 
         const limparArtefatos = CATALOGO_COMANDOS_COMPLETO.find(item => item.caminho.join(" ") === "projeto artefatos limpar");
         expect(limparArtefatos?.efeitos.remocao).toBe(true);
+
+        expect(CATALOGO_COMANDOS_COMPLETO.find(item => item.caminho.join(" ") === "servidor cobertura auditoria")?.escopo)
+            .toBe("perfil-sgc");
+        expect(CATALOGO_COMANDOS_COMPLETO.filter(item => item.decisao === "manter-ocasional").length)
+            .toBeGreaterThan(0);
     });
 
     test("pode ser importada sem executar a CLI", async () => {

@@ -63,8 +63,8 @@ permanentes. O catálogo também registra persistência, remoção, subprocessos
 
 | Comando | Camada | Finalidade | Decisão |
 |---|---|---|---|
-| `servidor cobertura auditoria` | adaptável | Auditar cobertura e risco do servidor | Manter |
-| `servidor cobertura ramificacoes` | adaptável | Auditar lacunas de ramificações do servidor | Manter |
+| `servidor cobertura auditoria` | perfil SGC | Auditar cobertura e risco do servidor com exclusões do perfil | Manter |
+| `servidor cobertura ramificacoes` | perfil SGC | Auditar lacunas de ramificações do servidor com exclusões do perfil | Manter |
 | `servidor arquitetura auditar` | adaptável | Auditar concentração de responsabilidades em Java | Manter |
 | `servidor coesao auditar` | perfil SGC | Auditar mistura de responsabilidades nos Services do SGC | Manter |
 | `servidor contratos auditar` | adaptável | Auditar vazamento de modelos em DTOs expostos | Manter |
@@ -105,6 +105,10 @@ permanentes. O catálogo também registra persistência, remoção, subprocessos
 Os comandos classificados como perfil SGC operam sobre convenções do SGC; isso não significa que o SGC consuma o
 toolkit. Os comandos adaptáveis são os candidatos ao uso em outros projetos, desde que configuração e política sejam
 fornecidas.
+
+O catálogo registra a decisão vigente: `manter` para capacidades permanentes, `manter-ocasional` para inventários e
+utilitários sob demanda e `manter-tendencia` para fotografias comparativas. Não há comando catalogado como temporário,
+redundante ou pendente de decisão.
 
 ## Exemplos de execução
 
@@ -183,8 +187,10 @@ serve apenas para ordenar itens e não é uma severidade global do projeto.
 `pontosCriticos` e `pontuacaoImpacto`; os campos de cobertura dentro de `totais` continuam seguindo os formatos JaCoCo e
 V8 lidos na fronteira.
 
-O domínio JaCoCo não presume exclusões do SGC. Os comandos de cobertura do servidor passam explicitamente os padrões do
-perfil SGC; consumidores externos podem usar `aplicarExclusoes` com seus próprios `padroesExclusao`.
+O domínio JaCoCo não presume exclusões do SGC. Os dois comandos de cobertura do servidor são entrypoints do perfil SGC e
+passam os padrões locais de exclusão; consumidores externos devem usar a API `extrairCoberturaJacoco` com seus próprios
+`padroesExclusao` ou compor um comando equivalente. A cobertura do cliente e seus comandos de ramificações continuam
+adaptáveis por `--base` e pelo arquivo V8 informado.
 
 Os três comandos de ramificações também emitem `versaoSchema: "1.0.0"` e `geradoEm`; seus campos de JaCoCo/V8 permanecem
 nos nomes da fonte externa.
@@ -193,7 +199,8 @@ nos nomes da fonte externa.
 críticos atuais e rejeita fotografias incompatíveis. O coletor e os adaptadores usam `pontosCriticos` e `pontuacao` nos
 contratos próprios; campos antigos não são aceitos.
 
-OpenAPI mantém exportação, comparação e promoção de baseline. O toolkit não gera tipos TypeScript a partir do contrato.
+OpenAPI mantém exportação, comparação e promoção de baseline como utilitários ocasionais para revisão de contrato. O
+toolkit não gera tipos TypeScript a partir do contrato.
 O documento exportado preserva o vocabulário oficial da especificação; os resultados operacionais do toolkit usam campos
 em português/camelCase (`quantidadeRotas`, `saidaPadrao`, `saidaErro`) e caminhos relativos informados por opção são
 resolvidos a partir de `--base`. Os motores `integracao/contratos-openapi-motor.ts`, `contratos-diff-motor.ts` e
@@ -409,7 +416,7 @@ dependências acidentais do workspace.
 ```bash
 npm --prefix toolkit pack
 npm install --save-dev ./ferramentas-projeto-0.1.0.tgz
-npx ferramentas --help
+npm exec -- ferramentas --help
 ```
 
 As APIs programáticas públicas atuais são deliberadamente pequenas:
