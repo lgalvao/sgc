@@ -126,6 +126,26 @@ describe("Resíduos do cliente", () => {
                 "<template><button @click=\"salvar\">Salvar</button></template>"
             ].join("\n")
         );
+        await escreverArquivo(
+            path.join(diretorioCliente, "services", "arquivoGrande.ts"),
+            [
+                "const linhasSemSinal = [",
+                "  1,",
+                "  2,",
+                "  3,",
+                "  4,",
+                "  5,",
+                "  6,",
+                "  7,",
+                "  8,",
+                "];",
+                "void linhasSemSinal;",
+            ].join("\n")
+        );
+        await escreverArquivo(
+            path.join(diretorioCliente, "services", "useLocalStorage.ts"),
+            "const ler = () => localStorage.getItem('chave');\nvoid ler;\n"
+        );
 
         const resultado = await executarSgc([
             "cliente",
@@ -140,8 +160,9 @@ describe("Resíduos do cliente", () => {
 
         expect(resultado.exitCode).toBe(0);
         const conteudo = JSON.parse(resultado.stdout);
-        expect(conteudo.versaoSchema).toBe("2.0.0");
+        expect(conteudo.versaoSchema).toBe("3.0.0");
         expect(conteudo.resumo.pontuacaoTotal).toBeTypeOf("number");
+        expect(conteudo.resumo.classificacao).toBe("inventario");
         expect(conteudo.pontosCriticos).toBeInstanceOf(Array);
         expect(conteudo.hotspots).toBeUndefined();
         expect(conteudo.contagens.producao.anyExplicito).toBe(1);
@@ -149,7 +170,36 @@ describe("Resíduos do cliente", () => {
         expect(conteudo.contagens.producao.fallbacksDefensivos).toBe(1);
         expect(conteudo.contagens.producao.storageDireto).toBe(1);
         expect(conteudo.contagens.producao.exportacoesSuspeitas).toBe(1);
-        expect(conteudo.contagens.producao.arquivosAcimaMeta.service).toBe(1);
+        expect(conteudo.contagens.producao.arquivosAcimaMeta.service).toBe(2);
+        const pontoComSinais = conteudo.pontosCriticos.find((ponto: {arquivo: string}) => ponto.arquivo.endsWith("exemploService.ts"));
+        expect(pontoComSinais.sinaisAtivos).toEqual(expect.arrayContaining([
+            {tipo: "anyExplicito", quantidade: 1},
+            {tipo: "checksNull", quantidade: 1},
+            {tipo: "fallbacksDefensivos", quantidade: 1},
+            {tipo: "exportacoesSuspeitas", quantidade: 1},
+        ]));
+        expect(pontoComSinais.violacoes.length).toBeGreaterThan(0);
+
+        const pontoSomenteOrcamento = conteudo.pontosCriticos.find((ponto: {arquivo: string}) => ponto.arquivo.endsWith("arquivoGrande.ts"));
+        expect(pontoSomenteOrcamento.sinaisAtivos).toEqual([]);
+        expect(pontoSomenteOrcamento.violacoes.length).toBeGreaterThan(0);
+        expect(conteudo.pontosCriticos.every((ponto: {sinaisAtivos: unknown[]; violacoes: unknown[]}) => ponto.sinaisAtivos.length > 0 || ponto.violacoes.length > 0)).toBe(true);
+        const adaptadorStorage = conteudo.arquivos.find((arquivo: {arquivo: string}) => arquivo.arquivo.endsWith("useLocalStorage.ts"));
+        expect(adaptadorStorage.contagens.storageDireto).toBe(0);
+
+        const humano = await executarSgc([
+            "cliente",
+            "residuos",
+            "auditar",
+            "--base",
+            base,
+            "--orcamento",
+            "orcamento.json",
+        ]);
+        expect(humano.exitCode).toBe(0);
+        expect(humano.stdout).toContain("nao e severidade");
+        expect(humano.stdout).toContain("Sinais: anyExplicito (1)");
+        expect(humano.stdout).toContain("Violacoes de orcamento:");
 
         const gravacao = await executarSgc([
             "cliente",

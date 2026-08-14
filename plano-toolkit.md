@@ -88,13 +88,14 @@ Uma execução representativa contra o workspace real mostrou que rapidez, contr
 avaliados terminaram em poucos segundos, mas revelaram problemas de utilidade que passam a orientar o fechamento:
 
 - `projeto ambiente verificar` conhece `e2e`, portas e arquivos do SGC; no estado atual é perfil SGC, não adaptador;
-- `servidor arquitetura auditar` encontra alvos plausíveis, mas chama alertas e críticos conjuntamente de
-  `pontosCriticos`, tornando o contrato contraditório;
-- `servidor testes analisar` produz um inventário detalhado útil, porém marcou todas as 163 classes testadas como
-  correspondências ambíguas, inclusive testes no pacote esperado; essa classificação precisa ser corrigida;
-- `cliente arquitetura auditar`, `cliente residuos auditar` e `codigo cheiros auditar` classificam o repositório inteiro
-  como crítico por pontuações absolutas proporcionais ao tamanho. Isso não demonstra severidade nem orienta uma ação;
-- resíduos pode destacar arquivos com `violacoes: []`; auditoria descritiva e validação por orçamento estão misturadas;
+- `servidor arquitetura auditar` agora separa `pontosCriticos` de `alertas`; a saída humana usa `achados` sem chamar todo
+  achado de ponto crítico;
+- `servidor testes analisar` agora compara o pacote Java declarado no código, e não apenas o caminho relativo de cada
+  raiz; correspondências no pacote esperado deixaram de ser classificadas como ambíguas;
+- `cliente residuos auditar` agora separa `sinaisAtivos` de `violacoes`, e `resumo.classificacao` é `"inventario"`;
+  `pontuacaoTotal` serve somente para ordenar itens, enquanto o gate continua em `cliente residuos validar`;
+- `cliente arquitetura auditar` e `codigo cheiros auditar` ainda classificam o repositório por pontuações absolutas
+  proporcionais ao tamanho. Isso não demonstra severidade nem orienta uma ação;
 - cheiros atribui severidade a `@Nullable`, verificações de nulo e `any` em testes sem contexto, sobrepondo resíduos e
   produzindo mais volume que diagnóstico;
 - os dois comandos CDU consolidam corretamente o corpus, mas a saída humana mostra apenas totais, enquanto o JSON de
@@ -125,8 +126,8 @@ Resolver nessa revisão as dúvidas remanescentes, sem abrir novas famílias de 
 - reclassificar `projeto ambiente verificar` como perfil SGC ou tornar todos os pré-requisitos configuráveis;
 - decidir se `codigo cheiros auditar` será removido, fundido a resíduos ou convertido em fotografia de tendência sem
   severidade absoluta;
-- separar inventário de sinais e gate de orçamento na família de resíduos, eliminando “crítico” sem violação;
-- corrigir a ambiguidade sistemática do analisador de testes e a nomenclatura contraditória da arquitetura do servidor;
+  - eliminar severidade global baseada em soma absoluta na arquitetura do cliente e nos cheiros, preservando a ordem dos
+    itens e tornando explícita a natureza descritiva desses inventários;
 - confirmar se o corretor FQN e os inventários ainda têm finalidade ocasional clara;
 - verificar se Semgrep e cobertura/ramificações continuam complementares na saída atual;
 - definir uma saída humana curta mas acionável para CDU e relatórios volumosos;
@@ -143,7 +144,8 @@ Corrigir apenas violações encontradas no recorte 1:
 - mover literals e caminhos SGC ainda presentes em motores declarados horizontais para política ou borda;
 - reclassificar como perfil SGC o que não justificar parametrização;
 - separar CLI, persistência ou formatação de um motor apenas quando isso impedir reuso ou teste isolado;
-- garantir que os dois comandos CDU e o analisador Java continuem funcionando com configuração externa;
+  - garantir que os dois comandos CDU e o analisador Java continuem funcionando com configuração externa, incluindo a
+    correspondência por pacote já corrigida;
 - substituir testes que apenas reproduzem a implementação por testes semânticos das decisões aprovadas;
 - atualizar contratos públicos deliberados sem aliases de compatibilidade.
 

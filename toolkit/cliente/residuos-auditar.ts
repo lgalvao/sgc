@@ -76,7 +76,7 @@ async function principal(argumentosInformados: string[] = process.argv.slice(2))
     }
 
     imprimirCabecalho("AUDITORIA DE RESIDUOS DO CLIENTE");
-    escreverLinha(`Pontuacao total: ${pc.bold(String(fotografia.resumo.pontuacaoTotal))} (${fotografia.resumo.faixa})`);
+    escreverLinha(`Pontuacao de ordenacao: ${pc.bold(String(fotografia.resumo.pontuacaoTotal))} (nao e severidade)`);
     escreverLinha(`Arquivos de producao: ${fotografia.resumo.arquivosProducao}`);
     escreverLinha(`Arquivos de teste/story: ${fotografia.resumo.arquivosTeste}`);
     escreverLinha("");
@@ -89,10 +89,12 @@ async function principal(argumentosInformados: string[] = process.argv.slice(2))
     escreverLinha(`- storage direto: ${fotografia.contagens.producao.storageDireto}`);
     escreverLinha(`- exportacoes suspeitas: ${fotografia.contagens.producao.exportacoesSuspeitas}`);
     escreverLinha("");
-    escreverLinha(pc.bold("5 principais pontos criticos:"));
+    escreverLinha(pc.bold("5 principais itens sinalizados:"));
     fotografia.pontosCriticos.slice(0, 5).forEach((pontoCritico, indice) => {
         escreverLinha(`${indice + 1}. ${pontoCritico.arquivo} [${pontoCritico.camada}]`);
         escreverLinha(`   Linhas: ${pontoCritico.linhas} | Pontuacao: ${pontoCritico.pontuacao}`);
+        escreverLinha(`   Sinais: ${pontoCritico.sinaisAtivos.map((sinal) => `${sinal.tipo} (${sinal.quantidade})`).join(", ") || "nenhum"}`);
+        escreverLinha(`   Violacoes de orcamento: ${pontoCritico.violacoes.map((violacao) => violacao.mensagem).join("; ") || "nenhuma"}`);
     });
 
     if (argumentos.includes("--gravar")) {

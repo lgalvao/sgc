@@ -10,7 +10,7 @@ import {
 } from "./residuos-politicas.js";
 
 const EXTENSOES_SUPORTADAS = new Set([".ts", ".vue"]);
-const VERSAO_SCHEMA_FOTOGRAFIA = "2.0.0" as const;
+const VERSAO_SCHEMA_FOTOGRAFIA = "3.0.0" as const;
 
 const PADROES = {
     anyExplicito: [/\bas any\b/g, /:\s*any\b/g, /\bArray<any>\b/g, /\bPromise<any>\b/g, /\bref<any>\b/g, /\bRecord<[^>]+,\s*any>\b/g, /\[key:\s*string\]:\s*any\b/g],
@@ -35,7 +35,6 @@ const PESOS_PONTUACAO = {
 
 type Camada = "service" | "store" | "composable" | "view" | "component" | "router" | "utils" | "outro";
 type CategoriaArquivo = "producao" | "teste";
-type FaixaPontuacao = "bom" | "atencao" | "critico";
 
 interface ContagensSinais {
     anyExplicito: number;
@@ -45,6 +44,13 @@ interface ContagensSinais {
     castsDuplos: number;
     storageDireto: number;
     exportacoesSuspeitas: number;
+}
+
+type TipoSinalResiduo = keyof ContagensSinais;
+
+interface SinalResiduo {
+    tipo: TipoSinalResiduo;
+    quantidade: number;
 }
 
 interface ContagensTotais extends ContagensSinais {
@@ -66,6 +72,7 @@ interface ArquivoResiduo {
     exportacoes: number;
     exportacoesTempoExecucao: string[];
     contagens: ContagensSinais;
+    sinaisAtivos: SinalResiduo[];
     limites: LimitesCamada;
     pontuacao: number;
     violacoes: ViolacaoResiduo[];
@@ -90,6 +97,7 @@ interface PontoCriticoResiduo {
     linhas: number;
     pontuacao: number;
     contagens: ContagensSinais;
+    sinaisAtivos: SinalResiduo[];
     violacoes: ViolacaoResiduo[];
 }
 
@@ -98,7 +106,7 @@ interface ResumoResiduos {
     arquivosProducao: number;
     arquivosTeste: number;
     pontuacaoTotal: number;
-    faixa: FaixaPontuacao;
+    classificacao: "inventario";
 }
 
 interface FotografiaResiduos {
@@ -250,14 +258,20 @@ function somarCamada(mapa: Record<string, number>, camada: string): void {
     mapa[camada] = (mapa[camada] ?? 0) + 1;
 }
 
-function calcularFaixa(pontuacao: number): FaixaPontuacao {
-    if (pontuacao <= 80) {
-        return "bom";
-    }
-    if (pontuacao <= 180) {
-        return "atencao";
-    }
-    return "critico";
+const TIPOS_SINAIS: TipoSinalResiduo[] = [
+    "anyExplicito",
+    "checksNull",
+    "fallbacksDefensivos",
+    "catchBlocks",
+    "castsDuplos",
+    "storageDireto",
+    "exportacoesSuspeitas",
+];
+
+function extrairSinaisAtivos(contagens: ContagensSinais): SinalResiduo[] {
+    return TIPOS_SINAIS
+        .filter((tipo) => contagens[tipo] > 0)
+        .map((tipo) => ({tipo, quantidade: contagens[tipo]}));
 }
 
 function calcularPontuacaoArquivo(arquivo: ArquivoResiduo, limitesCamada: LimitesCamada): number {
@@ -318,6 +332,7 @@ async function analisarResiduosCliente({base = DIRETORIO_RAIZ, caminhoOrcamento}
             exportacoes: 0,
             exportacoesTempoExecucao: [],
             contagens,
+            sinaisAtivos: [],
             limites: limitesCamada,
             pontuacao: 0,
             violacoes: [],
@@ -382,6 +397,7 @@ async function analisarResiduosCliente({base = DIRETORIO_RAIZ, caminhoOrcamento}
         bucket.castsDuplos += arquivo.contagens.castsDuplos;
         bucket.storageDireto += arquivo.contagens.storageDireto;
         bucket.exportacoesSuspeitas += arquivo.contagens.exportacoesSuspeitas;
+        arquivo.sinaisAtivos = extrairSinaisAtivos(arquivo.contagens);
 
         if (arquivo.categoriaArquivo !== "producao") {
             continue;
@@ -417,6 +433,7 @@ async function analisarResiduosCliente({base = DIRETORIO_RAIZ, caminhoOrcamento}
             linhas: item.linhas,
             pontuacao: Number(item.pontuacao.toFixed(1)),
             contagens: item.contagens,
+            sinaisAtivos: item.sinaisAtivos,
             violacoes: item.violacoes,
         }));
 
@@ -432,7 +449,7 @@ async function analisarResiduosCliente({base = DIRETORIO_RAIZ, caminhoOrcamento}
             arquivosProducao: arquivosProducao.length,
             arquivosTeste: arquivosAnalisados.length - arquivosProducao.length,
             pontuacaoTotal: Number(pontuacaoTotal.toFixed(1)),
-            faixa: calcularFaixa(pontuacaoTotal),
+            classificacao: "inventario",
         },
         contagens: {
             producao: contagensProducao,
@@ -454,7 +471,7 @@ function gerarMarkdownAuditoria(fotografia: FotografiaResiduos): string {
     linhas.push("# Auditoria de residuos do cliente");
     linhas.push("");
     linhas.push(`Gerado em: ${fotografia.geradoEm}`);
-    linhas.push(`Pontuacao total: ${fotografia.resumo.pontuacaoTotal} (${fotografia.resumo.faixa})`);
+    linhas.push(`Pontuacao de ordenacao: ${fotografia.resumo.pontuacaoTotal} (inventario; nao e severidade)`);
     linhas.push("");
     linhas.push("## Resumo");
     linhas.push("");
@@ -481,14 +498,16 @@ function gerarMarkdownAuditoria(fotografia: FotografiaResiduos): string {
     linhas.push("");
     linhas.push("## Principais pontos criticos");
     linhas.push("");
-    linhas.push("| Arquivo | Camada | Linhas | Pontuacao | Sinais |");
-    linhas.push("|---|---|---:|---:|---|");
+    linhas.push("| Arquivo | Camada | Linhas | Pontuacao | Sinais de codigo | Violacoes de orcamento |");
+    linhas.push("|---|---|---:|---:|---|---|");
     for (const pontoCritico of fotografia.pontosCriticos) {
-        const sinais = Object.entries(pontoCritico.contagens)
-            .filter(([, valor]) => typeof valor === "number" && valor > 0)
-            .map(([chave, valor]) => `${chave}: ${valor}`)
+        const sinais = pontoCritico.sinaisAtivos
+            .map((sinal) => `${sinal.tipo}: ${sinal.quantidade}`)
             .join(", ");
-        linhas.push(`| ${pontoCritico.arquivo} | ${pontoCritico.camada} | ${pontoCritico.linhas} | ${pontoCritico.pontuacao} | ${sinais || "-"} |`);
+        const violacoes = pontoCritico.violacoes
+            .map((violacao) => violacao.mensagem)
+            .join("; ");
+        linhas.push(`| ${pontoCritico.arquivo} | ${pontoCritico.camada} | ${pontoCritico.linhas} | ${pontoCritico.pontuacao} | ${sinais || "-"} | ${violacoes || "-"} |`);
     }
 
     return `${linhas.join("\n")}\n`;

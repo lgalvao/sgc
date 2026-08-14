@@ -17,7 +17,7 @@ interface ResultadoResiduos {
     status?: string;
     resumo?: {
         pontuacaoTotal?: number;
-        faixa?: string;
+        classificacao?: string;
     };
     violacoes?: unknown[];
     avisos?: unknown[];
@@ -179,13 +179,13 @@ function criarAdaptadoresSgc(dependencias: DependenciasAdaptadoresSgc): Catalogo
             registrarResultadoExecucao(execucao, saida);
             execucao.metricas = {
                 pontuacaoTotal: resultado.resumo?.pontuacaoTotal ?? null,
-                faixa: resultado.resumo?.faixa ?? null,
+                classificacao: resultado.resumo?.classificacao ?? null,
                 violacoes: resultado.violacoes ?? [],
                 avisos: resultado.avisos ?? [],
                 pontosCriticos: resultado.pontosCriticos ?? []
             };
             execucao.sumario = resultado.resumo
-                ? `Pontuacao de residuos: ${resultado.resumo.pontuacaoTotal} (${resultado.resumo.faixa}).`
+                ? `Pontuacao de ordenacao de residuos: ${resultado.resumo.pontuacaoTotal}.`
                 : "Validacao de residuos executada.";
             return execucao;
         },

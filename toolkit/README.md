@@ -170,6 +170,12 @@ de ser tratada como se não existisse.
 `cliente arquitetura validar` é um gate do perfil SGC: além das regras locais do Dependency Cruiser, verifica a política
 SGC que impede cálculos locais de ações baseados em estado de domínio. Ele não é uma auditoria horizontal sem adaptação.
 
+`cliente residuos auditar` produz uma fotografia `versaoSchema: "3.0.0"`. Em cada arquivo, `sinaisAtivos` registra os
+sinais heurísticos encontrados e `violacoes` registra somente excesso de orçamento de linhas. Portanto, um item em
+`pontosCriticos` pode ter sinal de código sem representar falha do gate; `cliente residuos validar` é o comando que decide
+se orçamento e exceções foram violados. A fotografia marca `resumo.classificacao` como `"inventario"`: `pontuacaoTotal`
+serve apenas para ordenar itens e não é uma severidade global do projeto.
+
 `servidor cobertura auditoria` e `cliente cobertura auditoria` emitem resultados `versaoSchema: "1.0.0"` com
 `pontosCriticos` e `pontuacaoImpacto`; os campos de cobertura dentro de `totais` continuam seguindo os formatos JaCoCo e
 V8 lidos na fronteira.

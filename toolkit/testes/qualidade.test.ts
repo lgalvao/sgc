@@ -317,7 +317,7 @@ describe("Qualidade do toolkit", () => {
         const executarComandoSgcFake = async (_contexto: ContextoColeta, argumentos: string[]): Promise<ResultadoComando> => ({
             codigoSaida: 0,
             saida: JSON.stringify(argumentos.includes("residuos")
-                ? {status: "ok", resumo: {pontuacaoTotal: 90, faixa: "A"}, violacoes: [], avisos: [], pontosCriticos: []}
+                ? {status: "ok", resumo: {pontuacaoTotal: 90, classificacao: "inventario"}, violacoes: [], avisos: [], pontosCriticos: []}
                 : {resumo: {pontuacaoTotal: 95, faixa: "A", metricas: {}}, pontosCriticos: []}),
             erro: "",
             duracaoMs: 3

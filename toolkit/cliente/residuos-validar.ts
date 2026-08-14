@@ -29,7 +29,7 @@ interface ResultadoValidacaoResiduos {
     geradoEm: string;
     resumo: {
         pontuacaoTotal: number;
-        faixa: FotografiaResiduos["resumo"]["faixa"];
+        classificacao: FotografiaResiduos["resumo"]["classificacao"];
         violacoes: number;
         avisos: number;
     };
@@ -171,7 +171,7 @@ async function executarValidacaoClienteResiduos(
         geradoEm: new Date().toISOString(),
         resumo: {
             pontuacaoTotal: fotografia.resumo.pontuacaoTotal,
-            faixa: fotografia.resumo.faixa,
+            classificacao: fotografia.resumo.classificacao,
             violacoes: violacoes.length,
             avisos: avisos.length,
         },
@@ -240,7 +240,7 @@ async function principal(argumentosInformados: string[] = process.argv.slice(2))
 
     imprimirCabecalho("VALIDACAO DE RESIDUOS DO CLIENTE");
     escreverLinha(`Status: ${resultado.status === "ok" ? pc.green("ok") : pc.red("falha")}`);
-    escreverLinha(`Pontuacao total: ${resultado.resumo.pontuacaoTotal} (${resultado.resumo.faixa})`);
+    escreverLinha(`Pontuacao de ordenacao: ${resultado.resumo.pontuacaoTotal} (nao e severidade)`);
     escreverLinha(`Violacoes: ${resultado.resumo.violacoes}`);
     escreverLinha(`Avisos: ${resultado.resumo.avisos}`);
     escreverLinha("");
