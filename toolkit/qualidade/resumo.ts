@@ -20,10 +20,22 @@ interface FotografiaResumo {
     pontosCriticos: Array<{nome: string; risco: number}>;
 }
 
+interface ResumoQualidadeCompacto {
+    versaoResumo: 1;
+    versaoSchema: typeof VERSAO_SCHEMA_FOTOGRAFIA;
+    caminho: string;
+    truncado: true;
+    limiteItens: number;
+    resumo: FotografiaResumo["resumo"];
+    verificacoes: Array<Pick<VerificacaoQualidade, "codigo" | "status" | "sumario">>;
+    pontosCriticos: Array<{nome: string; risco: number}>;
+}
+
 interface OpcoesResumo {
     arquivo?: string;
     base?: string;
     json?: boolean;
+    jsonResumido?: boolean;
     limitePontosCriticos?: number;
 }
 
@@ -37,6 +49,20 @@ interface ResultadoResumo {
 
 function formatarVerificacao(verificacao: VerificacaoQualidade): string {
     return `${verificacao.codigo} [${verificacao.status}] ${verificacao.sumario || ""}`.trim();
+}
+
+function criarResumoJson(caminho: string, fotografia: FotografiaResumo): ResumoQualidadeCompacto {
+    const limiteItens = 20;
+    return {
+        versaoResumo: 1,
+        versaoSchema: fotografia.versaoSchema,
+        caminho,
+        truncado: true,
+        limiteItens,
+        resumo: fotografia.resumo,
+        verificacoes: fotografia.verificacoes.slice(0, limiteItens).map(({codigo, status, sumario}) => ({codigo, status, sumario})),
+        pontosCriticos: fotografia.pontosCriticos.slice(0, limiteItens)
+    };
 }
 
 function ehRegistro(valor: unknown): valor is Record<string, unknown> {
@@ -110,7 +136,9 @@ async function executarResumoQualidade(opcoes: OpcoesResumo = {}): Promise<Resul
         pontosCriticos: fotografia.pontosCriticos
     };
 
-    if (opcoes.json) {
+    if (opcoes.jsonResumido) {
+        imprimirJson(criarResumoJson(saida.caminho, fotografia));
+    } else if (opcoes.json) {
         imprimirJson(saida);
     } else {
         imprimirHumano(saida.caminho, fotografia, opcoes.limitePontosCriticos ?? 5);
@@ -120,5 +148,6 @@ async function executarResumoQualidade(opcoes: OpcoesResumo = {}): Promise<Resul
 }
 
 export {
-    executarResumoQualidade
+    executarResumoQualidade,
+    type ResumoQualidadeCompacto
 };

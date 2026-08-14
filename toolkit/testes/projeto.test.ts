@@ -1,5 +1,6 @@
 import os from "node:os";
 import path from "node:path";
+import process from "node:process";
 import {mkdtemp} from "node:fs/promises";
 import {describe, expect, test} from "vitest";
 import {execa} from "execa";
@@ -354,6 +355,57 @@ describe("Comandos de projeto do toolkit", () => {
             argumentos: ["verificar", "--json"],
             base: diretorioBase
         }]);
+    });
+
+    test("interrompe tarefas quando uma execucao danifica a instalacao do toolkit", async () => {
+        const diretorioBase = await mkdtemp(path.join(os.tmpdir(), "sgc-qualidade-integridade-toolkit-"));
+        const executadas: string[] = [];
+        let verificacoes = 0;
+
+        await expect(executarTarefasQualidade("verificacao", {
+            base: diretorioBase,
+            perfis: {
+                verificacao: {
+                    descricao: "Verificacao de integridade.",
+                    tarefas: [
+                        {titulo: "Primeira tarefa", comando: "primeira", argumentos: []},
+                        {titulo: "Segunda tarefa", comando: "segunda", argumentos: []}
+                    ]
+                }
+            },
+            executarComando: async comando => {
+                executadas.push(comando);
+            },
+            verificarInstalacaoToolkit: () => {
+                verificacoes += 1;
+                if (verificacoes === 2) {
+                    throw new Error("Instalacao do toolkit danificada pela tarefa.");
+                }
+            }
+        })).rejects.toThrow("Instalacao do toolkit danificada");
+
+        expect(verificacoes).toBe(2);
+        expect(executadas).toEqual(["primeira"]);
+    });
+
+    test("prioriza o node atual nos subprocessos de tarefas", async () => {
+        const diretorioBase = await mkdtemp(path.join(os.tmpdir(), "sgc-qualidade-node-atual-"));
+        const caminhoNodeExecutado = path.join(diretorioBase, "node-executado.txt");
+        await executarTarefasQualidade("verificacao", {
+            base: diretorioBase,
+            perfis: {
+                verificacao: {
+                    descricao: "Verificacao do Node.",
+                    tarefas: [{
+                        titulo: "Registrar Node",
+                        comando: "node",
+                        argumentos: ["-e", `require("node:fs").writeFileSync(${JSON.stringify(caminhoNodeExecutado)}, process.execPath)`]
+                    }]
+                }
+            }
+        });
+
+        expect(await lerArquivo(caminhoNodeExecutado)).toBe(process.execPath);
     });
 
     test("audita dependencias em escopos e comandos externos", async () => {

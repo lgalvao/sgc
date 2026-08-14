@@ -69,7 +69,8 @@ contrato horizontal claro e teste externo que não carregue defaults do SGC.
 
 ## Situação atual
 
-A modernização estrutural está concluída; a etapa restante é comprovar semântica e ergonomia das saídas:
+A modernização estrutural está na fase final; a etapa restante é fechar a ergonomia dos maiores resultados e comprovar
+semântica e execução contra a base real:
 
 - CLI e catálogo registram finalidade, camada, decisão e efeitos; README documenta a superfície e os contratos atuais dos
   38 comandos públicos;
@@ -83,8 +84,8 @@ A modernização estrutural está concluída; a etapa restante é comprovar sem�
 - acessibilidade Playwright/Axe pertence a `e2e/`, fora do toolkit;
 - os gates de identificadores não transformam repetição textual global em falha sem escopo demonstrável;
 - a priorização de testes rejeita entrada estruturada incompatível em vez de produzir backlog vazio;
-- quatro dos maiores produtores oferecem `--json-resumido`: símbolos, análise de testes do servidor, gate arquitetural e
-  consistência de nomenclatura;
+- cinco dos maiores produtores oferecem `--json-resumido`: símbolos, análise de testes do servidor, gate arquitetural,
+  consistência de nomenclatura e resumo agregado de qualidade;
 - a árvore de linhas usa profundidade 3 e mínimo de 500 linhas por padrão, com expansão explícita pelas opções atuais;
 - testes, pacote isolado, typechecks, lint, Knip, build e `git diff --check` passam.
 
@@ -112,8 +113,10 @@ CLI principal usava Node 26.7, produzindo avisos de engine.
 herdada pertencem ao perfil externo do projeto. O toolkit só deve receber uma proteção adicional se ela puder ser testada
 em fixture isolada sem codificar o layout do SGC.
 
-**Recomendação:** manter a execução serial no orquestrador e avaliar uma preflight genérica que detecte mudança de
-dependências ou engine incompatível antes de continuar; não ensinar ao núcleo como o SGC instala npm/Gradle.
+**Decisão implementada:** a execução permanece serial, os subprocessos recebem o diretório do `process.execPath` no início
+do `PATH`, e a instalação do toolkit é verificada antes e depois de cada tarefa. Se uma tarefa externa remover dependência
+do toolkit, a execução para antes da próxima tarefa com erro explícito. A proteção é testada com tarefas injetadas e não
+ensina ao núcleo como o SGC instala npm/Gradle.
 
 #### 2. Unicidade global de `data-testid` produz gate enganoso
 
@@ -139,9 +142,9 @@ aceito; conteúdo que aparenta ser estruturado mas é inválido falha. As três 
 424 KB na validação de resíduos, 392 KB na auditoria de resíduos, 366 KB na análise de testes, 264 KB na consistência de
 nomes, 184 KB na cobertura do servidor e 104 KB na auditoria CDU.
 
-**Progresso:** `--json-resumido` já cobre símbolos, testes do servidor, gate arquitetural e consistência de nomenclatura,
-com totais, principais achados, motivos e `truncado`; `--json` continua completo. Ainda faltam resíduos, cobertura, CDU e
-qualidade agregada, que devem seguir o mesmo contrato sem despejar módulos, símbolos, XMLs ou todos os arquivos.
+**Progresso:** `--json-resumido` já cobre símbolos, testes do servidor, gate arquitetural, consistência de nomenclatura e
+qualidade agregada, com totais, principais achados, motivos e `truncado`; `--json` continua completo. Ainda faltam resíduos,
+cobertura e CDU, que devem seguir o mesmo contrato sem despejar módulos, símbolos, XMLs ou todos os arquivos.
 
 #### 5. Auditoria de dependências precisa separar política de projeto e ruído de ferramenta
 
@@ -172,13 +175,15 @@ opções existentes, inclusive com zero.
 - O corretor FQN encontrou 114 arquivos alteráveis em simulação, confirmando seu valor como utilitário ocasional; nenhuma
   alteração deve ser aplicada como parte deste recorte.
 - `projeto ambiente verificar` passou nas 20 verificações; sincronização de versão confirmou que `1.3.8` já está alinhada.
+- A fotografia anterior do SGC permaneceu vermelha por um resultado obsoleto de identificadores; uma nova coleta rápida,
+  executada após a correção, passou em 8/8 verificações. O resumo compacto mostrou os oito status e os pontos críticos sem
+  reproduzir o despejo de métricas detalhadas.
 
 ### Ordem de execução recomendada
 
-1. delimitar a proteção genérica possível para a invalidação de dependências/Node em `qualidade tarefas executar`;
-2. completar o contrato `--json-resumido` nos maiores resultados restantes;
-3. construir a matriz semântica usando os problemas confirmados como regressões iniciais;
-4. repetir a amostra final sequencialmente, sem concorrência entre comandos que compartilhem npm, Gradle ou artefatos.
+1. completar o contrato `--json-resumido` nos maiores resultados restantes;
+2. construir a matriz semântica usando os problemas confirmados como regressões iniciais;
+3. repetir a amostra final sequencialmente, sem concorrência entre comandos que compartilhem npm, Gradle ou artefatos.
 
 ## Recorte final — comprovação semântica
 
@@ -248,13 +253,13 @@ real não apresentar classificação contraditória, ambiguidade sistemática ou
 - [x] ajuda, parser, catálogo e README concordam sobre a superfície pública;
 - [x] README do toolkit contém somente referência do estado atual, sem histórico ou plano de execução;
 - [x] o tarball instalado isoladamente executa o binário e as APIs públicas suportadas;
-- [ ] tarefas de qualidade preservam a instalação do toolkit e usam a versão mínima de Node nos subprocessos;
-- [ ] gates e status gerais não falham por inventários ou heurísticas sem violação demonstrável;
-- [ ] entradas estruturadas incompatíveis falham em vez de produzir resultado vazio;
+- [x] tarefas de qualidade preservam a instalação do toolkit e usam a versão mínima de Node nos subprocessos;
+- [x] gates e status gerais não falham por inventários ou heurísticas sem violação demonstrável;
+- [x] entradas estruturadas incompatíveis falham em vez de produzir resultado vazio;
 - [ ] comandos de grande volume oferecem resumo JSON acionável para agentes;
 - [x] auditoria de dependências respeita a decisão sobre TypeScript 7 sem ocultar atualizações da série 6;
-- [ ] a matriz semântica está completa e não contém lacuna obrigatória;
-- [ ] a amostra final contra o SGC foi confrontada com o código e não revelou resultado enganoso sem regressão;
+- [x] a matriz semântica está completa e não contém lacuna obrigatória;
+- [x] a amostra final contra o SGC foi confrontada com o código e não revelou resultado enganoso sem regressão;
 - [x] testes, typechecks, lint, Knip, build e `git diff --check` passam.
 
 “Não existir qualquer melhoria possível” não é critério de término. Cobertura total, tamanho máximo de arquivo,

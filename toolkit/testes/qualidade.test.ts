@@ -36,6 +36,27 @@ describe("Qualidade do toolkit", () => {
         expect(json.pontosCriticos).toHaveLength(2);
     });
 
+    test("resume uma fotografia sem despejar metricas detalhadas", async () => {
+        const resultado = await executarSgc(["qualidade", "resumo", "--json-resumido", "--arquivo", FIXTURE_FOTOGRAFIA]);
+        expect(resultado.exitCode).toBe(0);
+
+        const json = JSON.parse(resultado.stdout);
+        expect(json).toMatchObject({
+            versaoResumo: 1,
+            versaoSchema: "3.0.0",
+            truncado: true,
+            limiteItens: 20,
+            resumo: {statusGeral: "verde"}
+        });
+        expect(json.verificacoes).toEqual([
+            {codigo: "servidor-cobertura", status: "sucesso", sumario: "Cobertura do servidor consistente."},
+            {codigo: "cliente-cobertura", status: "sucesso", sumario: "Cobertura do cliente acima do limiar."},
+            {codigo: "cliente-lint", status: "sucesso", sumario: "Lint sem erros."}
+        ]);
+        expect(json.pontosCriticos).toHaveLength(2);
+        expect(json.metricas).toBeUndefined();
+    });
+
     test("resume a fotografia mais recente a partir da base externa", async () => {
         const diretorioBase = await mkdtemp(path.join(os.tmpdir(), "sgc-qualidade-resumo-base-"));
         const caminhoFotografia = path.join(diretorioBase, "toolkit", "qualidade", "artefatos", "mais-recente", "fotografia.json");

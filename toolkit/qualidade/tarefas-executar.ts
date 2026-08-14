@@ -1,8 +1,10 @@
+import {readFileSync} from "node:fs";
 import path from "node:path";
+import process from "node:process";
 import {execa} from "execa";
 import {Listr} from "listr2";
 import {carregarConfiguracao, type PerfilQualidadeConfigurado, type TarefaConfigurada} from "../biblioteca/configuracao.js";
-import {resolverNaRaiz} from "../biblioteca/caminhos.js";
+import {DIRETORIO_RAIZ, DIRETORIO_TOOLKIT} from "../biblioteca/caminhos.js";
 import {imprimirCabecalho} from "../biblioteca/saida.js";
 
 type TarefaQualidade = TarefaConfigurada;
@@ -15,6 +17,7 @@ interface OpcoesExecucaoTarefas {
     base?: string;
     perfis?: CatalogoPerfisQualidade;
     executarComando?: ExecutarComando;
+    verificarInstalacaoToolkit?: VerificarInstalacaoToolkit;
 }
 
 interface ResultadoTarefasQualidade {
@@ -24,6 +27,24 @@ interface ResultadoTarefasQualidade {
 }
 
 type ExecutarComando = (comando: string, argumentos: readonly string[], diretorioBase: string) => Promise<void>;
+type VerificarInstalacaoToolkit = () => void | Promise<void>;
+
+function verificarInstalacaoToolkit(): void {
+    const pacote = JSON.parse(readFileSync(path.join(DIRETORIO_TOOLKIT, "package.json"), "utf8")) as {
+        dependencies?: Record<string, string>;
+    };
+    const ausentes = Object.keys(pacote.dependencies ?? {}).filter(dependencia => {
+        try {
+            import.meta.resolve(dependencia);
+            return false;
+        } catch {
+            return true;
+        }
+    });
+    if (ausentes.length > 0) {
+        throw new Error(`Instalacao do toolkit invalida; dependencias ausentes: ${ausentes.join(", ")}.`);
+    }
+}
 
 const PERFIS_QUALIDADE_SGC: CatalogoPerfisQualidade = {
     all: {
@@ -69,8 +90,11 @@ const PERFIS_QUALIDADE_SGC: CatalogoPerfisQualidade = {
 };
 
 const executarComandoPadrao: ExecutarComando = async (comando, argumentos, diretorioBase) => {
+    const caminhoNode = path.dirname(process.execPath);
+    const caminhoPath = [caminhoNode, process.env.PATH].filter(Boolean).join(path.delimiter);
     await execa(comando, argumentos, {
         cwd: diretorioBase,
+        env: {...process.env, PATH: caminhoPath},
         stdio: "inherit",
         shell: process.platform === "win32"
     });
@@ -92,19 +116,22 @@ async function executarTarefasQualidade(
     perfil: string,
     opcoes: OpcoesExecucaoTarefas = {}
 ): Promise<ResultadoTarefasQualidade> {
-    const diretorioBase = path.resolve(opcoes.base ?? resolverNaRaiz());
+    const diretorioBase = path.resolve(opcoes.base ?? DIRETORIO_RAIZ);
     const perfis = opcoes.perfis
         ?? carregarConfiguracao(diretorioBase).execucoes?.qualidade
         ?? PERFIS_QUALIDADE_SGC;
     const definicao = resolverPerfilTarefasQualidade(perfil, perfis);
     const executarComando = opcoes.executarComando ?? executarComandoPadrao;
+    const verificarInstalacao = opcoes.verificarInstalacaoToolkit ?? verificarInstalacaoToolkit;
 
     imprimirCabecalho("Qualidade do projeto", definicao.descricao);
     const tarefas = new Listr(
         definicao.tarefas.map((tarefa) => ({
             title: tarefa.titulo,
             task: async () => {
+                await verificarInstalacao();
                 await executarComando(tarefa.comando, tarefa.argumentos, diretorioBase);
+                await verificarInstalacao();
             }
         })),
         {
@@ -133,5 +160,6 @@ export {
     type ExecutarComando,
     type OpcoesExecucaoTarefas,
     type ResultadoTarefasQualidade,
-    type TarefaQualidade
+    type TarefaQualidade,
+    type VerificarInstalacaoToolkit
 };

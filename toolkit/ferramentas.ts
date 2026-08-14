@@ -123,6 +123,7 @@ qualidade
     .option("--arquivo <caminho>", "Usa uma fotografia especifica em vez da mais recente.")
     .option("--base <diretorio>", "Resolve a fotografia mais recente a partir da base do projeto.")
     .option("--json", "Emite saida estruturada em JSON.")
+    .option("--json-resumido", "Emite somente o resumo limitado da fotografia.")
     .option("--limite-pontos-criticos <n>", "Limita a quantidade de pontos criticos exibidos.", Number.parseInt)
     .action(async (opcoes) => {
         const {executarResumoQualidade} = await import("./qualidade/resumo.js");

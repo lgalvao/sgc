@@ -113,6 +113,7 @@ Resumos JSON disponíveis:
 | `servidor testes analisar` | Estatísticas, categorias e 20 principais pendências |
 | `cliente arquitetura validar` | Módulos, regras e até 20 violações de cada fonte |
 | `cliente residuos validar` | Status, resumo, violações e pontos críticos |
+| `qualidade resumo` | Status, totais, verificações e até 20 pontos críticos |
 
 Contratos próprios versionados:
 
@@ -193,7 +194,9 @@ ferramentas projeto versao-sincronizar 1.2.3
 ```
 
 `qualidade coletar` usa os perfis de qualidade configurados. `qualidade tarefas executar` executa as tarefas de
-`execucoes.qualidade`. `qualidade resumo` lê fotografias `versaoSchema: "3.0.0"`.
+`execucoes.qualidade` em série, prioriza o Node atual nos subprocessos e verifica a instalação do toolkit antes e depois
+de cada tarefa. Se uma tarefa danificar dependências do toolkit, a execução é interrompida. `qualidade resumo` lê
+fotografias `versaoSchema: "3.0.0"`.
 
 `projeto dependencias auditar` reúne uso e declarações pelo Knip, versões npm, vulnerabilidades npm e atualizações Gradle.
 Achados e falhas de execução são separados. Atualizações da major 7 do TypeScript são ignoradas pelo perfil SGC enquanto

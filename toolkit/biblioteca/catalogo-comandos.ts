@@ -400,7 +400,7 @@ const CATALOGO_COMANDOS_ESPECIAIS = [
         decisao: "manter",
         finalidade: "auditar",
         efeitos: criarEfeitosComando("nenhuma"),
-        argumentos: esquema(["--arquivo", "--base", "--limite-pontos-criticos"], ["--json"])
+        argumentos: esquema(["--arquivo", "--base", "--limite-pontos-criticos"], ["--json", "--json-resumido"])
     },
     {
         caminho: ["projeto", "dependencias", "auditar"],
