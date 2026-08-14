@@ -31,6 +31,10 @@ describe("Auditores de código", () => {
                 "}"
             ].join("\n")
         );
+        await escreverArquivo(
+            path.join(diretorioCliente, "__tests__", "Exemplo.spec.ts"),
+            "const resposta: any = {};\nvoid resposta;\n"
+        );
 
         await escreverArquivo(
             path.join(diretorioServidor, "ExemploDto.java"),
@@ -56,7 +60,10 @@ describe("Auditores de código", () => {
 
         expect(resultado.exitCode).toBe(0);
         const conteudo = JSON.parse(resultado.stdout);
-        expect(conteudo.versao).toBe(3);
+        expect(conteudo.versao).toBe(4);
+        expect(conteudo.pontuacao.classificacao).toBe("tendencia");
+        expect(conteudo.pontuacao.porEscopo).toEqual({servidor: 7, cliente: 11});
+        expect(conteudo.contagens.clienteAnyTestes).toBeUndefined();
         expect(conteudo.contagens.servidorDtoNulavel).toBe(1);
         expect(conteudo.contagens.servidorVerificacoesNulas).toBe(1);
         expect(conteudo.contagens.clienteAnyProducao).toBe(2);
@@ -69,9 +76,14 @@ describe("Auditores de código", () => {
         expect(await existe(path.join(diretorioSaida, "fotografia.json"))).toBe(true);
         expect(await existe(path.join(diretorioSaida, "resumo.md"))).toBe(true);
         const fotografia = JSON.parse(await readFile(path.join(diretorioSaida, "fotografia.json"), "utf8"));
-        expect(fotografia.versao).toBe(3);
-        expect(fotografia.pontosCriticos).toBeInstanceOf(Array);
+        expect(fotografia.versao).toBe(4);
+        expect(fotografia.itensSinalizados).toBeInstanceOf(Array);
         expect(fotografia.hotspots).toBeUndefined();
+
+        const humano = await executarSgc(["codigo", "cheiros", "auditar", "--base", base]);
+        expect(humano.exitCode).toBe(0);
+        expect(humano.stdout).toContain("nao e severidade");
+        expect(humano.stdout).toContain("Itens com sinais:");
     });
 
     test("resolve politica Semgrep padrao a partir da instalacao do toolkit", async () => {

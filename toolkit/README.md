@@ -160,9 +160,11 @@ O motor `codigo/semgrep-motor.ts` recebe regra, alvos e comando explicitamente e
 com formato ou versão incompatível é rejeitado, enquanto a ausência do arquivo ainda permite uma coleta somente em
 memória quando o comando não usa `--gravar`.
 
-`codigo cheiros auditar` produz uma fotografia `versao: 3`; ela é reutilizada para calcular deltas na execução seguinte.
-As chaves próprias da fotografia usam camelCase em português, e uma fotografia anterior incompatível é rejeitada em vez
-de ser tratada como se não existisse.
+`codigo cheiros auditar` produz uma fotografia `versao: 4` de tendência; ela é reutilizada para calcular deltas na
+execução seguinte. O relatório agrega sinais Java e cliente que não são gates, não classifica a soma como severidade e
+expõe os arquivos em `itensSinalizados`. `any` em testes não entra na fotografia padrão por não ser uma política
+confiável sem contexto. As chaves próprias da fotografia usam camelCase em português, e uma fotografia anterior
+incompatível é rejeitada em vez de ser tratada como se não existisse.
 
 `cliente arquitetura auditar` produz uma fotografia `versaoSchema: "4.0.0"`; seus resultados próprios usam
 `pontosCriticos`, `pontuacao` e `pontuacaoTotal`. O formato anterior não é carregado nem traduzido.

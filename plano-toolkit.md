@@ -94,8 +94,10 @@ avaliados terminaram em poucos segundos, mas revelaram problemas de utilidade qu
   raiz; correspondências no pacote esperado deixaram de ser classificadas como ambíguas;
 - `cliente residuos auditar` agora separa `sinaisAtivos` de `violacoes`, e `resumo.classificacao` é `"inventario"`;
   `pontuacaoTotal` serve somente para ordenar itens, enquanto o gate continua em `cliente residuos validar`;
-- `cliente arquitetura auditar` e `codigo cheiros auditar` ainda classificam o repositório por pontuações absolutas
-  proporcionais ao tamanho. Isso não demonstra severidade nem orienta uma ação;
+- `codigo cheiros auditar` agora é explicitamente uma fotografia de tendência, sem faixa de severidade; `any` em testes
+  foi retirado do conjunto padrão porque dominava o ranking sem uma política contextual;
+- `cliente arquitetura auditar` ainda classifica o repositório por pontuação absoluta proporcional ao tamanho. Isso não
+  demonstra severidade nem orienta uma ação;
 - cheiros atribui severidade a `@Nullable`, verificações de nulo e `any` em testes sem contexto, sobrepondo resíduos e
   produzindo mais volume que diagnóstico;
 - os dois comandos CDU consolidam corretamente o corpus, mas a saída humana mostra apenas totais, enquanto o JSON de
@@ -126,8 +128,8 @@ Resolver nessa revisão as dúvidas remanescentes, sem abrir novas famílias de 
 - reclassificar `projeto ambiente verificar` como perfil SGC ou tornar todos os pré-requisitos configuráveis;
 - decidir se `codigo cheiros auditar` será removido, fundido a resíduos ou convertido em fotografia de tendência sem
   severidade absoluta;
-  - eliminar severidade global baseada em soma absoluta na arquitetura do cliente e nos cheiros, preservando a ordem dos
-    itens e tornando explícita a natureza descritiva desses inventários;
+  - eliminar severidade global baseada em soma absoluta na arquitetura do cliente, preservando a ordem dos itens e
+    tornando explícita a natureza descritiva desse inventário;
 - confirmar se o corretor FQN e os inventários ainda têm finalidade ocasional clara;
 - verificar se Semgrep e cobertura/ramificações continuam complementares na saída atual;
 - definir uma saída humana curta mas acionável para CDU e relatórios volumosos;

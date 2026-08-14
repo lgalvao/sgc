@@ -9,14 +9,12 @@ import {ehEntradaPrincipal, validarArgumentosEntradaDireta} from "../biblioteca/
 import {escreverErro, escreverLinha, imprimirCabecalho, imprimirJson} from "../biblioteca/saida.js";
 import {VERSAO_FOTOGRAFIA_CHEIROS} from "./cheiros-contrato.js";
 
-type EscopoCheiro = "servidor" | "cliente" | "clienteTestes";
-type FaixaPontuacao = "bom" | "atencao" | "critico";
+type EscopoCheiro = "servidor" | "cliente";
 type ChavePadrao =
     | "servidorDtoNulavel"
     | "servidorVerificacoesNulas"
     | "servidorObjetosNulos"
     | "clienteAnyProducao"
-    | "clienteAnyTestes"
     | "clienteCapturaAny"
     | "clienteVerificacoesNulas"
     | "clienteFallbackOu";
@@ -53,12 +51,12 @@ interface FotografiaCheiros {
     base: string;
     pontuacao: {
         total: number;
-        faixa: FaixaPontuacao;
+        classificacao: "tendencia";
         porEscopo: PontuacaoPorEscopo;
     };
     contagens: ContagensCheiros;
     deltas: DeltasCheiros;
-    pontosCriticos: ResumoArquivoCheiros[];
+    itensSinalizados: ResumoArquivoCheiros[];
 }
 
 interface ResultadoAuditoriaCheiros {
@@ -120,22 +118,6 @@ const PADROES: PadraoCheiro[] = [
             /\bref<any>\b/g,
             /\bRecord<[^>]+,\s*any>\b/g,
             /\[key:\s*string\]:\s*any\b/g
-        ]
-    },
-    {
-        chave: "clienteAnyTestes",
-        titulo: "Cliente testes com any explicito",
-        peso: 1,
-        escopo: "clienteTestes",
-        filtroArquivo: ({caminhoRelativo, diretorioCodigoCliente}) =>
-            ehArquivoDentroDiretorio(caminhoRelativo, diretorioCodigoCliente)
-            && ehArquivoTesteOuStory(caminhoRelativo),
-        regexes: [
-            /\bas any\b/g,
-            /:\s*any\b/g,
-            /\bArray<any>\b/g,
-            /\bPromise<any>\b/g,
-            /\bref<any>\b/g
         ]
     },
     {
@@ -234,16 +216,6 @@ function somarCategoriaPorArquivo(
     resumoArquivo.pontuacao += quantidade * peso;
 }
 
-function classificarPontuacao(pontuacao: number): FaixaPontuacao {
-    if (pontuacao <= 120) {
-        return "bom";
-    }
-    if (pontuacao <= 260) {
-        return "atencao";
-    }
-    return "critico";
-}
-
 interface FotografiaAnterior {
     versao: typeof VERSAO_FOTOGRAFIA_CHEIROS;
     contagens?: Partial<ContagensCheiros>;
@@ -293,19 +265,19 @@ function formatarDelta(valor: number): string {
 
 function gerarMarkdown(fotografia: FotografiaCheiros): string {
     const linhas: string[] = [];
-    linhas.push("# Auditoria de cheiros de codigo", "", `Gerado em: ${fotografia.geradoEm}`, `Pontuacao: ${fotografia.pontuacao.total} (${fotografia.pontuacao.faixa})`, "");
+    linhas.push("# Auditoria de cheiros de codigo", "", `Gerado em: ${fotografia.geradoEm}`, `Pontuacao de ordenacao: ${fotografia.pontuacao.total} (nao e severidade)`, "");
     linhas.push("## Contagens", "", "| Sinal | Total | Delta | Peso |", "|---|---:|---:|---:|");
     for (const padrao of PADROES) {
         linhas.push(`| ${padrao.titulo} | ${fotografia.contagens[padrao.chave]} | ${formatarDelta(fotografia.deltas[padrao.chave])} | ${padrao.peso} |`);
     }
 
-    linhas.push("", "## Principais pontos criticos", "", "| Arquivo | Pontos | Sinais |", "|---|---:|---|");
-    for (const pontoCritico of fotografia.pontosCriticos) {
-        const sinais = Object.entries(pontoCritico.categorias)
+    linhas.push("", "## Itens sinalizados", "", "| Arquivo | Pontos de ordenacao | Sinais |", "|---|---:|---|");
+    for (const itemSinalizado of fotografia.itensSinalizados) {
+        const sinais = Object.entries(itemSinalizado.categorias)
             .toSorted((a, b) => b[1] - a[1])
             .map(([categoria, valor]) => `${categoria}: ${valor}`)
             .join(", ");
-        linhas.push(`| ${pontoCritico.arquivo} | ${pontoCritico.pontuacao} | ${sinais} |`);
+        linhas.push(`| ${itemSinalizado.arquivo} | ${itemSinalizado.pontuacao} | ${sinais} |`);
     }
 
     linhas.push("", "## Escopos", "");
@@ -336,7 +308,7 @@ async function executarAuditoria({
         resolverCaminhoConfigurado("codigoCliente", baseResolvida)
     ));
     const contagens = criarEstruturaContagens();
-    const pontuacaoPorEscopo: PontuacaoPorEscopo = {servidor: 0, cliente: 0, clienteTestes: 0};
+    const pontuacaoPorEscopo: PontuacaoPorEscopo = {servidor: 0, cliente: 0};
     const arquivosPontuados: ResumoArquivoCheiros[] = [];
 
     for (const arquivo of arquivos) {
@@ -368,10 +340,10 @@ async function executarAuditoria({
         versao: VERSAO_FOTOGRAFIA_CHEIROS,
         geradoEm: new Date().toISOString(),
         base: baseResolvida,
-        pontuacao: {total: pontuacaoTotal, faixa: classificarPontuacao(pontuacaoTotal), porEscopo: pontuacaoPorEscopo},
+        pontuacao: {total: pontuacaoTotal, classificacao: "tendencia", porEscopo: pontuacaoPorEscopo},
         contagens,
         deltas: calcularDelta(contagens, anterior),
-        pontosCriticos: arquivosPontuados
+        itensSinalizados: arquivosPontuados
             .toSorted((a, b) => b.pontuacao - a.pontuacao || a.arquivo.localeCompare(b.arquivo))
             .slice(0, 15)
     };
@@ -410,15 +382,15 @@ async function principal(argumentosInformados: string[] = process.argv.slice(2))
     }
 
     imprimirCabecalho("Auditoria de cheiros de codigo", `Base: ${fotografia.base}`);
-    escreverLinha(`Pontuacao total: ${fotografia.pontuacao.total} (${fotografia.pontuacao.faixa})`);
+    escreverLinha(`Pontuacao de ordenacao: ${fotografia.pontuacao.total} (nao e severidade)`);
     escreverLinha("");
     for (const padrao of PADROES) {
         escreverLinha(`- ${padrao.titulo}: ${fotografia.contagens[padrao.chave]} (delta ${formatarDelta(fotografia.deltas[padrao.chave])})`);
     }
     escreverLinha("");
-    escreverLinha("Pontos criticos:");
-    for (const pontoCritico of fotografia.pontosCriticos.slice(0, 10)) {
-        escreverLinha(`- ${pontoCritico.arquivo}: ${pontoCritico.pontuacao} ponto(s)`);
+    escreverLinha("Itens com sinais:");
+    for (const itemSinalizado of fotografia.itensSinalizados.slice(0, 10)) {
+        escreverLinha(`- ${itemSinalizado.arquivo}: ${itemSinalizado.pontuacao} ponto(s)`);
     }
     if (argumentos.includes("--gravar")) {
         escreverLinha("");

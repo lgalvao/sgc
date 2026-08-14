@@ -73,7 +73,7 @@ test("pacote fonte executa em um projeto consumidor isolado", async () => {
     expect(await existe(path.join(diretorioConsumidor, "node_modules", "ferramentas-projeto", "ferramentas.ts"))).toBe(true);
     expect(JSON.parse(String(resultado.stdout))).toMatchObject({
         base: await realpath(diretorioConsumidor),
-        pontuacao: {faixa: "bom"}
+        pontuacao: {classificacao: "tendencia"}
     });
 
     const diretorioBinario = path.join(diretorioTemporario, "bin");
