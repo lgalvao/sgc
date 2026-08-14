@@ -69,9 +69,10 @@ contrato horizontal claro e teste externo que não carregue defaults do SGC.
 
 ## Situação atual
 
-A modernização estrutural está concluída:
+A modernização estrutural está concluída; a etapa restante é comprovar semântica e ergonomia das saídas:
 
-- CLI, catálogo e README registram finalidade, camada, decisão e efeitos dos 38 comandos públicos;
+- CLI e catálogo registram finalidade, camada, decisão e efeitos; README documenta a superfície e os contratos atuais dos
+  38 comandos públicos;
 - não há comando classificado como temporário, redundante ou pendente de decisão;
 - a implementação é TypeScript e executa diretamente com `tsx` em Node 26;
 - o pacote e o binário têm identidade neutra e o tarball é testado em consumidor isolado;
@@ -80,7 +81,10 @@ A modernização estrutural está concluída:
 - Semgrep, OpenAPI, JaCoCo, V8 e sincronização de versão recebem entradas explícitas em seus motores;
 - defaults e políticas do SGC estão nas bordas ou em módulos identificados como perfil SGC;
 - acessibilidade Playwright/Axe pertence a `e2e/`, fora do toolkit;
-- um reality check anterior corrigiu classificações contraditórias, ambiguidades sistemáticas e destaques sem violação;
+- os gates de identificadores não transformam repetição textual global em falha sem escopo demonstrável;
+- a priorização de testes rejeita entrada estruturada incompatível em vez de produzir backlog vazio;
+- quatro dos maiores produtores oferecem `--json-resumido`: símbolos, análise de testes do servidor, gate arquitetural e
+  consistência de nomenclatura;
 - testes, pacote isolado, typechecks, lint, Knip, build e `git diff --check` passam.
 
 Essa situação não comprova, por si só, a correção semântica uniforme de todos os auditores. A revisão final encontrou
@@ -90,18 +94,9 @@ aberto.
 
 ## Reality check de encerramento
 
-### Contexto da execução
-
-Os 38 comandos públicos foram exercitados contra o workspace real do SGC. Operações destrutivas ficaram em simulação;
-OpenAPI diff e promoção de baseline usaram arquivos temporários; a exportação tentou o endpoint padrão sem iniciar o
-servidor. A primeira passagem executou comandos independentes em paralelo, inclusive `qualidade coletar` e `qualidade
-tarefas executar rapido`. Como ambas acionam Gradle/npm e compartilham artefatos, a fotografia contaminada por essa
-concorrência foi descartada e `qualidade coletar --perfil rapido` foi repetido isoladamente.
-
-Na repetição isolada, testes do servidor (1.588), cobertura, cobertura do cliente, lint, typecheck, resíduos e arquitetura
-passaram. A fotografia continuou vermelha apenas por duplicações globais de `data-testid`. O ambiente foi restaurado com
-`npm install` depois que a rodada de tarefas removeu dependências necessárias à CLI. Nenhuma alteração versionada ficou
-na worktree.
+Os 38 comandos públicos foram exercitados contra o workspace real do SGC; operações destrutivas ficaram em simulação e
+os fluxos OpenAPI usaram arquivos temporários quando necessário. Os achados abaixo são evidência para decisões do toolkit,
+não histórico operacional nem autorização para alterar o SGC.
 
 ### Achados obrigatórios
 
@@ -112,34 +107,30 @@ na worktree.
 `ERR_MODULE_NOT_FOUND` até executar `npm install` na raiz. A execução também usou Node 26.4 em subprocessos enquanto a
 CLI principal usava Node 26.7, produzindo avisos de engine.
 
-**Cautela:** a descoberta ocorreu numa rodada concorrente. Antes de corrigir, reproduzir isoladamente e identificar se a
-causa é a tarefa Gradle, o uso de `npm --prefix`, a topologia de workspaces ou a herança de PATH/Node. O teste de regressão
-deve provar que `ferramentas --help` continua executável depois da tarefa e que todos os subprocessos usam o Node mínimo.
+**Fronteira:** a serialização das tarefas pertence ao toolkit, mas a tarefa que reinstala dependências e a versão de Node
+herdada pertencem ao perfil externo do projeto. O toolkit só deve receber uma proteção adicional se ela puder ser testada
+em fixture isolada sem codificar o layout do SGC.
 
-**Recomendação:** impedir que uma tarefa de qualidade reinstale ou remova dependências compartilhadas, ou executar a
-instalação em escopo que preserve o workspace. Falha ou engine incompatível deve aparecer como erro da tarefa, não como
-quebra tardia da próxima chamada.
+**Recomendação:** manter a execução serial no orquestrador e avaliar uma preflight genérica que detecte mudança de
+dependências ou engine incompatível antes de continuar; não ensinar ao núcleo como o SGC instala npm/Gradle.
 
 #### 2. Unicidade global de `data-testid` produz gate enganoso
 
-**Evidência:** `cliente identificadores-teste listar-duplicados` encontrou três valores em 273 identificadores e fez a
-fotografia geral ficar vermelha, embora as outras sete verificações tenham passado. Os casos incluem seletores iguais em
-telas/componentes distintos e cards repetidos por `v-for`; reutilização não implica colisão no mesmo DOM nem teste
-ambíguo.
+**Evidência:** `cliente identificadores-teste listar-duplicados` encontrou três valores em 273 identificadores. Os casos
+incluem seletores iguais em telas/componentes distintos e cards repetidos por `v-for`; reutilização não implica colisão no
+mesmo DOM nem teste ambíguo.
 
-**Recomendação:** decidir explicitamente o contrato. Preferência: manter a listagem global como inventário e só falhar por
-duplicidade comprovadamente ambígua no mesmo escopo renderizado. Se essa análise estática não for confiável, retirar o
-comando do gate de qualidade ou exigir política/exceção configurada. A fotografia não pode declarar vermelho por uma
-heurística sem violação demonstrável.
+**Decisão implementada:** a listagem global permanece inventário, com código de saída zero; a fotografia não falha por
+repetição textual sem uma regra de escopo renderizado. Uma análise futura de ambiguidade precisa ser uma política
+separada e testável.
 
 #### 3. Priorização de testes aceita entrada incompatível silenciosamente
 
 **Evidência:** o JSON válido de `servidor testes analisar`, salvo com extensão `.out`, foi tratado como Markdown e gerou
 P1/P2/P3 vazios sem erro. O mesmo conteúdo com extensão `.json` produziu 6 itens P1, 8 P2 e 4 P3.
 
-**Recomendação:** detectar o formato pelo conteúdo ou exigir formato explícito; em ambos os casos, entrada não reconhecida
-deve falhar. Adicionar regressões para JSON com extensão não convencional, Markdown válido e conteúdo inválido que hoje
-resulta silenciosamente vazio.
+**Decisão implementada:** o conteúdo estruturado é detectado mesmo com extensão não convencional; Markdown válido continua
+aceito; conteúdo que aparenta ser estruturado mas é inválido falha. As três situações têm regressões.
 
 #### 4. JSON completo é impraticável como resposta padrão para agentes
 
@@ -147,10 +138,9 @@ resulta silenciosamente vazio.
 424 KB na validação de resíduos, 392 KB na auditoria de resíduos, 366 KB na análise de testes, 264 KB na consistência de
 nomes, 184 KB na cobertura do servidor e 104 KB na auditoria CDU.
 
-**Recomendação:** definir um contrato uniforme de resumo estruturado, preferencialmente `--json-resumido`, preservando
-`--json` como saída completa quando necessária. O resumo deve conter totais, classificação, principais achados limitados,
-motivos e indicação de truncamento; não deve despejar módulos, símbolos, XMLs ou todos os arquivos. Priorizar primeiro os
-comandos acima de 250 KB e a saída de `qualidade resumo`.
+**Progresso:** `--json-resumido` já cobre símbolos, testes do servidor, gate arquitetural e consistência de nomenclatura,
+com totais, principais achados, motivos e `truncado`; `--json` continua completo. Ainda faltam resíduos, cobertura, CDU e
+qualidade agregada, que devem seguir o mesmo contrato sem despejar módulos, símbolos, XMLs ou todos os arquivos.
 
 #### 5. Auditoria de dependências ainda contém ruído evitável
 
@@ -184,14 +174,12 @@ para expandir. Não transformar o comando em auditor nem adicionar persistência
 
 ### Ordem de execução recomendada
 
-1. reproduzir isoladamente e corrigir a invalidação de dependências/Node em `qualidade tarefas executar`;
-2. corrigir o contrato e a severidade de identificadores duplicados;
-3. corrigir a detecção e validação de formato em `servidor testes priorizar`;
-4. introduzir resumos JSON consistentes, começando pelos maiores resultados;
-5. reduzir ruído conhecido da auditoria de dependências;
-6. ajustar a saída padrão da árvore de linhas;
-7. construir a matriz semântica usando cada problema confirmado acima como regressão inicial;
-8. repetir a amostra final sequencialmente, sem concorrência entre comandos que compartilhem npm, Gradle ou artefatos.
+1. delimitar a proteção genérica possível para a invalidação de dependências/Node em `qualidade tarefas executar`;
+2. completar o contrato `--json-resumido` nos maiores resultados restantes;
+3. reduzir o ruído conhecido da auditoria de dependências sem ocultar atualizações da série 6;
+4. ajustar a saída padrão da árvore de linhas;
+5. construir a matriz semântica usando os problemas confirmados como regressões iniciais;
+6. repetir a amostra final sequencialmente, sem concorrência entre comandos que compartilhem npm, Gradle ou artefatos.
 
 ## Recorte final — comprovação semântica
 
@@ -248,6 +236,7 @@ real não apresentar classificação contraditória, ambiguidade sistemática ou
 - [x] políticas para auditar o SGC estão identificadas e continuam funcionando contra seu workspace;
 - [x] CDU e análise de testes Java funcionam com projeto externo sem editar o toolkit;
 - [x] ajuda, parser, catálogo e README concordam sobre a superfície pública;
+- [x] README do toolkit contém somente referência do estado atual, sem histórico ou plano de execução;
 - [x] o tarball instalado isoladamente executa o binário e as APIs públicas suportadas;
 - [ ] tarefas de qualidade preservam a instalação do toolkit e usam a versão mínima de Node nos subprocessos;
 - [ ] gates e status gerais não falham por inventários ou heurísticas sem violação demonstrável;
