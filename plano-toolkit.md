@@ -69,8 +69,8 @@ contrato horizontal claro e teste externo que não carregue defaults do SGC.
 
 ## Situação atual
 
-A modernização estrutural e a ergonomia dos maiores resultados estão concluídas; resta apenas a validação final do pacote
-e a confirmação de que catálogo, README e plano refletem o contrato atual:
+A modernização estrutural, a ergonomia dos maiores resultados e a validação do recorte estão concluídas. O toolkit possui
+uma superfície documentada, executável em Node 26 e validada contra o pacote isolado e o corpus real do SGC:
 
 - CLI e catálogo registram finalidade, camada, decisão e efeitos; README documenta a superfície e os contratos atuais dos
   38 comandos públicos;
@@ -183,11 +183,11 @@ opções existentes, inclusive com zero.
 - As novas respostas resumidas no SGC ficaram entre aproximadamente 3,8 KB e 25,4 KB: resíduos 11,4 KB, cobertura 4,9–5,7
   KB, ramificações 3,9–4,2 KB, inventário CDU 17,1 KB e auditoria CDU 25,4 KB.
 
-### Ordem de execução recomendada
+### Próximos passos
 
-1. executar a validação final completa do toolkit e conferir a sincronização catálogo/README/plano;
-2. repetir a amostra final sequencialmente, sem concorrência entre comandos que compartilhem npm, Gradle ou artefatos;
-3. marcar o recorte encerrado se todos os critérios abaixo permanecerem satisfeitos.
+Não há etapa obrigatória restante neste recorte. Uma nova rodada só deve ser aberta diante de evidência concreta de
+regressão, resultado enganoso, falha de segurança, necessidade horizontal comprovada ou mudança relevante nas ferramentas
+externas. Nesse caso, registrar primeiro a nova lacuna, definir um critério de término específico e manter o escopo pequeno.
 
 ## Recorte final — comprovação semântica
 
