@@ -30,6 +30,25 @@ interface ResultadoValidacaoArquitetura extends ICruiseResult {
     acoesServidor: ResultadoAcoesServidor;
 }
 
+interface ResumoValidacaoArquitetura {
+    versaoResumo: 1;
+    geradoEm: string;
+    truncado: true;
+    limiteItens: number;
+    exitCode: number;
+    totalModulos: number;
+    resumo: {
+        totalViolacoes: number;
+        porRegra: Array<{regra: string; total: number}>;
+    };
+    violacoes: Array<ReturnType<typeof formatarViolacao>>;
+    acoesServidor: {
+        dispensadas: number;
+        totalViolacoes: number;
+        violacoes: ViolacaoAcaoArquitetura[];
+    };
+}
+
 function carregarRegras(caminhoConfiguracao: string): IConfiguration {
     const require = createRequire(import.meta.url);
     delete require.cache[caminhoConfiguracao];
@@ -97,6 +116,36 @@ function imprimirViolacoesAcoesServidor(resultado: ResultadoAcoesServidor): void
     });
 }
 
+function criarResumoJson(resultado: ResultadoValidacaoArquitetura, diretorioBase: string): ResumoValidacaoArquitetura {
+    const limiteItens = 20;
+    const violacoes = resultado.summary.violations ?? [];
+    const porRegra = Map.groupBy(violacoes, (violacao) => violacao.rule?.name ?? "regra-desconhecida");
+    return {
+        versaoResumo: 1,
+        geradoEm: new Date().toISOString(),
+        truncado: true,
+        limiteItens,
+        exitCode: resultado.exitCode,
+        totalModulos: resultado.modules?.length ?? 0,
+        resumo: {
+            totalViolacoes: violacoes.length,
+            porRegra: [...porRegra.entries()]
+                .map(([regra, itens]) => ({regra, total: itens.length}))
+                .toSorted((a, b) => b.total - a.total || a.regra.localeCompare(b.regra, "pt-BR")),
+        },
+        violacoes: violacoes
+            .toSorted((a, b) => (a.rule?.name ?? "").localeCompare(b.rule?.name ?? "", "pt-BR")
+                || a.from.localeCompare(b.from, "pt-BR"))
+            .slice(0, limiteItens)
+            .map((violacao) => formatarViolacao(violacao, diretorioBase)),
+        acoesServidor: {
+            dispensadas: resultado.acoesServidor.dispensadas ?? 0,
+            totalViolacoes: resultado.acoesServidor.violacoes?.length ?? 0,
+            violacoes: resultado.acoesServidor.violacoes?.slice(0, limiteItens) ?? [],
+        },
+    };
+}
+
 interface OpcoesValidacaoArquiteturaCliente {
     base?: string;
 }
@@ -149,7 +198,8 @@ async function executarValidacaoArquiteturaCliente(
 
 async function principal(argumentosInformados: string[] = process.argv.slice(2)): Promise<void> {
     const argumentos = validarArgumentosEntradaDireta(import.meta.url, argumentosInformados);
-    const emitirJson = argumentos.includes("--json");
+    const emitirJson = argumentos.includes("--json") || argumentos.includes("--json-resumido");
+    const emitirJsonResumido = argumentos.includes("--json-resumido");
     const exibirAjuda = argumentos.includes("--help") || argumentos.includes("-h");
 
     if (exibirAjuda) {
@@ -158,6 +208,7 @@ async function principal(argumentosInformados: string[] = process.argv.slice(2))
             descricao: "Valida regras arquiteturais duras do cliente usando resolucao real de modulos.",
             opcoes: [
                 "--json               Emite o resultado bruto em JSON.",
+                "--json-resumido      Emite totais, regras e violacoes limitadas em JSON.",
                 "--base <diretorio>   Sobrescreve o diretorio base da validacao.",
             ],
             exemplos: [
@@ -174,7 +225,12 @@ async function principal(argumentosInformados: string[] = process.argv.slice(2))
     });
 
     if (emitirJson) {
-        imprimirJson(resultado);
+        if (emitirJsonResumido) {
+            const diretorioBase = path.resolve(lerOpcao(argumentos, "--base", DIRETORIO_RAIZ) ?? DIRETORIO_RAIZ);
+            imprimirJson(criarResumoJson(resultado, diretorioBase));
+        } else {
+            imprimirJson(resultado);
+        }
     } else {
         const diretorioBase = path.resolve(lerOpcao(argumentos, "--base", DIRETORIO_RAIZ) ?? DIRETORIO_RAIZ);
         imprimirViolacoes(resultado.summary.violations ?? [], diretorioBase);

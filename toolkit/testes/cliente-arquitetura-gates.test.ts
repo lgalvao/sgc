@@ -84,6 +84,41 @@ describe("Gates arquiteturais do cliente", () => {
         expect(resultado.stdout).toContain("Nenhuma violacao arquitetural encontrada");
     });
 
+    test("emite resumo JSON limitado do gate arquitetural", async () => {
+        const base = await mkdtemp(path.join(os.tmpdir(), "sgc-arquitetura-gate-resumo-"));
+        const diretorioCliente = path.join(base, "frontend");
+
+        await escreverJson(path.join(diretorioCliente, "package.json"), {name: "cliente-fixture", private: true});
+        await escreverJson(path.join(diretorioCliente, "tsconfig.json"), {
+            compilerOptions: {
+                baseUrl: ".",
+                paths: {"@/*": ["./src/*"]},
+            },
+            include: ["src/**/*.ts", "src/**/*.vue"],
+        });
+        await escreverArquivo(path.join(diretorioCliente, "src", "services", "unidadeService.ts"), "export async function buscarUnidade() { return null; }");
+        await escreverArquivo(
+            path.join(diretorioCliente, "src", "views", "UnidadeView.vue"),
+            [
+                "<script setup lang=\"ts\">",
+                "import {buscarUnidade} from '../services/unidadeService';",
+                "void buscarUnidade();",
+                "</script>",
+            ].join("\n")
+        );
+        await copiar(path.join(DIRETORIO_RAIZ, "frontend", ".dependency-cruiser.cjs"), path.join(diretorioCliente, ".dependency-cruiser.cjs"));
+
+        const resultado = await executarSgc(["cliente", "arquitetura", "validar", "--base", base, "--json-resumido"]);
+
+        expect(resultado.exitCode).not.toBe(0);
+        const resumo = JSON.parse(resultado.stdout);
+        expect(resumo).toMatchObject({versaoResumo: 1, truncado: true, limiteItens: 20});
+        expect(resumo.totalModulos).toBeGreaterThan(0);
+        expect(resumo.resumo.totalViolacoes).toBeGreaterThan(0);
+        expect(resumo.violacoes[0]).toMatchObject({regra: "view-sem-service-direto"});
+        expect(resumo.modules).toBeUndefined();
+    });
+
     test("resolve diretorio cliente configurado no gate arquitetural", async () => {
         const base = await mkdtemp(path.join(os.tmpdir(), "sgc-arquitetura-diretorio-configurado-"));
         const diretorioCliente = path.join(base, "cliente");

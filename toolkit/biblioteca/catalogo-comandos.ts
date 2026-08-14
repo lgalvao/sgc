@@ -208,7 +208,7 @@ const CATALOGO_COMANDOS = [
         decisao: "manter",
         finalidade: "auditar",
         efeitos: criarEfeitosComando("nenhuma"),
-        argumentos: esquema(["--base"], ["--json"]),
+        argumentos: esquema(["--base"], ["--json", "--json-resumido"]),
         arquivo: "cliente/arquitetura-validar.ts"
     },
     {

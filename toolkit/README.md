@@ -178,6 +178,8 @@ somente para ordenar sinais; ela não é uma severidade global. O formato anteri
 
 `cliente arquitetura validar` é um gate do perfil SGC: além das regras locais do Dependency Cruiser, verifica a política
 SGC que impede cálculos locais de ações baseados em estado de domínio. Ele não é uma auditoria horizontal sem adaptação.
+Use `--json-resumido` para receber totais de módulos, violações por regra e até 20 violações de cada fonte; `--json`
+continua emitindo o resultado completo do Dependency Cruiser.
 
 `cliente residuos auditar` produz uma fotografia `versaoSchema: "3.0.0"`. Em cada arquivo, `sinaisAtivos` registra os
 sinais heurísticos encontrados e `violacoes` registra somente excesso de orçamento de linhas. Portanto, um item em
