@@ -80,6 +80,14 @@ describe("Configuracao do toolkit", () => {
             versao: VERSAO_CONFIGURACAO,
             execucoes: {dependencias: [{titulo: "auditoria", segmento: ".", comando: "npm", argumentos: [], codigoNaoZeroIndicaAchados: "sim"}]}
         })).toThrow("codigoNaoZeroIndicaAchados deve ser booleano");
+        expect(() => validarConfiguracao({
+            versao: VERSAO_CONFIGURACAO,
+            execucoes: {dependencias: [{titulo: "auditoria", segmento: ".", comando: "npm", argumentos: [], ignorarAtualizacoes: "sim"}]}
+        })).toThrow("ignorarAtualizacoes deve ser uma lista");
+        expect(() => validarConfiguracao({
+            versao: VERSAO_CONFIGURACAO,
+            execucoes: {dependencias: [{titulo: "auditoria", segmento: ".", comando: "npm", argumentos: [], ignorarAtualizacoes: [{pacote: "typescript", major: -1}]}]}
+        })).toThrow("major deve ser inteiro não negativo");
     });
 
     test("configura execucoes de projeto sem substituir os defaults do SGC", async () => {
@@ -92,7 +100,8 @@ describe("Configuracao do toolkit", () => {
                     segmento: "cliente",
                     comando: "npm",
                     argumentos: ["run", "auditar-dependencias"],
-                    codigoNaoZeroIndicaAchados: true
+                    codigoNaoZeroIndicaAchados: true,
+                    ignorarAtualizacoes: [{pacote: "typescript", major: 7}]
                 }],
                 qualidade: {
                     rapido: {
@@ -107,7 +116,8 @@ describe("Configuracao do toolkit", () => {
             titulo: "Auditar cliente",
             segmento: "cliente",
             diretorio: path.join(base, "cliente"),
-            codigoNaoZeroIndicaAchados: true
+            codigoNaoZeroIndicaAchados: true,
+            ignorarAtualizacoes: [{pacote: "typescript", major: 7}]
         }]);
         const chamadas: ChamadaComando[] = [];
         await executarTarefasQualidade("rapido", {

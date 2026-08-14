@@ -10,6 +10,11 @@ interface EscopoAuditoria extends DefinicaoEscopoAuditoria {
     diretorio: string;
 }
 
+interface ResultadoExecucaoComando {
+    exitCode?: number;
+    stdout?: string;
+}
+
 interface ResultadoEscopoAuditoria {
     escopo: string;
     codigoSaida: number;
@@ -27,8 +32,9 @@ interface OpcoesAuditoriaDependencias {
 type ExecutarComando = (
     comando: string,
     argumentos: readonly string[],
-    diretorio: string
-) => Promise<{exitCode?: number}>;
+    diretorio: string,
+    ignorarAtualizacoes?: readonly {pacote: string; major: number}[]
+) => Promise<ResultadoExecucaoComando>;
 
 interface ResultadoAuditoriaDependencias {
     diretorioBase: string;
@@ -49,7 +55,8 @@ const ESCOPOS_AUDITORIA_SGC: readonly DefinicaoEscopoAuditoria[] = [
         segmento: "",
         comando: "npm",
         argumentos: ["outdated", "--workspaces", "--include-workspace-root", "--json"],
-        codigoNaoZeroIndicaAchados: true
+        codigoNaoZeroIndicaAchados: true,
+        ignorarAtualizacoes: [{pacote: "typescript", major: 7}]
     },
     {
         titulo: "Verificar vulnerabilidades npm",
@@ -84,12 +91,69 @@ function resolverEscoposAuditoria(
     }));
 }
 
-const executarComandoPadrao: ExecutarComando = async (comando, argumentos, diretorio) => execa(comando, argumentos, {
-    cwd: diretorio,
-    stdio: "inherit",
-    shell: process.platform === "win32",
-    reject: false
-});
+function obterMajorVersao(versao: unknown): number | null {
+    if (typeof versao !== "string") {
+        return null;
+    }
+    const correspondencia = /^v?(\d+)/.exec(versao.trim());
+    return correspondencia ? Number.parseInt(correspondencia[1], 10) : null;
+}
+
+function deveIgnorarAtualizacao(
+    pacote: string,
+    dados: unknown,
+    regras: readonly {pacote: string; major: number}[]
+): boolean {
+    if (!dados || typeof dados !== "object" || Array.isArray(dados)) {
+        return false;
+    }
+    const regra = regras.find(item => item.pacote === pacote);
+    return regra !== undefined && obterMajorVersao((dados as {latest?: unknown}).latest) === regra.major;
+}
+
+function filtrarSaidaNpmOutdated(
+    saida: string,
+    regras: readonly {pacote: string; major: number}[],
+    codigoSaidaOriginal: number
+): {saida: string; codigoSaida: number} {
+    if (regras.length === 0) {
+        return {saida, codigoSaida: codigoSaidaOriginal};
+    }
+    try {
+        const dados = JSON.parse(saida) as Record<string, unknown>;
+        const filtrado = Object.fromEntries(Object.entries(dados).flatMap(([pacote, valor]) => {
+            if (Array.isArray(valor)) {
+                const itens = valor.filter(item => !deveIgnorarAtualizacao(pacote, item, regras));
+                return itens.length > 0 ? [[pacote, itens]] : [];
+            }
+            return deveIgnorarAtualizacao(pacote, valor, regras) ? [] : [[pacote, valor]];
+        }));
+        return {
+            saida: `${JSON.stringify(filtrado, null, 2)}\n`,
+            codigoSaida: Object.keys(filtrado).length === 0 ? 0 : codigoSaidaOriginal
+        };
+    } catch {
+        return {saida, codigoSaida: codigoSaidaOriginal};
+    }
+}
+
+const executarComandoPadrao: ExecutarComando = async (comando, argumentos, diretorio, ignorarAtualizacoes = []) => {
+    const filtrarNpmOutdated = comando === "npm"
+        && argumentos.includes("outdated")
+        && ignorarAtualizacoes.length > 0;
+    const resultado = await execa(comando, argumentos, {
+        cwd: diretorio,
+        ...(filtrarNpmOutdated ? {stdout: "pipe", stderr: "inherit"} : {stdio: "inherit"}),
+        shell: process.platform === "win32",
+        reject: false
+    });
+    if (!filtrarNpmOutdated || resultado.stdout === undefined) {
+        return {exitCode: resultado.exitCode};
+    }
+    const filtrado = filtrarSaidaNpmOutdated(resultado.stdout, ignorarAtualizacoes, resultado.exitCode ?? 1);
+    process.stdout.write(filtrado.saida);
+    return {exitCode: filtrado.codigoSaida};
+};
 
 async function executarAuditoriaDependencias(
     opcoes: OpcoesAuditoriaDependencias = {}
@@ -107,7 +171,7 @@ async function executarAuditoriaDependencias(
     for (const escopo of escopos) {
         escreverLinha();
         escreverLinha(escopo.titulo);
-        const resultado = await executarComando(escopo.comando, escopo.argumentos, escopo.diretorio);
+        const resultado = await executarComando(escopo.comando, escopo.argumentos, escopo.diretorio, escopo.ignorarAtualizacoes);
         const codigoSaida = resultado.exitCode;
         const status: StatusAuditoriaDependencias = codigoSaida === undefined
             ? "falha"
@@ -144,5 +208,6 @@ export {
     type OpcoesAuditoriaDependencias,
     type ResultadoAuditoriaDependencias,
     type ResultadoEscopoAuditoria,
-    type StatusAuditoriaDependencias
+    type StatusAuditoriaDependencias,
+    filtrarSaidaNpmOutdated
 };

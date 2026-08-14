@@ -196,7 +196,8 @@ ferramentas projeto versao-sincronizar 1.2.3
 `execucoes.qualidade`. `qualidade resumo` lê fotografias `versaoSchema: "3.0.0"`.
 
 `projeto dependencias auditar` reúne uso e declarações pelo Knip, versões npm, vulnerabilidades npm e atualizações Gradle.
-Achados e falhas de execução são separados.
+Achados e falhas de execução são separados. Atualizações da major 7 do TypeScript são ignoradas pelo perfil SGC enquanto
+os projetos permanecem na série 6; outras atualizações continuam visíveis.
 
 `projeto artefatos limpar` lista artefatos e remove com `--confirmar`. `projeto versao-sincronizar` mostra alterações e
 grava com `--gravar`.
@@ -266,6 +267,9 @@ Execuções de dependências e qualidade são configuráveis:
   }
 }
 ```
+
+`execucoes.dependencias[].ignorarAtualizacoes` aceita pares `{pacote, major}` para remover essas atualizações do JSON de
+`npm outdated` e recalcular o status do escopo.
 
 ## Uso como pacote
 

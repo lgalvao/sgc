@@ -28,6 +28,7 @@ interface TarefaConfigurada {
 interface EscopoComandoConfigurado extends TarefaConfigurada {
     segmento: string;
     codigoNaoZeroIndicaAchados?: boolean;
+    ignorarAtualizacoes?: Array<{pacote: string; major: number}>;
 }
 
 interface PerfilQualidadeConfigurado {
@@ -282,7 +283,7 @@ function validarEscoposComando(valor: unknown, caminho: string): EscopoComandoCo
         throw new Error(`${NOME_ARQUIVO_CONFIGURACAO}.${caminho} deve ser uma lista.`);
     }
     return valor.map((item, indice) => {
-        const tarefa = validarTarefa(item, `${caminho}[${indice}]`, true, ["codigoNaoZeroIndicaAchados"]);
+        const tarefa = validarTarefa(item, `${caminho}[${indice}]`, true, ["codigoNaoZeroIndicaAchados", "ignorarAtualizacoes"]);
         if (!ehObjeto(item)) {
             throw new Error(`${NOME_ARQUIVO_CONFIGURACAO}.${caminho}[${indice}] deve ser um objeto.`);
         }
@@ -290,10 +291,28 @@ function validarEscoposComando(valor: unknown, caminho: string): EscopoComandoCo
         if (codigoNaoZeroIndicaAchados !== undefined && typeof codigoNaoZeroIndicaAchados !== "boolean") {
             throw new Error(`${NOME_ARQUIVO_CONFIGURACAO}.${caminho}[${indice}].codigoNaoZeroIndicaAchados deve ser booleano.`);
         }
+        const ignorarAtualizacoes = item.ignorarAtualizacoes;
+        let regrasAtualizacoesValidadas: Array<{pacote: string; major: number}> | undefined;
+        if (ignorarAtualizacoes !== undefined) {
+            if (!Array.isArray(ignorarAtualizacoes)) {
+                throw new Error(`${NOME_ARQUIVO_CONFIGURACAO}.${caminho}[${indice}].ignorarAtualizacoes deve ser uma lista.`);
+            }
+            regrasAtualizacoesValidadas = [];
+            for (const [indiceRegra, regra] of ignorarAtualizacoes.entries()) {
+                if (!ehObjeto(regra) || typeof regra.pacote !== "string" || regra.pacote.trim() === "") {
+                    throw new Error(`${NOME_ARQUIVO_CONFIGURACAO}.${caminho}[${indice}].ignorarAtualizacoes[${indiceRegra}].pacote deve ser texto não vazio.`);
+                }
+                if (typeof regra.major !== "number" || !Number.isInteger(regra.major) || regra.major < 0) {
+                    throw new Error(`${NOME_ARQUIVO_CONFIGURACAO}.${caminho}[${indice}].ignorarAtualizacoes[${indiceRegra}].major deve ser inteiro não negativo.`);
+                }
+                regrasAtualizacoesValidadas.push({pacote: regra.pacote.trim(), major: regra.major});
+            }
+        }
         return {
             ...tarefa,
             segmento: validarTexto(item.segmento, `${caminho}[${indice}].segmento`),
-            ...(codigoNaoZeroIndicaAchados === undefined ? {} : {codigoNaoZeroIndicaAchados})
+            ...(codigoNaoZeroIndicaAchados === undefined ? {} : {codigoNaoZeroIndicaAchados}),
+            ...(regrasAtualizacoesValidadas === undefined ? {} : {ignorarAtualizacoes: regrasAtualizacoesValidadas})
         };
     });
 }

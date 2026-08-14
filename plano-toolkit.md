@@ -142,16 +142,16 @@ nomes, 184 KB na cobertura do servidor e 104 KB na auditoria CDU.
 com totais, principais achados, motivos e `truncado`; `--json` continua completo. Ainda faltam resíduos, cobertura, CDU e
 qualidade agregada, que devem seguir o mesmo contrato sem despejar módulos, símbolos, XMLs ou todos os arquivos.
 
-#### 5. Auditoria de dependências ainda contém ruído evitável
+#### 5. Auditoria de dependências precisa separar política de projeto e ruído de ferramenta
 
-**Evidência:** a auditoria funcionou e separou achados de falhas, mas apresentou TypeScript 7 para toolkit, frontend e
-e2e apesar da decisão explícita de permanecer em TypeScript 6 enquanto o ecossistema for incompatível. O Knip também
-apontou `tsx` como binário não declarado na raiz e no frontend. Não foram encontradas vulnerabilidades npm.
+**Evidência:** a auditoria funciona e separa achados de falhas. `npm outdated` apresenta TypeScript 7 para toolkit,
+frontend e e2e apesar da decisão de permanecer na série 6; o Gradle já filtra as configurações relevantes do build e
+produz um conjunto limitado de dependências do projeto. O Knip aponta `tsx` como binário não declarado na raiz e no
+frontend. Não foram encontradas vulnerabilidades npm.
 
-**Recomendação:** configurar uma exclusão documentada e temporária para a major 7, com condição clara de remoção, sem
-ocultar atualizações da série 6. Verificar se os usos de `tsx` devem virar dependências declaradas ou se os scripts podem
-usar a dependência do escopo correto. O comando deve continuar retornando código distinto quando houver atualizações,
-sem tratar achado esperado como falha de execução.
+**Decisão implementada:** `execucoes.dependencias[].ignorarAtualizacoes` filtra pares pacote/major do JSON de
+`npm outdated` e recalcula o status. O perfil SGC ignora apenas `typescript` major 7; Pinia e demais atualizações continuam
+visíveis. Declarações ausentes de `tsx` em root/frontend são propriedade dos manifestos do SGC e não entram neste recorte.
 
 #### 6. Árvore de linhas tem saída padrão excessiva
 
@@ -176,10 +176,9 @@ para expandir. Não transformar o comando em auditor nem adicionar persistência
 
 1. delimitar a proteção genérica possível para a invalidação de dependências/Node em `qualidade tarefas executar`;
 2. completar o contrato `--json-resumido` nos maiores resultados restantes;
-3. reduzir o ruído conhecido da auditoria de dependências sem ocultar atualizações da série 6;
-4. ajustar a saída padrão da árvore de linhas;
-5. construir a matriz semântica usando os problemas confirmados como regressões iniciais;
-6. repetir a amostra final sequencialmente, sem concorrência entre comandos que compartilhem npm, Gradle ou artefatos.
+3. ajustar a saída padrão da árvore de linhas;
+4. construir a matriz semântica usando os problemas confirmados como regressões iniciais;
+5. repetir a amostra final sequencialmente, sem concorrência entre comandos que compartilhem npm, Gradle ou artefatos.
 
 ## Recorte final — comprovação semântica
 
@@ -242,7 +241,7 @@ real não apresentar classificação contraditória, ambiguidade sistemática ou
 - [ ] gates e status gerais não falham por inventários ou heurísticas sem violação demonstrável;
 - [ ] entradas estruturadas incompatíveis falham em vez de produzir resultado vazio;
 - [ ] comandos de grande volume oferecem resumo JSON acionável para agentes;
-- [ ] auditoria de dependências respeita a decisão temporária sobre TypeScript 7 sem ocultar atualizações da série 6;
+- [x] auditoria de dependências respeita a decisão sobre TypeScript 7 sem ocultar atualizações da série 6;
 - [ ] a matriz semântica está completa e não contém lacuna obrigatória;
 - [ ] a amostra final contra o SGC foi confrontada com o código e não revelou resultado enganoso sem regressão;
 - [x] testes, typechecks, lint, Knip, build e `git diff --check` passam.

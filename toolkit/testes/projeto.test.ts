@@ -9,7 +9,7 @@ import {sincronizarVersao} from "../projeto/versao-sincronizacao-motor.js";
 import {executarVerificacaoAmbiente, obterRecursosAmbientePadrao} from "../projeto/ambiente-verificar.js";
 import {limparArtefatos, obterPadroesArtefatos} from "../projeto/artefatos-limpar.js";
 import {executarTarefasQualidade} from "../qualidade/tarefas-executar.js";
-import {executarAuditoriaDependencias} from "../projeto/dependencias-auditar.js";
+import {executarAuditoriaDependencias, filtrarSaidaNpmOutdated} from "../projeto/dependencias-auditar.js";
 import {VERSAO_CONFIGURACAO} from "../biblioteca/configuracao.js";
 
 type ChamadaComando = {
@@ -423,5 +423,26 @@ describe("Comandos de projeto do toolkit", () => {
             {escopo: "Dependencias desatualizadas", codigoSaida: 1, status: "achados"},
             {escopo: "Ferramenta indisponivel", codigoSaida: 1, status: "falha"}
         ]);
+    });
+
+    test("filtra major ignorada de TypeScript sem ocultar outras atualizacoes npm", () => {
+        const resultado = filtrarSaidaNpmOutdated(JSON.stringify({
+            typescript: [{current: "6.0.3", latest: "7.0.2", dependent: "toolkit"}],
+            pinia: {current: "3.0.4", latest: "4.0.3", dependent: "frontend"}
+        }), [{pacote: "typescript", major: 7}], 1);
+
+        expect(resultado.codigoSaida).toBe(1);
+        expect(JSON.parse(resultado.saida)).toEqual({
+            pinia: {current: "3.0.4", latest: "4.0.3", dependent: "frontend"}
+        });
+    });
+
+    test("converte resultado apenas com major ignorada em escopo sem achados", () => {
+        const resultado = filtrarSaidaNpmOutdated(JSON.stringify({
+            typescript: [{current: "6.0.3", latest: "7.0.2", dependent: "toolkit"}]
+        }), [{pacote: "typescript", major: 7}], 1);
+
+        expect(resultado.codigoSaida).toBe(0);
+        expect(JSON.parse(resultado.saida)).toEqual({});
     });
 }, 30000);
