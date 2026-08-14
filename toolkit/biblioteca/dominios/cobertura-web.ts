@@ -1,7 +1,5 @@
 import fs from "node:fs/promises";
 import path from "node:path";
-import {DIRETORIO_RAIZ} from "../caminhos.js";
-import {resolverCaminhoConfigurado} from "../configuracao.js";
 
 export interface DadosCoberturaV8 {
     s?: Record<string, number>;
@@ -95,14 +93,17 @@ function deveIgnorarArquivo(caminhoRelativo: string): boolean {
 }
 
 async function extrairCoberturaCliente(
-    caminhoRelativo: string | null = null,
+    caminhoRelatorio: string,
     opcoes: OpcoesCoberturaCliente = {}
 ): Promise<ResultadoCoberturaCliente> {
-    const diretorioBase = opcoes.diretorioBase ?? DIRETORIO_RAIZ;
-    const caminhoPadrao = resolverCaminhoConfigurado("coberturaCliente", diretorioBase);
-    const caminhoJson = caminhoRelativo
-        ? (path.isAbsolute(caminhoRelativo) ? caminhoRelativo : path.resolve(diretorioBase, caminhoRelativo))
-        : caminhoPadrao;
+    if (caminhoRelatorio.trim() === "") {
+        throw new Error("O caminho do relatório V8 é obrigatório.");
+    }
+
+    const diretorioBase = opcoes.diretorioBase ?? process.cwd();
+    const caminhoJson = path.isAbsolute(caminhoRelatorio)
+        ? caminhoRelatorio
+        : path.resolve(diretorioBase, caminhoRelatorio);
     let conteudo;
     try {
         conteudo = await fs.readFile(caminhoJson, "utf-8");

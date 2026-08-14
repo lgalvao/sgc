@@ -2,6 +2,7 @@ import path from "node:path";
 import process from "node:process";
 import {extrairCoberturaJacoco} from "../biblioteca/dominios/cobertura-java.js";
 import {extrairCoberturaCliente} from "../biblioteca/dominios/cobertura-web.js";
+import {resolverCaminhoConfigurado} from "../biblioteca/configuracao.js";
 import type {
     CatalogoAdaptadores,
     ContextoColeta,
@@ -127,7 +128,10 @@ function criarAdaptadoresSgc(dependencias: DependenciasAdaptadoresSgc): Catalogo
                 args: [":backend:jacocoTestReport"],
                 cwd: contexto.base
             });
-            const cobertura = await extrairCoberturaJacoco(null, {diretorioBase: contexto.base});
+            const cobertura = await extrairCoberturaJacoco(
+                resolverCaminhoConfigurado("coberturaServidor", contexto.base),
+                {diretorioBase: contexto.base}
+            );
             execucao.status = saida.codigoSaida === 0 ? "sucesso" : "falha";
             registrarResultadoExecucao(execucao, saida);
             execucao.metricas = cobertura;
@@ -141,7 +145,10 @@ function criarAdaptadoresSgc(dependencias: DependenciasAdaptadoresSgc): Catalogo
                 args: ["run", "coverage:unit:collect"],
                 cwd: contexto.diretorioCliente
             });
-            const cobertura = await extrairCoberturaCliente(null, {diretorioBase: contexto.base});
+            const cobertura = await extrairCoberturaCliente(
+                resolverCaminhoConfigurado("coberturaCliente", contexto.base),
+                {diretorioBase: contexto.base}
+            );
             execucao.status = saida.codigoSaida === 0 ? "sucesso" : "falha";
             registrarResultadoExecucao(execucao, saida);
             execucao.metricas = cobertura;

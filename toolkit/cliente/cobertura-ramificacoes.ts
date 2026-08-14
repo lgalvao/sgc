@@ -1,6 +1,7 @@
 import pc from "picocolors";
 import path from "node:path";
 import {DIRETORIO_RAIZ} from "../biblioteca/caminhos.js";
+import {resolverCaminhoConfigurado} from "../biblioteca/configuracao.js";
 import {lerNumero, lerOpcao} from "../biblioteca/cli-opcoes.js";
 import {ehEntradaPrincipal, validarArgumentosEntradaDireta} from "../biblioteca/execucao.js";
 import {extrairCoberturaCliente, type ArquivoCobertura, type ResultadoCoberturaCliente} from "../biblioteca/dominios/cobertura-web.js";
@@ -48,7 +49,10 @@ async function principal(argumentosInformados: string[] = process.argv.slice(2))
     }
 
     const diretorioBase = path.resolve(lerOpcao(argumentos, "--base", DIRETORIO_RAIZ) ?? DIRETORIO_RAIZ);
-    const caminhoRelatorio = lerOpcao(argumentos, "--arquivo", undefined);
+    const caminhoInformado = lerOpcao(argumentos, "--arquivo", undefined);
+    const caminhoRelatorio = caminhoInformado
+        ? path.resolve(diretorioBase, caminhoInformado)
+        : resolverCaminhoConfigurado("coberturaCliente", diretorioBase);
     const limite = lerNumero(argumentos, "--limite", 20, {minimo: 0}) ?? 20;
     const coleta = await extrairCoberturaCliente(caminhoRelatorio, {diretorioBase});
     const arquivos: ArquivoRamificacoes[] = coleta.arquivos

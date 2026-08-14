@@ -2,6 +2,7 @@ import path from "node:path";
 import pc from "picocolors";
 import {lerNumero, lerOpcao} from "../biblioteca/cli-opcoes.js";
 import {resolverNaRaiz} from "../biblioteca/caminhos.js";
+import {resolverCaminhoConfigurado} from "../biblioteca/configuracao.js";
 import {ehEntradaPrincipal, validarArgumentosEntradaDireta} from "../biblioteca/execucao.js";
 import {extrairCoberturaJacoco} from "../biblioteca/dominios/cobertura-java.js";
 import type {ClasseCobertura, ResultadoCoberturaJacoco} from "../biblioteca/dominios/cobertura-java.js";
@@ -58,10 +59,13 @@ async function principal(argumentosInformados: string[] = process.argv.slice(2))
     }
 
     const diretorioBase = path.resolve(lerOpcao(argumentos, "--base", resolverNaRaiz()) ?? resolverNaRaiz());
-    const arquivo = lerOpcao(argumentos, "--arquivo", "") ?? "";
+    const arquivoInformado = lerOpcao(argumentos, "--arquivo", "") ?? "";
+    const arquivo = arquivoInformado
+        ? path.resolve(diretorioBase, arquivoInformado)
+        : resolverCaminhoConfigurado("coberturaServidor", diretorioBase);
     const limite = lerNumero(argumentos, "--limite", 20, {minimo: 0}) ?? 20;
     const filtro = lerOpcao(argumentos, "--filtro", "") || null;
-    const coleta = await extrairCoberturaJacoco(arquivo || undefined, {
+    const coleta = await extrairCoberturaJacoco(arquivo, {
         diretorioBase,
         incluirSemLacunas: true,
         aplicarExclusoes: true,

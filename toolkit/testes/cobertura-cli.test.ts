@@ -10,6 +10,7 @@ import {
 } from "./apoio.js";
 import {VERSAO_CONFIGURACAO} from "../biblioteca/configuracao.js";
 import {extrairCoberturaJacoco} from "../biblioteca/dominios/cobertura-java.js";
+import {extrairCoberturaCliente} from "../biblioteca/dominios/cobertura-web.js";
 
 describe("Auditorias de cobertura da CLI", () => {
     test("mantem auditorias de cobertura read-only e grava sob demanda", async () => {
@@ -159,6 +160,15 @@ describe("Auditorias de cobertura da CLI", () => {
 
         expect(semPolitica.totais.totalArquivos).toBe(1);
         expect(comPolitica.totais.totalArquivos).toBe(0);
+    });
+
+    test("domínios de cobertura exigem relatório explícito", async () => {
+        const base = await mkdtemp(path.join(os.tmpdir(), "sgc-cobertura-caminho-explicito-"));
+
+        await expect(extrairCoberturaJacoco("", {diretorioBase: base}))
+            .rejects.toThrow("O caminho do relatório JaCoCo é obrigatório.");
+        await expect(extrairCoberturaCliente("", {diretorioBase: base}))
+            .rejects.toThrow("O caminho do relatório V8 é obrigatório.");
     });
 
     test("analisa cobertura do cliente a partir de base e relatorio V8 externos", async () => {

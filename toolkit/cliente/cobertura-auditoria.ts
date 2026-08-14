@@ -2,6 +2,7 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import pc from "picocolors";
 import {DIRETORIO_RAIZ} from "../biblioteca/caminhos.js";
+import {resolverCaminhoConfigurado} from "../biblioteca/configuracao.js";
 import {lerNumero, lerOpcao} from "../biblioteca/cli-opcoes.js";
 import {ehEntradaPrincipal, validarArgumentosEntradaDireta} from "../biblioteca/execucao.js";
 import {extrairCoberturaCliente, type ArquivoCobertura, type ResultadoCoberturaCliente} from "../biblioteca/dominios/cobertura-web.js";
@@ -101,7 +102,10 @@ async function principal(argumentosInformados: string[] = process.argv.slice(2))
     }
 
     const diretorioBase = path.resolve(lerOpcao(argumentos, "--base", DIRETORIO_RAIZ) ?? DIRETORIO_RAIZ);
-    const arquivo = lerOpcao(argumentos, "--arquivo", undefined);
+    const arquivoInformado = lerOpcao(argumentos, "--arquivo", undefined);
+    const arquivo = arquivoInformado
+        ? path.resolve(diretorioBase, arquivoInformado)
+        : resolverCaminhoConfigurado("coberturaCliente", diretorioBase);
     const caminhoSaida = path.resolve(diretorioBase, lerOpcao(argumentos, "--saida", CAMINHO_PADRAO_SAIDA) ?? CAMINHO_PADRAO_SAIDA);
     const gravar = argumentos.includes("--gravar");
     const metaMinima = lerNumero(argumentos, "--minimo", 0, {inteiro: false, minimo: 0, maximo: 100}) ?? 0;

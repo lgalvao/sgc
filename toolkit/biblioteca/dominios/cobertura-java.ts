@@ -1,8 +1,6 @@
 import fs from "node:fs/promises";
 import path from "node:path";
 import {parseStringPromise} from "xml2js";
-import {DIRETORIO_RAIZ} from "../caminhos.js";
-import {resolverCaminhoConfigurado} from "../configuracao.js";
 
 interface AtributosXml {
     [nome: string]: string;
@@ -137,14 +135,17 @@ async function lerRelatorioJacoco(caminhoAbsoluto: string): Promise<RelatorioJac
 }
 
 async function extrairCoberturaJacoco(
-    caminhoRelativo: string | null = null,
+    caminhoRelatorio: string,
     opcoes: OpcoesCoberturaJacoco = {}
 ): Promise<ResultadoCoberturaJacoco> {
-    const diretorioBase = opcoes.diretorioBase ?? DIRETORIO_RAIZ;
-    const caminhoPadrao = resolverCaminhoConfigurado("coberturaServidor", diretorioBase);
-    const caminhoXml = caminhoRelativo
-        ? (path.isAbsolute(caminhoRelativo) ? caminhoRelativo : path.resolve(diretorioBase, caminhoRelativo))
-        : caminhoPadrao;
+    if (caminhoRelatorio.trim() === "") {
+        throw new Error("O caminho do relatório JaCoCo é obrigatório.");
+    }
+
+    const diretorioBase = opcoes.diretorioBase ?? process.cwd();
+    const caminhoXml = path.isAbsolute(caminhoRelatorio)
+        ? caminhoRelatorio
+        : path.resolve(diretorioBase, caminhoRelatorio);
     const relatorio = await lerRelatorioJacoco(caminhoXml);
     if (!relatorio) {
         throw new Error(`Relatorio JaCoCo nao encontrado em ${caminhoXml}`);

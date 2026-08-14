@@ -296,7 +296,10 @@ async function carregarCoberturaPorClasse(
     diretorioBase: string = DIRETORIO_RAIZ
 ): Promise<Map<string, ClasseCobertura>> {
     try {
-        const coleta = await extrairCoberturaJacoco(caminhoJacocoXml || undefined, {
+        const caminhoRelatorio = caminhoJacocoXml
+            ? path.resolve(diretorioBase, caminhoJacocoXml)
+            : resolverCaminhoConfigurado("coberturaServidor", diretorioBase);
+        const coleta = await extrairCoberturaJacoco(caminhoRelatorio, {
             diretorioBase,
             incluirSemLacunas: true,
             aplicarExclusoes: false
