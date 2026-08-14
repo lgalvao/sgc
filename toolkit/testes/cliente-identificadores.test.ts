@@ -50,7 +50,7 @@ describe("Identificadores de teste do cliente", () => {
         expect(resultado.stdout).toContain("btn-configurado");
     });
 
-    test("detecta corretamente identificadores de teste duplicados e falha com codigo 1", async () => {
+    test("inventaria identificadores repetidos sem transformar repeticao textual em gate", async () => {
         const diretorioBase = await mkdtemp(path.join(os.tmpdir(), "sgc-testids-duplicados-"));
 
         // Criar dois arquivos com o mesmo test-id
@@ -65,8 +65,8 @@ describe("Identificadores de teste do cliente", () => {
 
         const resultado = await executarSgc(["cliente", "identificadores-teste", "listar-duplicados", "--diretorio", diretorioBase]);
 
-        // O script deve falhar com exitCode 1 quando encontra duplicados
-        expect(resultado.exitCode).toBe(1);
+        // A repeticao global e apenas inventario: o motor nao conhece o DOM simultaneo nem as rotas renderizadas.
+        expect(resultado.exitCode).toBe(0);
         expect(resultado.stdout).toContain("Identificadores de teste duplicados encontrados");
         expect(resultado.stdout).toContain("btn-acao");
         expect(resultado.stdout).toContain("ComponenteX.vue");

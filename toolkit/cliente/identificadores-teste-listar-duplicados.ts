@@ -78,7 +78,7 @@ async function principal(argumentosInformados: string[] = process.argv.slice(2))
     if (exibirAjuda) {
         exibirAjudaComando({
             comandoToolkit: "cliente identificadores-teste listar-duplicados",
-            descricao: "Lista identificadores de teste duplicados nos templates Vue.",
+            descricao: "Inventaria identificadores de teste repetidos nos templates Vue, sem configurar um gate.",
             opcoes: [
                 "--json               Emite os duplicados em JSON.",
                 "--base <diretorio>   Raiz do projeto para resolver codigoCliente.",
@@ -102,9 +102,6 @@ async function principal(argumentosInformados: string[] = process.argv.slice(2))
         imprimirDuplicados(resultado);
     }
 
-    if (resultado.totalDuplicados > 0) {
-        process.exitCode = 1;
-    }
 }
 
 if (ehEntradaPrincipal(import.meta.url)) {

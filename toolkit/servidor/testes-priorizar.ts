@@ -177,7 +177,12 @@ function carregarPendencias(caminhoEntrada: string): Pendencia[] {
     if (!fs.existsSync(caminhoEntrada)) {
         throw new Error(`Arquivo de entrada nao encontrado: ${caminhoEntrada}`);
     }
-    const pendencias = caminhoEntrada.endsWith('.json')
+    const conteudo = fs.readFileSync(caminhoEntrada, "utf-8");
+    const conteudoInicial = conteudo.trimStart();
+    const pareceJson = caminhoEntrada.endsWith(".json")
+        || conteudoInicial.startsWith("{")
+        || conteudoInicial.startsWith("[");
+    const pendencias = pareceJson
         ? extrairPendenciasDeJson(caminhoEntrada)
         : extrairPendenciasDeMarkdown(caminhoEntrada);
     return pendencias.map((item: PendenciaEntrada): Pendencia => typeof item === 'string' ? {

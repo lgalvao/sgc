@@ -82,7 +82,7 @@ permanentes. O catálogo também registra persistência, remoção, subprocessos
 | `cliente views templates-validar` | perfil SGC | Validar previsibilidade dos templates do SGC | Manter |
 | `cliente modais validar` | perfil SGC | Validar o padrão de modais do SGC | Manter |
 | `cliente identificadores-teste listar` | adaptável | Inventariar identificadores de testes | Manter como diagnóstico ocasional |
-| `cliente identificadores-teste listar-duplicados` | adaptável | Auditar identificadores de testes duplicados | Manter como diagnóstico ocasional |
+| `cliente identificadores-teste listar-duplicados` | adaptável | Inventariar identificadores de testes repetidos | Manter como diagnóstico ocasional |
 | `codigo cheiros auditar` | adaptável | Fotografar tendências de complexidade e código defensivo | Manter como tendência |
 | `codigo semgrep auditar` | adaptável | Executar regras Semgrep configuradas | Manter |
 | `codigo nomes coletar-simbolos` | adaptável | Inventariar símbolos do código | Manter como diagnóstico ocasional |

@@ -565,6 +565,38 @@ describe("Análise e priorização dos testes do servidor", () => {
         expect(conteudo.prioridades.P1).toHaveLength(1);
     });
 
+    test("detecta JSON pelo conteudo mesmo quando a extensao nao e json", async () => {
+        const diretorioSaida = await mkdtemp(path.join(os.tmpdir(), "sgc-testes-priorizar-formato-conteudo-"));
+        const entrada = path.join(diretorioSaida, "analise-teste-relatorio.out");
+
+        await escreverArquivo(entrada, JSON.stringify({
+            versao: 2,
+            categorias: {
+                servicos: {
+                    semTeste: [{caminhoRelativo: "sgc/mapa/service/MapaCriticoService.java"}]
+                }
+            }
+        }));
+
+        const resultado = await executarScriptTestesPriorizar(["--entrada", entrada, "--json"]);
+
+        expect(resultado.exitCode).toBe(0);
+        expect(JSON.parse(resultado.stdout).prioridades.P1).toHaveLength(1);
+    });
+
+    test("rejeita conteudo estruturado invalido em vez de produzir priorizacao vazia", async () => {
+        const diretorioSaida = await mkdtemp(path.join(os.tmpdir(), "sgc-testes-priorizar-formato-invalido-"));
+        const entrada = path.join(diretorioSaida, "analise-teste.out");
+
+        await escreverArquivo(entrada, "{ relatorio incompleto");
+
+        const resultado = await executarScriptTestesPriorizar(["--entrada", entrada]);
+
+        expect(resultado.exitCode).toBe(1);
+        expect(resultado.stdout).toBe("");
+        expect(resultado.stderr).toContain("Erro ao processar priorizacao");
+    });
+
     test("rejeita versao incompativel do relatorio de analise", async () => {
         const diretorioSaida = await mkdtemp(path.join(os.tmpdir(), "sgc-testes-priorizar-versao-"));
         const entrada = path.join(diretorioSaida, "analise-testes.json");

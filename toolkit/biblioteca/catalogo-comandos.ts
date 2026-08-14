@@ -243,10 +243,10 @@ const CATALOGO_COMANDOS = [
     },
     {
         caminho: ["cliente", "identificadores-teste", "listar-duplicados"],
-        descricao: "Lista identificadores de teste duplicados.",
+        descricao: "Inventaria identificadores de teste repetidos, sem transformar repeticao textual em gate.",
         escopo: "adaptavel",
         decisao: "manter-ocasional",
-        finalidade: "auditar",
+        finalidade: "inventariar",
         efeitos: criarEfeitosComando("nenhuma"),
         argumentos: esquema(["--base", "--diretorio"], ["--json"]),
         arquivo: "cliente/identificadores-teste-listar-duplicados.ts"
