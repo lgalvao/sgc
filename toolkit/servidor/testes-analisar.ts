@@ -104,6 +104,23 @@ interface OpcoesAnalisar {
     ajuda: boolean;
     gravar: boolean;
     emitirJson: boolean;
+    emitirJsonResumido: boolean;
+}
+
+interface ResumoAnaliseTestes {
+    versaoResumo: 1;
+    geradoEm: string;
+    diretorioServidor: string;
+    truncado: true;
+    limiteItens: number;
+    estatisticas: EstatisticasRelatorio;
+    categorias: Record<Categoria, {comTeste: number; semTeste: number}>;
+    principaisPendencias: Array<{
+        categoria: Categoria;
+        classe: string;
+        caminhoRelativo: string;
+        evidenciaQualidade: string;
+    }>;
 }
 
 interface OpcoesAnaliseTestes {
@@ -135,7 +152,8 @@ function lerArgumentos(argumentos: string[]): OpcoesAnalisar {
             : POLITICA_CLASSIFICACAO_TESTES_SGC,
         ajuda: argumentos.includes("--help") || argumentos.includes("-h"),
         gravar: argumentos.includes("--gravar"),
-        emitirJson: argumentos.includes("--json"),
+        emitirJson: argumentos.includes("--json") || argumentos.includes("--json-resumido"),
+        emitirJsonResumido: argumentos.includes("--json-resumido"),
     };
     return resultado;
 }
@@ -153,6 +171,7 @@ function imprimirAjuda(): void {
             '--politica <arquivo>    Arquivo JSON com a politica de classificacao Java',
             '--gravar                Persiste os relatorios em Markdown e JSON',
             '--json                  Emite o relatorio estruturado no stdout',
+            '--json-resumido         Emite totais e principais pendencias no stdout',
             '--help, -h              Exibe esta ajuda'
         ],
         exemplos: [
@@ -675,6 +694,38 @@ function imprimirResumoConsole(dados: RelatorioTestes): void {
     }
 }
 
+function criarResumoJson(dados: RelatorioTestes): ResumoAnaliseTestes {
+    const limiteItens = 20;
+    const categorias = Object.fromEntries(
+        [...CATEGORIAS_PRIORITARIAS, ...CATEGORIAS_SECUNDARIAS].map(categoria => [categoria, {
+            comTeste: dados.categorias[categoria].comTeste.length,
+            semTeste: dados.categorias[categoria].semTeste.length
+        }])
+    ) as Record<Categoria, {comTeste: number; semTeste: number}>;
+    const principaisPendencias = [...CATEGORIAS_PRIORITARIAS, ...CATEGORIAS_SECUNDARIAS]
+        .flatMap(categoria => dados.categorias[categoria].semTeste.map(item => ({
+            categoria,
+            classe: item.classe,
+            caminhoRelativo: item.caminhoRelativo,
+            evidenciaQualidade: item.evidenciaQualidade
+        })))
+        .filter(item => item.evidenciaQualidade !== "foraEscopoJacoco")
+        .toSorted((a, b) => a.evidenciaQualidade.localeCompare(b.evidenciaQualidade, "pt-BR")
+            || a.caminhoRelativo.localeCompare(b.caminhoRelativo, "pt-BR"))
+        .slice(0, limiteItens);
+
+    return {
+        versaoResumo: 1,
+        geradoEm: dados.geradoEm,
+        diretorioServidor: dados.diretorioServidor,
+        truncado: true,
+        limiteItens,
+        estatisticas: dados.estatisticas,
+        categorias,
+        principaisPendencias
+    };
+}
+
 async function principal(argumentos: string[] = process.argv.slice(2)): Promise<void> {
     const opcoes = lerArgumentos(validarArgumentosEntradaDireta(import.meta.url, argumentos));
     if (opcoes.ajuda) {
@@ -691,7 +742,7 @@ async function principal(argumentos: string[] = process.argv.slice(2)): Promise<
         politica: opcoes.politica,
     });
     if (opcoes.emitirJson) {
-        imprimirJson(dados);
+        imprimirJson(opcoes.emitirJsonResumido ? criarResumoJson(dados) : dados);
     } else {
         imprimirResumoConsole(dados);
     }

@@ -72,9 +72,28 @@ export interface InventarioSimbolos {
 interface OpcoesColeta {
     base?: string;
     json?: boolean;
+    jsonResumido?: boolean;
     gravar?: boolean;
     arquivoSaida?: string | null;
     silencioso?: boolean;
+}
+
+interface ResumoInventarioSimbolos {
+    versaoResumo: 1;
+    geradoEm: string;
+    base: string;
+    truncado: true;
+    limiteItens: number;
+    totais: InventarioSimbolos["totais"];
+    porLinguagem: EstatisticasPorLinguagem;
+    pacotesJava: Array<Pick<PacoteJava, "nome" | "totalArquivos">>;
+    arquivosComMaisMembros: Array<{
+        caminho: string;
+        linguagem: Linguagem;
+        tipos: number;
+        membros: number;
+        pacote: string | null;
+    }>;
 }
 
 const EXTENSOES_SUPORTADAS = new Set([".java", ".ts", ".tsx", ".js", ".jsx", ".vue"]);
@@ -472,9 +491,37 @@ function montarResumoMarkdown(inventario: InventarioSimbolos): string {
     return `${linhas.join("\n")}\n`;
 }
 
+function criarResumoJson(inventario: InventarioSimbolos): ResumoInventarioSimbolos {
+    const limiteItens = 20;
+    return {
+        versaoResumo: 1,
+        geradoEm: inventario.geradoEm,
+        base: inventario.base,
+        truncado: true,
+        limiteItens,
+        totais: inventario.totais,
+        porLinguagem: inventario.porLinguagem,
+        pacotesJava: inventario.pacotesJava
+            .toSorted((a, b) => b.totalArquivos - a.totalArquivos || a.nome.localeCompare(b.nome, "pt-BR"))
+            .slice(0, limiteItens)
+            .map(({nome, totalArquivos}) => ({nome, totalArquivos})),
+        arquivosComMaisMembros: inventario.arquivos
+            .toSorted((a, b) => b.membros.length - a.membros.length || b.tipos.length - a.tipos.length || a.caminho.localeCompare(b.caminho, "pt-BR"))
+            .slice(0, limiteItens)
+            .map(arquivo => ({
+                caminho: arquivo.caminho,
+                linguagem: arquivo.linguagem,
+                tipos: arquivo.tipos.length,
+                membros: arquivo.membros.length,
+                pacote: arquivo.pacote
+            }))
+    };
+}
+
 async function executarColeta({
     base = DIRETORIO_RAIZ,
     json = false,
+    jsonResumido = false,
     gravar = false,
     arquivoSaida = null,
     silencioso = false
@@ -569,7 +616,7 @@ async function executarColeta({
 
     if (json) {
         if (!silencioso) {
-            imprimirJson(inventario);
+            imprimirJson(jsonResumido ? criarResumoJson(inventario) : inventario);
         }
         return inventario;
     }
@@ -633,6 +680,7 @@ function lerOpcoes(argv: string[]): OpcoesColeta {
     const opcoes: Required<OpcoesColeta> = {
         base: DIRETORIO_RAIZ,
         json: false,
+        jsonResumido: false,
         gravar: false,
         arquivoSaida: null,
         silencioso: false
@@ -642,6 +690,11 @@ function lerOpcoes(argv: string[]): OpcoesColeta {
         const argumento = argv[indice];
         if (argumento === "--json") {
             opcoes.json = true;
+            continue;
+        }
+        if (argumento === "--json-resumido") {
+            opcoes.json = true;
+            opcoes.jsonResumido = true;
             continue;
         }
         if (argumento === "--gravar") {
@@ -665,7 +718,7 @@ function lerOpcoes(argv: string[]): OpcoesColeta {
 async function principal(argumentos: string[] = process.argv.slice(2)): Promise<void> {
     const argumentosValidados = validarArgumentosEntradaDireta(import.meta.url, argumentos);
     if (argumentosValidados.includes("--help") || argumentosValidados.includes("-h")) {
-        escreverLinha("Uso: ferramentas codigo nomes coletar-simbolos [--json] [--gravar] [--base <diretorio>] [--saida <arquivo.json>]");
+        escreverLinha("Uso: ferramentas codigo nomes coletar-simbolos [--json|--json-resumido] [--gravar] [--base <diretorio>] [--saida <arquivo.json>]");
         escreverLinha("");
         escreverLinha("Gera inventario completo de pacotes, arquivos, tipos e membros.");
         return;

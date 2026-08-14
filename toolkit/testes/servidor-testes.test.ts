@@ -565,6 +565,33 @@ describe("Análise e priorização dos testes do servidor", () => {
         expect(conteudo.prioridades.P1).toHaveLength(1);
     });
 
+    test("emite resumo JSON limitado da analise do servidor", async () => {
+        const base = await mkdtemp(path.join(os.tmpdir(), "sgc-testes-resumo-"));
+        const diretorioServidor = path.join(base, "servidor");
+        await escreverArquivo(
+            path.join(diretorioServidor, "src", "main", "java", "com", "exemplo", "ExemploService.java"),
+            "package com.exemplo; public class ExemploService { public void buscar() {} }"
+        );
+
+        const resultado = await executarSgc([
+            "servidor",
+            "testes",
+            "analisar",
+            "--base",
+            base,
+            "--diretorio",
+            "servidor",
+            "--json-resumido"
+        ]);
+
+        expect(resultado.exitCode).toBe(0);
+        const resumo = JSON.parse(resultado.stdout);
+        expect(resumo).toMatchObject({versaoResumo: 1, truncado: true, limiteItens: 20});
+        expect(resumo.estatisticas.totalClasses).toBe(1);
+        expect(resumo.categorias.servicos).toEqual({comTeste: 0, semTeste: 1});
+        expect(resumo.principaisPendencias[0]).toMatchObject({classe: "ExemploService"});
+    });
+
     test("detecta JSON pelo conteudo mesmo quando a extensao nao e json", async () => {
         const diretorioSaida = await mkdtemp(path.join(os.tmpdir(), "sgc-testes-priorizar-formato-conteudo-"));
         const entrada = path.join(diretorioSaida, "analise-teste-relatorio.out");

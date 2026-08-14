@@ -108,7 +108,7 @@ const CATALOGO_COMANDOS = [
         decisao: "manter",
         finalidade: "inventariar",
         efeitos: criarEfeitosComando("opcional"),
-        argumentos: esquema(["--base", "--diretorio", "--saida", "--saida-json", "--arquivo-jacoco", "--politica"], ["--json", "--gravar"]),
+        argumentos: esquema(["--base", "--diretorio", "--saida", "--saida-json", "--arquivo-jacoco", "--politica"], ["--json", "--json-resumido", "--gravar"]),
         arquivo: "servidor/testes-analisar.ts"
     },
     {
@@ -278,7 +278,7 @@ const CATALOGO_COMANDOS = [
         decisao: "manter-ocasional",
         finalidade: "inventariar",
         efeitos: criarEfeitosComando("opcional"),
-        argumentos: esquema(["--base", "--saida"], ["--json", "--gravar"]),
+        argumentos: esquema(["--base", "--saida"], ["--json", "--json-resumido", "--gravar"]),
         arquivo: "codigo/nomes-simbolos-coletar.ts"
     },
     {

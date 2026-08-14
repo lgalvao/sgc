@@ -17,6 +17,34 @@ import {resolverDiretoriosPadrao} from "../codigo/semgrep-auditar.js";
 import {executarAuditoria as executarAuditoriaCheiros} from "../codigo/cheiros-auditar.js";
 
 describe("Auditores de código", () => {
+    test("emite resumo JSON limitado para inventario de simbolos", async () => {
+        const base = await mkdtemp(path.join(os.tmpdir(), "sgc-simbolos-resumo-"));
+        await escreverArquivo(
+            path.join(base, "Exemplo.java"),
+            "package exemplo; public class Exemplo { public void buscar() {} }"
+        );
+        await escreverArquivo(
+            path.join(base, "Exemplo.ts"),
+            "export function criar() { return true; }\n"
+        );
+
+        const resultado = await executarSgc([
+            "codigo",
+            "nomes",
+            "coletar-simbolos",
+            "--base",
+            base,
+            "--json-resumido"
+        ]);
+
+        expect(resultado.exitCode).toBe(0);
+        const resumo = JSON.parse(resultado.stdout);
+        expect(resumo).toMatchObject({versaoResumo: 1, truncado: true, limiteItens: 20});
+        expect(resumo.totais.arquivos).toBe(2);
+        expect(resumo.arquivos).toBeUndefined();
+        expect(resumo.arquivosComMaisMembros).toHaveLength(2);
+    });
+
     test("audita cheiros de codigo em um recorte controlado", async () => {
         const base = await mkdtemp(path.join(os.tmpdir(), "sgc-cheiros-"));
         const diretorioCliente = path.join(base, "frontend", "src");

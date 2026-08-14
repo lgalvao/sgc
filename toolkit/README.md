@@ -159,7 +159,9 @@ estruturais configuráveis.
 O motor `codigo/semgrep-motor.ts` recebe regra, alvos e comando explicitamente e não resolve caminhos do SGC. A borda
 `codigo/semgrep-auditar.ts` compõe esses valores a partir da configuração e da política Semgrep do perfil SGC.
 
-`codigo nomes coletar-simbolos` produz um inventário `versao: 1`. As auditorias `codigo nomes auditar-consistencia` e
+`codigo nomes coletar-simbolos` produz um inventário `versao: 1`. Use `--json-resumido` para receber apenas totais,
+linguagens, pacotes principais e os 20 arquivos com mais membros; `--json` continua emitindo o inventário completo.
+As auditorias `codigo nomes auditar-consistencia` e
 `codigo nomes auditar-idioma` reutilizam esse inventário e emitem resultados versionados (`auditar-idioma` em `versao: 2`); um inventário existente
 com formato ou versão incompatível é rejeitado, enquanto a ausência do arquivo ainda permite uma coleta somente em
 memória quando o comando não usa `--gravar`.
