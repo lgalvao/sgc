@@ -69,8 +69,9 @@ contrato horizontal claro e teste externo que não carregue defaults do SGC.
 
 ## Situação atual
 
-A modernização estrutural, a ergonomia dos maiores resultados e a validação do recorte estão concluídas. O toolkit possui
-uma superfície documentada, executável em Node 26 e validada contra o pacote isolado e o corpus real do SGC:
+A modernização estrutural e a validação contra o SGC estão concluídas, mas a execução em um segundo projeto real reabriu
+o recorte de horizontalidade. O SAPE tem Spring Boot 4, Java 25 e Vue/TypeScript, porém usa três módulos Java e
+vocabulário arquitetural em português; ele expôs resultados vazios ou verdes produzidos por premissas do SGC:
 
 - CLI e catálogo registram finalidade, camada, decisão e efeitos; README documenta a superfície e os contratos atuais dos
   38 comandos públicos;
@@ -88,6 +89,29 @@ uma superfície documentada, executável em Node 26 e validada contra o pacote i
   servidor, gate arquitetural, consistência de nomenclatura, qualidade, resíduos, cobertura e CDU;
 - a árvore de linhas usa profundidade 3 e mínimo de 500 linhas por padrão, com expansão explícita pelas opções atuais;
 - testes, pacote isolado, typechecks, lint, Knip, build e `git diff --check` passam.
+
+### Prova externa com o SAPE
+
+O SAPE está disponível como cópia sem metadados Git e com uma dependência Java privada indisponível. A validação deve
+permanecer somente leitura e não executar build, teste ou resolução de dependências do Gradle.
+
+Achados confirmados:
+
+- arquitetura reconhecia apenas sufixos ingleses e retornava zero; o motor agora usa anotações Spring e nomes em
+  português ou inglês, encontrando 82 alvos no servidor, 28 no admin e 17 no ETL;
+- contratos reconhecia apenas `*Controller.java` e pacotes `.model`; agora reconhece controladores por anotação ou nome,
+  pacotes `model`, `modelo`, `domain` e `dominio`, e informa quantos controladores e DTOs foram analisados;
+- análise de testes classificava `Servico`, `Controlador`, `Fachada` e diretórios `.modelo` como `outros`; a classificação
+  bilíngue e a priorização sem itens já considerados ruído estão implementadas;
+- resíduos classificava `componentes` e `visoes` como `outro`; os diretórios equivalentes em português agora preservam
+  a camada correta;
+- arquitetura, contratos e análise de testes aceitam `--diretorio <modulo>`, permitindo auditar `servidor`, `admin` e
+  `etl` separadamente;
+- árvore de linhas ainda exige Git, mas agora apresenta a pré-condição sem stack trace quando recebe uma cópia sem `.git`;
+- consistência geral ainda inclui a política SGC de rejeitar `id`, apesar de existir um comando específico de idioma;
+- Semgrep usa silenciosamente regras do SGC quando o projeto externo não configura regras próprias;
+- validação de resíduos sem orçamento retorna `ok`, embora tenha executado somente um inventário;
+- auditoria de dependências pode classificar erro operacional como achado quando o escopo aceita código não zero.
 
 Essa situação não comprova, por si só, a correção semântica uniforme de todos os auditores. A revisão final encontrou
 auditores com bons testes comportamentais e outros ainda cobertos principalmente por execução, schema, persistência ou
@@ -185,9 +209,12 @@ opções existentes, inclusive com zero.
 
 ### Próximos passos
 
-Não há etapa obrigatória restante neste recorte. Uma nova rodada só deve ser aberta diante de evidência concreta de
-regressão, resultado enganoso, falha de segurança, necessidade horizontal comprovada ou mudança relevante nas ferramentas
-externas. Nesse caso, registrar primeiro a nova lacuna, definir um critério de término específico e manter o escopo pequeno.
+1. impedir política Semgrep do SGC em projeto externo sem configuração explícita;
+2. separar a regra `id` da auditoria geral de consistência e mantê-la apenas no perfil de idioma do SGC;
+3. fazer `cliente residuos validar` distinguir orçamento ausente de aprovação real;
+4. distinguir achados de erros operacionais nas execuções configuradas de dependências;
+5. repetir a amostra estática no SAPE e a regressão representativa no SGC, sem executar Gradle no SAPE;
+6. encerrar novamente o recorte quando os critérios adicionais estiverem atendidos.
 
 ## Recorte final — comprovação semântica
 
@@ -251,7 +278,7 @@ real não apresentar classificação contraditória, ambiguidade sistemática ou
 - [x] não há comando decidido como redundante, temporário ou obsoleto ainda presente;
 - [x] não há JavaScript legado, alias de compatibilidade ou implementação paralela;
 - [x] nomes e contratos próprios seguem TypeScript e português brasileiro;
-- [x] motores classificados como núcleo ou adaptador não importam política ou caminho SGC;
+- [ ] motores classificados como núcleo ou adaptador não aplicam política ou caminho SGC silenciosamente em outro projeto;
 - [x] políticas para auditar o SGC estão identificadas e continuam funcionando contra seu workspace;
 - [x] CDU e análise de testes Java funcionam com projeto externo sem editar o toolkit;
 - [x] ajuda, parser, catálogo e README concordam sobre a superfície pública;
@@ -265,6 +292,14 @@ real não apresentar classificação contraditória, ambiguidade sistemática ou
 - [x] a matriz semântica está completa e não contém lacuna obrigatória;
 - [x] a amostra final contra o SGC foi confrontada com o código e não revelou resultado enganoso sem regressão;
 - [x] testes, typechecks, lint, Knip, build e `git diff --check` passam.
+
+Critérios adicionais da prova externa:
+
+- [x] auditorias adaptáveis reconhecem vocabulário Java e diretórios Vue em português e inglês;
+- [x] módulos Java adicionais podem ser selecionados sem alterar a configuração do projeto;
+- [ ] ausência de política obrigatória não produz `ok` ou zero achados enganoso;
+- [ ] erro operacional de ferramenta externa não é classificado como achado;
+- [ ] amostra estática final do SAPE passa sem executar Gradle.
 
 “Não existir qualquer melhoria possível” não é critério de término. Cobertura total, tamanho máximo de arquivo,
 generalização de toda política e padronização de formatos externos também não são requisitos.

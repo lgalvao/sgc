@@ -119,19 +119,31 @@ function normalizarCaminho(caminho: string): string {
 function inferirCategoria(nomeClasse: string, caminhoRelativo: string): Categoria {
     const caminhoNormalizado = normalizarCaminho(caminhoRelativo);
 
-    if (nomeClasse.includes("Controller")) return "controladores";
-    if (nomeClasse.includes("Service") || nomeClasse.includes("Policy")) return "servicos";
-    if (nomeClasse.includes("Facade")) return "fachadas";
-    if (nomeClasse.includes("Mapper")) return "mapeadores";
+    if (nomeClasse.includes("Controller") || nomeClasse.includes("Controlador")
+        || nomeClasse.startsWith("Rest") || caminhoNormalizado.includes("/controle/")
+        || caminhoNormalizado.includes("/rest/")) return "controladores";
+    if (/(?:Service|Servico)$/.test(nomeClasse) || /^(?:Service|Servico)[A-Z]/.test(nomeClasse)
+        || /Policy$/.test(nomeClasse) || /^Politica[A-Z]/.test(nomeClasse)) return "servicos";
+    if (nomeClasse.includes("Facade") || nomeClasse.includes("Fachada")) return "fachadas";
+    if (nomeClasse.includes("Mapper") || nomeClasse.includes("Mapeador")) return "mapeadores";
     if (
         caminhoNormalizado.includes("/dto/")
+        || caminhoNormalizado.includes("/dtos/")
+        || caminhoNormalizado.includes("/form/")
+        || caminhoNormalizado.includes("/formularios/")
         || nomeClasse.includes("Dto")
         || nomeClasse.includes("Request")
         || nomeClasse.includes("Response")
+        || nomeClasse.includes("Requisicao")
+        || nomeClasse.includes("Resposta")
+        || nomeClasse.endsWith("Form")
         || nomeClasse.includes("Command")
     ) return "dtos";
-    if (nomeClasse.includes("Repo")) return "repositorios";
-    if (caminhoNormalizado.includes("/model/") || caminhoNormalizado.includes("/dominio/")) return "modelos";
+    if (nomeClasse.includes("Repo") || nomeClasse.includes("Repository") || nomeClasse.includes("Repositorio")) {
+        return "repositorios";
+    }
+    if (caminhoNormalizado.includes("/model/") || caminhoNormalizado.includes("/modelo/")
+        || caminhoNormalizado.includes("/domain/") || caminhoNormalizado.includes("/dominio/")) return "modelos";
     return "outros";
 }
 

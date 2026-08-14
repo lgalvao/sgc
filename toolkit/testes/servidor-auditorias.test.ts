@@ -128,6 +128,38 @@ describe("Auditorias do servidor", () => {
         expect(await existe(path.join(base, "artefatos", "servidor", "mais-recente", "arquitetura-auditoria.md"))).toBe(true);
     });
 
+    test("reconhece nomes e anotacoes de arquitetura em portugues", async () => {
+        const base = await mkdtemp(path.join(os.tmpdir(), "sgc-arquitetura-portugues-"));
+        const codigoServidor = path.join(base, "modulo", "src", "main", "java");
+        await escreverArquivo(
+            path.join(codigoServidor, "exemplo", "ServicoExemplo.java"),
+            [
+                "package exemplo;",
+                "@Service",
+                "public class ServicoExemplo {",
+                ...Array.from({length: 8}, (_, indice) => `    private final Dependencia${indice} dependencia${indice};`),
+                ...Array.from({length: 15}, (_, indice) => `    public void buscar${indice}() {}`),
+                "}"
+            ].join("\n")
+        );
+        await escreverArquivo(
+            path.join(codigoServidor, "exemplo", "ApiPublica.java"),
+            "package exemplo; @RestController public class ApiPublica { public void listar() {} }"
+        );
+
+        const resultado = await executarSgc([
+            "servidor", "arquitetura", "auditar", "--json", "--base", base, "--diretorio", "modulo"
+        ]);
+
+        expect(resultado.exitCode).toBe(0);
+        const conteudo = JSON.parse(resultado.stdout);
+        expect(conteudo.resumo.totalAnalisados).toBe(2);
+        expect(conteudo.todos).toEqual(expect.arrayContaining([
+            expect.objectContaining({nomeArquivo: "ServicoExemplo.java", tipo: "service", severidade: "alerta"}),
+            expect.objectContaining({nomeArquivo: "ApiPublica.java", tipo: "controller"})
+        ]));
+    });
+
     test("audita vazamento de modelo em DTO de controlador sem gravar por padrao", async () => {
         const base = await mkdtemp(path.join(os.tmpdir(), "sgc-contratos-servidor-"));
         const codigoServidor = path.join(base, "servidor", "java");
@@ -175,7 +207,11 @@ describe("Auditorias do servidor", () => {
 
         expect(resultado.exitCode).toBe(0);
         const conteudo = JSON.parse(resultado.stdout);
-        expect(conteudo.resumo.totalAchados).toBe(1);
+        expect(conteudo.resumo).toMatchObject({
+            totalControladoresAnalisados: 1,
+            totalDtosAnalisados: 1,
+            totalAchados: 1
+        });
         expect(conteudo.achados[0]).toMatchObject({
             controlador: "UsuarioController.java",
             metodo: "obter",
@@ -196,5 +232,46 @@ describe("Auditorias do servidor", () => {
         ]);
         expect(gravacao.exitCode).toBe(0);
         expect(await existe(path.join(base, "artefatos", "servidor", "mais-recente", "contratos-auditoria.md"))).toBe(true);
+    });
+
+    test("reconhece controladores e pacotes de modelo em portugues", async () => {
+        const base = await mkdtemp(path.join(os.tmpdir(), "sgc-contratos-portugues-"));
+        const codigoServidor = path.join(base, "modulo", "src", "main", "java");
+        await escreverArquivo(
+            path.join(codigoServidor, "exemplo", "web", "ControladorUsuarios.java"),
+            [
+                "package exemplo.web;",
+                "import exemplo.web.respostas.UsuarioResposta;",
+                "@RestController",
+                "public class ControladorUsuarios {",
+                "    public UsuarioResposta obter() { return null; }",
+                "}"
+            ].join("\n")
+        );
+        await escreverArquivo(
+            path.join(codigoServidor, "exemplo", "web", "respostas", "UsuarioResposta.java"),
+            [
+                "package exemplo.web.respostas;",
+                "import exemplo.modelo.Usuario;",
+                "public record UsuarioResposta(Usuario usuario) {}"
+            ].join("\n")
+        );
+        await escreverArquivo(
+            path.join(codigoServidor, "exemplo", "modelo", "Usuario.java"),
+            "package exemplo.modelo; @Entity public class Usuario {}"
+        );
+
+        const resultado = await executarSgc([
+            "servidor", "contratos", "auditar", "--json", "--base", base, "--diretorio", "modulo"
+        ]);
+
+        expect(resultado.exitCode).toBe(0);
+        const conteudo = JSON.parse(resultado.stdout);
+        expect(conteudo.resumo.totalAchados).toBe(1);
+        expect(conteudo.achados[0]).toMatchObject({
+            controlador: "ControladorUsuarios.java",
+            tipoRetorno: "UsuarioResposta",
+            tipoModelo: "exemplo.modelo.Usuario"
+        });
     });
 });

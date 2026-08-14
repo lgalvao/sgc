@@ -134,6 +134,14 @@ describe("Comandos de projeto do toolkit", () => {
         expect(listarArquivosGit(diretorioBase)).toEqual(["arquivo.txt"]);
     });
 
+    test("explica a pre-condicao quando a arvore recebe diretorio sem Git", async () => {
+        const diretorioBase = await mkdtemp(path.join(os.tmpdir(), "sgc-arvore-sem-git-"));
+
+        expect(() => listarArquivosGit(diretorioBase)).toThrow(
+            `O diretorio informado nao e um repositorio Git acessivel: ${diretorioBase}`
+        );
+    });
+
     test("padroniza opcoes da arvore de linhas em portugues e reconhece testes Java externos", () => {
         expect(lerOpcoes([
             "--base",

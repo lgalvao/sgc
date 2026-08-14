@@ -26,6 +26,7 @@ const TIPOS_ESCALARES = new Set([
     "Object",
     "SseEmitter"
 ]);
+const SEGMENTOS_MODELO = new Set(["model", "modelo", "domain", "dominio"]);
 
 type CategoriaModelo = "entidade" | "enum" | "modelo";
 
@@ -70,6 +71,8 @@ interface RelatorioContratos {
     geradoEm: string;
     base: string;
     resumo: {
+        totalControladoresAnalisados: number;
+        totalDtosAnalisados: number;
         totalAchados: number;
         controladoresAfetados: number;
         dtosAfetados: number;
@@ -79,6 +82,23 @@ interface RelatorioContratos {
 
 function normalizarCaminho(caminho: string): string {
     return caminho.replaceAll(path.sep, "/");
+}
+
+function ehPacoteModelo(fqn: string): boolean {
+    return fqn.split(".").some(segmento => SEGMENTOS_MODELO.has(segmento));
+}
+
+function ehControlador(arquivo: string, conteudo: string): boolean {
+    const nomeArquivo = path.basename(arquivo);
+    return /@(?:RestController|Controller)\b/.test(conteudo)
+        || /(?:^Controlador.*|.+Controller)\.java$/.test(nomeArquivo);
+}
+
+function ehDtoExposto(arquivo: string): boolean {
+    const caminho = normalizarCaminho(arquivo);
+    const nome = path.basename(arquivo);
+    return /\/(?:dto|dtos|form|forms|formularios)\//.test(caminho)
+        || /(?:Dto|Request|Response|Requisicao|Resposta|Form)\.java$/.test(nome);
 }
 
 function extrairImports(conteudo: string): Importacoes {
@@ -234,8 +254,7 @@ async function listarTiposPacoteModelo(
     cacheArquivos: Map<string, string>,
     diretorioCodigo: string
 ): Promise<Map<string, TipoModelo>> {
-    const diretorioRaizJava = path.dirname(diretorioCodigo);
-    const diretorio = path.join(diretorioRaizJava, ...pacoteCuringa.split("."));
+    const diretorio = path.join(diretorioCodigo, ...pacoteCuringa.split("."));
     const candidatos = await globby(path.join(diretorio, "*.java").replace(/\\/g, "/"), {absolute: true});
     const tipos = new Map<string, TipoModelo>();
 
@@ -271,7 +290,7 @@ async function resolverTiposModeloDisponiveis(
     const tiposModelo = new Map<string, TipoModelo>();
 
     for (const [simples, fqn] of imports.exatos.entries()) {
-        if (!fqn.includes(".model.")) {
+        if (!ehPacoteModelo(fqn)) {
             continue;
         }
         const candidatos = indiceArquivos.porNome.get(simples) ?? [];
@@ -287,7 +306,7 @@ async function resolverTiposModeloDisponiveis(
         });
     }
 
-    for (const pacote of imports.curingas.filter((item) => item.includes(".model"))) {
+    for (const pacote of imports.curingas.filter(ehPacoteModelo)) {
         const tiposPacote = await listarTiposPacoteModelo(pacote, cacheArquivos, diretorioCodigo);
         for (const [simples, meta] of tiposPacote.entries()) {
             if (!tiposModelo.has(simples)) {
@@ -302,8 +321,15 @@ async function resolverTiposModeloDisponiveis(
 async function auditarContratos(diretorioCodigo: string, diretorioBase: string): Promise<RelatorioContratos> {
     const indiceArquivos = await indexarArquivosJava(diretorioCodigo);
     const cacheArquivos = new Map<string, string>();
-    const controladores = indiceArquivos.arquivos.filter((arquivo) => arquivo.endsWith("Controller.java"));
+    const controladores: string[] = [];
+    for (const arquivo of indiceArquivos.arquivos) {
+        const conteudo = await lerCacheado(cacheArquivos, arquivo);
+        if (ehControlador(arquivo, conteudo)) {
+            controladores.push(arquivo);
+        }
+    }
     const achados: AchadoContrato[] = [];
+    const dtosAnalisados = new Set<string>();
 
     for (const controlador of controladores) {
         const conteudoControlador = await lerCacheado(cacheArquivos, controlador);
@@ -313,9 +339,10 @@ async function auditarContratos(diretorioCodigo: string, diretorioBase: string):
         for (const retorno of retornos) {
             const arquivosTipo = indiceArquivos.porNome.get(retorno.tipo) ?? [];
             const arquivoTipo = arquivosTipo[0];
-            if (!arquivoTipo || !arquivoTipo.includes("/dto/") && !arquivoTipo.endsWith("Dto.java") && !arquivoTipo.endsWith("Response.java")) {
+            if (!arquivoTipo || !ehDtoExposto(arquivoTipo)) {
                 continue;
             }
+            dtosAnalisados.add(arquivoTipo);
 
             const conteudoTipo = await lerCacheado(cacheArquivos, arquivoTipo);
             const imports = extrairImports(conteudoTipo);
@@ -354,6 +381,8 @@ async function auditarContratos(diretorioCodigo: string, diretorioBase: string):
         geradoEm: new Date().toISOString(),
         base: diretorioBase,
         resumo: {
+            totalControladoresAnalisados: controladores.length,
+            totalDtosAnalisados: dtosAnalisados.size,
             totalAchados: achados.length,
             controladoresAfetados: new Set(achados.map((item) => item.controlador)).size,
             dtosAfetados: new Set(achados.map((item) => item.arquivoDto)).size
@@ -366,12 +395,14 @@ function gerarMarkdown(relatorio: RelatorioContratos): string {
     const linhas: string[] = [];
     linhas.push("# Auditoria de contratos HTTP do servidor", "");
     linhas.push(`Gerado em: ${relatorio.geradoEm}`, "");
+    linhas.push(`- Controladores analisados: ${relatorio.resumo.totalControladoresAnalisados}`);
+    linhas.push(`- DTOs analisados: ${relatorio.resumo.totalDtosAnalisados}`);
     linhas.push(`- Achados: ${relatorio.resumo.totalAchados}`);
     linhas.push(`- Controllers afetados: ${relatorio.resumo.controladoresAfetados}`);
     linhas.push(`- DTOs afetados: ${relatorio.resumo.dtosAfetados}`, "");
 
     if (relatorio.achados.length === 0) {
-        linhas.push("Nenhum DTO publico com vazamento direto de `model.*` foi encontrado.");
+        linhas.push("Nenhum DTO publico com vazamento direto de tipos de modelo foi encontrado.");
         return linhas.join("\n");
     }
 
@@ -395,11 +426,12 @@ async function gravarRelatorio(relatorio: RelatorioContratos, diretorioSaida: st
 function exibirAjuda(): void {
     exibirAjudaComando({
         comandoToolkit: "servidor contratos auditar",
-        descricao: "Audita DTOs e responses expostos por controllers para detectar vazamento de tipos model.* no contrato HTTP.",
+        descricao: "Audita DTOs e respostas expostos por controladores para detectar vazamento de tipos de modelo no contrato HTTP.",
         opcoes: [
             "--json              Emite o relatório em JSON.",
             "--gravar            Grava o relatório Markdown em disco.",
             "--base <diretorio>  Sobrescreve a base da auditoria.",
+            "--diretorio <modulo> Raiz do modulo Java que contem src/main/java.",
             "--help, -h          Exibe esta ajuda."
         ],
         exemplos: [
@@ -415,7 +447,10 @@ async function principal(argumentosInformados: string[] = process.argv.slice(2))
     const emitirJson = argumentos.includes("--json");
     const gravar = argumentos.includes("--gravar");
     const diretorioBase = path.resolve(lerOpcao(argumentos, "--base", DIRETORIO_RAIZ) ?? DIRETORIO_RAIZ);
-    const diretorioCodigo = resolverCaminhoConfigurado("codigoServidor", diretorioBase);
+    const diretorioInformado = lerOpcao(argumentos, "--diretorio", undefined);
+    const diretorioCodigo = diretorioInformado
+        ? path.resolve(diretorioBase, diretorioInformado, "src", "main", "java")
+        : resolverCaminhoConfigurado("codigoServidor", diretorioBase);
     const diretorioSaida = path.join(resolverCaminhoConfigurado("artefatosQualidade", diretorioBase), "servidor", "mais-recente");
 
     if (argumentos.includes("--help") || argumentos.includes("-h")) {
@@ -438,6 +473,8 @@ async function principal(argumentosInformados: string[] = process.argv.slice(2))
     }
 
     if (!emitirJson) {
+        escreverLinha(`Controladores analisados: ${relatorio.resumo.totalControladoresAnalisados}`);
+        escreverLinha(`DTOs analisados: ${relatorio.resumo.totalDtosAnalisados}`);
         escreverLinha(`Achados: ${relatorio.resumo.totalAchados}`);
         escreverLinha(`Controllers afetados: ${relatorio.resumo.controladoresAfetados}`);
         escreverLinha(`DTOs afetados: ${relatorio.resumo.dtosAfetados}`);
@@ -447,7 +484,7 @@ async function principal(argumentosInformados: string[] = process.argv.slice(2))
                 escreverLinha(`- ${achado.controlador}.${achado.metodo} -> ${achado.tipoRetorno}.${achado.campo} (${achado.tipoModelo})`);
             }
         } else {
-            escreverLinha(pc.green("Nenhum vazamento direto de model.* foi encontrado nos DTOs publicos auditados."));
+            escreverLinha(pc.green("Nenhum vazamento direto de tipos de modelo foi encontrado nos DTOs publicos auditados."));
         }
     }
 

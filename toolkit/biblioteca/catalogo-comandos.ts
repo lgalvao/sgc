@@ -73,12 +73,12 @@ const CATALOGO_COMANDOS = [
     },
     {
         caminho: ["servidor", "arquitetura", "auditar"],
-        descricao: "Audita concentração de responsabilidades em Services, Facades e Controllers por linhas, métodos e dependências.",
+        descricao: "Audita concentracao de responsabilidades em servicos, fachadas e controladores por linhas, metodos e dependencias.",
         escopo: "adaptavel",
         decisao: "manter",
         finalidade: "auditar",
         efeitos: criarEfeitosComando("nenhuma"),
-        argumentos: esquema(["--base"], ["--json", "--gravar"]),
+        argumentos: esquema(["--base", "--diretorio"], ["--json", "--gravar"]),
         arquivo: "servidor/arquitetura-auditar.ts"
     },
     {
@@ -93,12 +93,12 @@ const CATALOGO_COMANDOS = [
     },
     {
         caminho: ["servidor", "contratos", "auditar"],
-        descricao: "Audita vazamentos de model.* em DTOs expostos por controllers.",
+        descricao: "Audita vazamentos de tipos de modelo em DTOs expostos por controladores.",
         escopo: "adaptavel",
         decisao: "manter",
         finalidade: "auditar",
         efeitos: criarEfeitosComando("nenhuma"),
-        argumentos: esquema(["--base"], ["--json", "--gravar"]),
+        argumentos: esquema(["--base", "--diretorio"], ["--json", "--gravar"]),
         arquivo: "servidor/contratos-auditar.ts"
     },
     {

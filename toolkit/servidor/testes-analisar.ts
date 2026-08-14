@@ -164,7 +164,7 @@ function imprimirAjuda(): void {
         descricao: 'Analisa evidências de testes e cobertura das classes do servidor e gera Markdown e JSON por categoria.',
         opcoes: [
             '--base <diretorio>     Base do projeto para resolver configuracao.',
-            '--diretorio <caminho>   Diretorio de fontes Java; substitui codigoServidor.',
+            '--diretorio <caminho>   Raiz do modulo Java que contem src/main/java e src/test/java.',
             '--saida <arquivo>       Arquivo de saida em Markdown',
             '--saida-json <arquivo>  Arquivo de saida estruturado em JSON (padrao: sidecar do Markdown)',
             '--arquivo-jacoco <arquivo> Relatorio XML do JaCoCo para classificar cobertura indireta',
@@ -696,6 +696,9 @@ function imprimirResumoConsole(dados: RelatorioTestes): void {
 
 function criarResumoJson(dados: RelatorioTestes): ResumoAnaliseTestes {
     const limiteItens = 20;
+    const ordemCategorias = new Map(
+        [...CATEGORIAS_PRIORITARIAS, ...CATEGORIAS_SECUNDARIAS].map((categoria, indice) => [categoria, indice])
+    );
     const categorias = Object.fromEntries(
         [...CATEGORIAS_PRIORITARIAS, ...CATEGORIAS_SECUNDARIAS].map(categoria => [categoria, {
             comTeste: dados.categorias[categoria].comTeste.length,
@@ -709,8 +712,10 @@ function criarResumoJson(dados: RelatorioTestes): ResumoAnaliseTestes {
             caminhoRelativo: item.caminhoRelativo,
             evidenciaQualidade: item.evidenciaQualidade
         })))
-        .filter(item => item.evidenciaQualidade !== "foraEscopoJacoco")
-        .toSorted((a, b) => a.evidenciaQualidade.localeCompare(b.evidenciaQualidade, "pt-BR")
+        .filter(item => item.evidenciaQualidade !== "foraEscopoJacoco" && item.evidenciaQualidade !== "ruidoDtoEstrutural")
+        .toSorted((a, b) => (ordemCategorias.get(a.categoria) ?? Number.MAX_SAFE_INTEGER)
+            - (ordemCategorias.get(b.categoria) ?? Number.MAX_SAFE_INTEGER)
+            || a.evidenciaQualidade.localeCompare(b.evidenciaQualidade, "pt-BR")
             || a.caminhoRelativo.localeCompare(b.caminhoRelativo, "pt-BR"))
         .slice(0, limiteItens);
 

@@ -275,6 +275,10 @@ describe("Resíduos do cliente", () => {
             path.join(base, "cliente", "codigo", "services", "exemploService.ts"),
             "export function carregarExemplo(codigo: string) { return codigo; }\n"
         );
+        await escreverArquivo(
+            path.join(base, "cliente", "codigo", "componentes", "ExemploCard.vue"),
+            "<template><div>Exemplo</div></template>\n"
+        );
 
         const resultado = await executarSgc([
             "cliente",
@@ -287,9 +291,11 @@ describe("Resíduos do cliente", () => {
 
         expect(resultado.exitCode).toBe(0);
         const fotografia = JSON.parse(resultado.stdout);
-        expect(fotografia.resumo.arquivosProducao).toBe(1);
-        expect(fotografia.arquivos[0].arquivo).toBe("cliente/codigo/services/exemploService.ts");
-        expect(fotografia.arquivos[0].camada).toBe("service");
+        expect(fotografia.resumo.arquivosProducao).toBe(2);
+        expect(fotografia.arquivos).toEqual(expect.arrayContaining([
+            expect.objectContaining({arquivo: "cliente/codigo/services/exemploService.ts", camada: "service"}),
+            expect.objectContaining({arquivo: "cliente/codigo/componentes/ExemploCard.vue", camada: "component"})
+        ]));
     });
 
     test("valida residuos do cliente com excecao de tamanho", async () => {

@@ -1,4 +1,4 @@
-import {execSync} from "node:child_process";
+import {execFileSync} from "node:child_process";
 import {existsSync, readFileSync} from "node:fs";
 import path from "node:path";
 import {DIRETORIO_RAIZ} from "../biblioteca/caminhos.js";
@@ -31,12 +31,17 @@ const PROFUNDIDADE_PADRAO = 3;
 const MINIMO_LINHAS_PADRAO = 500;
 
 function listarArquivosGit(diretorioBase = DIRETORIO_RAIZ): string[] {
-    const saida = execSync("git ls-files", {
-        cwd: diretorioBase,
-        encoding: "utf-8",
-        maxBuffer: 1024 * 1024 * 10
-    });
-    return saida.trim().split(/\r?\n/).filter(Boolean);
+    try {
+        const saida = execFileSync("git", ["ls-files"], {
+            cwd: diretorioBase,
+            encoding: "utf-8",
+            maxBuffer: 1024 * 1024 * 10,
+            stdio: ["ignore", "pipe", "pipe"]
+        });
+        return saida.trim().split(/\r?\n/).filter(Boolean);
+    } catch {
+        throw new Error(`O diretorio informado nao e um repositorio Git acessivel: ${path.resolve(diretorioBase)}`);
+    }
 }
 
 function contarLinhas(caminhoArquivo: string, diretorioBase: string): number {
@@ -219,7 +224,12 @@ function principal(argumentos: string[] = process.argv.slice(2)): void {
 }
 
 if (ehEntradaPrincipal(import.meta.url)) {
-    principal();
+    try {
+        principal();
+    } catch (erro: unknown) {
+        escreverLinha(`Erro ao gerar arvore de linhas: ${erro instanceof Error ? erro.message : String(erro)}`);
+        process.exitCode = 1;
+    }
 }
 
 export {

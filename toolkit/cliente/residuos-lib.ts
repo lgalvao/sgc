@@ -203,16 +203,18 @@ function ehArquivoProducaoCliente(caminhoRelativo: string, prefixoCodigo: string
 }
 
 function classificarCamada(caminhoRelativo: string, prefixoCodigo: string): Camada {
-    const definicoesCamada: Array<{camada: Camada; prefixo: string}> = [
-        {camada: "service", prefixo: `${prefixoCodigo}services/`},
-        {camada: "store", prefixo: `${prefixoCodigo}stores/`},
-        {camada: "composable", prefixo: `${prefixoCodigo}composables/`},
-        {camada: "view", prefixo: `${prefixoCodigo}views/`},
-        {camada: "component", prefixo: `${prefixoCodigo}components/`},
-        {camada: "router", prefixo: `${prefixoCodigo}router/`},
-        {camada: "utils", prefixo: `${prefixoCodigo}utils/`},
+    const definicoesCamada: Array<{camada: Camada; diretorios: string[]}> = [
+        {camada: "service", diretorios: ["services", "servicos"]},
+        {camada: "store", diretorios: ["stores"]},
+        {camada: "composable", diretorios: ["composables"]},
+        {camada: "view", diretorios: ["views", "visoes"]},
+        {camada: "component", diretorios: ["components", "componentes"]},
+        {camada: "router", diretorios: ["router", "rotas"]},
+        {camada: "utils", diretorios: ["utils", "utilitarios"]},
     ];
-    const definicao = definicoesCamada.find((item) => caminhoRelativo.startsWith(item.prefixo));
+    const definicao = definicoesCamada.find((item) => item.diretorios.some(
+        diretorio => caminhoRelativo.startsWith(`${prefixoCodigo}${diretorio}/`)
+    ));
     return definicao?.camada ?? "outro";
 }
 

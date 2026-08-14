@@ -55,9 +55,9 @@ O SGC é uma base auditada pelo toolkit. O SGC não importa nem executa o toolki
 |---|---|---|---|
 | `servidor cobertura auditoria` | perfil SGC | auditoria | Cobertura e risco do servidor |
 | `servidor cobertura ramificacoes` | perfil SGC | auditoria | Lacunas de ramificações do servidor |
-| `servidor arquitetura auditar` | adaptável | auditoria | Concentração de responsabilidades em Java |
+| `servidor arquitetura auditar` | adaptável | auditoria | Concentração de responsabilidades em serviços, fachadas e controladores Java |
 | `servidor coesao auditar` | perfil SGC | auditoria | Mistura de responsabilidades nos Services |
-| `servidor contratos auditar` | adaptável | auditoria | Vazamento de modelos em DTOs expostos |
+| `servidor contratos auditar` | adaptável | auditoria | Vazamento de modelos em DTOs expostos por controladores |
 | `servidor testes analisar` | adaptável | análise | Evidências de testes e cobertura Java |
 | `servidor testes priorizar` | adaptável | análise | Prioridades para o backlog de testes |
 | `servidor java corrigir-fqn` | adaptável | utilitário | Conversão de FQNs Java em imports |
@@ -160,6 +160,10 @@ ferramentas requisitos cdus auditar --json-resumido
 
 Políticas Java são recebidas por `--politica`. A política contém as listas de anotações, nomes, prefixos, sufixos e
 caminhos estruturais da classificação.
+
+`servidor arquitetura auditar`, `servidor contratos auditar` e `servidor testes analisar` aceitam
+`--diretorio <modulo>` para analisar um módulo Java com `src/main/java`; a análise de testes também usa o
+`src/test/java` correspondente. Sem essa opção, os diretórios vêm de `configuracao-toolkit.json`.
 
 O motor Semgrep recebe regra, alvos e comando explicitamente. A configuração do perfil compõe esses valores.
 

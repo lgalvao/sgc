@@ -15,7 +15,7 @@ import {
     type ResultadoExecucao
 } from "./apoio.js";
 import {VERSAO_CONFIGURACAO} from "../biblioteca/configuracao.js";
-import {classificarPerfilDto, classificarPerfilModelo, classificarPerfilOutro} from "../servidor/biblioteca/testes-analisar-regras.js";
+import {classificarPerfilDto, classificarPerfilModelo, classificarPerfilOutro, inferirCategoria} from "../servidor/biblioteca/testes-analisar-regras.js";
 import {POLITICA_CLASSIFICACAO_TESTES_SGC} from "../servidor/testes-politica-sgc.js";
 
 type ObjetoJson = Record<string, unknown>;
@@ -54,6 +54,15 @@ describe("Análise e priorização dos testes do servidor", () => {
         expect(classificarPerfilOutro({nomeClasse: "Sgc", caminhoRelativo: "Sgc.java", conteudoFonte: classeOutro, politica: POLITICA_CLASSIFICACAO_TESTES_SGC})).toBe("estruturalPuro");
         expect(classificarPerfilDto(dto)).toBe("estruturalPuro");
         expect(classificarPerfilDto(dto, POLITICA_CLASSIFICACAO_TESTES_SGC)).toBe("estruturalContrato");
+    });
+
+    test("classifica categorias Java em portugues e ingles", () => {
+        expect(inferirCategoria("ServicoEleicao", "exemplo/servicos/ServicoEleicao.java")).toBe("servicos");
+        expect(inferirCategoria("ConfigServicos", "exemplo/config/ConfigServicos.java")).toBe("outros");
+        expect(inferirCategoria("ControladorEleicao", "exemplo/rest/ControladorEleicao.java")).toBe("controladores");
+        expect(inferirCategoria("FachadaEleicao", "exemplo/FachadaEleicao.java")).toBe("fachadas");
+        expect(inferirCategoria("Eleicao", "exemplo/modelo/Eleicao.java")).toBe("modelos");
+        expect(inferirCategoria("EleicaoResposta", "exemplo/respostas/EleicaoResposta.java")).toBe("dtos");
     });
 
     test("aceita política de classificação externa pela CLI", async () => {
@@ -569,8 +578,12 @@ describe("Análise e priorização dos testes do servidor", () => {
         const base = await mkdtemp(path.join(os.tmpdir(), "sgc-testes-resumo-"));
         const diretorioServidor = path.join(base, "servidor");
         await escreverArquivo(
-            path.join(diretorioServidor, "src", "main", "java", "com", "exemplo", "ExemploService.java"),
-            "package com.exemplo; public class ExemploService { public void buscar() {} }"
+            path.join(diretorioServidor, "src", "main", "java", "com", "exemplo", "ServicoExemplo.java"),
+            "package com.exemplo; public class ServicoExemplo { public void buscar() {} }"
+        );
+        await escreverArquivo(
+            path.join(diretorioServidor, "src", "main", "java", "com", "exemplo", "Config.java"),
+            "package com.exemplo; public class Config {}"
         );
 
         const resultado = await executarSgc([
@@ -587,9 +600,11 @@ describe("Análise e priorização dos testes do servidor", () => {
         expect(resultado.exitCode).toBe(0);
         const resumo = JSON.parse(resultado.stdout);
         expect(resumo).toMatchObject({versaoResumo: 1, truncado: true, limiteItens: 20});
-        expect(resumo.estatisticas.totalClasses).toBe(1);
+        expect(resumo.estatisticas.totalClasses).toBe(2);
         expect(resumo.categorias.servicos).toEqual({comTeste: 0, semTeste: 1});
-        expect(resumo.principaisPendencias[0]).toMatchObject({classe: "ExemploService"});
+        expect(resumo.principaisPendencias).toEqual([
+            expect.objectContaining({classe: "ServicoExemplo", categoria: "servicos"})
+        ]);
     });
 
     test("detecta JSON pelo conteudo mesmo quando a extensao nao e json", async () => {

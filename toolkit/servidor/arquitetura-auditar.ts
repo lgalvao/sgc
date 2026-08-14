@@ -19,8 +19,6 @@ const LIMITE_DEPENDENCIAS_ALERTA = 8;
 const LIMITE_DEPENDENCIAS_CRITICO = 12;
 const VERSAO_RELATORIO = 3 as const;
 
-const SUFIXOS_ALVO = ["Service.java", "Facade.java", "Controller.java"];
-
 type TipoAlvo = "controller" | "facade" | "service" | "outro";
 type Severidade = "critico" | "alerta" | "ok";
 
@@ -85,10 +83,16 @@ function extrairPacote(conteudo: string): string {
     return conteudo.match(/^package\s+([\w.]+)\s*;/m)?.[1] ?? "";
 }
 
-function classificarTipo(nomeArquivo: string): TipoAlvo {
-    if (nomeArquivo.endsWith("Controller.java")) return "controller";
-    if (nomeArquivo.endsWith("Facade.java")) return "facade";
-    if (nomeArquivo.endsWith("Service.java")) return "service";
+function classificarTipo(nomeArquivo: string, conteudo: string): TipoAlvo {
+    if (/@(?:RestController|Controller)\b/.test(conteudo) || /(?:^Controlador.*|.+Controller)\.java$/.test(nomeArquivo)) {
+        return "controller";
+    }
+    if (/(?:^Fachada.+|.+Facade)\.java$/.test(nomeArquivo)) {
+        return "facade";
+    }
+    if (/@Service\b/.test(conteudo) || /(?:^Servico.+|.+Service)\.java$/.test(nomeArquivo)) {
+        return "service";
+    }
     return "outro";
 }
 
@@ -118,22 +122,24 @@ function motivosSeveridade(linhas: number, metodos: number, dependencias: number
 
 async function auditarArquitetura(diretorioCodigo: string, diretorioBase: string): Promise<RelatorioArquitetura> {
     const arquivos = await globby(path.join(diretorioCodigo, "**/*.java").replace(/\\/g, "/"), {absolute: true});
-    const alvos = arquivos.filter((f) => SUFIXOS_ALVO.some((s) => f.endsWith(s)));
-
-    const resultados: ResultadoArquitetura[] = await Promise.all(alvos.map(async (arquivo): Promise<ResultadoArquitetura> => {
+    const resultadosPossiveis = await Promise.all(arquivos.map(async (arquivo): Promise<ResultadoArquitetura | null> => {
         const conteudo = await fs.readFile(arquivo, "utf-8");
         const nomeArquivo = path.basename(arquivo);
+        const tipo = classificarTipo(nomeArquivo, conteudo);
+        if (tipo === "outro") {
+            return null;
+        }
         const linhas = contarLinhas(conteudo);
         const metodos = contarMetodosPublicos(conteudo);
         const dependencias = contarDependencias(conteudo);
         const severidade = calcularSeveridade(linhas, metodos, dependencias);
         const motivos = motivosSeveridade(linhas, metodos, dependencias);
         const pacote = extrairPacote(conteudo);
-        const tipo = classificarTipo(nomeArquivo);
         const caminhoRelativo = normalizarCaminho(path.relative(diretorioBase, arquivo));
 
         return {nomeArquivo, caminhoRelativo, pacote, tipo, linhas, metodos, dependencias, severidade, motivos};
     }));
+    const resultados = resultadosPossiveis.filter((resultado): resultado is ResultadoArquitetura => resultado !== null);
 
     resultados.sort((a, b) => {
         const ordem = {critico: 0, alerta: 1, ok: 2};
@@ -228,11 +234,12 @@ async function gravarRelatorios(relatorio: RelatorioArquitetura, diretorioSaida:
 function exibirAjuda(): void {
     exibirAjudaComando({
         comandoToolkit: "servidor arquitetura auditar",
-        descricao: "Audita concentração de responsabilidades em Services, Facades e Controllers por linhas, métodos e dependências.",
+        descricao: "Audita concentração de responsabilidades em serviços, fachadas e controladores por linhas, métodos e dependências.",
         opcoes: [
             "--json              Emite o relatório em JSON.",
             "--gravar            Grava os relatórios em disco.",
             "--base <diretorio>  Sobrescreve a base da auditoria.",
+            "--diretorio <modulo> Raiz do modulo Java que contem src/main/java.",
             "--help, -h          Exibe esta ajuda."
         ],
         exemplos: [
@@ -254,7 +261,10 @@ async function principal(argumentosInformados: string[] = process.argv.slice(2))
     const emitirJson = argumentos.includes("--json");
     const gravar = argumentos.includes("--gravar");
     const diretorioBase = path.resolve(lerOpcao(argumentos, "--base", DIRETORIO_RAIZ) ?? DIRETORIO_RAIZ);
-    const diretorioCodigo = resolverCaminhoConfigurado("codigoServidor", diretorioBase);
+    const diretorioInformado = lerOpcao(argumentos, "--diretorio", undefined);
+    const diretorioCodigo = diretorioInformado
+        ? path.resolve(diretorioBase, diretorioInformado, "src", "main", "java")
+        : resolverCaminhoConfigurado("codigoServidor", diretorioBase);
     const diretorioSaida = path.join(resolverCaminhoConfigurado("artefatosQualidade", diretorioBase), "servidor", "mais-recente");
 
     if (!emitirJson) {
