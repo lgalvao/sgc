@@ -98,8 +98,8 @@ avaliados terminaram em poucos segundos, mas revelaram problemas de utilidade qu
   foi retirado do conjunto padrão porque dominava o ranking sem uma política contextual;
 - `cliente arquitetura auditar` agora identifica sua saída como `classificacao: "politica-sgc"`; a pontuação serve para
   ordenar sinais e não para classificar a severidade global do cliente;
-- os dois comandos CDU consolidam corretamente o corpus, mas a saída humana mostra apenas totais, enquanto o JSON de
-  auditoria é grande; faltam detalhes humanos limitados e acionáveis;
+- os dois comandos CDU agora mostram amostras limitadas com arquivo, linha, regra, mensagem e sugestão quando aplicável;
+  o inventário ordena frequências e exibe exemplos das duplicações, mantendo o JSON completo para agentes;
 - `servidor contratos auditar` foi rápido, específico e teve resultado inequívoco, servindo como referência de comando
   bem delimitado;
 - exemplos baseados em `npx tsx` acrescentam ruído npm. No workspace, a entrada estável deve ser um script npm; no pacote
@@ -124,7 +124,6 @@ Resolver nessa revisão as dúvidas remanescentes, sem abrir novas famílias de 
 
 - confirmar se o corretor FQN e os inventários ainda têm finalidade ocasional clara;
 - verificar se Semgrep e cobertura/ramificações continuam complementares na saída atual;
-- definir uma saída humana curta mas acionável para CDU e relatórios volumosos;
 - recomendar scripts npm no workspace e o binário `ferramentas` após instalação, removendo `npx tsx` da documentação;
 - remover módulos e exports órfãos revelados pelas decisões.
 
@@ -138,8 +137,8 @@ Corrigir apenas violações encontradas no recorte 1:
 - mover literals e caminhos SGC ainda presentes em motores declarados horizontais para política ou borda;
 - reclassificar como perfil SGC o que não justificar parametrização;
 - separar CLI, persistência ou formatação de um motor apenas quando isso impedir reuso ou teste isolado;
-  - garantir que os dois comandos CDU e o analisador Java continuem funcionando com configuração externa, incluindo a
-    correspondência por pacote já corrigida;
+- garantir que os dois comandos CDU e o analisador Java continuem funcionando com configuração externa, incluindo a
+  correspondência por pacote já corrigida;
 - substituir testes que apenas reproduzem a implementação por testes semânticos das decisões aprovadas;
 - atualizar contratos públicos deliberados sem aliases de compatibilidade.
 

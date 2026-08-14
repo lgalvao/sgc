@@ -178,6 +178,51 @@ describe("Ferramentas de requisitos dos CDUs", () => {
         expect(auditoria.secoes.mensagens).toBeDefined();
     });
 
+    test("saidas humanas dos agregadores CDU mostram amostras acionaveis", async () => {
+        const base = await mkdtemp(path.join(os.tmpdir(), "sgc-cdus-saida-humana-"));
+        const dirSpecs = path.join(base, "specs", "cdu");
+        const conteudo = [
+            "# CDU-01 - Exemplo",
+            "",
+            "## Atores",
+            "",
+            "- 'ADMIN'",
+            "",
+            "## Pré-condições",
+            "",
+            "- Sistema disponível.",
+            "",
+            "## Fluxo principal",
+            "",
+            "1. O sistema mostra o `Painel`.",
+            "1. O sistema registra a mensagem \"Exemplo repetido\".",
+            "",
+            "```text",
+            "Assunto: SGC: Exemplo repetido em vários documentos",
+            "Detalhe: mensagem documental compartilhada entre os casos de uso.",
+            "```"
+        ].join("\n");
+        await escreverArquivo(path.join(dirSpecs, "cdu-01.md"), conteudo);
+        await escreverArquivo(path.join(dirSpecs, "cdu-02.md"), conteudo.replace("CDU-01", "CDU-02"));
+
+        const auditoria = await executarSgc([
+            "requisitos", "cdus", "auditar", "--secoes", "estrutura,estilo", "--base", base
+        ]);
+        expect(auditoria.exitCode).toBe(0);
+        expect(auditoria.stdout).toContain("Amostra de achados de estrutura");
+        expect(auditoria.stdout).toContain("numeracao_repetida");
+        expect(auditoria.stdout).toContain("cdu-01.md");
+        expect(auditoria.stdout).toContain("use --json para consultar todos os itens");
+
+        const inventario = await executarSgc([
+            "requisitos", "cdus", "inventariar", "--secoes", "duplicacoes", "--base", base
+        ]);
+        expect(inventario.exitCode).toBe(0);
+        expect(inventario.stdout).toContain("Itens duplicados:");
+        expect(inventario.stdout).toContain("Amostra:");
+        expect(inventario.stdout).toContain("cdu-01.md");
+    });
+
     test("limita casos Java ao método de assuntos configurado", async () => {
         const base = await mkdtemp(path.join(os.tmpdir(), "sgc-cdus-assuntos-java-"));
         await escreverArquivo(

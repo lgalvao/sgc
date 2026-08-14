@@ -7,7 +7,9 @@ import {obterOpcoesCdu} from "./cdus-opcoes.js";
 import {inventariarCdus, type InventarioCdus, type InventarioFormatos} from "./cdus-inventario-motor.js";
 
 function imprimirResumoMapa(titulo: string, mapa: Record<string, number>): void {
-    const itens = Object.entries(mapa).slice(0, 8);
+    const itens = Object.entries(mapa)
+        .toSorted((a, b) => b[1] - a[1] || a[0].localeCompare(b[0], "pt-BR"))
+        .slice(0, 8);
     escreverLinha(`${titulo}: ${Object.keys(mapa).length} valores`);
     for (const [valor, quantidade] of itens) {
         escreverLinha(`  ${quantidade}x ${valor}`);
@@ -58,6 +60,10 @@ function imprimirInventario(resultado: InventarioCdus): void {
     if (duplicacoes) {
         escreverLinha("[duplicações]");
         escreverLinha(`Itens duplicados: ${duplicacoes.duplicacoes.length}`);
+        duplicacoes.duplicacoes.slice(0, 5).forEach((duplicacao, indice) => {
+            escreverLinha(`${indice + 1}. [${duplicacao.tipo}] ${duplicacao.ocorrencias} ocorrência(s) em ${duplicacao.arquivos.slice(0, 3).join(", ")}`);
+            escreverLinha(`   Amostra: ${duplicacao.amostra.split("\n")[0]}`);
+        });
     }
 }
 
