@@ -3,234 +3,164 @@
 ## Objetivos
 
 O trabalho abrange exclusivamente `toolkit/`. O SGC não consome nem depende do toolkit: seu workspace é alvo de
-auditoria, fonte de políticas locais e massa de regressão para os comandos que operam sobre ele.
+auditoria, fonte de políticas locais e corpus real de validação.
 
 1. remover código temporário, obsoleto, redundante ou sem finalidade permanente;
-2. separar capacidades horizontais de integrações de stack e políticas específicas do SGC;
+2. separar capacidades horizontais, integrações de stack e políticas específicas do SGC;
 3. simplificar e uniformizar diretórios, símbolos, comandos, opções e resultados;
-4. manter toda a implementação em TypeScript e português brasileiro;
+4. manter a implementação em TypeScript e português brasileiro;
 5. preservar as capacidades específicas do SGC que continuam úteis;
-6. distribuir um pacote utilizável por outros projetos e por agentes sem depender do workspace do SGC.
+6. distribuir um pacote utilizável pelo autor, por agentes e por outros projetos sem depender do workspace do SGC.
 
-Não existe requisito de compatibilidade retroativa. Nomes, caminhos, exports e formatos podem ser corrigidos diretamente.
-A continuidade exigida é funcional, não histórica.
+Não existe requisito de compatibilidade retroativa. A continuidade exigida é funcional, não histórica.
 
-## Diretrizes
+## Diretrizes vigentes
+
+### Utilidade e escopo
+
+- Uso humano ou por agentes é consumo legítimo; ausência de imports não torna um comando inútil.
+- Todo comando mantido precisa ter finalidade permanente explicável em uma frase.
+- Testes não justificam uma funcionalidade cuja finalidade desapareceu.
+- Utilitários ocasionais podem permanecer quando resolvem um problema recorrente e são identificados como tal.
+- O histórico pertence ao Git. Este plano descreve apenas decisões vigentes e trabalho ainda necessário.
+- O SGC é corpus de validação do toolkit, não parte da implementação nem consumidor dela.
 
 ### Fronteiras
-
-Cada capacidade mantida deve ter uma classificação explícita:
 
 | Camada | Critério | Exemplos |
 |---|---|---|
 | Núcleo | algoritmo independente de projeto e stack | CLI, configuração, parser CDU, agregação de cobertura |
 | Adaptador | integração parametrizável com linguagem, framework ou ferramenta | Gradle, npm, Vue, OpenAPI, Semgrep, JaCoCo |
-| Perfil SGC | convenção, caminho ou política para auditar o SGC | notificações, views, modais, coesão e defaults SGC |
+| Perfil SGC | convenção, caminho ou política usada para auditar o SGC | notificações, views, modais, coesão e defaults SGC |
 
-Não é necessário generalizar toda funcionalidade. Uma política SGC bem identificada é um resultado correto. Só promover
-uma regra para núcleo ou adaptador quando o contrato horizontal estiver claro e puder ser testado sem carregar defaults
-do SGC.
-
-### Utilidade
-
-- A ausência de imports não demonstra ausência de consumidores: autor e agentes usam a CLI e os relatórios diretamente.
-- Manter um comando exige finalidade permanente explicável em uma frase, não uma referência no código.
-- Testes não justificam código cuja finalidade desapareceu.
-- Utilitários ocasionais podem permanecer quando resolvem um problema recorrente e estão identificados como tal.
-- O histórico pertence ao Git; README e plano descrevem somente a interface e as decisões vigentes.
+Uma política SGC bem identificada é um resultado correto. Ela só deve ser promovida a núcleo ou adaptador quando houver
+contrato horizontal claro e teste externo que não carregue defaults do SGC.
 
 ### Implementação e execução
 
-- TypeScript é a única fonte; não manter JavaScript paralelo, wrappers ou aliases de transição.
-- A única exceção de distribuição é `binarios/ferramentas.cjs`, um lançador mínimo exigido pelo `bin` do npm; ele não
-  contém lógica do toolkit nem constitui uma segunda implementação.
+- TypeScript é a única fonte de implementação.
+- `binarios/ferramentas.cjs` é a única exceção: lançador mínimo necessário ao `bin` do npm, sem regra de domínio.
 - Código, símbolos, mensagens e documentação próprios usam português brasileiro.
-- Vocabulário externo de bibliotecas e formatos permanece apenas nas bordas de leitura e integração.
-- `toolkit/ferramentas.ts` roda diretamente com `tsx`; `dist/` serve apenas para verificar o build.
+- Vocabulário de bibliotecas e formatos externos permanece apenas nas bordas de integração.
+- `toolkit/ferramentas.ts` executa diretamente com `tsx`; `dist/` existe somente para validar o build.
 - Node 26.7 ou superior é o ambiente mínimo.
-- Arquivos grandes só são divididos quando houver responsabilidades ou contratos realmente independentes.
-- Não introduzir cache, concorrência ou novas abstrações sem medição ou caso de uso concreto.
+- Não criar aliases, wrappers de transição ou implementações paralelas.
+- Não dividir arquivos, introduzir cache, concorrência ou abstrações sem responsabilidade independente ou evidência real.
 
 ### Segurança e contratos
 
 - Auditorias e inventários são somente leitura por padrão.
-- Persistência exige `--gravar`; remoção exige `--confirmar`, exceto quando gerar ou promover é a própria finalidade do
-  comando.
+- Persistência exige `--gravar`; remoção exige `--confirmar`, salvo quando persistir é a finalidade explícita do comando.
 - JSON limpo vai para stdout; diagnóstico operacional vai para stderr.
-- Opções desconhecidas, valores ausentes e argumentos excedentes devem falhar.
-- Ajuda, parser e catálogo descrevem a mesma gramática `<dominio> <recurso> <acao>`.
-- Formatos persistidos ou consumidos por outro comando têm tipo, versão e validação de entrada.
+- Opções desconhecidas, valores ausentes e argumentos excedentes falham.
+- Ajuda, parser e catálogo seguem a gramática `<dominio> <recurso> <acao>` e devem permanecer sincronizados.
+- Formatos próprios persistidos ou consumidos por outro comando têm tipo, versão e validação de entrada.
 - Funções de domínio retornam resultados ou lançam erros; somente a borda CLI altera `process.exitCode`.
 
 ### Reuso
 
-- `configuracao-toolkit.json` é o contrato de configuração por projeto e `--base` identifica a raiz auditada.
+- `configuracao-toolkit.json` é o contrato de configuração por projeto; `--base` identifica a raiz auditada.
 - Motores horizontais recebem caminhos, políticas e executores explicitamente.
-- Defaults locais ficam na borda ou em módulos nomeados como perfil SGC.
-- O pacote publicado é `ferramentas-projeto`, o binário é `ferramentas` e a instalação isolada não depende do
-  `node_modules` nem do layout do SGC.
-- APIs programáticas são deliberadas e validadas por fixture ou consumidor isolado; não precisam ter imports prévios no
+- Defaults locais ficam na borda ou em módulos identificados como perfil SGC.
+- O pacote é `ferramentas-projeto` e o binário é `ferramentas`.
+- A instalação isolada não depende do `node_modules`, da configuração nem do layout do SGC.
+- APIs programáticas são deliberadas e validadas por fixture ou consumidor isolado; não precisam de imports prévios no
   repositório para serem legítimas.
 
 ## Situação atual
 
-- A implementação do toolkit é TypeScript e executa diretamente com `tsx` em Node 26.
-- A coleta de qualidade resolve `eslint`, Playwright e demais ferramentas locais pelos binários instalados; não há
-  `npx` no código ou na documentação do toolkit.
-- A CLI possui catálogo, preflight comum, opções em português e metadados separados de finalidade, decisão e efeitos.
-- O pacote e o binário têm identidade neutra e o tarball é testado fora do workspace.
-- Casos de uso foram reduzidos a `requisitos cdus inventariar` e `requisitos cdus auditar`; corpus, vocabulário, tipos,
-  situações e fontes de mensagens são configuráveis, e há regressão com um segundo projeto.
-- Cobertura Java/web e casos de uso possuem APIs horizontais publicadas.
-- Os domínios JaCoCo e V8 são horizontais e exigem o caminho do relatório explicitamente; os entrypoints de cobertura e o
-  coletor do perfil SGC resolvem seus defaults e exclusões somente na borda.
-- Motores de Semgrep, OpenAPI e sincronização de versão recebem entradas explícitas; defaults do SGC ficam nas bordas.
-- O analisador de testes Java aceita política externa validada; as heurísticas de domínio SGC estão em política própria.
-- Fotografias e relatórios próprios prioritários usam contratos versionados e campos em português/camelCase.
-- A coleta de qualidade separa o motor de composição dos perfis SGC; a execução de tarefas permanece um comando distinto.
-- Acessibilidade Playwright/Axe pertence a `e2e/`, fora do toolkit.
+A modernização estrutural está concluída:
 
-Uma execução representativa contra o workspace real mostrou que rapidez, contratos e testes não bastam. Os comandos
-avaliados terminaram em poucos segundos, mas revelaram problemas de utilidade que passam a orientar o fechamento:
+- CLI, catálogo e README registram finalidade, camada, decisão e efeitos dos 38 comandos públicos;
+- não há comando classificado como temporário, redundante ou pendente de decisão;
+- a implementação é TypeScript e executa diretamente com `tsx` em Node 26;
+- o pacote e o binário têm identidade neutra e o tarball é testado em consumidor isolado;
+- casos de uso foram consolidados em `requisitos cdus inventariar` e `requisitos cdus auditar`;
+- CDU, cobertura Java/web e análise de testes Java possuem contratos reutilizáveis e testes com projeto externo;
+- Semgrep, OpenAPI, JaCoCo, V8 e sincronização de versão recebem entradas explícitas em seus motores;
+- defaults e políticas do SGC estão nas bordas ou em módulos identificados como perfil SGC;
+- acessibilidade Playwright/Axe pertence a `e2e/`, fora do toolkit;
+- o reality check contra o SGC corrigiu classificações contraditórias, ambiguidades sistemáticas e destaques sem violação;
+- testes, pacote isolado, typechecks, lint, Knip, build e `git diff --check` passam.
 
-- `projeto ambiente verificar` conhece `e2e`, portas e arquivos do SGC; no estado atual é perfil SGC, não adaptador;
-- `servidor arquitetura auditar` agora separa `pontosCriticos` de `alertas`; a saída humana usa `achados` sem chamar todo
-  achado de ponto crítico;
-- `servidor testes analisar` agora compara o pacote Java declarado no código, e não apenas o caminho relativo de cada
-  raiz; correspondências no pacote esperado deixaram de ser classificadas como ambíguas;
-- `cliente residuos auditar` agora separa `sinaisAtivos` de `violacoes`, e `resumo.classificacao` é `"inventario"`;
-  `pontuacaoTotal` serve somente para ordenar itens, enquanto o gate continua em `cliente residuos validar`;
-- `codigo cheiros auditar` agora é explicitamente uma fotografia de tendência, sem faixa de severidade; `any` em testes
-  foi retirado do conjunto padrão porque dominava o ranking sem uma política contextual;
-- `cliente arquitetura auditar` agora identifica sua saída como `classificacao: "politica-sgc"`; a pontuação serve para
-  ordenar sinais e não para classificar a severidade global do cliente;
-- os dois comandos CDU agora mostram amostras limitadas com arquivo, linha, regra, mensagem e sugestão quando aplicável;
-  o inventário ordena frequências e exibe exemplos das duplicações, mantendo o JSON completo para agentes;
-- `servidor contratos auditar` foi rápido, específico e teve resultado inequívoco, servindo como referência de comando
-  bem delimitado;
-- exemplos baseados em `npx tsx` acrescentam ruído npm. No workspace, a entrada estável deve ser um script npm; no pacote
-  instalado, deve ser o binário `ferramentas`.
+Essa situação não comprova, por si só, a correção semântica uniforme de todos os auditores. A revisão final encontrou
+auditores com bons testes comportamentais e outros ainda cobertos principalmente por execução, schema, persistência ou
+um único exemplo positivo. Portanto, a modernização não deve ser declarada encerrada enquanto o recorte abaixo estiver
+aberto.
 
-Auditores extensos de arquitetura Vue e regras de views, modais, notificações, coesão e erros contêm políticas locais.
-Eles devem ser classificados como perfil SGC, e não parametrizados automaticamente. A fixture externa continua sendo
-exigida apenas para capacidades que permanecerem declaradas como adaptáveis.
+## Recorte final — comprovação semântica
 
-## Escopo restante obrigatório
+### Objetivo
 
-### Recorte 1 — inventário funcional (concluído)
+Comprovar que os auditores mantidos respondem corretamente às perguntas que anunciam, sem reabrir arquitetura, catálogo
+ou generalização já encerrados.
 
-O catálogo e o README agora registram finalidade, camada, efeitos e decisão para as 38 folhas da CLI. A revisão confirmou:
+### Passos obrigatórios
 
-- o corretor FQN é útil como utilitário ocasional e funciona em raiz Java externa configurada;
-- inventários de símbolos, identificadores, árvore de linhas, CDU e OpenAPI têm valor sob demanda e não devem ser gates
-  permanentes;
-- Semgrep executa regras estruturais configuráveis, enquanto cheiros mede tendências heurísticas; cobertura unificada e
-  ramificações respondem a perguntas diferentes e permanecem complementares;
-- não há módulos ou exports órfãos segundo o Knip, e todos os arquivos catalogados existem;
-- os entrypoints Java de cobertura são perfil SGC por aplicarem exclusões locais; o domínio JaCoCo permanece horizontal;
-- a execução documentada usa scripts npm no workspace, o binário `ferramentas` no pacote e não usa `npx tsx`.
+1. Criar uma matriz `auditor -> regras relevantes -> evidências existentes -> lacunas`.
+2. Priorizar regras que produzem gate, severidade, pontuação, violação ou recomendação acionável.
+3. Completar somente as evidências necessárias para cada tipo de regra:
+   - achado positivo mínimo, com arquivo e motivo corretos;
+   - negativo próximo para heurísticas sujeitas a falso positivo;
+   - limite inferior/superior quando houver threshold ou mudança de classificação;
+   - invariantes entre resumo, severidade, lista destacada e motivos;
+   - mais de um arquivo quando contagem, duplicação ou escala alterar o resultado;
+   - saída humana quando ela for o principal produto do comando.
+4. Não exigir mecanicamente todos os casos acima de toda regra. A matriz deve registrar `não aplicável` com justificativa
+   curta quando a natureza da regra não exigir uma dimensão.
+5. Executar uma amostra curta e representativa no SGC, cobrindo ao menos:
+   - um auditor de servidor;
+   - um auditor de cliente;
+   - uma capacidade horizontal configurável;
+   - CDU;
+   - um orquestrador ou agregador.
+6. Confrontar os principais resultados com os arquivos apontados. Todo falso positivo, falso negativo ou texto enganoso
+   confirmado gera primeiro uma regressão mínima e depois a correção.
 
-Critério de saída atendido: todo comando tem finalidade e camada inequívocas, e nenhuma decisão funcional ficou marcada como
-“avaliar”, “revisar” ou “confirmar”.
+### Limites do recorte
 
-### Recorte 2 — fechar somente as fronteiras aprovadas (concluído)
+- Não buscar cobertura total nem um percentual arbitrário.
+- Não testar detalhes internos, fórmulas copiadas da implementação ou snapshots extensos.
+- Não generalizar políticas SGC sem necessidade de um segundo projeto.
+- Não reabrir comandos já decididos sem nova evidência de inutilidade ou incorreção.
+- Inventários, transformadores e orquestradores não são auditores: recebem testes adequados ao seu contrato, não uma
+  matriz artificial de falsos positivos e severidade.
+- Melhorias sem relação com um critério de término vão para backlog e não ampliam este recorte.
 
-As fronteiras aprovadas foram fechadas com:
+### Critério de saída do recorte
 
-- mover literals e caminhos SGC ainda presentes em motores declarados horizontais para política ou borda;
-- reclassificar como perfil SGC o que não justificar parametrização;
-- separar CLI, persistência ou formatação de um motor apenas quando isso impedir reuso ou teste isolado;
-- garantir que os dois comandos CDU e o analisador Java continuem funcionando com configuração externa, incluindo a
-  correspondência por pacote já corrigida;
-- substituir testes que apenas reproduzem a implementação por testes semânticos das decisões aprovadas;
-- atualizar contratos públicos deliberados sem aliases de compatibilidade.
-
-Critério de saída atendido: nenhum motor classificado como núcleo ou adaptador depende de vocabulário, caminho ou regra de
-negócio SGC; entrypoints adaptáveis oferecem conveniências locais somente na borda e aceitam configuração explícita para
-outro projeto. Capacidades locais continuam executáveis contra o workspace do SGC.
-
-### Recorte 3 — auditoria final e encerramento (concluído)
-
-- ajuda, catálogo, README, exports e arquivos empacotados estão sincronizados;
-- a instalação isolada e todas as validações do toolkit passam;
-- a amostra contra o SGC foi confrontada manualmente com o código apontado;
-- artefatos, fixtures e documentação sem finalidade foram removidos;
-- melhorias opcionais estão restritas ao backlog e não bloqueiam a modernização;
-- o recorte foi encerrado com worktree limpo, commit e push.
-
-Critério de saída atendido: todos os critérios de término abaixo estão comprovados e não há pendência obrigatória aberta.
+O recorte termina quando a matriz não tiver lacuna obrigatória, as regressões descobertas estiverem corrigidas e a amostra
+real não apresentar classificação contraditória, ambiguidade sistemática ou destaque sem motivo correspondente.
 
 ## Critérios de término
 
-A modernização termina quando todos estes itens forem verdadeiros:
-
 - [x] todos os comandos públicos têm finalidade atual, camada e efeitos documentados;
 - [x] não há comando decidido como redundante, temporário ou obsoleto ainda presente;
-- [x] não há JavaScript legado, alias de compatibilidade ou implementação paralela; o lançador npm é apenas distribuição;
-- [x] nomes e contratos próprios do toolkit seguem TypeScript e português brasileiro;
-- [x] motores classificados como núcleo/adaptador não importam política ou caminho SGC;
+- [x] não há JavaScript legado, alias de compatibilidade ou implementação paralela;
+- [x] nomes e contratos próprios seguem TypeScript e português brasileiro;
+- [x] motores classificados como núcleo ou adaptador não importam política ou caminho SGC;
 - [x] políticas para auditar o SGC estão identificadas e continuam funcionando contra seu workspace;
-- [x] CDU e análise de testes Java funcionam com fixture externa sem editar o toolkit;
-- [x] uma execução representativa contra o SGC não produz severidade contraditória, ambiguidade sistemática ou destaque
-  sem violação correspondente;
-- [x] cada auditor mantido possui testes que demonstram acerto semântico, e não apenas execução, schema ou snapshot;
+- [x] CDU e análise de testes Java funcionam com projeto externo sem editar o toolkit;
 - [x] ajuda, parser, catálogo e README concordam sobre a superfície pública;
 - [x] o tarball instalado isoladamente executa o binário e as APIs públicas suportadas;
-- [x] testes, typechecks, lint, Knip, build e `git diff --check` passam;
-- [x] não restam itens obrigatórios nos três recortes acima.
+- [ ] a matriz semântica está completa e não contém lacuna obrigatória;
+- [ ] a amostra final contra o SGC foi confrontada com o código e não revelou resultado enganoso sem regressão;
+- [x] testes, typechecks, lint, Knip, build e `git diff --check` passam.
 
 “Não existir qualquer melhoria possível” não é critério de término. Cobertura total, tamanho máximo de arquivo,
 generalização de toda política e padronização de formatos externos também não são requisitos.
 
 ## Regra contra rabbit holes
 
-Um novo achado só bloqueia a conclusão se violar pelo menos um destes pontos:
+Um novo achado só bloqueia a conclusão se violar correção ou segurança, funcionamento contra o SGC, reuso de capacidade
+declarada horizontal, consistência pública ou um critério de término acima. Caso contrário, fica fora do recorte.
 
-1. correção ou segurança de uma funcionalidade mantida;
-2. funcionamento dos comandos que auditam o workspace do SGC;
-3. reuso de uma capacidade já declarada horizontal;
-4. consistência pública de CLI, configuração, pacote ou contrato persistido;
-5. um critério de término listado acima.
-
-Caso contrário, o achado vai para backlog e não amplia o recorte ativo. Em particular:
-
-- não parametrizar uma heurística apenas porque ela contém nomes locais; é válido reclassificá-la como perfil SGC;
-- não criar API pública, camada ou arquivo apenas por possibilidade futura;
-- não dividir código por contagem de linhas;
-- não reescrever um relatório sem consumidor automático ou incompatibilidade concreta;
-- não perseguir thresholds arbitrários de cobertura;
-- não reabrir uma decisão encerrada sem nova evidência de uso, falha ou necessidade externa.
-
-Cada recorte deve caber em uma decisão funcional coesa, terminar validado e receber commit/push. Se surgir trabalho maior,
-ele substitui um recorte futuro ou vai para backlog; não vira uma cadeia ilimitada de sub-recortes.
-
-## Testes de utilidade e correção semântica
-
-Todo auditor mantido deve ter uma especificação comportamental curta que diga o que constitui achado, não achado e
-severidade. Os testes devem partir dessa especificação, sem calcular o resultado esperado repetindo a fórmula interna.
-
-Para cada regra relevante, exigir:
-
-- exemplo positivo mínimo, no qual o problema existe e é localizado com motivo compreensível;
-- exemplo negativo próximo, no qual uma construção legítima não é marcada;
-- caso limítrofe para thresholds ou classificações;
-- teste de invariantes do relatório, como “ponto crítico que declara severidade é crítico”, “inventário declara quando a
-  pontuação não é severidade”, “violação destacada contém ao menos um motivo” e “teste no pacote correspondente não é
-  ambíguo”;
-- fixture com vários arquivos para detectar efeitos proporcionais ao tamanho, duplicações e falsos positivos sistêmicos;
-- teste da saída humana, verificando que ela informa arquivo, motivo e próxima decisão sem exigir leitura do JSON completo;
-- regressão focada derivada de cada erro descoberto no reality check.
-
-Snapshots e validações de schema continuam úteis, mas apenas como testes de contrato. Não substituem assertions sobre o
-significado do resultado. Cobertura de linhas também não comprova qualidade da heurística.
-
-Além das fixtures sintéticas, o encerramento exige uma amostra de caracterização contra o SGC real. Os principais achados
-devem ser confrontados com os arquivos apontados; resultados incorretos geram uma regressão mínima antes da correção. O
-corpus real não deve ser copiado integralmente para os testes nem congelado em snapshots gigantes.
+Cada correção deve ser pequena, semanticamente coesa, validada e seguida de commit/push. Um achado maior substitui uma
+etapa futura ou vai para backlog; não cria uma cadeia ilimitada de sub-recortes.
 
 ## Validação
 
-Executar em série ao encerrar cada recorte com código:
+Ao encerrar uma rodada com código:
 
 ```bash
 npm --prefix toolkit run test -- --maxWorkers=1
@@ -244,11 +174,10 @@ npm --prefix toolkit run build
 git diff --check
 ```
 
-Para alteração exclusivamente documental, bastam validação dos links/referências afetados, consistência com o catálogo e
-`git diff --check`. Testes focados adicionais são exigidos somente quando o risco do recorte justificar.
+Para alteração exclusivamente documental, validar referências afetadas, consistência com catálogo/README e executar
+`git diff --check`.
 
 ## Backlog após a conclusão
 
-O backlog não bloqueia o encerramento e deve permanecer pequeno. Só adicionar um item com evidência concreta e condição
-clara para retomada, por exemplo: “generalizar o auditor de arquitetura Vue quando um segundo projeto precisar das mesmas
-heurísticas”. Ideias sem caso de uso permanecem fora do plano.
+O backlog não bloqueia o encerramento e deve permanecer pequeno. Só registrar item com evidência concreta e condição
+clara para retomada. Ideias sem caso de uso ficam fora do plano.
