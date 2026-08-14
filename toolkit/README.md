@@ -166,8 +166,9 @@ expõe os arquivos em `itensSinalizados`. `any` em testes não entra na fotograf
 confiável sem contexto. As chaves próprias da fotografia usam camelCase em português, e uma fotografia anterior
 incompatível é rejeitada em vez de ser tratada como se não existisse.
 
-`cliente arquitetura auditar` produz uma fotografia `versaoSchema: "4.0.0"`; seus resultados próprios usam
-`pontosCriticos`, `pontuacao` e `pontuacaoTotal`. O formato anterior não é carregado nem traduzido.
+`cliente arquitetura auditar` produz uma fotografia `versaoSchema: "5.0.0"`; seus resultados próprios usam
+`pontosCriticos`, `pontuacao` e `pontuacaoTotal`. `resumo.classificacao` vale `"politica-sgc"` e a pontuação serve
+somente para ordenar sinais; ela não é uma severidade global. O formato anterior não é carregado nem traduzido.
 
 `cliente arquitetura validar` é um gate do perfil SGC: além das regras locais do Dependency Cruiser, verifica a política
 SGC que impede cálculos locais de ações baseados em estado de domínio. Ele não é uma auditoria horizontal sem adaptação.

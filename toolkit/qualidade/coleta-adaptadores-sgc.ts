@@ -27,7 +27,7 @@ interface ResultadoResiduos {
 interface ResultadoArquitetura {
     resumo?: {
         pontuacaoTotal?: number;
-        faixa?: string;
+        classificacao?: string;
         metricas?: Record<string, unknown>;
     };
     pontosCriticos?: PontoCriticoQualidade[];
@@ -197,7 +197,7 @@ function criarAdaptadoresSgc(dependencias: DependenciasAdaptadoresSgc): Catalogo
             registrarResultadoExecucao(execucao, saida);
             execucao.metricas = {
                 pontuacaoTotal: resultado.resumo?.pontuacaoTotal ?? null,
-                faixa: resultado.resumo?.faixa ?? null,
+                classificacao: resultado.resumo?.classificacao ?? null,
                 viewsComVazamentoCache: resultado.resumo?.metricas?.viewsComVazamentoCache ?? null,
                 viewsComServiceDireto: resultado.resumo?.metricas?.viewsComServiceDireto ?? null,
                 viewsComFanoutAlto: resultado.resumo?.metricas?.viewsComFanoutAlto ?? null,
@@ -211,7 +211,7 @@ function criarAdaptadoresSgc(dependencias: DependenciasAdaptadoresSgc): Catalogo
                 pontosCriticos: resultado.pontosCriticos ?? [],
             };
             execucao.sumario = resultado.resumo
-                ? `Pontuacao arquitetural: ${resultado.resumo.pontuacaoTotal} (${resultado.resumo.faixa}).`
+                ? `Pontuacao de ordenacao arquitetural: ${resultado.resumo.pontuacaoTotal}.`
                 : "Auditoria arquitetural executada.";
             return execucao;
         },

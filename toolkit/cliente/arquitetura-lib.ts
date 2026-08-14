@@ -4,7 +4,7 @@ import {Node, Project, SyntaxKind, ts, type SourceFile} from "ts-morph";
 import {DIRETORIO_RAIZ} from "../biblioteca/caminhos.js";
 import {resolverCaminhoConfigurado} from "../biblioteca/configuracao.js";
 
-const VERSAO_SCHEMA = "4.0.0";
+const VERSAO_SCHEMA = "5.0.0";
 const EXTENSOES_SUPORTADAS = new Set([".ts", ".vue"]);
 const EXTENSOES_RESOLUCAO = [".ts", ".vue", ".js", "/index.ts", "/index.vue", "/index.js"];
 const CATEGORIAS_ACOPLAMENTO = ["store", "composable", "service", "router"] as const;
@@ -33,7 +33,6 @@ const LIMITE_FAMILIA_PULVERIZADA = 4;
 
 type Camada = "view" | "composable" | "store" | "component" | "service" | "router" | "outro";
 type CategoriaImportacao = keyof ImportacoesPorCategoria | "externo";
-type FaixaPontuacao = "excelente" | "bom" | "atencao" | "critico";
 
 interface ImportacoesPorCategoria {
     store: Set<string>;
@@ -147,7 +146,7 @@ interface FotografiaArquitetura {
     resumo: {
         arquivosProducao: number;
         pontuacaoTotal: number;
-        faixa: FaixaPontuacao;
+        classificacao: "politica-sgc";
         metricas: MetricasResumo;
     };
     pontosCriticos: ArquivoAnalisado[];
@@ -815,18 +814,11 @@ function calcularPontuacaoArquivo({camada, sinaisLexicais, analiseAst, hubCentra
     return total;
 }
 
-function calcularFaixa(pontuacao: number): FaixaPontuacao {
-    if (pontuacao === 0) return "excelente";
-    if (pontuacao <= 15) return "bom";
-    if (pontuacao <= 50) return "atencao";
-    return "critico";
-}
-
 function criarResumoMarkdown(fotografia: FotografiaArquitetura): string {
     const linhas: string[] = [
         "# Auditoria Arquitetural do Cliente",
         "",
-        `- Pontuacao total: **${fotografia.resumo.pontuacaoTotal}** (${fotografia.resumo.faixa})`,
+        `- Pontuacao de ordenacao: **${fotografia.resumo.pontuacaoTotal}** (politica SGC; nao e severidade global)`,
         `- Arquivos de producao: **${fotografia.resumo.arquivosProducao}**`,
         `- Views com vazamento de estrategia de cache: **${fotografia.resumo.metricas.viewsComVazamentoCache}**`,
         `- Views com chamadas diretas a service: **${fotografia.resumo.metricas.viewsComServiceDireto}**`,
@@ -843,18 +835,18 @@ function criarResumoMarkdown(fotografia: FotografiaArquitetura): string {
         `- Composables minúsculos (< ${LIMITE_LINHAS_ARQUIVO_MINUSCULO}L): **${fotografia.resumo.metricas.composablesMinusculos}**`,
         `- Famílias pulverizadas (>= ${LIMITE_FAMILIA_PULVERIZADA} membros): **${fotografia.resumo.metricas.familiasPulverizadas}**`,
         "",
-        "## Principais pontos criticos",
+        "## Principais itens sinalizados",
         "",
     ];
 
     if (fotografia.pontosCriticos.length === 0) {
-        linhas.push("Nenhum ponto critico arquitetural detectado.");
+        linhas.push("Nenhum item sinalizado arquiteturalmente detectado.");
     } else {
-        fotografia.pontosCriticos.slice(0, 10).forEach((pontoCritico, indice) => {
-            linhas.push(`${indice + 1}. \`${pontoCritico.arquivo}\` [${pontoCritico.camada}]`);
-            linhas.push(`   - pontuacao: ${pontoCritico.pontuacao}`);
-            linhas.push(`   - sinais: ${pontoCritico.sinaisAtivos.join(", ")}`);
-            linhas.push(`   - fan-out: ${pontoCritico.metricasAst.categoriasAcoplamento} categorias / ${pontoCritico.metricasAst.importacoesArquiteturais} imports arquiteturais`);
+        fotografia.pontosCriticos.slice(0, 10).forEach((itemSinalizado, indice) => {
+            linhas.push(`${indice + 1}. \`${itemSinalizado.arquivo}\` [${itemSinalizado.camada}]`);
+            linhas.push(`   - pontuacao de ordenacao: ${itemSinalizado.pontuacao}`);
+            linhas.push(`   - sinais: ${itemSinalizado.sinaisAtivos.join(", ")}`);
+            linhas.push(`   - fan-out: ${itemSinalizado.metricasAst.categoriasAcoplamento} categorias / ${itemSinalizado.metricasAst.importacoesArquiteturais} imports arquiteturais`);
         });
     }
 
@@ -1188,7 +1180,7 @@ async function analisarArquiteturaCliente({base = DIRETORIO_RAIZ}: OpcoesAnalise
         resumo: {
             arquivosProducao: analisados.length,
             pontuacaoTotal,
-            faixa: calcularFaixa(pontuacaoTotal),
+            classificacao: "politica-sgc",
             metricas,
         },
         pontosCriticos,

@@ -98,7 +98,8 @@ describe("Auditoria arquitetural do cliente", () => {
         expect(conteudo.resumo.metricas.arquivosComSuperficieAmpla).toBe(1);
         expect(conteudo.resumo.metricas.arquivosComMisturaCamadas).toBe(1);
         expect(conteudo.resumo.metricas.arquivosComServerStateCaseiro).toBe(1);
-        expect(conteudo.versaoSchema).toBe("4.0.0");
+        expect(conteudo.versaoSchema).toBe("5.0.0");
+        expect(conteudo.resumo.classificacao).toBe("politica-sgc");
         expect(conteudo.resumo.pontuacaoTotal).toBeTypeOf("number");
         expect(conteudo.pontosCriticos[0].arquivo).toBe("frontend/src/views/UnidadeView.vue");
         expect(conteudo.pontosCriticos[0].sinaisAtivos).toContain("serverStateCaseiro");
@@ -106,6 +107,11 @@ describe("Auditoria arquitetural do cliente", () => {
         expect(conteudo.pontosCriticos.some((pontoCritico: PontoArquiteturalJson) => pontoCritico.hubCentral && pontoCritico.sinaisAtivos.includes("superficieAmpla"))).toBe(false);
         expect(conteudo.hotspots).toBeUndefined();
         expect(await existe(path.join(base, "toolkit", "qualidade", "artefatos", "arquitetura-cliente"))).toBe(false);
+
+        const humano = await executarSgc(["cliente", "arquitetura", "auditar", "--base", base]);
+        expect(humano.exitCode).toBe(0);
+        expect(humano.stdout).toContain("nao e severidade global");
+        expect(humano.stdout).toContain("5 principais itens sinalizados:");
 
         const diretorioSaida = path.join("artefatos", "arquitetura");
         const gravacao = await executarSgc([

@@ -96,10 +96,8 @@ avaliados terminaram em poucos segundos, mas revelaram problemas de utilidade qu
   `pontuacaoTotal` serve somente para ordenar itens, enquanto o gate continua em `cliente residuos validar`;
 - `codigo cheiros auditar` agora é explicitamente uma fotografia de tendência, sem faixa de severidade; `any` em testes
   foi retirado do conjunto padrão porque dominava o ranking sem uma política contextual;
-- `cliente arquitetura auditar` ainda classifica o repositório por pontuação absoluta proporcional ao tamanho. Isso não
-  demonstra severidade nem orienta uma ação;
-- cheiros atribui severidade a `@Nullable`, verificações de nulo e `any` em testes sem contexto, sobrepondo resíduos e
-  produzindo mais volume que diagnóstico;
+- `cliente arquitetura auditar` agora identifica sua saída como `classificacao: "politica-sgc"`; a pontuação serve para
+  ordenar sinais e não para classificar a severidade global do cliente;
 - os dois comandos CDU consolidam corretamente o corpus, mas a saída humana mostra apenas totais, enquanto o JSON de
   auditoria é grande; faltam detalhes humanos limitados e acionáveis;
 - `servidor contratos auditar` foi rápido, específico e teve resultado inequívoco, servindo como referência de comando
@@ -108,8 +106,8 @@ avaliados terminaram em poucos segundos, mas revelaram problemas de utilidade qu
   instalado, deve ser o binário `ferramentas`.
 
 Auditores extensos de arquitetura Vue e regras de views, modais, notificações, coesão e erros contêm políticas locais.
-Eles devem ser classificados como perfil SGC, e não parametrizados automaticamente. `cliente arquitetura auditar` só
-continuará como adaptável se uma fixture externa provar que suas regras e sua escala funcionam sem conhecimento do SGC.
+Eles devem ser classificados como perfil SGC, e não parametrizados automaticamente. A fixture externa continua sendo
+exigida apenas para capacidades que permanecerem declaradas como adaptáveis.
 
 ## Escopo restante obrigatório
 
@@ -124,12 +122,6 @@ Revisar uma única vez todos os comandos públicos e registrar no catálogo e no
 
 Resolver nessa revisão as dúvidas remanescentes, sem abrir novas famílias de comandos:
 
-- classificar corretamente arquitetura Vue, views, modais, notificações, coesão e ramificações de erro;
-- reclassificar `projeto ambiente verificar` como perfil SGC ou tornar todos os pré-requisitos configuráveis;
-- decidir se `codigo cheiros auditar` será removido, fundido a resíduos ou convertido em fotografia de tendência sem
-  severidade absoluta;
-  - eliminar severidade global baseada em soma absoluta na arquitetura do cliente, preservando a ordem dos itens e
-    tornando explícita a natureza descritiva desse inventário;
 - confirmar se o corretor FQN e os inventários ainda têm finalidade ocasional clara;
 - verificar se Semgrep e cobertura/ramificações continuam complementares na saída atual;
 - definir uma saída humana curta mas acionável para CDU e relatórios volumosos;
@@ -219,8 +211,9 @@ Para cada regra relevante, exigir:
 - exemplo positivo mínimo, no qual o problema existe e é localizado com motivo compreensível;
 - exemplo negativo próximo, no qual uma construção legítima não é marcada;
 - caso limítrofe para thresholds ou classificações;
-- teste de invariantes do relatório, como “ponto crítico possui severidade crítica”, “violação destacada contém ao menos
-  um motivo” e “teste no pacote correspondente não é ambíguo”;
+- teste de invariantes do relatório, como “ponto crítico que declara severidade é crítico”, “inventário declara quando a
+  pontuação não é severidade”, “violação destacada contém ao menos um motivo” e “teste no pacote correspondente não é
+  ambíguo”;
 - fixture com vários arquivos para detectar efeitos proporcionais ao tamanho, duplicações e falsos positivos sistêmicos;
 - teste da saída humana, verificando que ela informa arquivo, motivo e próxima decisão sem exigir leitura do JSON completo;
 - regressão focada derivada de cada erro descoberto no reality check.
