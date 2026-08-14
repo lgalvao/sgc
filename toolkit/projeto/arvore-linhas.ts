@@ -27,6 +27,9 @@ interface ConectoresArvore {
     prefixoFilho: string;
 }
 
+const PROFUNDIDADE_PADRAO = 3;
+const MINIMO_LINHAS_PADRAO = 500;
+
 function listarArquivosGit(diretorioBase = DIRETORIO_RAIZ): string[] {
     const saida = execSync("git ls-files", {
         cwd: diretorioBase,
@@ -157,8 +160,8 @@ function lerOpcoes(argumentos: string[] = process.argv.slice(2)): OpcoesArvore {
 Uso recomendado: ferramentas projeto arvore-linhas [opções]
 
 Opções:
-  --profundidade <n>    Limita a profundidade da árvore exibida (ex: --profundidade 2)
-  --minimo-linhas <n>   Exibe apenas itens com no mínimo n linhas
+  --profundidade <n>    Limita a profundidade da árvore exibida (padrão: 3)
+  --minimo-linhas <n>   Exibe apenas itens com no mínimo n linhas (padrão: 500)
   --excluir-testes      Exclui arquivos de teste da contagem e da árvore
   --base <diretorio>    Diretório Git analisado (padrão: diretório atual)
   --help, -h            Exibe esta mensagem de ajuda
@@ -166,8 +169,8 @@ Opções:
         return {ajuda: true};
     }
 
-    opcoes.profundidadeMaxima = lerNumero(argumentos, "--profundidade", undefined, {minimo: 0});
-    opcoes.minimoLinhas = lerNumero(argumentos, "--minimo-linhas", undefined, {minimo: 0});
+    opcoes.profundidadeMaxima = lerNumero(argumentos, "--profundidade", PROFUNDIDADE_PADRAO, {minimo: 0});
+    opcoes.minimoLinhas = lerNumero(argumentos, "--minimo-linhas", MINIMO_LINHAS_PADRAO, {minimo: 0});
 
     if (argumentos.includes("--excluir-testes")) {
         opcoes.excluirTestes = true;

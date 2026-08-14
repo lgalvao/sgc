@@ -85,6 +85,7 @@ A modernização estrutural está concluída; a etapa restante é comprovar sem�
 - a priorização de testes rejeita entrada estruturada incompatível em vez de produzir backlog vazio;
 - quatro dos maiores produtores oferecem `--json-resumido`: símbolos, análise de testes do servidor, gate arquitetural e
   consistência de nomenclatura;
+- a árvore de linhas usa profundidade 3 e mínimo de 500 linhas por padrão, com expansão explícita pelas opções atuais;
 - testes, pacote isolado, typechecks, lint, Knip, build e `git diff --check` passam.
 
 Essa situação não comprova, por si só, a correção semântica uniforme de todos os auditores. A revisão final encontrou
@@ -158,8 +159,8 @@ visíveis. Declarações ausentes de `tsx` em root/frontend são propriedade dos
 **Evidência:** `projeto arvore-linhas` imprimiu a árvore integral de cerca de 246 mil linhas do repositório. As opções
 `--profundidade` e `--minimo-linhas` resolvem o problema, mas exigem conhecimento prévio e não há JSON resumido.
 
-**Recomendação:** adotar defaults humanos úteis de profundidade/mínimo ou apresentar primeiro um resumo com orientação
-para expandir. Não transformar o comando em auditor nem adicionar persistência sem caso de uso.
+**Decisão implementada:** os defaults são profundidade 3 e mínimo de 500 linhas. Os limites podem ser substituídos pelas
+opções existentes, inclusive com zero.
 
 ### Resultados úteis que não exigem correção imediata
 
@@ -176,9 +177,8 @@ para expandir. Não transformar o comando em auditor nem adicionar persistência
 
 1. delimitar a proteção genérica possível para a invalidação de dependências/Node em `qualidade tarefas executar`;
 2. completar o contrato `--json-resumido` nos maiores resultados restantes;
-3. ajustar a saída padrão da árvore de linhas;
-4. construir a matriz semântica usando os problemas confirmados como regressões iniciais;
-5. repetir a amostra final sequencialmente, sem concorrência entre comandos que compartilhem npm, Gradle ou artefatos.
+3. construir a matriz semântica usando os problemas confirmados como regressões iniciais;
+4. repetir a amostra final sequencialmente, sem concorrência entre comandos que compartilhem npm, Gradle ou artefatos.
 
 ## Recorte final — comprovação semântica
 

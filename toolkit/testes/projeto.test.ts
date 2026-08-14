@@ -152,6 +152,13 @@ describe("Comandos de projeto do toolkit", () => {
         expect(ehArquivoTeste("aplicacao/src/main/java/Exemplo.java")).toBe(false);
     });
 
+    test("usa limites humanos na arvore de linhas quando nao informados", () => {
+        expect(lerOpcoes([])).toMatchObject({
+            profundidadeMaxima: 3,
+            minimoLinhas: 500
+        });
+    });
+
     test("executa a verificacao do ambiente em JSON", async () => {
         const resultado = await executarSgc(["projeto", "ambiente", "verificar", "--json"]);
         expect(resultado.exitCode).toBe(0);

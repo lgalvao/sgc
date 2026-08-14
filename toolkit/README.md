@@ -202,6 +202,9 @@ os projetos permanecem na série 6; outras atualizações continuam visíveis.
 `projeto artefatos limpar` lista artefatos e remove com `--confirmar`. `projeto versao-sincronizar` mostra alterações e
 grava com `--gravar`.
 
+`projeto arvore-linhas` usa profundidade 3 e mínimo de 500 linhas por padrão. Use `--profundidade 0` e
+`--minimo-linhas 0` para expandir todos os níveis e arquivos.
+
 ## Configuração por projeto
 
 Crie `configuracao-toolkit.json` na raiz auditada. O schema atual usa `versao: 2`.
