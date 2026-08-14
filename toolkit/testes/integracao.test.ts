@@ -2,14 +2,12 @@ import os from "node:os";
 import path from "node:path";
 import {mkdtemp} from "node:fs/promises";
 import {describe, expect, test} from "vitest";
-import {execa} from "execa";
-import {pathToFileURL} from "node:url";
 import {executarDiffContratos} from "../integracao/contratos-diff-motor.js";
 import {fixarBaselineContrato} from "../integracao/contratos-baseline-motor.js";
 import {resolverCaminhoArquivoOpenapi, resolverCaminhosOpenapi} from "../integracao/contratos-openapi-caminhos.js";
 import {exportarOpenapi} from "../integracao/contratos-openapi-motor.js";
 import {VERSAO_CONFIGURACAO} from "../biblioteca/configuracao.js";
-import {DIRETORIO_RAIZ, executarSgc, escreverJson, lerArquivo, existe} from "./apoio.js";
+import {DIRETORIO_RAIZ, executarSgc, escreverJson, lerArquivo, existe, importarModuloSemExecutar} from "./apoio.js";
 
 const CAMINHOS_COMANDOS_CONTRATOS = [
     "contratos-diff.ts",
@@ -20,16 +18,7 @@ const CAMINHOS_COMANDOS_CONTRATOS = [
 describe("Integrações de contratos do toolkit", () => {
     test("pode importar comandos de contratos sem executar integrações", async () => {
         const resultados = await Promise.all(CAMINHOS_COMANDOS_CONTRATOS.map(async caminho => {
-            const urlModulo = pathToFileURL(caminho).href;
-            return execa(process.execPath, [
-                "--import=tsx",
-                "--input-type=module",
-                "-e",
-                `process.argv.push("--help"); await import(${JSON.stringify(urlModulo)}); process.stdout.write("importacao-ok\\n");`
-            ], {
-                cwd: DIRETORIO_RAIZ,
-                reject: false
-            });
+            return importarModuloSemExecutar(caminho);
         }));
 
         for (const resultado of resultados) {

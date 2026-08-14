@@ -1,4 +1,5 @@
 import path from "node:path";
+import {pathToFileURL} from "node:url";
 import {
     access as verificarAcesso,
     chmod as alterarModo,
@@ -24,6 +25,22 @@ async function executarSgc(args: string[], opcoes: Options = {}): Promise<Result
         cwd: DIRETORIO_RAIZ,
         reject: false,
         ...opcoes
+    });
+    return {
+        exitCode: resultado.exitCode,
+        stdout: String(resultado.stdout),
+        stderr: String(resultado.stderr)
+    };
+}
+
+async function importarModuloSemExecutar(caminho: string): Promise<ResultadoExecucao> {
+    const urlModulo = pathToFileURL(caminho).href;
+    const resultado = await execa(CAMINHO_TSX, [
+        "-e",
+        `process.argv.push("--help"); import(${JSON.stringify(urlModulo)}).then(() => process.stdout.write("importacao-ok\\n"));`
+    ], {
+        cwd: DIRETORIO_RAIZ,
+        reject: false
     });
     return {
         exitCode: resultado.exitCode,
@@ -80,6 +97,7 @@ export {
     CAMINHO_FERRAMENTAS,
     CAMINHO_TSX,
     executarSgc,
+    importarModuloSemExecutar,
     criarDiretorio,
     escreverArquivo,
     escreverJson,

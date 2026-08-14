@@ -42,6 +42,8 @@ do SGC.
 ### Implementação e execução
 
 - TypeScript é a única fonte; não manter JavaScript paralelo, wrappers ou aliases de transição.
+- A única exceção de distribuição é `binarios/ferramentas.cjs`, um lançador mínimo exigido pelo `bin` do npm; ele não
+  contém lógica do toolkit nem constitui uma segunda implementação.
 - Código, símbolos, mensagens e documentação próprios usam português brasileiro.
 - Vocabulário externo de bibliotecas e formatos permanece apenas nas bordas de leitura e integração.
 - `toolkit/ferramentas.ts` roda diretamente com `tsx`; `dist/` serve apenas para verificar o build.
@@ -80,8 +82,8 @@ do SGC.
 - Casos de uso foram reduzidos a `requisitos cdus inventariar` e `requisitos cdus auditar`; corpus, vocabulário, tipos,
   situações e fontes de mensagens são configuráveis, e há regressão com um segundo projeto.
 - Cobertura Java/web e casos de uso possuem APIs horizontais publicadas.
-- O domínio JaCoCo é horizontal; os entrypoints Java de cobertura foram identificados como perfil SGC porque aplicam
-  exclusões locais sem receber uma política pela CLI. O uso externo continua disponível pela API com padrões explícitos.
+- Os domínios JaCoCo e V8 são horizontais e exigem o caminho do relatório explicitamente; os entrypoints de cobertura e o
+  coletor do perfil SGC resolvem seus defaults e exclusões somente na borda.
 - Motores de Semgrep, OpenAPI e sincronização de versão recebem entradas explícitas; defaults do SGC ficam nas bordas.
 - O analisador de testes Java aceita política externa validada; as heurísticas de domínio SGC estão em política própria.
 - Fotografias e relatórios próprios prioritários usam contratos versionados e campos em português/camelCase.
@@ -131,9 +133,9 @@ O catálogo e o README agora registram finalidade, camada, efeitos e decisão pa
 Critério de saída atendido: todo comando tem finalidade e camada inequívocas, e nenhuma decisão funcional ficou marcada como
 “avaliar”, “revisar” ou “confirmar”.
 
-### Recorte 2 — fechar somente as fronteiras aprovadas
+### Recorte 2 — fechar somente as fronteiras aprovadas (concluído)
 
-Corrigir apenas violações encontradas no recorte 1:
+As fronteiras aprovadas foram fechadas com:
 
 - mover literals e caminhos SGC ainda presentes em motores declarados horizontais para política ou borda;
 - reclassificar como perfil SGC o que não justificar parametrização;
@@ -143,39 +145,39 @@ Corrigir apenas violações encontradas no recorte 1:
 - substituir testes que apenas reproduzem a implementação por testes semânticos das decisões aprovadas;
 - atualizar contratos públicos deliberados sem aliases de compatibilidade.
 
-Critério de saída: nenhum motor classificado como núcleo ou adaptador depende de vocabulário, caminho ou regra de negócio
-SGC; entrypoints adaptáveis podem oferecer uma conveniência SGC somente quando aceitam configuração explícita para outro
-projeto. Capacidades locais continuam executáveis contra o workspace do SGC.
+Critério de saída atendido: nenhum motor classificado como núcleo ou adaptador depende de vocabulário, caminho ou regra de
+negócio SGC; entrypoints adaptáveis oferecem conveniências locais somente na borda e aceitam configuração explícita para
+outro projeto. Capacidades locais continuam executáveis contra o workspace do SGC.
 
-### Recorte 3 — auditoria final e encerramento
+### Recorte 3 — auditoria final e encerramento (concluído)
 
-- confrontar ajuda, catálogo, README, exports e arquivos empacotados;
-- executar a instalação isolada e todas as validações do toolkit;
-- repetir a amostra contra o SGC e confrontar manualmente os principais achados com o código apontado;
-- remover artefatos, fixtures e documentação que tenham perdido a finalidade;
-- registrar melhorias opcionais em uma seção curta de backlog, sem tratá-las como bloqueadoras;
-- encerrar com worktree limpo, commit e push.
+- ajuda, catálogo, README, exports e arquivos empacotados estão sincronizados;
+- a instalação isolada e todas as validações do toolkit passam;
+- a amostra contra o SGC foi confrontada manualmente com o código apontado;
+- artefatos, fixtures e documentação sem finalidade foram removidos;
+- melhorias opcionais estão restritas ao backlog e não bloqueiam a modernização;
+- o recorte foi encerrado com worktree limpo, commit e push.
 
-Critério de saída: todos os critérios de término abaixo estão comprovados e não há pendência obrigatória aberta.
+Critério de saída atendido: todos os critérios de término abaixo estão comprovados e não há pendência obrigatória aberta.
 
 ## Critérios de término
 
 A modernização termina quando todos estes itens forem verdadeiros:
 
-- [ ] todos os comandos públicos têm finalidade atual, camada e efeitos documentados;
-- [ ] não há comando decidido como redundante, temporário ou obsoleto ainda presente;
-- [ ] não há JavaScript legado, alias de compatibilidade ou segundo caminho de execução;
-- [ ] nomes e contratos próprios do toolkit seguem TypeScript e português brasileiro;
-- [ ] motores classificados como núcleo/adaptador não importam política ou caminho SGC;
-- [ ] políticas para auditar o SGC estão identificadas e continuam funcionando contra seu workspace;
-- [ ] CDU e análise de testes Java funcionam com fixture externa sem editar o toolkit;
-- [ ] uma execução representativa contra o SGC não produz severidade contraditória, ambiguidade sistemática ou destaque
+- [x] todos os comandos públicos têm finalidade atual, camada e efeitos documentados;
+- [x] não há comando decidido como redundante, temporário ou obsoleto ainda presente;
+- [x] não há JavaScript legado, alias de compatibilidade ou implementação paralela; o lançador npm é apenas distribuição;
+- [x] nomes e contratos próprios do toolkit seguem TypeScript e português brasileiro;
+- [x] motores classificados como núcleo/adaptador não importam política ou caminho SGC;
+- [x] políticas para auditar o SGC estão identificadas e continuam funcionando contra seu workspace;
+- [x] CDU e análise de testes Java funcionam com fixture externa sem editar o toolkit;
+- [x] uma execução representativa contra o SGC não produz severidade contraditória, ambiguidade sistemática ou destaque
   sem violação correspondente;
-- [ ] cada auditor mantido possui testes que demonstram acerto semântico, e não apenas execução, schema ou snapshot;
-- [ ] ajuda, parser, catálogo e README concordam sobre a superfície pública;
-- [ ] o tarball instalado isoladamente executa o binário e as APIs públicas suportadas;
-- [ ] testes, typechecks, lint, Knip, build e `git diff --check` passam;
-- [ ] não restam itens obrigatórios nos três recortes acima.
+- [x] cada auditor mantido possui testes que demonstram acerto semântico, e não apenas execução, schema ou snapshot;
+- [x] ajuda, parser, catálogo e README concordam sobre a superfície pública;
+- [x] o tarball instalado isoladamente executa o binário e as APIs públicas suportadas;
+- [x] testes, typechecks, lint, Knip, build e `git diff --check` passam;
+- [x] não restam itens obrigatórios nos três recortes acima.
 
 “Não existir qualquer melhoria possível” não é critério de término. Cobertura total, tamanho máximo de arquivo,
 generalização de toda política e padronização de formatos externos também não são requisitos.

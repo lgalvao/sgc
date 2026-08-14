@@ -1,8 +1,6 @@
 import path from "node:path";
-import {pathToFileURL} from "node:url";
 import {describe, expect, test} from "vitest";
-import {execa} from "execa";
-import {DIRETORIO_RAIZ} from "./apoio.js";
+import {DIRETORIO_RAIZ, importarModuloSemExecutar} from "./apoio.js";
 
 const DIRETORIO_TOOLKIT = path.join(DIRETORIO_RAIZ, "toolkit");
 const CAMINHOS_COMANDOS_PROJETO = [
@@ -25,40 +23,23 @@ const CAMINHOS_COMANDOS_CONSISTENCIA = [
     "idioma-consistencia-auditar.ts"
 ].map(nome => path.join(DIRETORIO_TOOLKIT, "codigo", nome));
 
-async function importarSemExecutar(caminho: string): Promise<{exitCode?: number; stdout: string}> {
-    const urlModulo = pathToFileURL(caminho).href;
-    const resultado = await execa(process.execPath, [
-        "--import=tsx",
-        "--input-type=module",
-        "-e",
-        `process.argv.push("--help"); await import(${JSON.stringify(urlModulo)}); process.stdout.write("importacao-ok\\n");`
-    ], {
-        cwd: DIRETORIO_RAIZ,
-        reject: false
-    });
-    return {
-        exitCode: resultado.exitCode,
-        stdout: resultado.stdout
-    };
-}
-
 function todasImportacoesConcluidas(resultados: Array<{exitCode?: number; stdout: string}>): boolean {
     return resultados.every(resultado => resultado.exitCode === 0 && resultado.stdout === "importacao-ok");
 }
 
 describe("Importação segura dos núcleos do toolkit", () => {
     test("pode importar comandos de projeto sem executar efeitos", async () => {
-        const resultados = await Promise.all(CAMINHOS_COMANDOS_PROJETO.map(importarSemExecutar));
+        const resultados = await Promise.all(CAMINHOS_COMANDOS_PROJETO.map(importarModuloSemExecutar));
         expect(todasImportacoesConcluidas(resultados)).toBe(true);
     });
 
     test("pode importar comandos de qualidade sem executar coleta ou resumo", async () => {
-        const resultados = await Promise.all(CAMINHOS_COMANDOS_QUALIDADE.map(importarSemExecutar));
+        const resultados = await Promise.all(CAMINHOS_COMANDOS_QUALIDADE.map(importarModuloSemExecutar));
         expect(todasImportacoesConcluidas(resultados)).toBe(true);
     });
 
     test("pode importar auditores de consistencia sem gerar artefatos", async () => {
-        const resultados = await Promise.all(CAMINHOS_COMANDOS_CONSISTENCIA.map(importarSemExecutar));
+        const resultados = await Promise.all(CAMINHOS_COMANDOS_CONSISTENCIA.map(importarModuloSemExecutar));
         expect(todasImportacoesConcluidas(resultados)).toBe(true);
     });
 });

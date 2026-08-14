@@ -3,11 +3,11 @@ import path from "node:path";
 import {mkdir, mkdtemp, writeFile} from "node:fs/promises";
 import {describe, expect, test} from "vitest";
 import {execa} from "execa";
-import {pathToFileURL} from "node:url";
 import {auditarCdus} from "../requisitos/cdus-auditoria-motor.js";
 import {auditarMensagensCodigo} from "../requisitos/cdus-auditar-mensagens-codigo.js";
 import {inventariarCdus} from "../requisitos/cdus-inventario-motor.js";
 import {carregarMensagensCanonicas} from "../requisitos/cdus-mensagens-codigo-lib.js";
+import {importarModuloSemExecutar} from "./apoio.js";
 
 const DIRETORIO_RAIZ = path.resolve(import.meta.dirname, "..", "..");
 const CAMINHO_FERRAMENTAS = path.join(DIRETORIO_RAIZ, "toolkit", "ferramentas.ts");
@@ -268,18 +268,7 @@ describe("Ferramentas de requisitos dos CDUs", () => {
     });
 
     test("pode importar todos os comandos sem executar auditorias", async () => {
-        const resultados = await Promise.all(CAMINHOS_COMANDOS_CDU.map(async caminho => {
-            const urlModulo = pathToFileURL(caminho).href;
-            return execa(process.execPath, [
-                "--import=tsx",
-                "--input-type=module",
-                "-e",
-                `process.argv.push("--help"); await import(${JSON.stringify(urlModulo)}); process.stdout.write("importacao-ok\\n");`
-            ], {
-                cwd: DIRETORIO_RAIZ,
-                reject: false
-            });
-        }));
+        const resultados = await Promise.all(CAMINHOS_COMANDOS_CDU.map(importarModuloSemExecutar));
 
         for (const resultado of resultados) {
             expect(resultado.exitCode).toBe(0);

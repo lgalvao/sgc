@@ -189,8 +189,9 @@ V8 lidos na fronteira.
 
 O domínio JaCoCo não presume exclusões do SGC. Os dois comandos de cobertura do servidor são entrypoints do perfil SGC e
 passam os padrões locais de exclusão; consumidores externos devem usar a API `extrairCoberturaJacoco` com seus próprios
-`padroesExclusao` ou compor um comando equivalente. A cobertura do cliente e seus comandos de ramificações continuam
-adaptáveis por `--base` e pelo arquivo V8 informado.
+`padroesExclusao` e caminho de relatório explícito, ou compor um comando equivalente. A API de cobertura web segue o mesmo
+contrato de caminho explícito. A cobertura do cliente e seus comandos de ramificações continuam adaptáveis por `--base` e
+pelo arquivo V8 informado.
 
 Os três comandos de ramificações também emitem `versaoSchema: "1.0.0"` e `geradoEm`; seus campos de JaCoCo/V8 permanecem
 nos nomes da fonte externa.
@@ -414,6 +415,10 @@ separados do motor de análise.
 
 O pacote usa o modelo fonte + `tsx`. O smoke de distribuição instala o tarball em um consumidor temporário para impedir
 dependências acidentais do workspace.
+
+`binarios/ferramentas.cjs` é somente o lançador mínimo exigido pelo campo `bin` do npm: ele localiza o `tsx` instalado e
+inicia `ferramentas.ts`. Não contém regras do toolkit, não é uma implementação paralela e não existe JavaScript legado no
+domínio da ferramenta.
 
 ```bash
 npm --prefix toolkit pack

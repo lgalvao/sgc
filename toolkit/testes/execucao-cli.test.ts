@@ -1,12 +1,12 @@
 import os from "node:os";
 import path from "node:path";
 import {mkdtemp} from "node:fs/promises";
-import {pathToFileURL} from "node:url";
 import {describe, expect, test} from "vitest";
 import {execa, execaNode} from "execa";
 import {
     DIRETORIO_RAIZ,
     CAMINHO_FERRAMENTAS,
+    importarModuloSemExecutar,
     escreverArquivo,
     existe
 } from "./apoio.js";
@@ -66,16 +66,7 @@ describe("Execução e distribuição da CLI", () => {
     });
 
     test("pode ser importada sem executar a CLI", async () => {
-        const caminhoSgc = pathToFileURL(CAMINHO_FERRAMENTAS).href;
-        const resultado = await execa(process.execPath, [
-            "--import=tsx",
-            "--input-type=module",
-            "-e",
-            `process.argv.push("--help"); await import(${JSON.stringify(caminhoSgc)}); process.stdout.write("importacao-ok\\n");`
-        ], {
-            cwd: DIRETORIO_RAIZ,
-            reject: false
-        });
+        const resultado = await importarModuloSemExecutar(CAMINHO_FERRAMENTAS);
 
         expect(resultado.exitCode).toBe(0);
         expect(resultado.stdout).toBe("importacao-ok");
