@@ -44,7 +44,7 @@ async function principal(argumentos: string[] = process.argv.slice(2)): Promise<
     if (argumentosValidados.includes("--help") || argumentosValidados.includes("-h")) {
         exibirAjudaComando({
             comandoToolkit: "codigo semgrep auditar",
-            descricao: "Executa um piloto de Semgrep OSS com a política configurada para monitorar deriva estrutural no projeto.",
+            descricao: "Executa regras Semgrep configuradas para monitorar deriva estrutural no projeto.",
             opcoes: [
                 "--regra <arquivo>     Sobrescreve o arquivo de regras YAML.",
                 "--diretorio <caminho> Adiciona diretório-alvo; pode ser repetido.",

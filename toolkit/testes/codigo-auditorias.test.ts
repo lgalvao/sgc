@@ -115,6 +115,14 @@ describe("Auditores de código", () => {
         expect(obterComandoSemgrep(path.join(diretorioBinario, "inexistente"))).toBe("semgrep");
     });
 
+    test("descreve o Semgrep como auditoria configurada, nao como piloto", async () => {
+        const resultado = await executarSgc(["codigo", "semgrep", "auditar", "--help"]);
+
+        expect(resultado.exitCode).toBe(0);
+        expect(resultado.stdout).toContain("Executa regras Semgrep configuradas");
+        expect(resultado.stdout).not.toContain("piloto de Semgrep");
+    });
+
     test("resolve alvos padrao do Semgrep pela configuracao da base", async () => {
         const base = await mkdtemp(path.join(os.tmpdir(), "sgc-semgrep-base-"));
         await escreverJson(path.join(base, "configuracao-toolkit.json"), {
