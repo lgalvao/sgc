@@ -187,27 +187,38 @@ opções existentes, inclusive com zero.
 Comprovar que os auditores mantidos respondem corretamente às perguntas que anunciam, sem reabrir arquitetura, catálogo
 ou generalização já encerrados.
 
+### Matriz semântica atual
+
+| Área | Contrato verificado | Evidência comportamental | Lacuna obrigatória |
+|---|---|---|---|
+| Servidor: cobertura e auditorias | Mede cobertura, risco, arquitetura, coesão e contratos com caminhos/políticas explícitos | `servidor-auditorias.test.ts`, `cobertura-cli.test.ts` | Nenhuma identificada |
+| Servidor: testes e notificações | Classifica evidências, prioriza backlog e detecta assuntos fora da fonte canônica | `servidor-testes.test.ts`, `servidor-notificacoes.test.ts` | Nenhuma identificada |
+| Cliente: arquitetura e gates | Sinaliza violações reais, permite composição correta e mantém políticas SGC na borda | `cliente-arquitetura.test.ts`, `cliente-arquitetura-gates.test.ts` | Nenhuma identificada |
+| Cliente: resíduos, templates, modais e identificadores | Distingue inventário de gate e valida padrões estruturais configuráveis | `cliente-residuos.test.ts`, `cliente-validadores.test.ts`, `cliente-identificadores.test.ts` | Nenhuma identificada |
+| Cliente: cobertura | Lista lacunas, cruza sinais de tratamento de erro e ignora fontes removidas | `cobertura-cli.test.ts` | Nenhuma identificada |
+| Código e nomenclatura | Executa Semgrep/heurísticas e valida inventário, idioma, contratos e resumos | `codigo-auditorias.test.ts`, `consistencia.test.ts` | Nenhuma identificada |
+| OpenAPI e CDU | Usa caminhos/configuração explícitos e produz contratos horizontais em projeto externo | `integracao.test.ts`, `cdus.test.ts`, `externo.test.ts` | Nenhuma identificada |
+| Projeto e qualidade | Mantém efeitos, status, filtros de dependência, árvore limitada e composição externa | `projeto.test.ts`, `qualidade.test.ts`, `qualidade-externa.test.ts` | Nenhuma identificada |
+
 ### Passos obrigatórios
 
-1. Resolver os achados obrigatórios do reality check na ordem recomendada acima.
-2. Criar uma matriz `auditor -> regras relevantes -> evidências existentes -> lacunas`.
-3. Priorizar regras que produzem gate, severidade, pontuação, violação ou recomendação acionável.
-4. Completar somente as evidências necessárias para cada tipo de regra:
+1. Priorizar regras que produzem gate, severidade, pontuação, violação ou recomendação acionável.
+2. Completar somente as evidências necessárias para cada tipo de regra:
    - achado positivo mínimo, com arquivo e motivo corretos;
    - negativo próximo para heurísticas sujeitas a falso positivo;
    - limite inferior/superior quando houver threshold ou mudança de classificação;
    - invariantes entre resumo, severidade, lista destacada e motivos;
    - mais de um arquivo quando contagem, duplicação ou escala alterar o resultado;
    - saída humana quando ela for o principal produto do comando.
-5. Não exigir mecanicamente todos os casos acima de toda regra. A matriz deve registrar `não aplicável` com justificativa
+3. Não exigir mecanicamente todos os casos acima de toda regra. A matriz deve registrar `não aplicável` com justificativa
    curta quando a natureza da regra não exigir uma dimensão.
-6. Executar uma amostra curta e representativa no SGC, cobrindo ao menos:
+4. Executar uma amostra curta e representativa no SGC, cobrindo ao menos:
    - um auditor de servidor;
    - um auditor de cliente;
    - uma capacidade horizontal configurável;
    - CDU;
    - um orquestrador ou agregador.
-7. Confrontar os principais resultados com os arquivos apontados. Todo falso positivo, falso negativo ou texto enganoso
+5. Confrontar os principais resultados com os arquivos apontados. Todo falso positivo, falso negativo ou texto enganoso
    confirmado gera primeiro uma regressão mínima e depois a correção.
 
 ### Limites do recorte

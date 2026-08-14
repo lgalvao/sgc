@@ -101,6 +101,7 @@ describe("Auditorias de cobertura da CLI", () => {
         const servidorRamificacoesJson = JSON.parse(servidorRamificacoes.stdout);
         expect(servidorRamificacoesJson).toMatchObject({versaoSchema: "1.0.0", status: "ok"});
         expect(servidorRamificacoesJson.geradoEm).toBeTypeOf("string");
+        expect(servidorRamificacoesJson.classes[0]).toMatchObject({ramificacoesPerdidas: 1, totalRamificacoes: 1});
         expect(servidorRamificacoesJson.timestamp).toBeUndefined();
         expect(await existe(path.join(base, "servidor-cobertura-auditoria.md"))).toBe(false);
         expect(await existe(path.join(base, "cliente-cobertura-auditoria.md"))).toBe(false);
@@ -275,5 +276,49 @@ describe("Auditorias de cobertura da CLI", () => {
         expect(conteudo.geradoEm).toBeTypeOf("string");
         expect(conteudo.timestamp).toBeUndefined();
         expect(conteudo.arquivos).toEqual([]);
+    });
+
+    test("cruza ramificação perdida com linha suspeita de tratamento de erro", async () => {
+        const base = await mkdtemp(path.join(os.tmpdir(), "sgc-cobertura-erros-achado-"));
+        const caminhoArquivo = path.join(base, "frontend", "src", "servico.ts");
+        const caminhoRelatorio = path.join(base, "coverage", "coverage-final.json");
+        await escreverArquivo(caminhoArquivo, [
+            "export async function buscar() {",
+            "  try { return true; }",
+            "  catch (erro) { return Promise.reject(erro); }",
+            "}",
+            "",
+        ].join("\n"));
+        await escreverJson(caminhoRelatorio, {
+            [caminhoArquivo]: {
+                s: {"1": 1, "2": 1, "3": 0},
+                f: {"1": 1},
+                b: {"1": [1, 0]},
+                statementMap: {"1": {}, "2": {}, "3": {}},
+            },
+        });
+
+        const resultado = await executarSgc([
+            "cliente",
+            "cobertura",
+            "ramificacoes-erros",
+            "--json",
+            "--base",
+            base,
+            "--arquivo",
+            caminhoRelatorio,
+        ]);
+
+        expect(resultado.exitCode).toBe(0);
+        const conteudo = JSON.parse(resultado.stdout);
+        expect(conteudo.arquivos).toHaveLength(1);
+        expect(conteudo.arquivos[0]).toMatchObject({
+            arquivo: "frontend/src/servico.ts",
+            ramificacoesPerdidas: 1,
+        });
+        expect(conteudo.arquivos[0].linhasSuspeitas).toEqual(expect.arrayContaining([
+            expect.objectContaining({numero: 3, texto: expect.stringContaining("catch")}),
+            expect.objectContaining({numero: 3, texto: expect.stringContaining("Promise.reject")}),
+        ]));
     });
 });
