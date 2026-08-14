@@ -110,6 +110,32 @@ describe("Auditorias de consistência e nomenclatura", () => {
         ))).versao).toBe(1);
     });
 
+    test("emite resumo JSON limitado da auditoria de nomenclatura", async () => {
+        const diretorioBase = await mkdtemp(path.join(os.tmpdir(), "sgc-nomenclatura-resumo-"));
+        await escreverArquivo(
+            path.join(diretorioBase, "frontend", "src", "exemplo.ts"),
+            "export function getExemplo(id: string) { return id; }\n"
+        );
+
+        const resultado = await executarSgc([
+            "codigo",
+            "nomes",
+            "auditar-consistencia",
+            "--base",
+            diretorioBase,
+            "--json-resumido"
+        ]);
+
+        expect(resultado.exitCode).toBe(0);
+        const resumo = JSON.parse(resultado.stdout);
+        expect(resumo).toMatchObject({versaoResumo: 1, truncado: true, limiteItens: 20});
+        expect(resumo.indicadores.arquivos).toBe(1);
+        expect(resumo.indicadores.parametrosComId).toBe(1);
+        expect(resumo.achados.parametrosComId).toHaveLength(1);
+        expect(resumo.formatosArquivos[".ts"]).toBeDefined();
+        expect(resumo.tiposForaPadrao).toBeUndefined();
+    });
+
     test("mantem auditoria de idioma read-only e grava sob demanda", async () => {
         const diretorioBase = await mkdtemp(path.join(os.tmpdir(), "sgc-idioma-"));
         await escreverArquivo(

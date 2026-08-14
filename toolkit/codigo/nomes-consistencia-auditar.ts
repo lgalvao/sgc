@@ -66,9 +66,29 @@ interface AuditoriaNomes {
     pacotesJavaForaPadrao: PacoteForaPadrao[];
 }
 
+interface ResumoAuditoriaNomes {
+    versaoResumo: 1;
+    geradoEm: string;
+    base: string;
+    inventarioFonte: string;
+    truncado: true;
+    limiteItens: number;
+    indicadores: AuditoriaNomes["indicadores"];
+    formatosArquivos: Record<string, Record<string, number>>;
+    formatosDiretorios: Record<string, number>;
+    achados: {
+        tiposForaPadrao: TipoForaPadrao[];
+        membrosForaPadrao: MembroForaPadrao[];
+        parametrosForaPadrao: ParametroForaPadrao[];
+        parametrosComId: ParametroComId[];
+        pacotesJavaForaPadrao: PacoteForaPadrao[];
+    };
+}
+
 interface OpcoesAuditoriaNomes {
     base?: string;
     json?: boolean;
+    jsonResumido?: boolean;
     gravar?: boolean;
     inventario?: string | null;
     saidaJson?: string | null;
@@ -273,9 +293,44 @@ function montarResumo(auditoria: AuditoriaNomes): string {
     return `${linhas.join("\n")}\n`;
 }
 
+function criarResumoJson(auditoria: AuditoriaNomes): ResumoAuditoriaNomes {
+    const limiteItens = 20;
+    const formatosArquivos = Object.fromEntries(
+        Object.entries(auditoria.formatosArquivos).map(([extensao, formatos]) => [
+            extensao,
+            Object.fromEntries(Object.entries(formatos).map(([formato, arquivos]) => [formato, arquivos.length]))
+        ])
+    );
+    const formatosDiretorios = Object.groupBy(
+        Object.values(auditoria.formatosDiretorios),
+        formato => formato
+    );
+    return {
+        versaoResumo: 1,
+        geradoEm: auditoria.geradoEm,
+        base: auditoria.base,
+        inventarioFonte: auditoria.inventarioFonte,
+        truncado: true,
+        limiteItens,
+        indicadores: auditoria.indicadores,
+        formatosArquivos,
+        formatosDiretorios: Object.fromEntries(
+            Object.entries(formatosDiretorios).map(([formato, itens]) => [formato, itens.length])
+        ),
+        achados: {
+            tiposForaPadrao: auditoria.tiposForaPadrao.slice(0, limiteItens),
+            membrosForaPadrao: auditoria.membrosForaPadrao.slice(0, limiteItens),
+            parametrosForaPadrao: auditoria.parametrosForaPadrao.slice(0, limiteItens),
+            parametrosComId: auditoria.parametrosComId.slice(0, limiteItens),
+            pacotesJavaForaPadrao: auditoria.pacotesJavaForaPadrao.slice(0, limiteItens),
+        },
+    };
+}
+
 async function executarAuditoriaNomes({
     base = DIRETORIO_RAIZ,
     json = false,
+    jsonResumido = false,
     gravar = false,
     inventario = null,
     saidaJson = null
@@ -325,7 +380,7 @@ async function executarAuditoriaNomes({
     }
 
     if (json) {
-        imprimirJson(auditoria);
+        imprimirJson(jsonResumido ? criarResumoJson(auditoria) : auditoria);
         return auditoria;
     }
 
@@ -350,6 +405,7 @@ function lerOpcoes(argv: string[]): OpcoesAuditoriaNomes {
     const opcoes: OpcoesAuditoriaNomes = {
         base: DIRETORIO_RAIZ,
         json: false,
+        jsonResumido: false,
         gravar: false,
         inventario: null,
         saidaJson: null
@@ -359,6 +415,11 @@ function lerOpcoes(argv: string[]): OpcoesAuditoriaNomes {
         const argumento = argv[indice];
         if (argumento === "--json") {
             opcoes.json = true;
+            continue;
+        }
+        if (argumento === "--json-resumido") {
+            opcoes.json = true;
+            opcoes.jsonResumido = true;
             continue;
         }
         if (argumento === "--gravar") {
@@ -387,7 +448,7 @@ function lerOpcoes(argv: string[]): OpcoesAuditoriaNomes {
 async function principal(argumentos: string[] = process.argv.slice(2)): Promise<void> {
     const argumentosValidados = validarArgumentosEntradaDireta(import.meta.url, argumentos);
     if (argumentosValidados.includes("--help") || argumentosValidados.includes("-h")) {
-        escreverLinha("Uso: ferramentas codigo nomes auditar-consistencia [--json] [--gravar] [--base <diretorio>] [--inventario <arquivo.json>] [--saida <arquivo.json>]");
+        escreverLinha("Uso: ferramentas codigo nomes auditar-consistencia [--json|--json-resumido] [--gravar] [--base <diretorio>] [--inventario <arquivo.json>] [--saida <arquivo.json>]");
         escreverLinha("");
         escreverLinha("Audita consistencia de nomenclatura com base no inventario de simbolos.");
         return;

@@ -165,6 +165,8 @@ As auditorias `codigo nomes auditar-consistencia` e
 `codigo nomes auditar-idioma` reutilizam esse inventário e emitem resultados versionados (`auditar-idioma` em `versao: 2`); um inventário existente
 com formato ou versão incompatível é rejeitado, enquanto a ausência do arquivo ainda permite uma coleta somente em
 memória quando o comando não usa `--gravar`.
+`codigo nomes auditar-consistencia --json-resumido` preserva os indicadores, conta formatos e os 20 primeiros itens de
+cada categoria; `--json` continua emitindo todos os achados.
 
 `codigo cheiros auditar` produz uma fotografia `versao: 4` de tendência; ela é reutilizada para calcular deltas na
 execução seguinte. O relatório agrega sinais Java e cliente que não são gates, não classifica a soma como severidade e

@@ -288,7 +288,7 @@ const CATALOGO_COMANDOS = [
         decisao: "manter",
         finalidade: "auditar",
         efeitos: criarEfeitosComando("opcional"),
-        argumentos: esquema(["--base", "--inventario", "--saida"], ["--json", "--gravar"]),
+        argumentos: esquema(["--base", "--inventario", "--saida"], ["--json", "--json-resumido", "--gravar"]),
         arquivo: "codigo/nomes-consistencia-auditar.ts"
     },
     {
