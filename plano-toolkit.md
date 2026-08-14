@@ -80,13 +80,118 @@ A modernização estrutural está concluída:
 - Semgrep, OpenAPI, JaCoCo, V8 e sincronização de versão recebem entradas explícitas em seus motores;
 - defaults e políticas do SGC estão nas bordas ou em módulos identificados como perfil SGC;
 - acessibilidade Playwright/Axe pertence a `e2e/`, fora do toolkit;
-- o reality check contra o SGC corrigiu classificações contraditórias, ambiguidades sistemáticas e destaques sem violação;
+- um reality check anterior corrigiu classificações contraditórias, ambiguidades sistemáticas e destaques sem violação;
 - testes, pacote isolado, typechecks, lint, Knip, build e `git diff --check` passam.
 
 Essa situação não comprova, por si só, a correção semântica uniforme de todos os auditores. A revisão final encontrou
 auditores com bons testes comportamentais e outros ainda cobertos principalmente por execução, schema, persistência ou
 um único exemplo positivo. Portanto, a modernização não deve ser declarada encerrada enquanto o recorte abaixo estiver
 aberto.
+
+## Reality check de encerramento
+
+### Contexto da execução
+
+Os 38 comandos públicos foram exercitados contra o workspace real do SGC. Operações destrutivas ficaram em simulação;
+OpenAPI diff e promoção de baseline usaram arquivos temporários; a exportação tentou o endpoint padrão sem iniciar o
+servidor. A primeira passagem executou comandos independentes em paralelo, inclusive `qualidade coletar` e `qualidade
+tarefas executar rapido`. Como ambas acionam Gradle/npm e compartilham artefatos, a fotografia contaminada por essa
+concorrência foi descartada e `qualidade coletar --perfil rapido` foi repetido isoladamente.
+
+Na repetição isolada, testes do servidor (1.588), cobertura, cobertura do cliente, lint, typecheck, resíduos e arquitetura
+passaram. A fotografia continuou vermelha apenas por duplicações globais de `data-testid`. O ambiente foi restaurado com
+`npm install` depois que a rodada de tarefas removeu dependências necessárias à CLI. Nenhuma alteração versionada ficou
+na worktree.
+
+### Achados obrigatórios
+
+#### 1. Execução de tarefas pode invalidar o próprio toolkit
+
+**Evidência:** durante `qualidade tarefas executar rapido`, a tarefa `frontend:install` executou instalação npm. Ao final,
+`commander` deixou de ser resolvido por `toolkit/ferramentas.ts`; comandos subsequentes falharam com
+`ERR_MODULE_NOT_FOUND` até executar `npm install` na raiz. A execução também usou Node 26.4 em subprocessos enquanto a
+CLI principal usava Node 26.7, produzindo avisos de engine.
+
+**Cautela:** a descoberta ocorreu numa rodada concorrente. Antes de corrigir, reproduzir isoladamente e identificar se a
+causa é a tarefa Gradle, o uso de `npm --prefix`, a topologia de workspaces ou a herança de PATH/Node. O teste de regressão
+deve provar que `ferramentas --help` continua executável depois da tarefa e que todos os subprocessos usam o Node mínimo.
+
+**Recomendação:** impedir que uma tarefa de qualidade reinstale ou remova dependências compartilhadas, ou executar a
+instalação em escopo que preserve o workspace. Falha ou engine incompatível deve aparecer como erro da tarefa, não como
+quebra tardia da próxima chamada.
+
+#### 2. Unicidade global de `data-testid` produz gate enganoso
+
+**Evidência:** `cliente identificadores-teste listar-duplicados` encontrou três valores em 273 identificadores e fez a
+fotografia geral ficar vermelha, embora as outras sete verificações tenham passado. Os casos incluem seletores iguais em
+telas/componentes distintos e cards repetidos por `v-for`; reutilização não implica colisão no mesmo DOM nem teste
+ambíguo.
+
+**Recomendação:** decidir explicitamente o contrato. Preferência: manter a listagem global como inventário e só falhar por
+duplicidade comprovadamente ambígua no mesmo escopo renderizado. Se essa análise estática não for confiável, retirar o
+comando do gate de qualidade ou exigir política/exceção configurada. A fotografia não pode declarar vermelho por uma
+heurística sem violação demonstrável.
+
+#### 3. Priorização de testes aceita entrada incompatível silenciosamente
+
+**Evidência:** o JSON válido de `servidor testes analisar`, salvo com extensão `.out`, foi tratado como Markdown e gerou
+P1/P2/P3 vazios sem erro. O mesmo conteúdo com extensão `.json` produziu 6 itens P1, 8 P2 e 4 P3.
+
+**Recomendação:** detectar o formato pelo conteúdo ou exigir formato explícito; em ambos os casos, entrada não reconhecida
+deve falhar. Adicionar regressões para JSON com extensão não convencional, Markdown válido e conteúdo inválido que hoje
+resulta silenciosamente vazio.
+
+#### 4. JSON completo é impraticável como resposta padrão para agentes
+
+**Evidência:** na base real, as respostas chegaram aproximadamente a 2,1 MB em símbolos, 858 KB no gate arquitetural,
+424 KB na validação de resíduos, 392 KB na auditoria de resíduos, 366 KB na análise de testes, 264 KB na consistência de
+nomes, 184 KB na cobertura do servidor e 104 KB na auditoria CDU.
+
+**Recomendação:** definir um contrato uniforme de resumo estruturado, preferencialmente `--json-resumido`, preservando
+`--json` como saída completa quando necessária. O resumo deve conter totais, classificação, principais achados limitados,
+motivos e indicação de truncamento; não deve despejar módulos, símbolos, XMLs ou todos os arquivos. Priorizar primeiro os
+comandos acima de 250 KB e a saída de `qualidade resumo`.
+
+#### 5. Auditoria de dependências ainda contém ruído evitável
+
+**Evidência:** a auditoria funcionou e separou achados de falhas, mas apresentou TypeScript 7 para toolkit, frontend e
+e2e apesar da decisão explícita de permanecer em TypeScript 6 enquanto o ecossistema for incompatível. O Knip também
+apontou `tsx` como binário não declarado na raiz e no frontend. Não foram encontradas vulnerabilidades npm.
+
+**Recomendação:** configurar uma exclusão documentada e temporária para a major 7, com condição clara de remoção, sem
+ocultar atualizações da série 6. Verificar se os usos de `tsx` devem virar dependências declaradas ou se os scripts podem
+usar a dependência do escopo correto. O comando deve continuar retornando código distinto quando houver atualizações,
+sem tratar achado esperado como falha de execução.
+
+#### 6. Árvore de linhas tem saída padrão excessiva
+
+**Evidência:** `projeto arvore-linhas` imprimiu a árvore integral de cerca de 246 mil linhas do repositório. As opções
+`--profundidade` e `--minimo-linhas` resolvem o problema, mas exigem conhecimento prévio e não há JSON resumido.
+
+**Recomendação:** adotar defaults humanos úteis de profundidade/mínimo ou apresentar primeiro um resumo com orientação
+para expandir. Não transformar o comando em auditor nem adicionar persistência sem caso de uso.
+
+### Resultados úteis que não exigem correção imediata
+
+- OpenAPI diff e promoção de baseline funcionaram em arquivos temporários. A exportação falhou porque o servidor não
+  estava ativo e apresentou orientação adequada; isso é pré-condição esperada, não defeito.
+- `servidor arquitetura auditar` encontrou 3 críticos e 7 alertas com arquivos e motivos coerentes.
+- CDU encontrou 0 erros, 35 avisos e 64 referências imprecisas; a saída completa é útil, mas precisa do resumo recomendado.
+- Contratos, notificações, views, modais e Semgrep não encontraram violações.
+- O corretor FQN encontrou 114 arquivos alteráveis em simulação, confirmando seu valor como utilitário ocasional; nenhuma
+  alteração deve ser aplicada como parte deste recorte.
+- `projeto ambiente verificar` passou nas 20 verificações; sincronização de versão confirmou que `1.3.8` já está alinhada.
+
+### Ordem de execução recomendada
+
+1. reproduzir isoladamente e corrigir a invalidação de dependências/Node em `qualidade tarefas executar`;
+2. corrigir o contrato e a severidade de identificadores duplicados;
+3. corrigir a detecção e validação de formato em `servidor testes priorizar`;
+4. introduzir resumos JSON consistentes, começando pelos maiores resultados;
+5. reduzir ruído conhecido da auditoria de dependências;
+6. ajustar a saída padrão da árvore de linhas;
+7. construir a matriz semântica usando cada problema confirmado acima como regressão inicial;
+8. repetir a amostra final sequencialmente, sem concorrência entre comandos que compartilhem npm, Gradle ou artefatos.
 
 ## Recorte final — comprovação semântica
 
@@ -97,24 +202,25 @@ ou generalização já encerrados.
 
 ### Passos obrigatórios
 
-1. Criar uma matriz `auditor -> regras relevantes -> evidências existentes -> lacunas`.
-2. Priorizar regras que produzem gate, severidade, pontuação, violação ou recomendação acionável.
-3. Completar somente as evidências necessárias para cada tipo de regra:
+1. Resolver os achados obrigatórios do reality check na ordem recomendada acima.
+2. Criar uma matriz `auditor -> regras relevantes -> evidências existentes -> lacunas`.
+3. Priorizar regras que produzem gate, severidade, pontuação, violação ou recomendação acionável.
+4. Completar somente as evidências necessárias para cada tipo de regra:
    - achado positivo mínimo, com arquivo e motivo corretos;
    - negativo próximo para heurísticas sujeitas a falso positivo;
    - limite inferior/superior quando houver threshold ou mudança de classificação;
    - invariantes entre resumo, severidade, lista destacada e motivos;
    - mais de um arquivo quando contagem, duplicação ou escala alterar o resultado;
    - saída humana quando ela for o principal produto do comando.
-4. Não exigir mecanicamente todos os casos acima de toda regra. A matriz deve registrar `não aplicável` com justificativa
+5. Não exigir mecanicamente todos os casos acima de toda regra. A matriz deve registrar `não aplicável` com justificativa
    curta quando a natureza da regra não exigir uma dimensão.
-5. Executar uma amostra curta e representativa no SGC, cobrindo ao menos:
+6. Executar uma amostra curta e representativa no SGC, cobrindo ao menos:
    - um auditor de servidor;
    - um auditor de cliente;
    - uma capacidade horizontal configurável;
    - CDU;
    - um orquestrador ou agregador.
-6. Confrontar os principais resultados com os arquivos apontados. Todo falso positivo, falso negativo ou texto enganoso
+7. Confrontar os principais resultados com os arquivos apontados. Todo falso positivo, falso negativo ou texto enganoso
    confirmado gera primeiro uma regressão mínima e depois a correção.
 
 ### Limites do recorte
@@ -143,6 +249,11 @@ real não apresentar classificação contraditória, ambiguidade sistemática ou
 - [x] CDU e análise de testes Java funcionam com projeto externo sem editar o toolkit;
 - [x] ajuda, parser, catálogo e README concordam sobre a superfície pública;
 - [x] o tarball instalado isoladamente executa o binário e as APIs públicas suportadas;
+- [ ] tarefas de qualidade preservam a instalação do toolkit e usam a versão mínima de Node nos subprocessos;
+- [ ] gates e status gerais não falham por inventários ou heurísticas sem violação demonstrável;
+- [ ] entradas estruturadas incompatíveis falham em vez de produzir resultado vazio;
+- [ ] comandos de grande volume oferecem resumo JSON acionável para agentes;
+- [ ] auditoria de dependências respeita a decisão temporária sobre TypeScript 7 sem ocultar atualizações da série 6;
 - [ ] a matriz semântica está completa e não contém lacuna obrigatória;
 - [ ] a amostra final contra o SGC foi confrontada com o código e não revelou resultado enganoso sem regressão;
 - [x] testes, typechecks, lint, Knip, build e `git diff --check` passam.
