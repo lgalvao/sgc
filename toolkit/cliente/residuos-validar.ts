@@ -3,7 +3,9 @@ import pc from "picocolors";
 import {DIRETORIO_RAIZ} from "../biblioteca/caminhos.js";
 import {
     analisarResiduosCliente,
+    criarResumoFotografiaResiduos,
     gravarFotografiaAuditoria,
+    LIMITE_RESUMO_RESIDUOS,
     resolverDiretorioSaidaResiduos
 } from "./residuos-lib.js";
 import {
@@ -40,8 +42,15 @@ interface ResultadoValidacaoResiduos {
     avisos: ViolacaoResiduoValidacao[];
 }
 
-interface ResumoValidacaoResiduos extends Omit<ResultadoValidacaoResiduos, "fotografia"> {
-    pontosCriticos: FotografiaResiduos["pontosCriticos"];
+interface ResumoValidacaoResiduos extends Omit<ResultadoValidacaoResiduos, "fotografia" | "violacoes" | "avisos">,
+    Omit<ReturnType<typeof criarResumoFotografiaResiduos>, "versaoResumo" | "versaoSchema" | "base" | "resumo"> {
+    versaoResumo: 1;
+    versaoSchema: FotografiaResiduos["versaoSchema"];
+    base: string;
+    truncado: true;
+    limiteItens: number;
+    violacoes: ViolacaoResiduoValidacao[];
+    avisos: ViolacaoResiduoValidacao[];
 }
 
 interface OpcoesValidacaoClienteResiduos {
@@ -65,15 +74,23 @@ function indexarExcecoes(excecoes: ExcecaoResiduo[]): Map<string, ExcecaoResiduo
 }
 
 function resumirResultado(resultado: ResultadoValidacaoResiduos): ResumoValidacaoResiduos {
+    const fotografia = criarResumoFotografiaResiduos(resultado.fotografia);
     return {
+        versaoResumo: 1,
+        versaoSchema: fotografia.versaoSchema,
+        base: fotografia.base,
+        truncado: true,
+        limiteItens: LIMITE_RESUMO_RESIDUOS,
         status: resultado.status,
         geradoEm: resultado.geradoEm,
         resumo: resultado.resumo,
         orcamento: resultado.orcamento,
         excecoes: resultado.excecoes,
-        violacoes: resultado.violacoes,
-        avisos: resultado.avisos,
-        pontosCriticos: resultado.fotografia.pontosCriticos,
+        contagens: fotografia.contagens,
+        exportacoesSuspeitas: fotografia.exportacoesSuspeitas,
+        pontosCriticos: fotografia.pontosCriticos,
+        violacoes: resultado.violacoes.slice(0, LIMITE_RESUMO_RESIDUOS),
+        avisos: resultado.avisos.slice(0, LIMITE_RESUMO_RESIDUOS),
     };
 }
 
@@ -187,8 +204,8 @@ async function executarValidacaoClienteResiduos(
 
 async function principal(argumentosInformados: string[] = process.argv.slice(2)): Promise<void> {
     const argumentos = validarArgumentosEntradaDireta(import.meta.url, argumentosInformados);
-    const emitirJson = argumentos.includes("--json");
     const emitirJsonResumido = argumentos.includes("--json-resumido");
+    const emitirJson = argumentos.includes("--json") || emitirJsonResumido;
     const exibirAjuda = argumentos.includes("--help") || argumentos.includes("-h");
 
     if (exibirAjuda) {
@@ -226,14 +243,14 @@ async function principal(argumentosInformados: string[] = process.argv.slice(2))
         gravar: argumentos.includes("--gravar"),
     });
 
-    if (emitirJson) {
-        imprimirJson(resultado);
+    if (emitirJsonResumido) {
+        imprimirJson(resumirResultado(resultado));
         if (resultado.status !== "ok") process.exitCode = 1;
         return;
     }
 
-    if (emitirJsonResumido) {
-        imprimirJson(resumirResultado(resultado));
+    if (emitirJson) {
+        imprimirJson(resultado);
         if (resultado.status !== "ok") process.exitCode = 1;
         return;
     }

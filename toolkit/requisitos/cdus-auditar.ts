@@ -18,6 +18,73 @@ interface ArquivoComAchados {
     achados: readonly AchadoParaExibicao[];
 }
 
+const LIMITE_ITENS_RESUMO = 20;
+
+function resumirRelatorio(relatorio: readonly ArquivoComAchados[]): Array<{
+    arquivo: string;
+    severidade?: "erro" | "aviso";
+    regra: string;
+    mensagem: string;
+    linha?: number | null;
+}> {
+    return relatorio
+        .flatMap(item => item.achados.map(achado => ({arquivo: item.arquivo, ...achado})))
+        .toSorted((a, b) => Number(b.severidade === "erro") - Number(a.severidade === "erro")
+            || a.arquivo.localeCompare(b.arquivo, "pt-BR"))
+        .slice(0, LIMITE_ITENS_RESUMO);
+}
+
+function criarResumoJson(resultado: AuditoriaCdus): unknown {
+    const secoes: Record<string, unknown> = {};
+    const estrutura = resultado.secoes.estrutura;
+    const estilo = resultado.secoes.estilo;
+    const vocabulario = resultado.secoes.vocabulario;
+    const mensagens = resultado.secoes.mensagens;
+    const mensagensCodigo = resultado.secoes.mensagensCodigo;
+
+    if (estrutura) {
+        secoes.estrutura = {resumo: estrutura.resumo, achados: resumirRelatorio(estrutura.relatorio)};
+    }
+    if (estilo) {
+        secoes.estilo = {resumo: estilo.resumo, achados: resumirRelatorio(estilo.relatorio)};
+    }
+    if (vocabulario) {
+        secoes.vocabulario = {resumo: vocabulario.resumo, achados: resumirRelatorio(vocabulario.relatorio)};
+    }
+    if (mensagens) {
+        secoes.mensagens = {resumo: mensagens.resumo, achados: resumirRelatorio(mensagens.relatorio)};
+    }
+    if (mensagensCodigo) {
+        secoes.mensagensCodigo = {
+            resumo: mensagensCodigo.resumo,
+            itens: mensagensCodigo.relatorio
+                .toSorted((a, b) => Number(a.referenciasExatas.length > 0) - Number(b.referenciasExatas.length > 0)
+                    || b.quantidade - a.quantidade)
+                .slice(0, LIMITE_ITENS_RESUMO)
+                .map(item => ({
+                tipo: item.tipo,
+                valor: item.valor,
+                quantidade: item.quantidade,
+                ocorrencias: item.ocorrencias.slice(0, 3),
+                referenciasExatas: item.referenciasExatas.slice(0, 3),
+                sugestoes: item.sugestoes.slice(0, 3)
+                }))
+        };
+    }
+
+    return {
+        versaoResumo: 1,
+        versao: resultado.versao,
+        base: resultado.base,
+        totalArquivos: resultado.totalArquivos,
+        secoesIgnoradas: resultado.secoesIgnoradas,
+        truncado: true,
+        limiteItens: LIMITE_ITENS_RESUMO,
+        resumo: resultado.resumo,
+        secoes
+    };
+}
+
 function imprimirAmostraAchados(
     titulo: string,
     relatorio: readonly ArquivoComAchados[],
@@ -107,8 +174,13 @@ function imprimirAuditoria(resultado: AuditoriaCdus): void {
 
 async function principal(argumentos: string[] = process.argv.slice(2)): Promise<void> {
     const argumentosValidados = validarArgumentosEntradaDireta(import.meta.url, argumentos);
-    const {emitirJson, base, secoes} = obterOpcoesCdu(argumentosValidados);
+    const {emitirJson, emitirJsonResumido, base, secoes} = obterOpcoesCdu(argumentosValidados);
     const resultado = await auditarCdus(base, secoes);
+
+    if (emitirJsonResumido) {
+        imprimirJson(criarResumoJson(resultado));
+        return;
+    }
 
     if (emitirJson) {
         imprimirJson(resultado);

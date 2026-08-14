@@ -187,6 +187,22 @@ describe("Resíduos do cliente", () => {
         const adaptadorStorage = conteudo.arquivos.find((arquivo: {arquivo: string}) => arquivo.arquivo.endsWith("useLocalStorage.ts"));
         expect(adaptadorStorage.contagens.storageDireto).toBe(0);
 
+        const resumo = await executarSgc([
+            "cliente",
+            "residuos",
+            "auditar",
+            "--json-resumido",
+            "--base",
+            base,
+            "--orcamento",
+            "orcamento.json"
+        ]);
+        expect(resumo.exitCode).toBe(0);
+        const resumoJson = JSON.parse(resumo.stdout);
+        expect(resumoJson).toMatchObject({versaoResumo: 1, truncado: true, limiteItens: 20});
+        expect(resumoJson.arquivos).toBeUndefined();
+        expect(resumoJson.pontosCriticos.length).toBeLessThanOrEqual(20);
+
         const humano = await executarSgc([
             "cliente",
             "residuos",
@@ -346,6 +362,23 @@ describe("Resíduos do cliente", () => {
         const conteudo = JSON.parse(resultado.stdout);
         expect(conteudo.status).toBe("ok");
         expect(conteudo.violacoes).toEqual([]);
+        const resumo = await executarSgc([
+            "cliente",
+            "residuos",
+            "validar",
+            "--json-resumido",
+            "--base",
+            base,
+            "--orcamento",
+            "orcamento.json",
+            "--excecoes",
+            "excecoes.json"
+        ]);
+        expect(resumo.exitCode).toBe(0);
+        const resumoJson = JSON.parse(resumo.stdout);
+        expect(resumoJson).toMatchObject({versaoResumo: 1, truncado: true, limiteItens: 20, status: "ok"});
+        expect(resumoJson.fotografia).toBeUndefined();
+        expect(resumoJson.violacoes).toEqual([]);
         expect(await existe(path.join(base, "toolkit", "qualidade", "artefatos", "cliente-residuos"))).toBe(false);
         const gravacao = await executarSgc([
             "cliente",

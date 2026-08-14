@@ -221,6 +221,23 @@ describe("Ferramentas de requisitos dos CDUs", () => {
         expect(inventario.stdout).toContain("Itens duplicados:");
         expect(inventario.stdout).toContain("Amostra:");
         expect(inventario.stdout).toContain("cdu-01.md");
+
+        const inventarioResumido = await executarSgc([
+            "requisitos", "cdus", "inventariar", "--json-resumido", "--secoes", "duplicacoes", "--base", base
+        ]);
+        expect(inventarioResumido.exitCode).toBe(0);
+        const inventarioResumidoJson = JSON.parse(inventarioResumido.stdout);
+        expect(inventarioResumidoJson).toMatchObject({versaoResumo: 1, truncado: true, limiteItens: 20});
+        expect(inventarioResumidoJson.secoes.duplicacoes.totalDuplicacoes).toBeGreaterThan(0);
+        expect(inventarioResumidoJson.secoes.duplicacoes.duplicacoes.length).toBeLessThanOrEqual(20);
+
+        const auditoriaResumida = await executarSgc([
+            "requisitos", "cdus", "auditar", "--json-resumido", "--secoes", "estrutura,estilo", "--base", base
+        ]);
+        expect(auditoriaResumida.exitCode).toBe(0);
+        const auditoriaResumidaJson = JSON.parse(auditoriaResumida.stdout);
+        expect(auditoriaResumidaJson).toMatchObject({versaoResumo: 1, truncado: true, limiteItens: 20});
+        expect(auditoriaResumidaJson.secoes.estrutura.achados.length).toBeLessThanOrEqual(20);
     });
 
     test("limita casos Java ao método de assuntos configurado", async () => {

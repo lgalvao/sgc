@@ -29,6 +29,43 @@ interface ResultadoRamificacoesErros {
     arquivos: ArquivoRamificacoesErros[];
 }
 
+interface ResumoRamificacoesErros {
+    versaoResumo: 1;
+    status: ResultadoRamificacoesErros["status"];
+    versaoSchema: typeof VERSAO_SCHEMA_RESULTADO;
+    geradoEm: string;
+    truncado: true;
+    limiteItens: number;
+    totais: ResultadoRamificacoesErros["totais"];
+    arquivos: Array<{
+        arquivo: string;
+        ramificacoesTotal: number;
+        ramificacoesPercentual: number;
+        ramificacoesPerdidas: number;
+        linhasSuspeitas: LinhaSuspeita[];
+    }>;
+}
+
+function criarResumoJson(resultado: ResultadoRamificacoesErros): ResumoRamificacoesErros {
+    const limiteItens = 20;
+    return {
+        versaoResumo: 1,
+        status: resultado.status,
+        versaoSchema: resultado.versaoSchema,
+        geradoEm: resultado.geradoEm,
+        truncado: true,
+        limiteItens,
+        totais: resultado.totais,
+        arquivos: resultado.arquivos.slice(0, limiteItens).map(arquivo => ({
+            arquivo: arquivo.arquivo,
+            ramificacoesTotal: arquivo.ramificacoesTotal,
+            ramificacoesPercentual: arquivo.ramificacoesPercentual,
+            ramificacoesPerdidas: arquivo.ramificacoesPerdidas,
+            linhasSuspeitas: arquivo.linhasSuspeitas.slice(0, 3)
+        }))
+    };
+}
+
 const PADROES_SUSPEITOS: RegExp[] = [
     /\bcatch\s*\(/,
     /\bnormalizarErro\s*\(/,
@@ -64,7 +101,8 @@ async function coletarLinhasSuspeitas(caminhoRelativo: string, diretorioBase: st
 
 async function principal(argumentosInformados: string[] = process.argv.slice(2)): Promise<void> {
     const argumentos = validarArgumentosEntradaDireta(import.meta.url, argumentosInformados);
-    const emitirJson = argumentos.includes("--json");
+    const emitirJsonResumido = argumentos.includes("--json-resumido");
+    const emitirJson = argumentos.includes("--json") || emitirJsonResumido;
     const exibirAjuda = argumentos.includes("--help") || argumentos.includes("-h");
 
     if (exibirAjuda) {
@@ -73,6 +111,7 @@ async function principal(argumentosInformados: string[] = process.argv.slice(2))
             descricao: "Cruza lacunas de ramificacoes do cliente com sinais de tratamento de erro suspeito.",
             opcoes: [
                 "--json          Saída estruturada em JSON.",
+                "--json-resumido Saída JSON limitada a arquivos e linhas suspeitas.",
                 "--limite <n>    Limita a quantidade de arquivos inspecionados. Padrão: 15.",
                 "--arquivo <arquivo> Usa um relatório V8 específico.",
                 "--base <diretorio> Resolve o relatório relativo a outra base."
@@ -120,6 +159,11 @@ async function principal(argumentosInformados: string[] = process.argv.slice(2))
         arquivos,
     };
 
+    if (emitirJsonResumido) {
+        imprimirJson(criarResumoJson(resultado));
+        return;
+    }
+
     if (emitirJson) {
         imprimirJson(resultado);
         return;
@@ -153,5 +197,6 @@ if (ehEntradaPrincipal(import.meta.url)) {
 }
 
 export {
+    criarResumoJson,
     principal,
 };

@@ -69,8 +69,8 @@ contrato horizontal claro e teste externo que não carregue defaults do SGC.
 
 ## Situação atual
 
-A modernização estrutural está na fase final; a etapa restante é fechar a ergonomia dos maiores resultados e comprovar
-semântica e execução contra a base real:
+A modernização estrutural e a ergonomia dos maiores resultados estão concluídas; resta apenas a validação final do pacote
+e a confirmação de que catálogo, README e plano refletem o contrato atual:
 
 - CLI e catálogo registram finalidade, camada, decisão e efeitos; README documenta a superfície e os contratos atuais dos
   38 comandos públicos;
@@ -84,8 +84,8 @@ semântica e execução contra a base real:
 - acessibilidade Playwright/Axe pertence a `e2e/`, fora do toolkit;
 - os gates de identificadores não transformam repetição textual global em falha sem escopo demonstrável;
 - a priorização de testes rejeita entrada estruturada incompatível em vez de produzir backlog vazio;
-- cinco dos maiores produtores oferecem `--json-resumido`: símbolos, análise de testes do servidor, gate arquitetural,
-  consistência de nomenclatura e resumo agregado de qualidade;
+- os produtores de maior volume identificados no reality check oferecem `--json-resumido`: símbolos, análise de testes do
+  servidor, gate arquitetural, consistência de nomenclatura, qualidade, resíduos, cobertura e CDU;
 - a árvore de linhas usa profundidade 3 e mínimo de 500 linhas por padrão, com expansão explícita pelas opções atuais;
 - testes, pacote isolado, typechecks, lint, Knip, build e `git diff --check` passam.
 
@@ -142,9 +142,10 @@ aceito; conteúdo que aparenta ser estruturado mas é inválido falha. As três 
 424 KB na validação de resíduos, 392 KB na auditoria de resíduos, 366 KB na análise de testes, 264 KB na consistência de
 nomes, 184 KB na cobertura do servidor e 104 KB na auditoria CDU.
 
-**Progresso:** `--json-resumido` já cobre símbolos, testes do servidor, gate arquitetural, consistência de nomenclatura e
-qualidade agregada, com totais, principais achados, motivos e `truncado`; `--json` continua completo. Ainda faltam resíduos,
-cobertura e CDU, que devem seguir o mesmo contrato sem despejar módulos, símbolos, XMLs ou todos os arquivos.
+**Decisão implementada:** os comandos de símbolos, testes do servidor, gate arquitetural, nomenclatura, qualidade, resíduos,
+cobertura e CDU oferecem `--json-resumido` com `versaoResumo: 1`, `truncado`, limite explícito, totais e amostras
+acionáveis. `--json` continua completo; listas de módulos, arquivos, linhas de cobertura, métricas detalhadas e documentos
+integrais ficam fora do resumo.
 
 #### 5. Auditoria de dependências precisa separar política de projeto e ruído de ferramenta
 
@@ -170,7 +171,8 @@ opções existentes, inclusive com zero.
 - OpenAPI diff e promoção de baseline funcionaram em arquivos temporários. A exportação falhou porque o servidor não
   estava ativo e apresentou orientação adequada; isso é pré-condição esperada, não defeito.
 - `servidor arquitetura auditar` encontrou 3 críticos e 7 alertas com arquivos e motivos coerentes.
-- CDU encontrou 0 erros, 35 avisos e 64 referências imprecisas; a saída completa é útil, mas precisa do resumo recomendado.
+- CDU encontrou 0 erros, 35 avisos e 64 referências imprecisas; o resumo agora mantém esses totais e até 20 achados ou itens
+  sem referência exata.
 - Contratos, notificações, views, modais e Semgrep não encontraram violações.
 - O corretor FQN encontrou 114 arquivos alteráveis em simulação, confirmando seu valor como utilitário ocasional; nenhuma
   alteração deve ser aplicada como parte deste recorte.
@@ -178,12 +180,14 @@ opções existentes, inclusive com zero.
 - A fotografia anterior do SGC permaneceu vermelha por um resultado obsoleto de identificadores; uma nova coleta rápida,
   executada após a correção, passou em 8/8 verificações. O resumo compacto mostrou os oito status e os pontos críticos sem
   reproduzir o despejo de métricas detalhadas.
+- As novas respostas resumidas no SGC ficaram entre aproximadamente 3,8 KB e 25,4 KB: resíduos 11,4 KB, cobertura 4,9–5,7
+  KB, ramificações 3,9–4,2 KB, inventário CDU 17,1 KB e auditoria CDU 25,4 KB.
 
 ### Ordem de execução recomendada
 
-1. completar o contrato `--json-resumido` nos maiores resultados restantes;
-2. construir a matriz semântica usando os problemas confirmados como regressões iniciais;
-3. repetir a amostra final sequencialmente, sem concorrência entre comandos que compartilhem npm, Gradle ou artefatos.
+1. executar a validação final completa do toolkit e conferir a sincronização catálogo/README/plano;
+2. repetir a amostra final sequencialmente, sem concorrência entre comandos que compartilhem npm, Gradle ou artefatos;
+3. marcar o recorte encerrado se todos os critérios abaixo permanecerem satisfeitos.
 
 ## Recorte final — comprovação semântica
 
@@ -256,7 +260,7 @@ real não apresentar classificação contraditória, ambiguidade sistemática ou
 - [x] tarefas de qualidade preservam a instalação do toolkit e usam a versão mínima de Node nos subprocessos;
 - [x] gates e status gerais não falham por inventários ou heurísticas sem violação demonstrável;
 - [x] entradas estruturadas incompatíveis falham em vez de produzir resultado vazio;
-- [ ] comandos de grande volume oferecem resumo JSON acionável para agentes;
+- [x] comandos de grande volume oferecem resumo JSON acionável para agentes;
 - [x] auditoria de dependências respeita a decisão sobre TypeScript 7 sem ocultar atualizações da série 6;
 - [x] a matriz semântica está completa e não contém lacuna obrigatória;
 - [x] a amostra final contra o SGC foi confrontada com o código e não revelou resultado enganoso sem regressão;

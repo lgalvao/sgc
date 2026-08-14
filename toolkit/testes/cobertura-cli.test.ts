@@ -77,10 +77,30 @@ describe("Auditorias de cobertura da CLI", () => {
             "--arquivo",
             caminhoJacoco
         ]);
+        const servidorResumo = await executarSgc([
+            "servidor", "cobertura", "auditoria", "--json-resumido", "--base", base, "--arquivo", caminhoJacoco
+        ]);
+        const clienteResumo = await executarSgc([
+            "cliente", "cobertura", "auditoria", "--json-resumido", "--base", base, "--arquivo", caminhoV8
+        ]);
+        const servidorRamificacoesResumo = await executarSgc([
+            "servidor", "cobertura", "ramificacoes", "--json-resumido", "--base", base, "--arquivo", caminhoJacoco
+        ]);
+        const clienteRamificacoesResumo = await executarSgc([
+            "cliente", "cobertura", "ramificacoes", "--json-resumido", "--base", base, "--arquivo", caminhoV8
+        ]);
+        const clienteRamificacoesErrosResumo = await executarSgc([
+            "cliente", "cobertura", "ramificacoes-erros", "--json-resumido", "--base", base, "--arquivo", caminhoV8
+        ]);
 
         expect(servidorLeitura.exitCode).toBe(0);
         expect(clienteLeitura.exitCode).toBe(0);
         expect(servidorRamificacoes.exitCode).toBe(0);
+        expect(servidorResumo.exitCode).toBe(0);
+        expect(clienteResumo.exitCode).toBe(0);
+        expect(servidorRamificacoesResumo.exitCode).toBe(0);
+        expect(clienteRamificacoesResumo.exitCode).toBe(0);
+        expect(clienteRamificacoesErrosResumo.exitCode).toBe(0);
         const servidorJson = JSON.parse(servidorLeitura.stdout);
         const clienteJson = JSON.parse(clienteLeitura.stdout);
         expect(servidorJson).toMatchObject({
@@ -103,6 +123,21 @@ describe("Auditorias de cobertura da CLI", () => {
         expect(servidorRamificacoesJson.geradoEm).toBeTypeOf("string");
         expect(servidorRamificacoesJson.classes[0]).toMatchObject({ramificacoesPerdidas: 1, totalRamificacoes: 1});
         expect(servidorRamificacoesJson.timestamp).toBeUndefined();
+        const servidorResumoJson = JSON.parse(servidorResumo.stdout);
+        const clienteResumoJson = JSON.parse(clienteResumo.stdout);
+        const servidorRamificacoesResumoJson = JSON.parse(servidorRamificacoesResumo.stdout);
+        const clienteRamificacoesResumoJson = JSON.parse(clienteRamificacoesResumo.stdout);
+        const clienteRamificacoesErrosResumoJson = JSON.parse(clienteRamificacoesErrosResumo.stdout);
+        expect(servidorResumoJson).toMatchObject({versaoResumo: 1, truncado: true, limiteItens: 20});
+        expect(servidorResumoJson.totais.classes).toBeUndefined();
+        expect(servidorResumoJson.pontosCriticos[0].linhasPerdidasLista).toBeUndefined();
+        expect(clienteResumoJson).toMatchObject({versaoResumo: 1, truncado: true, limiteItens: 20});
+        expect(clienteResumoJson.totais.arquivos).toBeUndefined();
+        expect(servidorRamificacoesResumoJson).toMatchObject({versaoResumo: 1, truncado: true});
+        expect(servidorRamificacoesResumoJson.classes[0].ramificacoesPerdidasLista).toBeUndefined();
+        expect(clienteRamificacoesResumoJson).toMatchObject({versaoResumo: 1, truncado: true});
+        expect(clienteRamificacoesResumoJson.arquivos[0]).toMatchObject({arquivo: "frontend/src/Exemplo.ts"});
+        expect(clienteRamificacoesErrosResumoJson).toMatchObject({versaoResumo: 1, truncado: true});
         expect(await existe(path.join(base, "servidor-cobertura-auditoria.md"))).toBe(false);
         expect(await existe(path.join(base, "cliente-cobertura-auditoria.md"))).toBe(false);
 

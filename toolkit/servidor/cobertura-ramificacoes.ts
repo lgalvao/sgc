@@ -28,6 +28,31 @@ interface ResultadoRamificacoes {
     classes: ClasseRamificacoes[];
 }
 
+interface ResumoRamificacoes {
+    versaoResumo: 1;
+    status: ResultadoRamificacoes["status"];
+    versaoSchema: typeof VERSAO_SCHEMA_RESULTADO;
+    geradoEm: string;
+    truncado: true;
+    limiteItens: number;
+    totais: ResultadoRamificacoes["totais"];
+    classes: Array<Omit<ClasseRamificacoes, "ramificacoesPerdidasLista">>;
+}
+
+function criarResumoJson(resultado: ResultadoRamificacoes): ResumoRamificacoes {
+    const limiteItens = 20;
+    return {
+        versaoResumo: 1,
+        status: resultado.status,
+        versaoSchema: resultado.versaoSchema,
+        geradoEm: resultado.geradoEm,
+        truncado: true,
+        limiteItens,
+        totais: resultado.totais,
+        classes: resultado.classes.slice(0, limiteItens).map(({ramificacoesPerdidasLista: _ramificacoesPerdidasLista, ...classe}) => classe)
+    };
+}
+
 function resumirClasse(classe: ClasseCobertura): ClasseRamificacoes {
     return {
         nome: classe.nome,
@@ -40,7 +65,8 @@ function resumirClasse(classe: ClasseCobertura): ClasseRamificacoes {
 
 async function principal(argumentosInformados: string[] = process.argv.slice(2)): Promise<void> {
     const argumentos = validarArgumentosEntradaDireta(import.meta.url, argumentosInformados);
-    const emitirJson = argumentos.includes("--json");
+    const emitirJsonResumido = argumentos.includes("--json-resumido");
+    const emitirJson = argumentos.includes("--json") || emitirJsonResumido;
     const exibirAjuda = argumentos.includes("--help") || argumentos.includes("-h");
 
     if (exibirAjuda) {
@@ -49,6 +75,7 @@ async function principal(argumentosInformados: string[] = process.argv.slice(2))
             descricao: "Lista classes com lacunas de ramificacoes no servidor segundo as exclusoes do perfil SGC.",
             opcoes: [
                 "--json            Saída estruturada em JSON.",
+                "--json-resumido   Saída JSON limitada sem listas de linhas.",
                 "--limite <n>      Limita a quantidade de classes exibidas. Padrão: 20.",
                 "--filtro <texto>  Filtra por nome de classe/pacote.",
                 "--arquivo <xml>   Usa um relatório JaCoCo específico.",
@@ -87,6 +114,11 @@ async function principal(argumentosInformados: string[] = process.argv.slice(2))
         classes
     };
 
+    if (emitirJsonResumido) {
+        imprimirJson(criarResumoJson(resultado));
+        return;
+    }
+
     if (emitirJson) {
         imprimirJson(resultado);
         return;
@@ -120,5 +152,6 @@ if (ehEntradaPrincipal(import.meta.url)) {
 }
 
 export {
+    criarResumoJson,
     principal
 };

@@ -11,6 +11,7 @@ import {
 
 const EXTENSOES_SUPORTADAS = new Set([".ts", ".vue"]);
 const VERSAO_SCHEMA_FOTOGRAFIA = "3.0.0" as const;
+const LIMITE_RESUMO_RESIDUOS = 20;
 
 const PADROES = {
     anyExplicito: [/\bas any\b/g, /:\s*any\b/g, /\bArray<any>\b/g, /\bPromise<any>\b/g, /\bref<any>\b/g, /\bRecord<[^>]+,\s*any>\b/g, /\[key:\s*string\]:\s*any\b/g],
@@ -127,6 +128,46 @@ interface FotografiaResiduos {
 interface OpcoesAnaliseResiduos {
     base?: string;
     caminhoOrcamento?: string;
+}
+
+interface ResumoFotografiaResiduos {
+    versaoResumo: 1;
+    versaoSchema: FotografiaResiduos["versaoSchema"];
+    base: string;
+    truncado: true;
+    limiteItens: number;
+    resumo: FotografiaResiduos["resumo"];
+    contagens: FotografiaResiduos["contagens"];
+    exportacoesSuspeitas: FotografiaResiduos["exportacoesSuspeitas"];
+    pontosCriticos: Array<{
+        arquivo: string;
+        camada: string;
+        linhas: number;
+        pontuacao: number;
+        sinaisAtivos: FotografiaResiduos["pontosCriticos"][number]["sinaisAtivos"];
+        violacoes: FotografiaResiduos["pontosCriticos"][number]["violacoes"];
+    }>;
+}
+
+function criarResumoFotografiaResiduos(fotografia: FotografiaResiduos): ResumoFotografiaResiduos {
+    return {
+        versaoResumo: 1,
+        versaoSchema: fotografia.versaoSchema,
+        base: fotografia.base,
+        truncado: true,
+        limiteItens: LIMITE_RESUMO_RESIDUOS,
+        resumo: fotografia.resumo,
+        contagens: fotografia.contagens,
+        exportacoesSuspeitas: fotografia.exportacoesSuspeitas.slice(0, LIMITE_RESUMO_RESIDUOS),
+        pontosCriticos: fotografia.pontosCriticos.slice(0, LIMITE_RESUMO_RESIDUOS).map(ponto => ({
+            arquivo: ponto.arquivo,
+            camada: ponto.camada,
+            linhas: ponto.linhas,
+            pontuacao: ponto.pontuacao,
+            sinaisAtivos: ponto.sinaisAtivos,
+            violacoes: ponto.violacoes
+        }))
+    };
 }
 
 function resolverDiretorioSaidaResiduos(base: string = DIRETORIO_RAIZ): string {
@@ -524,7 +565,9 @@ async function gravarFotografiaAuditoria(
 
 export {
     analisarResiduosCliente,
+    criarResumoFotografiaResiduos,
     gravarFotografiaAuditoria,
     resolverDiretorioSaidaResiduos,
+    LIMITE_RESUMO_RESIDUOS,
     type FotografiaResiduos,
 };

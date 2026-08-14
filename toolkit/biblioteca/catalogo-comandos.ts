@@ -58,7 +58,7 @@ const CATALOGO_COMANDOS = [
         decisao: "manter",
         finalidade: "auditar",
         efeitos: criarEfeitosComando("opcional"),
-        argumentos: esquema(["--base", "--arquivo", "--saida", "--minimo"], ["--json", "--gravar"]),
+        argumentos: esquema(["--base", "--arquivo", "--saida", "--minimo"], ["--json", "--json-resumido", "--gravar"]),
         arquivo: "servidor/cobertura-auditoria.ts"
     },
     {
@@ -68,7 +68,7 @@ const CATALOGO_COMANDOS = [
         decisao: "manter",
         finalidade: "auditar",
         efeitos: criarEfeitosComando("nenhuma"),
-        argumentos: esquema(["--base", "--arquivo", "--limite", "--filtro"], ["--json"]),
+        argumentos: esquema(["--base", "--arquivo", "--limite", "--filtro"], ["--json", "--json-resumido"]),
         arquivo: "servidor/cobertura-ramificacoes.ts"
     },
     {
@@ -148,7 +148,7 @@ const CATALOGO_COMANDOS = [
         decisao: "manter",
         finalidade: "auditar",
         efeitos: criarEfeitosComando("opcional"),
-        argumentos: esquema(["--base", "--arquivo", "--saida", "--minimo"], ["--json", "--gravar"]),
+        argumentos: esquema(["--base", "--arquivo", "--saida", "--minimo"], ["--json", "--json-resumido", "--gravar"]),
         arquivo: "cliente/cobertura-auditoria.ts"
     },
     {
@@ -158,7 +158,7 @@ const CATALOGO_COMANDOS = [
         decisao: "manter",
         finalidade: "auditar",
         efeitos: criarEfeitosComando("nenhuma"),
-        argumentos: esquema(["--base", "--arquivo", "--limite"], ["--json"]),
+        argumentos: esquema(["--base", "--arquivo", "--limite"], ["--json", "--json-resumido"]),
         arquivo: "cliente/cobertura-ramificacoes.ts"
     },
     {
@@ -168,7 +168,7 @@ const CATALOGO_COMANDOS = [
         decisao: "manter",
         finalidade: "auditar",
         efeitos: criarEfeitosComando("nenhuma"),
-        argumentos: esquema(["--base", "--arquivo", "--limite"], ["--json"]),
+        argumentos: esquema(["--base", "--arquivo", "--limite"], ["--json", "--json-resumido"]),
         arquivo: "cliente/cobertura-ramificacoes-erros.ts"
     },
     {
@@ -178,7 +178,7 @@ const CATALOGO_COMANDOS = [
         decisao: "manter",
         finalidade: "auditar",
         efeitos: criarEfeitosComando("opcional"),
-        argumentos: esquema(["--base", "--orcamento", "--saida"], ["--json", "--gravar"]),
+        argumentos: esquema(["--base", "--orcamento", "--saida"], ["--json", "--json-resumido", "--gravar"]),
         arquivo: "cliente/residuos-auditar.ts"
     },
     {
@@ -338,7 +338,7 @@ const CATALOGO_COMANDOS = [
         decisao: "manter-ocasional",
         finalidade: "inventariar",
         efeitos: criarEfeitosComando("nenhuma"),
-        argumentos: esquema(["--base", "--secoes"], ["--json"]),
+        argumentos: esquema(["--base", "--secoes"], ["--json", "--json-resumido"]),
         arquivo: "requisitos/cdus-inventariar.ts"
     },
     {
@@ -348,7 +348,7 @@ const CATALOGO_COMANDOS = [
         decisao: "manter",
         finalidade: "auditar",
         efeitos: criarEfeitosComando("nenhuma"),
-        argumentos: esquema(["--base", "--secoes"], ["--json"]),
+        argumentos: esquema(["--base", "--secoes"], ["--json", "--json-resumido"]),
         arquivo: "requisitos/cdus-auditar.ts"
     },
     {

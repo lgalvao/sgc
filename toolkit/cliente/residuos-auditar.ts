@@ -3,6 +3,7 @@ import pc from "picocolors";
 import {DIRETORIO_RAIZ} from "../biblioteca/caminhos.js";
 import {
     analisarResiduosCliente,
+    criarResumoFotografiaResiduos,
     gravarFotografiaAuditoria,
     resolverDiretorioSaidaResiduos
 } from "./residuos-lib.js";
@@ -37,7 +38,8 @@ async function executarAuditoriaClienteResiduos(opcoes: OpcoesAuditoriaClienteRe
 
 async function principal(argumentosInformados: string[] = process.argv.slice(2)): Promise<void> {
     const argumentos = validarArgumentosEntradaDireta(import.meta.url, argumentosInformados);
-    const emitirJson = argumentos.includes("--json");
+    const emitirJsonResumido = argumentos.includes("--json-resumido");
+    const emitirJson = argumentos.includes("--json") || emitirJsonResumido;
     const exibirAjuda = argumentos.includes("--help") || argumentos.includes("-h");
 
     if (exibirAjuda) {
@@ -46,6 +48,7 @@ async function principal(argumentosInformados: string[] = process.argv.slice(2))
             descricao: "Audita sinais de residuos estruturais e defensividade acidental no cliente.",
             opcoes: [
                 "--json               Emite a fotografia em JSON.",
+                "--json-resumido      Emite totais, contagens e pontos críticos limitados.",
                 "--gravar             Atualiza fotografia e resumo em disco.",
                 "--base <diretorio>   Sobrescreve o diretorio base da auditoria.",
                 "--orcamento <arquivo> Usa um arquivo de orcamento alternativo.",
@@ -69,6 +72,15 @@ async function principal(argumentosInformados: string[] = process.argv.slice(2))
         saida,
         gravar: argumentos.includes("--gravar"),
     });
+
+    if (emitirJsonResumido) {
+        const resumo = criarResumoFotografiaResiduos(fotografia);
+        imprimirJson({
+            ...resumo,
+            geradoEm: fotografia.geradoEm
+        });
+        return;
+    }
 
     if (emitirJson) {
         imprimirJson(fotografia);

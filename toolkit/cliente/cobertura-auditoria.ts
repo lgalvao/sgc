@@ -35,6 +35,31 @@ interface ResultadoAuditoriaCliente {
     pontosCriticos: PontoCriticoRelatorioCliente[];
 }
 
+interface ResumoAuditoriaCliente {
+    versaoResumo: 1;
+    status: ResultadoAuditoriaCliente["status"];
+    versaoSchema: typeof VERSAO_SCHEMA_RESULTADO;
+    geradoEm: string;
+    truncado: true;
+    limiteItens: number;
+    totais: ResumoMetricasCliente;
+    pontosCriticos: PontoCriticoRelatorioCliente[];
+}
+
+function criarResumoJson(resultado: ResultadoAuditoriaCliente): ResumoAuditoriaCliente {
+    const limiteItens = 20;
+    return {
+        versaoResumo: 1,
+        status: resultado.status,
+        versaoSchema: resultado.versaoSchema,
+        geradoEm: resultado.geradoEm,
+        truncado: true,
+        limiteItens,
+        totais: resultado.totais,
+        pontosCriticos: resultado.pontosCriticos.slice(0, limiteItens)
+    };
+}
+
 function calcularPontuacaoImpacto(arquivo: ArquivoCobertura): number {
     // No cliente, focamos em instruções e ramificações.
     // Arquivos com muitas instruções descobertas e muitas ramificações são prioridade.
@@ -82,7 +107,8 @@ async function gerarRelatorioMarkdown(dados: ResultadoAuditoriaCliente, caminho:
 
 async function principal(argumentosInformados: string[] = process.argv.slice(2)): Promise<void> {
     const argumentos = validarArgumentosEntradaDireta(import.meta.url, argumentosInformados);
-    const emitirJson = argumentos.includes("--json");
+    const emitirJsonResumido = argumentos.includes("--json-resumido");
+    const emitirJson = argumentos.includes("--json") || emitirJsonResumido;
     const exibirAjuda = argumentos.includes("--help") || argumentos.includes("-h");
 
     if (exibirAjuda) {
@@ -91,6 +117,7 @@ async function principal(argumentosInformados: string[] = process.argv.slice(2))
             descricao: 'Auditoria unificada de cobertura e risco (Cliente).',
             opcoes: [
                 '--json     Saída em formato JSON para integração com outras ferramentas.',
+                '--json-resumido Saída JSON limitada a totais e pontos críticos.',
                 '--saida <arquivo>   Caminho do arquivo Markdown a ser gerado.',
                 '--arquivo <arquivo> Usa um relatório V8 específico.',
                 '--base <diretorio> Resolve o relatório relativo a outra base.',
@@ -149,6 +176,12 @@ async function principal(argumentosInformados: string[] = process.argv.slice(2))
             await gerarRelatorioMarkdown(resultado, caminhoSaida);
         }
 
+        if (emitirJsonResumido) {
+            imprimirJson(criarResumoJson(resultado));
+            if (metaMinima > 0 && coleta.linhas.percentual < metaMinima) process.exitCode = 1;
+            return;
+        }
+
         if (emitirJson) {
             imprimirJson(resultado);
             if (metaMinima > 0 && coleta.linhas.percentual < metaMinima) process.exitCode = 1;
@@ -198,5 +231,6 @@ if (ehEntradaPrincipal(import.meta.url)) {
 }
 
 export {
+    criarResumoJson,
     principal,
 };

@@ -3,12 +3,14 @@ import {DIRETORIO_RAIZ} from "../biblioteca/caminhos.js";
 
 interface OpcoesCdu {
     emitirJson: boolean;
+    emitirJsonResumido: boolean;
     base: string;
     secoes?: string[];
 }
 
 function obterOpcoesCdu(argumentos: readonly string[] = process.argv.slice(2)): OpcoesCdu {
     let emitirJson = false;
+    let emitirJsonResumido = false;
     let baseInformada: string | undefined;
     let secoes: string[] | undefined;
 
@@ -16,6 +18,12 @@ function obterOpcoesCdu(argumentos: readonly string[] = process.argv.slice(2)): 
         const argumento = argumentos[indice];
         if (argumento === "--json") {
             emitirJson = true;
+            continue;
+        }
+
+        if (argumento === "--json-resumido") {
+            emitirJson = true;
+            emitirJsonResumido = true;
             continue;
         }
 
@@ -37,7 +45,7 @@ function obterOpcoesCdu(argumentos: readonly string[] = process.argv.slice(2)): 
     }
 
     const base = baseInformada ? path.resolve(baseInformada) : DIRETORIO_RAIZ;
-    return {emitirJson, base, secoes};
+    return {emitirJson, emitirJsonResumido, base, secoes};
 }
 
 export {obterOpcoesCdu};

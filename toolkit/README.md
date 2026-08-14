@@ -111,9 +111,17 @@ Resumos JSON disponíveis:
 | `codigo nomes coletar-simbolos` | Totais, linguagens, pacotes principais e 20 arquivos com mais membros |
 | `codigo nomes auditar-consistencia` | Indicadores, contagens de formatos e 20 achados por categoria |
 | `servidor testes analisar` | Estatísticas, categorias e 20 principais pendências |
+| `servidor cobertura auditoria` | Totais de cobertura e 20 pontos críticos sem listas de linhas |
+| `servidor cobertura ramificacoes` | Totais e 20 classes prioritárias sem listas de linhas |
+| `cliente cobertura auditoria` | Totais de cobertura e 20 pontos críticos |
+| `cliente cobertura ramificacoes` | Totais e 20 arquivos prioritários |
+| `cliente cobertura ramificacoes-erros` | Totais, arquivos prioritários e até 3 linhas suspeitas por arquivo |
+| `cliente residuos auditar` | Contagens, exportações suspeitas e 20 pontos críticos |
 | `cliente arquitetura validar` | Módulos, regras e até 20 violações de cada fonte |
 | `cliente residuos validar` | Status, resumo, violações e pontos críticos |
 | `qualidade resumo` | Status, totais, verificações e até 20 pontos críticos |
+| `requisitos cdus inventariar` | Seções, contagens e até 20 itens por coleção |
+| `requisitos cdus auditar` | Resumos por seção e até 20 achados ou itens acionáveis |
 
 Contratos próprios versionados:
 
@@ -135,16 +143,19 @@ Contratos próprios versionados:
 
 ```bash
 ferramentas servidor cobertura auditoria --json
+ferramentas servidor cobertura auditoria --json-resumido
 ferramentas servidor testes analisar --json-resumido
 ferramentas servidor testes priorizar --entrada analise-testes.json --gravar
 ferramentas servidor java corrigir-fqn
 ferramentas cliente cobertura auditoria --json
+ferramentas cliente cobertura ramificacoes-erros --json-resumido
 ferramentas cliente residuos validar --json-resumido
 ferramentas cliente identificadores-teste listar-duplicados
 ferramentas codigo cheiros auditar --json
 ferramentas codigo semgrep auditar
 ferramentas codigo nomes coletar-simbolos --json-resumido
 ferramentas codigo nomes auditar-consistencia --json-resumido
+ferramentas requisitos cdus auditar --json-resumido
 ```
 
 Políticas Java são recebidas por `--politica`. A política contém as listas de anotações, nomes, prefixos, sufixos e

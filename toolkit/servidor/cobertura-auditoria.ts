@@ -32,6 +32,52 @@ interface ResultadoAuditoriaCobertura {
     pontosCriticos: PontoCriticoRelatorio[];
 }
 
+interface ResumoAuditoriaCobertura {
+    versaoResumo: 1;
+    status: ResultadoAuditoriaCobertura["status"];
+    versaoSchema: typeof VERSAO_SCHEMA_RESULTADO;
+    geradoEm: string;
+    truncado: true;
+    limiteItens: number;
+    totais: Omit<ResultadoCoberturaJacoco, "classes">;
+    pontosCriticos: Array<{
+        nome: string;
+        complexidade: number;
+        linhasPerdidas: number;
+        ramificacoesPerdidas: number;
+        pontuacaoImpacto: number;
+        coberturaLinhas: number;
+    }>;
+}
+
+function criarResumoJson(resultado: ResultadoAuditoriaCobertura): ResumoAuditoriaCobertura {
+    const limiteItens = 20;
+    return {
+        versaoResumo: 1,
+        status: resultado.status,
+        versaoSchema: resultado.versaoSchema,
+        geradoEm: resultado.geradoEm,
+        truncado: true,
+        limiteItens,
+        totais: {
+            linhas: resultado.totais.linhas,
+            ramificacoes: resultado.totais.ramificacoes,
+            instrucoes: resultado.totais.instrucoes,
+            metodos: resultado.totais.metodos,
+            complexidade: resultado.totais.complexidade,
+            totais: resultado.totais.totais
+        },
+        pontosCriticos: resultado.pontosCriticos.slice(0, limiteItens).map(ponto => ({
+            nome: ponto.nome,
+            complexidade: ponto.complexidade,
+            linhasPerdidas: ponto.linhasPerdidas,
+            ramificacoesPerdidas: ponto.ramificacoesPerdidas,
+            pontuacaoImpacto: ponto.pontuacaoImpacto,
+            coberturaLinhas: ponto.coberturaLinhas
+        }))
+    };
+}
+
 function calcularPontuacaoImpacto(classe: ClasseCobertura): number {
     // Classes complexas com lacunas são os verdadeiros pontos críticos.
     // Se não há lacunas (100% de cobertura), a pontuação deve ser zero.
@@ -99,7 +145,8 @@ async function gerarRelatorioMarkdown(dados: ResultadoAuditoriaCobertura, caminh
 
 async function principal(argumentosInformados: string[] = process.argv.slice(2)): Promise<void> {
     const argumentos = validarArgumentosEntradaDireta(import.meta.url, argumentosInformados);
-    const emitirJson = argumentos.includes("--json");
+    const emitirJsonResumido = argumentos.includes("--json-resumido");
+    const emitirJson = argumentos.includes("--json") || emitirJsonResumido;
     const exibirAjuda = argumentos.includes("--help") || argumentos.includes("-h");
 
     if (exibirAjuda) {
@@ -108,6 +155,7 @@ async function principal(argumentosInformados: string[] = process.argv.slice(2))
                 descricao: "Auditoria unificada de cobertura e risco do servidor segundo as exclusoes do perfil SGC.",
             opcoes: [
                 "--json              Saída em formato JSON para integração com outras ferramentas.",
+                "--json-resumido     Saída JSON limitada a totais e pontos críticos.",
                 "--saida <arquivo>    Caminho do arquivo Markdown a ser gerado.",
                 "--arquivo <xml>     Usa um relatório JaCoCo específico.",
                 "--base <diretorio>   Resolve o relatório relativo a outra base.",
@@ -173,6 +221,14 @@ async function principal(argumentosInformados: string[] = process.argv.slice(2))
             await gerarRelatorioMarkdown(resultado, caminhoRelatorio);
         }
 
+        if (emitirJsonResumido) {
+            imprimirJson(criarResumoJson(resultado));
+            if (metaMinima > 0 && coleta.instrucoes.percentual < metaMinima) {
+                process.exitCode = 1;
+            }
+            return;
+        }
+
         if (emitirJson) {
             imprimirJson(resultado);
             if (metaMinima > 0 && coleta.instrucoes.percentual < metaMinima) {
@@ -226,5 +282,6 @@ if (ehEntradaPrincipal(import.meta.url)) {
 
 export {
     calcularPontuacaoImpacto,
+    criarResumoJson,
     principal
 };
