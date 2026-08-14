@@ -2,336 +2,169 @@
 
 ## Objetivos
 
-O trabalho abrange exclusivamente `toolkit/`. O SGC não consome nem depende do toolkit: seu workspace é alvo de
-auditoria, fonte de políticas locais e corpus real de validação.
+O trabalho abrange exclusivamente `toolkit/`. O SGC e outros projetos são corpus de validação, não consumidores nem
+partes da implementação.
 
 1. remover código temporário, obsoleto, redundante ou sem finalidade permanente;
-2. separar capacidades horizontais, integrações de stack e políticas específicas do SGC;
-3. simplificar e uniformizar diretórios, símbolos, comandos, opções e resultados;
-4. manter a implementação em TypeScript e português brasileiro;
-5. preservar as capacidades específicas do SGC que continuam úteis;
-6. distribuir um pacote utilizável pelo autor, por agentes e por outros projetos sem depender do workspace do SGC.
+2. separar núcleo horizontal, adaptadores de stack e políticas específicas de projeto;
+3. simplificar e uniformizar comandos, opções, nomes, resultados e documentação;
+4. manter TypeScript como fonte única e português brasileiro no vocabulário próprio;
+5. preservar capacidades específicas do SGC que continuem úteis, sem aplicá-las silenciosamente a outros projetos;
+6. oferecer um pacote utilizável diretamente por pessoas e agentes em projetos Java/Spring/Vue semelhantes;
+7. comprovar utilidade e correção com projetos reais, além de testes sintéticos.
 
-Não existe requisito de compatibilidade retroativa. A continuidade exigida é funcional, não histórica.
+Não há requisito de compatibilidade retroativa.
 
-## Diretrizes vigentes
+## Diretrizes
 
 ### Utilidade e escopo
 
-- Uso humano ou por agentes é consumo legítimo; ausência de imports não torna um comando inútil.
-- Todo comando mantido precisa ter finalidade permanente explicável em uma frase.
-- Testes não justificam uma funcionalidade cuja finalidade desapareceu.
-- Utilitários ocasionais podem permanecer quando resolvem um problema recorrente e são identificados como tal.
-- O histórico pertence ao Git. Este plano descreve apenas decisões vigentes e trabalho ainda necessário.
-- O SGC é corpus de validação do toolkit, não parte da implementação nem consumidor dela.
+- Uso humano ou por agentes é consumo legítimo; ausência de imports não é critério de remoção.
+- Todo comando mantido deve responder a uma pergunta permanente e explicável em uma frase.
+- Inventário, auditoria e gate são contratos diferentes e devem ser nomeados e sinalizados como tal.
+- Resultado vazio, código zero ou teste verde não comprovam utilidade; fixtures devem conter violações conhecidas.
+- O histórico pertence ao Git. Este documento contém somente objetivos, aprendizados vigentes e próximos passos.
 
 ### Fronteiras
 
-| Camada | Critério | Exemplos |
-|---|---|---|
-| Núcleo | algoritmo independente de projeto e stack | CLI, configuração, parser CDU, agregação de cobertura |
-| Adaptador | integração parametrizável com linguagem, framework ou ferramenta | Gradle, npm, Vue, OpenAPI, Semgrep, JaCoCo |
-| Perfil SGC | convenção, caminho ou política usada para auditar o SGC | notificações, views, modais, coesão e defaults SGC |
+| Camada | Responsabilidade |
+|---|---|
+| Núcleo | CLI, configuração, schemas e algoritmos independentes de projeto |
+| Adaptador | Integração parametrizável com Java, Spring, Vue, npm, Gradle, Semgrep, JaCoCo, V8 ou OpenAPI |
+| Perfil de projeto | caminhos, orçamentos, vocabulário e políticas locais, inclusive as do SGC |
 
-Uma política SGC bem identificada é um resultado correto. Ela só deve ser promovida a núcleo ou adaptador quando houver
-contrato horizontal claro e teste externo que não carregue defaults do SGC.
+- Motores horizontais recebem caminhos e políticas explicitamente.
+- Defaults genéricos podem existir quando não produzem aprovação enganosa.
+- Política ausente deve gerar `nao_configurado` ou erro claro quando for necessária para interpretar o resultado.
+- Uma política SGC só é aplicada ao SGC e deve permanecer identificável como perfil local.
+- Pequenos ajustes nos projetos auditados são aceitáveis: configuração, orçamento, regras e scripts fazem parte da
+  integração saudável com o toolkit.
 
 ### Implementação e execução
 
-- TypeScript é a única fonte de implementação.
-- `binarios/ferramentas.cjs` é a única exceção: lançador mínimo necessário ao `bin` do npm, sem regra de domínio.
-- Código, símbolos, mensagens e documentação próprios usam português brasileiro.
-- Vocabulário de bibliotecas e formatos externos permanece apenas nas bordas de integração.
-- `toolkit/ferramentas.ts` executa diretamente com `tsx`; `dist/` existe somente para validar o build.
+- TypeScript é a única implementação; `binarios/ferramentas.cjs` é apenas o lançador npm.
+- A execução usa `tsx` diretamente; `dist/` serve somente para validar o build do pacote.
 - Node 26.7 ou superior é o ambiente mínimo.
+- Código, símbolos, mensagens e documentação próprios usam português brasileiro.
+- Formatos externos preservam seu vocabulário somente na borda.
 - Não criar aliases, wrappers de transição ou implementações paralelas.
-- Não dividir arquivos, introduzir cache, concorrência ou abstrações sem responsabilidade independente ou evidência real.
+- Não introduzir abstrações, cache ou concorrência sem responsabilidade independente e evidência real.
 
 ### Segurança e contratos
 
 - Auditorias e inventários são somente leitura por padrão.
-- Persistência exige `--gravar`; remoção exige `--confirmar`, salvo quando persistir é a finalidade explícita do comando.
-- JSON limpo vai para stdout; diagnóstico operacional vai para stderr.
-- Opções desconhecidas, valores ausentes e argumentos excedentes falham.
-- Ajuda, parser e catálogo seguem a gramática `<dominio> <recurso> <acao>` e devem permanecer sincronizados.
-- Formatos próprios persistidos ou consumidos por outro comando têm tipo, versão e validação de entrada.
-- Funções de domínio retornam resultados ou lançam erros; somente a borda CLI altera `process.exitCode`.
+- Persistência exige `--gravar`; remoção exige `--confirmar`.
+- JSON limpo vai para stdout e diagnóstico operacional para stderr.
+- Erros de execução são diferentes de achados de auditoria.
+- Opções desconhecidas, valores ausentes e entradas incompatíveis falham explicitamente.
+- Formatos persistidos ou encadeados possuem tipo, versão e validação.
+- Respostas potencialmente grandes oferecem resumo limitado para agentes.
 
-### Reuso
+## Aprendizados atuais
 
-- `configuracao-toolkit.json` é o contrato de configuração por projeto; `--base` identifica a raiz auditada.
-- Motores horizontais recebem caminhos, políticas e executores explicitamente.
-- Defaults locais ficam na borda ou em módulos identificados como perfil SGC.
-- O pacote é `ferramentas-projeto` e o binário é `ferramentas`.
-- A instalação isolada não depende do `node_modules`, da configuração nem do layout do SGC.
-- APIs programáticas são deliberadas e validadas por fixture ou consumidor isolado; não precisam de imports prévios no
-  repositório para serem legítimas.
+### Estado do toolkit
 
-## Situação atual
+- A superfície pública está consolidada em 38 comandos com gramática `<dominio> <recurso> <acao>`.
+- Casos de uso foram reduzidos a `requisitos cdus inventariar` e `requisitos cdus auditar`.
+- Acessibilidade Playwright/Axe pertence aos diretórios `e2e` dos projetos, não ao toolkit.
+- O pacote isolado e o binário não dependem do layout nem do `node_modules` do SGC.
+- Cobertura Java/web, análise de testes, arquitetura, contratos, resíduos, nomenclatura e CDU possuem saídas estruturadas;
+  os produtores volumosos oferecem `--json-resumido`.
+- A política de idioma do SGC, inclusive a rejeição de `id`, permanece em `codigo nomes auditar-idioma`; a consistência
+  horizontal verifica somente convenções compartilháveis.
+- O perfil de qualidade do SGC coleta resíduos como inventário. Um gate só existe quando há orçamento configurado.
 
-A modernização estrutural e a validação contra o SGC estão concluídas, mas a execução em um segundo projeto real reabriu
-o recorte de horizontalidade. O SAPE tem Spring Boot 4, Java 25 e Vue/TypeScript, porém usa três módulos Java e
-vocabulário arquitetural em português; ele expôs resultados vazios ou verdes produzidos por premissas do SGC:
+### Prova real no SAPE
 
-- CLI e catálogo registram finalidade, camada, decisão e efeitos; README documenta a superfície e os contratos atuais dos
-  38 comandos públicos;
-- não há comando classificado como temporário, redundante ou pendente de decisão;
-- a implementação é TypeScript e executa diretamente com `tsx` em Node 26;
-- o pacote e o binário têm identidade neutra e o tarball é testado em consumidor isolado;
-- casos de uso foram consolidados em `requisitos cdus inventariar` e `requisitos cdus auditar`;
-- CDU, cobertura Java/web e análise de testes Java possuem contratos reutilizáveis e testes com projeto externo;
-- Semgrep, OpenAPI, JaCoCo, V8 e sincronização de versão recebem entradas explícitas em seus motores;
-- defaults e políticas do SGC estão nas bordas ou em módulos identificados como perfil SGC;
-- acessibilidade Playwright/Axe pertence a `e2e/`, fora do toolkit;
-- os gates de identificadores não transformam repetição textual global em falha sem escopo demonstrável;
-- a priorização de testes rejeita entrada estruturada incompatível em vez de produzir backlog vazio;
-- os produtores de maior volume identificados no reality check oferecem `--json-resumido`: símbolos, análise de testes do
-  servidor, gate arquitetural, consistência de nomenclatura, qualidade, resíduos, cobertura e CDU;
-- a árvore de linhas usa profundidade 3 e mínimo de 500 linhas por padrão, com expansão explícita pelas opções atuais;
-- testes, pacote isolado, typechecks, lint, Knip, build e `git diff --check` passam.
+O SAPE em `/Users/leonardo/hyphenation/sape` possui Spring Boot, Java e Vue/TypeScript, com módulos `servidor`, `admin` e
+`etl`. A dependência Java privada indisponível impede build e testes do backend; por isso a prova atual cobre somente
+análises estáticas e tarefas frontend independentes do Gradle.
 
-### Prova externa com o SAPE
+Achados que já produziram correções horizontais:
 
-O SAPE está disponível como cópia sem metadados Git e com uma dependência Java privada indisponível. A validação deve
-permanecer somente leitura e não executar build, teste ou resolução de dependências do Gradle.
+- arquitetura e contratos precisavam reconhecer anotações Spring, nomes e pacotes em português e inglês;
+- os três auditores Java precisavam aceitar `--diretorio <modulo>`;
+- a análise de testes precisava classificar `Servico`, `Controlador`, `Fachada`, `modelo` e equivalentes em inglês;
+- fora do SGC, a análise de testes agora usa política genérica, nunca a política SGC implícita;
+- resíduos precisava reconhecer `componentes`, `visoes` e `stores` como camadas equivalentes;
+- Semgrep externo sem regra própria agora falha com orientação, em vez de usar regras SGC;
+- validação de resíduos sem orçamento retorna `nao_configurado` e código não zero;
+- auditoria de dependências separa vulnerabilidade ou pacote desatualizado de falha operacional da ferramenta;
+- consistência de nomes não trata componentes Vue lazy em PascalCase como funções inválidas e aceita nomes descritivos
+  com `_` em métodos de teste, mantendo a regra camelCase em produção;
+- cópia sem `.git` recebe erro de pré-condição claro em `projeto arvore-linhas`.
 
-Achados confirmados:
+Resultados representativos atuais:
 
-- arquitetura reconhecia apenas sufixos ingleses e retornava zero; o motor agora usa anotações Spring e nomes em
-  português ou inglês, encontrando 82 alvos no servidor, 28 no admin e 17 no ETL;
-- contratos reconhecia apenas `*Controller.java` e pacotes `.model`; agora reconhece controladores por anotação ou nome,
-  pacotes `model`, `modelo`, `domain` e `dominio`, e informa quantos controladores e DTOs foram analisados;
-- análise de testes classificava `Servico`, `Controlador`, `Fachada` e diretórios `.modelo` como `outros`; a classificação
-  bilíngue e a priorização sem itens já considerados ruído estão implementadas;
-- resíduos classificava `componentes` e `visoes` como `outro`; os diretórios equivalentes em português agora preservam
-  a camada correta;
-- arquitetura, contratos e análise de testes aceitam `--diretorio <modulo>`, permitindo auditar `servidor`, `admin` e
-  `etl` separadamente;
-- árvore de linhas ainda exige Git, mas agora apresenta a pré-condição sem stack trace quando recebe uma cópia sem `.git`;
-- consistência geral ainda inclui a política SGC de rejeitar `id`, apesar de existir um comando específico de idioma;
-- Semgrep usa silenciosamente regras do SGC quando o projeto externo não configura regras próprias;
-- validação de resíduos sem orçamento retorna `ok`, embora tenha executado somente um inventário;
-- auditoria de dependências pode classificar erro operacional como achado quando o escopo aceita código não zero.
+- arquitetura: 82 alvos no `servidor`, 28 no `admin` e 17 no `etl`;
+- contratos: 3 controladores no `servidor`, 12 controladores e 3 DTOs no `admin`;
+- testes do `servidor`: 261 classes, 99 com teste dedicado e 89 pendências não classificadas como ruído;
+- nomenclatura: 882 arquivos, sem violações estruturais após eliminar dois falsos positivos sistemáticos;
+- resíduos: inventário com pontuação de ordenação 611 e status `nao_configurado`, portanto sem aprovação falsa;
+- frontend: typecheck e 253 testes unitários passaram no perfil estático;
+- dependências: a prova anterior encontrou achados reais de Knip e atualização de pacote, sem usar Gradle.
 
-Essa situação não comprova, por si só, a correção semântica uniforme de todos os auditores. A revisão final encontrou
-auditores com bons testes comportamentais e outros ainda cobertos principalmente por execução, schema, persistência ou
-um único exemplo positivo. Portanto, a modernização não deve ser declarada encerrada enquanto o recorte abaixo estiver
-aberto.
+### Limitações conhecidas
 
-## Reality check de encerramento
+- A identificação automática do perfil SGC ainda usa a presença de `toolkit/ferramentas.ts`; é eficaz no workspace atual,
+  mas um perfil explícito na configuração seria uma fronteira mais limpa.
+- Projetos multimódulo exigem repetir `--diretorio`; a configuração ainda não declara uma coleção de módulos Java para
+  execução agregada.
+- Semgrep não oferece valor em um projeto externo até que esse projeto forneça ou escolha regras próprias.
+- Resíduos é inventário, não gate, até existir orçamento calibrado no projeto auditado.
+- Métricas JaCoCo e verificações que dependem do classpath Java ficam indisponíveis enquanto o backend do SAPE não
+  resolver sua dependência privada.
+- `projeto arvore-linhas` depende de metadados Git e não analisa uma cópia sem repositório.
+- `projeto dependencias auditar` distingue status corretamente, mas ainda não oferece JSON; agentes precisam interpretar
+  a saída humana para identificar escopos com achados ou falhas.
+- Auditores heurísticos podem ter novos falsos positivos em vocabulários ou estruturas ainda não representados pelos
+  corpora SGC e SAPE; cada correção deve vir acompanhada de regressão sem enfraquecer produção.
 
-Os 38 comandos públicos foram exercitados contra o workspace real do SGC; operações destrutivas ficaram em simulação e
-os fluxos OpenAPI usaram arquivos temporários quando necessário. Os achados abaixo são evidência para decisões do toolkit,
-não histórico operacional nem autorização para alterar o SGC.
+### Oportunidades de integração nos projetos
 
-### Achados obrigatórios
+- Versionar `configuracao-toolkit.json` no SAPE com diretórios, módulos, perfis de qualidade e escopos de dependências.
+- Criar regras Semgrep compartilhadas para a stack e manter regras realmente locais em perfis separados.
+- Calibrar e versionar um orçamento de resíduos por projeto após revisar o inventário inicial.
+- Expor relatórios JaCoCo/V8 nos caminhos configurados quando os builds estiverem disponíveis.
+- Ajustar scripts npm dos projetos para oferecer tarefas estáticas estáveis (`typecheck`, testes unitários, lint sem
+  mutação e auditoria de dependências).
+- Manter uma fixture mínima por projeto com violações conhecidas para provar que os auditores não apenas executam.
 
-#### 1. Execução de tarefas pode invalidar o próprio toolkit
+## Próximos passos
 
-**Evidência:** durante `qualidade tarefas executar rapido`, a tarefa `frontend:install` executou instalação npm. Ao final,
-`commander` deixou de ser resolvido por `toolkit/ferramentas.ts`; comandos subsequentes falharam com
-`ERR_MODULE_NOT_FOUND` até executar `npm install` na raiz. A execução também usou Node 26.4 em subprocessos enquanto a
-CLI principal usava Node 26.7, produzindo avisos de engine.
+### Prioridade 1 — fechar a prova SAPE atual
 
-**Fronteira:** a serialização das tarefas pertence ao toolkit, mas a tarefa que reinstala dependências e a versão de Node
-herdada pertencem ao perfil externo do projeto. O toolkit só deve receber uma proteção adicional se ela puder ser testada
-em fixture isolada sem codificar o layout do SGC.
+1. executar a auditoria de dependências após a nova separação entre achado e falha operacional;
+2. executar regressão representativa no SGC para confirmar que políticas locais continuam ativas somente ali;
+3. executar a validação completa do toolkit: testes, pacote isolado, typechecks, lint, Knip, build e `git diff --check`;
+4. registrar somente resultados atuais no README e encerrar o recorte.
 
-**Decisão implementada:** a execução permanece serial, os subprocessos recebem o diretório do `process.execPath` no início
-do `PATH`, e a instalação do toolkit é verificada antes e depois de cada tarefa. Se uma tarefa externa remover dependência
-do toolkit, a execução para antes da próxima tarefa com erro explícito. A proteção é testada com tarefas injetadas e não
-ensina ao núcleo como o SGC instala npm/Gradle.
+### Prioridade 2 — tornar a integração externa deliberada
 
-#### 2. Unicidade global de `data-testid` produz gate enganoso
+1. substituir detecção implícita do SGC por seleção explícita de perfil na configuração;
+2. decidir um schema de módulos Java e agregar arquitetura, contratos e análise de testes sem multiplicar comandos;
+3. adicionar saída JSON completa e resumida à auditoria de dependências;
+4. versionar a configuração do SAPE e fornecer uma regra Semgrep e um orçamento de resíduos mínimos;
+5. criar um comando de diagnóstico da integração que informe capacidades disponíveis, indisponíveis e não configuradas,
+   sem executar builds.
 
-**Evidência:** `cliente identificadores-teste listar-duplicados` encontrou três valores em 273 identificadores. Os casos
-incluem seletores iguais em telas/componentes distintos e cards repetidos por `v-for`; reutilização não implica colisão no
-mesmo DOM nem teste ambíguo.
+### Prioridade 3 — ampliar comprovação semântica
 
-**Decisão implementada:** a listagem global permanece inventário, com código de saída zero; a fotografia não falha por
-repetição textual sem uma regra de escopo renderizado. Uma análise futura de ambiguidade precisa ser uma política
-separada e testável.
-
-#### 3. Priorização de testes aceita entrada incompatível silenciosamente
-
-**Evidência:** o JSON válido de `servidor testes analisar`, salvo com extensão `.out`, foi tratado como Markdown e gerou
-P1/P2/P3 vazios sem erro. O mesmo conteúdo com extensão `.json` produziu 6 itens P1, 8 P2 e 4 P3.
-
-**Decisão implementada:** o conteúdo estruturado é detectado mesmo com extensão não convencional; Markdown válido continua
-aceito; conteúdo que aparenta ser estruturado mas é inválido falha. As três situações têm regressões.
-
-#### 4. JSON completo é impraticável como resposta padrão para agentes
-
-**Evidência:** na base real, as respostas chegaram aproximadamente a 2,1 MB em símbolos, 858 KB no gate arquitetural,
-424 KB na validação de resíduos, 392 KB na auditoria de resíduos, 366 KB na análise de testes, 264 KB na consistência de
-nomes, 184 KB na cobertura do servidor e 104 KB na auditoria CDU.
-
-**Decisão implementada:** os comandos de símbolos, testes do servidor, gate arquitetural, nomenclatura, qualidade, resíduos,
-cobertura e CDU oferecem `--json-resumido` com `versaoResumo: 1`, `truncado`, limite explícito, totais e amostras
-acionáveis. `--json` continua completo; listas de módulos, arquivos, linhas de cobertura, métricas detalhadas e documentos
-integrais ficam fora do resumo.
-
-#### 5. Auditoria de dependências precisa separar política de projeto e ruído de ferramenta
-
-**Evidência:** a auditoria funciona e separa achados de falhas. `npm outdated` apresenta TypeScript 7 para toolkit,
-frontend e e2e apesar da decisão de permanecer na série 6; o Gradle já filtra as configurações relevantes do build e
-produz um conjunto limitado de dependências do projeto. O Knip aponta `tsx` como binário não declarado na raiz e no
-frontend. Não foram encontradas vulnerabilidades npm.
-
-**Decisão implementada:** `execucoes.dependencias[].ignorarAtualizacoes` filtra pares pacote/major do JSON de
-`npm outdated` e recalcula o status. O perfil SGC ignora apenas `typescript` major 7; Pinia e demais atualizações continuam
-visíveis. Declarações ausentes de `tsx` em root/frontend são propriedade dos manifestos do SGC e não entram neste recorte.
-
-#### 6. Árvore de linhas tem saída padrão excessiva
-
-**Evidência:** `projeto arvore-linhas` imprimiu a árvore integral de cerca de 246 mil linhas do repositório. As opções
-`--profundidade` e `--minimo-linhas` resolvem o problema, mas exigem conhecimento prévio e não há JSON resumido.
-
-**Decisão implementada:** os defaults são profundidade 3 e mínimo de 500 linhas. Os limites podem ser substituídos pelas
-opções existentes, inclusive com zero.
-
-### Resultados úteis que não exigem correção imediata
-
-- OpenAPI diff e promoção de baseline funcionaram em arquivos temporários. A exportação falhou porque o servidor não
-  estava ativo e apresentou orientação adequada; isso é pré-condição esperada, não defeito.
-- `servidor arquitetura auditar` encontrou 3 críticos e 7 alertas com arquivos e motivos coerentes.
-- CDU encontrou 0 erros, 35 avisos e 64 referências imprecisas; o resumo agora mantém esses totais e até 20 achados ou itens
-  sem referência exata.
-- Contratos, notificações, views, modais e Semgrep não encontraram violações.
-- O corretor FQN encontrou 114 arquivos alteráveis em simulação, confirmando seu valor como utilitário ocasional; nenhuma
-  alteração deve ser aplicada como parte deste recorte.
-- `projeto ambiente verificar` passou nas 20 verificações; sincronização de versão confirmou que `1.3.8` já está alinhada.
-- A fotografia anterior do SGC permaneceu vermelha por um resultado obsoleto de identificadores; uma nova coleta rápida,
-  executada após a correção, passou em 8/8 verificações. O resumo compacto mostrou os oito status e os pontos críticos sem
-  reproduzir o despejo de métricas detalhadas.
-- As novas respostas resumidas no SGC ficaram entre aproximadamente 3,8 KB e 25,4 KB: resíduos 11,4 KB, cobertura 4,9–5,7
-  KB, ramificações 3,9–4,2 KB, inventário CDU 17,1 KB e auditoria CDU 25,4 KB.
-
-### Próximos passos
-
-1. impedir política Semgrep do SGC em projeto externo sem configuração explícita;
-2. separar a regra `id` da auditoria geral de consistência e mantê-la apenas no perfil de idioma do SGC;
-3. fazer `cliente residuos validar` distinguir orçamento ausente de aprovação real;
-4. distinguir achados de erros operacionais nas execuções configuradas de dependências;
-5. repetir a amostra estática no SAPE e a regressão representativa no SGC, sem executar Gradle no SAPE;
-6. encerrar novamente o recorte quando os critérios adicionais estiverem atendidos.
-
-## Recorte final — comprovação semântica
-
-### Objetivo
-
-Comprovar que os auditores mantidos respondem corretamente às perguntas que anunciam, sem reabrir arquitetura, catálogo
-ou generalização já encerrados.
-
-### Matriz semântica atual
-
-| Área | Contrato verificado | Evidência comportamental | Lacuna obrigatória |
-|---|---|---|---|
-| Servidor: cobertura e auditorias | Mede cobertura, risco, arquitetura, coesão e contratos com caminhos/políticas explícitos | `servidor-auditorias.test.ts`, `cobertura-cli.test.ts` | Nenhuma identificada |
-| Servidor: testes e notificações | Classifica evidências, prioriza backlog e detecta assuntos fora da fonte canônica | `servidor-testes.test.ts`, `servidor-notificacoes.test.ts` | Nenhuma identificada |
-| Cliente: arquitetura e gates | Sinaliza violações reais, permite composição correta e mantém políticas SGC na borda | `cliente-arquitetura.test.ts`, `cliente-arquitetura-gates.test.ts` | Nenhuma identificada |
-| Cliente: resíduos, templates, modais e identificadores | Distingue inventário de gate e valida padrões estruturais configuráveis | `cliente-residuos.test.ts`, `cliente-validadores.test.ts`, `cliente-identificadores.test.ts` | Nenhuma identificada |
-| Cliente: cobertura | Lista lacunas, cruza sinais de tratamento de erro e ignora fontes removidas | `cobertura-cli.test.ts` | Nenhuma identificada |
-| Código e nomenclatura | Executa Semgrep/heurísticas e valida inventário, idioma, contratos e resumos | `codigo-auditorias.test.ts`, `consistencia.test.ts` | Nenhuma identificada |
-| OpenAPI e CDU | Usa caminhos/configuração explícitos e produz contratos horizontais em projeto externo | `integracao.test.ts`, `cdus.test.ts`, `externo.test.ts` | Nenhuma identificada |
-| Projeto e qualidade | Mantém efeitos, status, filtros de dependência, árvore limitada e composição externa | `projeto.test.ts`, `qualidade.test.ts`, `qualidade-externa.test.ts` | Nenhuma identificada |
-
-### Passos obrigatórios
-
-1. Priorizar regras que produzem gate, severidade, pontuação, violação ou recomendação acionável.
-2. Completar somente as evidências necessárias para cada tipo de regra:
-   - achado positivo mínimo, com arquivo e motivo corretos;
-   - negativo próximo para heurísticas sujeitas a falso positivo;
-   - limite inferior/superior quando houver threshold ou mudança de classificação;
-   - invariantes entre resumo, severidade, lista destacada e motivos;
-   - mais de um arquivo quando contagem, duplicação ou escala alterar o resultado;
-   - saída humana quando ela for o principal produto do comando.
-3. Não exigir mecanicamente todos os casos acima de toda regra. A matriz deve registrar `não aplicável` com justificativa
-   curta quando a natureza da regra não exigir uma dimensão.
-4. Executar uma amostra curta e representativa no SGC, cobrindo ao menos:
-   - um auditor de servidor;
-   - um auditor de cliente;
-   - uma capacidade horizontal configurável;
-   - CDU;
-   - um orquestrador ou agregador.
-5. Confrontar os principais resultados com os arquivos apontados. Todo falso positivo, falso negativo ou texto enganoso
-   confirmado gera primeiro uma regressão mínima e depois a correção.
-
-### Limites do recorte
-
-- Não buscar cobertura total nem um percentual arbitrário.
-- Não testar detalhes internos, fórmulas copiadas da implementação ou snapshots extensos.
-- Não generalizar políticas SGC sem necessidade de um segundo projeto.
-- Não reabrir comandos já decididos sem nova evidência de inutilidade ou incorreção.
-- Inventários, transformadores e orquestradores não são auditores: recebem testes adequados ao seu contrato, não uma
-  matriz artificial de falsos positivos e severidade.
-- Melhorias sem relação com um critério de término vão para backlog e não ampliam este recorte.
-
-### Critério de saída do recorte
-
-O recorte termina quando a matriz não tiver lacuna obrigatória, as regressões descobertas estiverem corrigidas e a amostra
-real não apresentar classificação contraditória, ambiguidade sistemática ou destaque sem motivo correspondente.
+1. manter fixtures positivas, negativas e de erro operacional para cada gate;
+2. adicionar corpus externo sempre que um falso positivo ou falso negativo real for encontrado;
+3. quando a dependência privada do SAPE estiver disponível, validar JaCoCo e tarefas backend sem transformar o build em
+   pré-condição das auditorias estáticas;
+4. só promover uma política local a compartilhada quando SGC e SAPE demonstrarem o mesmo contrato.
 
 ## Critérios de término
 
-- [x] todos os comandos públicos têm finalidade atual, camada e efeitos documentados;
-- [x] não há comando decidido como redundante, temporário ou obsoleto ainda presente;
-- [x] não há JavaScript legado, alias de compatibilidade ou implementação paralela;
-- [x] nomes e contratos próprios seguem TypeScript e português brasileiro;
-- [ ] motores classificados como núcleo ou adaptador não aplicam política ou caminho SGC silenciosamente em outro projeto;
-- [x] políticas para auditar o SGC estão identificadas e continuam funcionando contra seu workspace;
-- [x] CDU e análise de testes Java funcionam com projeto externo sem editar o toolkit;
-- [x] ajuda, parser, catálogo e README concordam sobre a superfície pública;
-- [x] README do toolkit contém somente referência do estado atual, sem histórico ou plano de execução;
-- [x] o tarball instalado isoladamente executa o binário e as APIs públicas suportadas;
-- [x] tarefas de qualidade preservam a instalação do toolkit e usam a versão mínima de Node nos subprocessos;
-- [x] gates e status gerais não falham por inventários ou heurísticas sem violação demonstrável;
-- [x] entradas estruturadas incompatíveis falham em vez de produzir resultado vazio;
-- [x] comandos de grande volume oferecem resumo JSON acionável para agentes;
-- [x] auditoria de dependências respeita a decisão sobre TypeScript 7 sem ocultar atualizações da série 6;
-- [x] a matriz semântica está completa e não contém lacuna obrigatória;
-- [x] a amostra final contra o SGC foi confrontada com o código e não revelou resultado enganoso sem regressão;
-- [x] testes, typechecks, lint, Knip, build e `git diff --check` passam.
+O trabalho pode ser declarado concluído quando:
 
-Critérios adicionais da prova externa:
-
-- [x] auditorias adaptáveis reconhecem vocabulário Java e diretórios Vue em português e inglês;
-- [x] módulos Java adicionais podem ser selecionados sem alterar a configuração do projeto;
-- [ ] ausência de política obrigatória não produz `ok` ou zero achados enganoso;
-- [ ] erro operacional de ferramenta externa não é classificado como achado;
-- [ ] amostra estática final do SAPE passa sem executar Gradle.
-
-“Não existir qualquer melhoria possível” não é critério de término. Cobertura total, tamanho máximo de arquivo,
-generalização de toda política e padronização de formatos externos também não são requisitos.
-
-## Regra contra rabbit holes
-
-Um novo achado só bloqueia a conclusão se violar correção ou segurança, funcionamento contra o SGC, reuso de capacidade
-declarada horizontal, consistência pública ou um critério de término acima. Caso contrário, fica fora do recorte.
-
-Cada correção deve ser pequena, semanticamente coesa, validada e seguida de commit/push. Um achado maior substitui uma
-etapa futura ou vai para backlog; não cria uma cadeia ilimitada de sub-recortes.
-
-## Validação
-
-Ao encerrar uma rodada com código:
-
-```bash
-npm --prefix toolkit run test -- --maxWorkers=1
-npm --prefix toolkit run test:coverage -- --maxWorkers=1
-npm --prefix toolkit run test:pacote
-npm --prefix toolkit run typecheck
-npm --prefix toolkit run typecheck:testes
-npm --prefix toolkit run lint
-npm --prefix toolkit run deps:audit
-npm --prefix toolkit run build
-git diff --check
-```
-
-Para alteração exclusivamente documental, validar referências afetadas, consistência com catálogo/README e executar
-`git diff --check`.
-
-## Backlog após a conclusão
-
-O backlog não bloqueia o encerramento e deve permanecer pequeno. Só registrar item com evidência concreta e condição
-clara para retomada. Ideias sem caso de uso ficam fora do plano.
+- cada comando tiver finalidade permanente, camada e contrato de saída claros;
+- nenhuma política ou caminho SGC for aplicado silenciosamente fora do perfil SGC;
+- inventário, auditoria, gate, achado, falha operacional e não configurado forem distinguíveis;
+- SGC e SAPE produzirem resultados acionáveis em amostras representativas;
+- cada gate tiver testes que provem aprovação, reprovação e pré-condição ausente;
+- pacote isolado, testes, typechecks, lint, Knip e build passarem;
+- README refletir apenas o estado atual e este plano contiver somente objetivos, aprendizados e próximos passos;
+- limitações restantes forem integrações opcionais ou dependências externas documentadas, não defeitos silenciosos.

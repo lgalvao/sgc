@@ -288,6 +288,7 @@ function criarItemRelatorio({
 }
 
 export {
+    POLITICA_CLASSIFICACAO_GENERICA,
     normalizarCaminho,
     inferirCategoria,
     lerConteudoFonte,

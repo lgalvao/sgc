@@ -721,6 +721,24 @@ function carregarConfiguracao(diretorioBase = DIRETORIO_RAIZ): ConfiguracaoToolk
     return combinarConfiguracoes(CONFIGURACAO_PADRAO, configuracaoSobreposta);
 }
 
+function temDiretorioConfiguradoExplicitamente(
+    nomeDiretorio: NomeDiretorioConfigurado,
+    diretorioBase = DIRETORIO_RAIZ
+): boolean {
+    const caminho = path.join(diretorioBase, NOME_ARQUIVO_CONFIGURACAO);
+    if (!existsSync(caminho)) {
+        return false;
+    }
+
+    try {
+        const configuracao = validarConfiguracao(JSON.parse(readFileSync(caminho, "utf8")));
+        return configuracao.diretorios?.[nomeDiretorio] !== undefined;
+    } catch (erro: unknown) {
+        const mensagem = erro instanceof Error ? erro.message : String(erro);
+        throw new Error(`Nao foi possivel validar ${NOME_ARQUIVO_CONFIGURACAO}: ${mensagem}`, {cause: erro});
+    }
+}
+
 function resolverCaminhoConfigurado(nomeDiretorio: NomeDiretorioConfigurado, diretorioBase = DIRETORIO_RAIZ): string {
     const caminho = tentarResolverCaminhoConfigurado(nomeDiretorio, diretorioBase);
     if (!caminho) {
@@ -754,6 +772,7 @@ export {
     NOME_ARQUIVO_CONFIGURACAO,
     VERSAO_CONFIGURACAO,
     carregarConfiguracao,
+    temDiretorioConfiguradoExplicitamente,
     resolverCaminhoConfigurado,
     tentarResolverCaminhoConfigurado,
     validarConfiguracao,

@@ -180,10 +180,10 @@ function criarAdaptadoresSgc(dependencias: DependenciasAdaptadoresSgc): Catalogo
             return execucao;
         },
         async residuosCliente(contexto: ContextoColeta): Promise<ExecucaoQualidade> {
-            const execucao = criarExecucao("cliente-residuos", "Residuos do cliente", "qualidade", "ferramentas cliente residuos validar --json-resumido --gravar", ".");
-            const saida = await executarComandoSgc(contexto, ["cliente", "residuos", "validar", "--json-resumido", "--gravar"]);
+            const execucao = criarExecucao("cliente-residuos", "Inventario de residuos do cliente", "qualidade", "ferramentas cliente residuos auditar --json-resumido --gravar", ".");
+            const saida = await executarComandoSgc(contexto, ["cliente", "residuos", "auditar", "--json-resumido", "--gravar"]);
             const resultado = parseJsonSeguro<ResultadoResiduos>(saida.saida, {});
-            execucao.status = saida.codigoSaida === 0 && resultado.status === "ok" ? "sucesso" : "falha";
+            execucao.status = saida.codigoSaida === 0 ? "sucesso" : "falha";
             registrarResultadoExecucao(execucao, saida);
             execucao.metricas = {
                 pontuacaoTotal: resultado.resumo?.pontuacaoTotal ?? null,
@@ -194,7 +194,7 @@ function criarAdaptadoresSgc(dependencias: DependenciasAdaptadoresSgc): Catalogo
             };
             execucao.sumario = resultado.resumo
                 ? `Pontuacao de ordenacao de residuos: ${resultado.resumo.pontuacaoTotal}.`
-                : "Validacao de residuos executada.";
+                : "Inventario de residuos executado.";
             return execucao;
         },
         async arquiteturaCliente(contexto: ContextoColeta): Promise<ExecucaoQualidade> {

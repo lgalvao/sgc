@@ -12,6 +12,7 @@ type CategoriaTipo = "class" | "interface" | "enum" | "record" | "type";
 type CategoriaMembro =
     | "funcao"
     | "funcao-arrow"
+    | "componente-lazy"
     | "metodo"
     | "construtor"
     | "campo"
@@ -299,10 +300,11 @@ function extrairFuncoesTsJs(texto: string): MembroSimbolo[] {
             continue;
         }
         const assinatura = `${correspondencia[1]}(${correspondencia[2].trim()})`;
+        const carregaModuloDinamico = /^\s*import\s*\(/.test(texto.slice(regexArrow.lastIndex));
         if (!assinaturasRegistradas.has(assinatura)) {
             assinaturasRegistradas.add(assinatura);
             funcoes.push({
-                categoria: "funcao-arrow",
+                categoria: carregaModuloDinamico ? "componente-lazy" : "funcao-arrow",
                 nome: correspondencia[1],
                 assinatura,
                 parametros: extrairParametros(correspondencia[2])

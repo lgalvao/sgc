@@ -27,7 +27,7 @@ interface ViolacaoResiduoValidacao {
 }
 
 interface ResultadoValidacaoResiduos {
-    status: "ok" | "falha";
+    status: "ok" | "falha" | "nao_configurado";
     geradoEm: string;
     resumo: {
         pontuacaoTotal: number;
@@ -112,6 +112,12 @@ async function executarValidacaoClienteResiduos(
     const excecoesPorArquivo = indexarExcecoes(excecoes.excecoes);
     const violacoes: ViolacaoResiduoValidacao[] = [];
     const avisos: ViolacaoResiduoValidacao[] = [];
+    if (!caminhoOrcamento) {
+        avisos.push(criarViolacao(
+            "orcamento_ausente",
+            "Nenhum orcamento de residuos foi configurado; o resultado e apenas inventario e nao aprova o gate."
+        ));
+    }
 
     const maximos = fotografia.orcamento.metricas?.maximosProducao ?? {};
     for (const [chave, maximo] of Object.entries(maximos)) {
@@ -184,7 +190,7 @@ async function executarValidacaoClienteResiduos(
     }
 
     const resultado: ResultadoValidacaoResiduos = {
-        status: violacoes.length === 0 ? "ok" : "falha",
+        status: !caminhoOrcamento ? "nao_configurado" : (violacoes.length === 0 ? "ok" : "falha"),
         geradoEm: new Date().toISOString(),
         resumo: {
             pontuacaoTotal: fotografia.resumo.pontuacaoTotal,
@@ -192,7 +198,7 @@ async function executarValidacaoClienteResiduos(
             violacoes: violacoes.length,
             avisos: avisos.length,
         },
-        orcamento: caminhoOrcamento ? path.relative(base, caminhoOrcamento).replaceAll("\\", "/") : "padrao-do-toolkit",
+        orcamento: caminhoOrcamento ? path.relative(base, caminhoOrcamento).replaceAll("\\", "/") : "nao-configurado",
         excecoes: caminhoExcecoes ? path.relative(base, caminhoExcecoes).replaceAll("\\", "/") : "padrao-do-toolkit",
         fotografia,
         violacoes,
@@ -256,7 +262,12 @@ async function principal(argumentosInformados: string[] = process.argv.slice(2))
     }
 
     imprimirCabecalho("VALIDACAO DE RESIDUOS DO CLIENTE");
-    escreverLinha(`Status: ${resultado.status === "ok" ? pc.green("ok") : pc.red("falha")}`);
+    const statusFormatado = resultado.status === "ok"
+        ? pc.green("ok")
+        : resultado.status === "nao_configurado"
+            ? pc.yellow("nao configurado")
+            : pc.red("falha");
+    escreverLinha(`Status: ${statusFormatado}`);
     escreverLinha(`Pontuacao de ordenacao: ${resultado.resumo.pontuacaoTotal} (nao e severidade)`);
     escreverLinha(`Violacoes: ${resultado.resumo.violacoes}`);
     escreverLinha(`Avisos: ${resultado.resumo.avisos}`);

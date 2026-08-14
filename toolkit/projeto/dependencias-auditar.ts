@@ -13,6 +13,7 @@ interface EscopoAuditoria extends DefinicaoEscopoAuditoria {
 interface ResultadoExecucaoComando {
     exitCode?: number;
     stdout?: string;
+    stderr?: string;
 }
 
 interface ResultadoEscopoAuditoria {
@@ -143,17 +144,39 @@ const executarComandoPadrao: ExecutarComando = async (comando, argumentos, diret
         && ignorarAtualizacoes.length > 0;
     const resultado = await execa(comando, argumentos, {
         cwd: diretorio,
-        ...(filtrarNpmOutdated ? {stdout: "pipe", stderr: "inherit"} : {stdio: "inherit"}),
+        stdout: "pipe",
+        stderr: "pipe",
         shell: process.platform === "win32",
         reject: false
     });
-    if (!filtrarNpmOutdated || resultado.stdout === undefined) {
-        return {exitCode: resultado.exitCode};
+    const stderr = resultado.stderr === undefined ? "" : String(resultado.stderr);
+    if (stderr) {
+        process.stderr.write(`${stderr}\n`);
     }
-    const filtrado = filtrarSaidaNpmOutdated(resultado.stdout, ignorarAtualizacoes, resultado.exitCode ?? 1);
+    const stdout = resultado.stdout === undefined ? "" : String(resultado.stdout);
+    if (!filtrarNpmOutdated) {
+        if (stdout) {
+            process.stdout.write(`${stdout}\n`);
+        }
+        return {exitCode: resultado.exitCode, stdout, stderr};
+    }
+    const filtrado = filtrarSaidaNpmOutdated(stdout, ignorarAtualizacoes, resultado.exitCode ?? 1);
     process.stdout.write(filtrado.saida);
-    return {exitCode: filtrado.codigoSaida};
+    return {exitCode: filtrado.codigoSaida, stdout: filtrado.saida, stderr};
 };
+
+function ehFalhaOperacional(resultado: ResultadoExecucaoComando): boolean {
+    const saida = `${resultado.stdout ?? ""}\n${resultado.stderr ?? ""}`;
+    try {
+        const json = JSON.parse(resultado.stdout ?? "") as {error?: unknown};
+        if (json.error !== undefined) {
+            return true;
+        }
+    } catch {
+        // Saidas textuais de ferramentas como Knip sao validas.
+    }
+    return /\b(?:ENOENT|ENOLOCK|MODULE_NOT_FOUND)\b|npm error|command not found|not recognized as an internal or external command/i.test(saida);
+}
 
 async function executarAuditoriaDependencias(
     opcoes: OpcoesAuditoriaDependencias = {}
@@ -171,13 +194,20 @@ async function executarAuditoriaDependencias(
     for (const escopo of escopos) {
         escreverLinha();
         escreverLinha(escopo.titulo);
-        const resultado = await executarComando(escopo.comando, escopo.argumentos, escopo.diretorio, escopo.ignorarAtualizacoes);
+        let resultado: ResultadoExecucaoComando;
+        try {
+            resultado = await executarComando(escopo.comando, escopo.argumentos, escopo.diretorio, escopo.ignorarAtualizacoes);
+        } catch (erro: unknown) {
+            const mensagem = erro instanceof Error ? erro.message : String(erro);
+            escreverLinha(`Falha ao executar ${escopo.titulo}: ${mensagem}`);
+            resultado = {exitCode: undefined, stderr: mensagem};
+        }
         const codigoSaida = resultado.exitCode;
         const status: StatusAuditoriaDependencias = codigoSaida === undefined
             ? "falha"
             : codigoSaida === 0
                 ? "ok"
-                : escopo.codigoNaoZeroIndicaAchados
+                : escopo.codigoNaoZeroIndicaAchados && !ehFalhaOperacional(resultado)
                     ? "achados"
                     : "falha";
         resultados.push({escopo: escopo.titulo, codigoSaida: codigoSaida ?? 1, status});

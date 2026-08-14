@@ -75,7 +75,7 @@ describe("Auditorias de consistência e nomenclatura", () => {
         ]);
 
         expect(resultado.exitCode).toBe(0);
-        expect(JSON.parse(resultado.stdout).versao).toBe(1);
+        expect(JSON.parse(resultado.stdout).versao).toBe(2);
         expect(JSON.parse(resultado.stdout).base).toBe(diretorioBase);
         expect(await existe(path.join(diretorioBase, "toolkit"))).toBe(false);
 
@@ -107,7 +107,60 @@ describe("Auditorias de consistência e nomenclatura", () => {
             "nomenclatura",
             "mais-recente",
             "consistencia.json"
-        ))).versao).toBe(1);
+        ))).versao).toBe(2);
+    });
+
+    test("aceita componente Vue lazy em PascalCase sem confundi-lo com funcao", async () => {
+        const diretorioBase = await mkdtemp(path.join(os.tmpdir(), "sgc-nomenclatura-componente-lazy-"));
+        await escreverArquivo(
+            path.join(diretorioBase, "frontend", "src", "rotas.ts"),
+            [
+                'const VisaoPrincipal = () => import("./VisaoPrincipal.vue");',
+                "const CarregarDados = () => Promise.resolve([]);"
+            ].join("\n")
+        );
+
+        const resultado = await executarSgc([
+            "codigo",
+            "nomes",
+            "auditar-consistencia",
+            "--json",
+            "--base",
+            diretorioBase
+        ]);
+
+        expect(resultado.exitCode).toBe(0);
+        const auditoria = JSON.parse(resultado.stdout);
+        expect(auditoria.membrosForaPadrao).toEqual([
+            expect.objectContaining({nome: "CarregarDados", categoria: "funcao-arrow"})
+        ]);
+    });
+
+    test("aceita nomes descritivos com sublinhado em métodos de teste Java", async () => {
+        const diretorioBase = await mkdtemp(path.join(os.tmpdir(), "sgc-nomenclatura-metodo-teste-"));
+        await escreverArquivo(
+            path.join(diretorioBase, "backend", "src", "test", "java", "ExemploTest.java"),
+            "class ExemploTest {\n    void executar_quandoValido_retornaResultado() {\n    }\n}"
+        );
+        await escreverArquivo(
+            path.join(diretorioBase, "backend", "src", "main", "java", "Exemplo.java"),
+            "class Exemplo {\n    void executar_quandoValido() {\n    }\n}"
+        );
+
+        const resultado = await executarSgc([
+            "codigo",
+            "nomes",
+            "auditar-consistencia",
+            "--json",
+            "--base",
+            diretorioBase
+        ]);
+
+        expect(resultado.exitCode).toBe(0);
+        const auditoria = JSON.parse(resultado.stdout);
+        expect(auditoria.membrosForaPadrao).toEqual([
+            expect.objectContaining({arquivo: "backend/src/main/java/Exemplo.java", nome: "executar_quandoValido"})
+        ]);
     });
 
     test("emite resumo JSON limitado da auditoria de nomenclatura", async () => {
@@ -130,8 +183,8 @@ describe("Auditorias de consistência e nomenclatura", () => {
         const resumo = JSON.parse(resultado.stdout);
         expect(resumo).toMatchObject({versaoResumo: 1, truncado: true, limiteItens: 20});
         expect(resumo.indicadores.arquivos).toBe(1);
-        expect(resumo.indicadores.parametrosComId).toBe(1);
-        expect(resumo.achados.parametrosComId).toHaveLength(1);
+        expect(resumo.indicadores.parametrosComId).toBeUndefined();
+        expect(resumo.achados.parametrosComId).toBeUndefined();
         expect(resumo.formatosArquivos[".ts"]).toBeDefined();
         expect(resumo.tiposForaPadrao).toBeUndefined();
     });

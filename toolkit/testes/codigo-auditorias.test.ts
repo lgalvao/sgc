@@ -167,6 +167,22 @@ describe("Auditores de código", () => {
         ]);
     });
 
+    test("exige regras Semgrep explicitas fora do perfil SGC", async () => {
+        const base = await mkdtemp(path.join(os.tmpdir(), "sgc-semgrep-sem-regra-"));
+        await escreverJson(path.join(base, "configuracao-toolkit.json"), {
+            versao: VERSAO_CONFIGURACAO,
+            diretorios: {
+                codigoServidor: "servidor/java",
+                codigoCliente: "cliente/src"
+            }
+        });
+
+        const resultado = await executarSgc(["codigo", "semgrep", "auditar", "--json", "--base", base]);
+
+        expect(resultado.exitCode).toBe(1);
+        expect(`${resultado.stdout}\n${resultado.stderr}`).toContain("Projeto externo sem regras Semgrep configuradas");
+    });
+
     test("normaliza caminhos relativos e absolutos dos achados Semgrep", async () => {
         const base = await mkdtemp(path.join(os.tmpdir(), "sgc-semgrep-caminhos-"));
         const caminhoRelativo = "servidor/java/ExemploService.java";

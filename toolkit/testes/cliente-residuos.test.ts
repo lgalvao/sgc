@@ -11,6 +11,29 @@ import {
 import {VERSAO_CONFIGURACAO} from "../biblioteca/configuracao.js";
 
 describe("Resíduos do cliente", () => {
+    test("nao aprova validacao sem orcamento configurado", async () => {
+        const base = await mkdtemp(path.join(os.tmpdir(), "sgc-residuos-sem-orcamento-"));
+        await escreverJson(path.join(base, "configuracao-toolkit.json"), {
+            versao: VERSAO_CONFIGURACAO,
+            diretorios: {codigoCliente: "cliente/src"}
+        });
+        await escreverArquivo(
+            path.join(base, "cliente", "src", "componentes", "Exemplo.vue"),
+            "<template><div>Exemplo</div></template>\n"
+        );
+
+        const resultado = await executarSgc([
+            "cliente", "residuos", "validar", "--json-resumido", "--base", base
+        ]);
+
+        expect(resultado.exitCode).toBe(1);
+        const resumo = JSON.parse(resultado.stdout);
+        expect(resumo).toMatchObject({status: "nao_configurado", orcamento: "nao-configurado"});
+        expect(resumo.avisos).toEqual([
+            expect.objectContaining({tipo: "orcamento_ausente"})
+        ]);
+    });
+
     test("trata politicas de residuos como overrides opcionais e explicita arquivos invalidos", async () => {
         const base = await mkdtemp(path.join(os.tmpdir(), "sgc-residuos-politicas-opcionais-"));
         const caminhoOrcamento = path.join(base, "politicas", "orcamento.json");

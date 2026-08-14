@@ -102,6 +102,29 @@ describe("Análise e priorização dos testes do servidor", () => {
         expect(relatorio.categorias.modelos.semTeste[0].ruidoModeloIgnorado).toBe(true);
     });
 
+    test("usa política genérica por padrão fora do SGC", async () => {
+        const base = await mkdtemp(path.join(os.tmpdir(), "sgc-testes-politica-generica-"));
+        const diretorioServidor = path.join(base, "backend-fake");
+        await escreverArquivo(
+            path.join(diretorioServidor, "src", "main", "java", "com", "exemplo", "model", "SituacaoExterna.java"),
+            "package com.exemplo.model; public class SituacaoExterna { public void descrever() {} }"
+        );
+
+        const resultado = await executarSgc([
+            "servidor",
+            "testes",
+            "analisar",
+            "--json",
+            "--diretorio",
+            diretorioServidor
+        ], {cwd: base});
+
+        expect(resultado.exitCode).toBe(0);
+        const relatorio = JSON.parse(resultado.stdout) as RelatorioAnaliseTestesJson;
+        expect(relatorio.estatisticas.modelosEstruturaisContratuais).toBe(1);
+        expect(relatorio.categorias.modelos.semTeste[0].perfilModelo).toBe("estruturalContrato");
+    });
+
     test("analisa testes do servidor com resumo no console e sidecar JSON", async () => {
         const diretorioSaida = await mkdtemp(path.join(os.tmpdir(), "sgc-testes-analisar-"));
         const markdown = path.join(diretorioSaida, "relatorio.md");

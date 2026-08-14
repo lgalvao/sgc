@@ -159,13 +159,22 @@ ferramentas requisitos cdus auditar --json-resumido
 ```
 
 Políticas Java são recebidas por `--politica`. A política contém as listas de anotações, nomes, prefixos, sufixos e
-caminhos estruturais da classificação.
+caminhos estruturais da classificação. No SGC, a política local é aplicada por padrão; em outros projetos, o padrão é a
+política genérica.
 
 `servidor arquitetura auditar`, `servidor contratos auditar` e `servidor testes analisar` aceitam
 `--diretorio <modulo>` para analisar um módulo Java com `src/main/java`; a análise de testes também usa o
 `src/test/java` correspondente. Sem essa opção, os diretórios vêm de `configuracao-toolkit.json`.
 
-O motor Semgrep recebe regra, alvos e comando explicitamente. A configuração do perfil compõe esses valores.
+`cliente residuos validar` exige um orçamento informado por `--orcamento` ou `diretorios.orcamentoResiduosCliente`.
+Sem orçamento, retorna `status: "nao_configurado"` e código não zero; use `cliente residuos auditar` para inventário.
+
+`codigo nomes auditar-consistencia` verifica convenções estruturais compartilháveis. Componentes Vue carregados por
+`import()` usam PascalCase; métodos Java em fontes de teste podem usar nomes descritivos com `_`. Regras locais de idioma
+e proibição de `id` pertencem a `codigo nomes auditar-idioma`.
+
+O motor Semgrep recebe regra, alvos e comando explicitamente. No SGC, usa a regra local padrão. Em outro projeto, exige
+`--regra` ou `diretorios.regrasSemgrep` em `configuracao-toolkit.json` e nunca aplica silenciosamente a política do SGC.
 
 As APIs de cobertura recebem relatório, diretório base, padrões de exclusão e caminhos explicitamente. Os formatos JaCoCo
 e V8 são preservados na fronteira dos adaptadores.

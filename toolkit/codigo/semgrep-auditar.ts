@@ -1,9 +1,10 @@
 
 import path from "node:path";
+import {existsSync} from "node:fs";
 import pc from "picocolors";
 import {DIRETORIO_RAIZ} from "../biblioteca/caminhos.js";
 import {lerOpcao} from "../biblioteca/cli-opcoes.js";
-import {resolverCaminhoConfigurado} from "../biblioteca/configuracao.js";
+import {resolverCaminhoConfigurado, temDiretorioConfiguradoExplicitamente} from "../biblioteca/configuracao.js";
 import {exibirAjudaComando} from "../biblioteca/cli-ajuda.js";
 import {ehEntradaPrincipal, validarArgumentosEntradaDireta} from "../biblioteca/execucao.js";
 import {escreverErro, escreverLinha, imprimirCabecalho, imprimirJson} from "../biblioteca/saida.js";
@@ -66,8 +67,12 @@ async function principal(argumentos: string[] = process.argv.slice(2)): Promise<
     const gravar = argumentosValidados.includes("--gravar");
     const auto = argumentosValidados.includes("--auto");
     const diretorioBase = path.resolve(lerOpcao(argumentosValidados, "--base", DIRETORIO_RAIZ) ?? DIRETORIO_RAIZ);
-    const regra = lerOpcao(argumentosValidados, "--regra", resolverCaminhoConfigurado("regrasSemgrep", diretorioBase))
-        ?? resolverCaminhoConfigurado("regrasSemgrep", diretorioBase);
+    const regraInformada = lerOpcao(argumentosValidados, "--regra", undefined);
+    const perfilSgc = existsSync(path.join(diretorioBase, "toolkit", "ferramentas.ts"));
+    if (!regraInformada && !perfilSgc && !temDiretorioConfiguradoExplicitamente("regrasSemgrep", diretorioBase)) {
+        throw new Error("Projeto externo sem regras Semgrep configuradas. Informe --regra ou diretorios.regrasSemgrep em configuracao-toolkit.json.");
+    }
+    const regra = regraInformada ?? resolverCaminhoConfigurado("regrasSemgrep", diretorioBase);
     const diretorios = extrairLista(argumentosValidados, "--diretorio");
     const alvos = diretorios.length > 0 ? diretorios : resolverDiretoriosPadrao(diretorioBase);
     const diretorioSaida = path.join(resolverCaminhoConfigurado("artefatosQualidade", diretorioBase), "semgrep", "mais-recente");

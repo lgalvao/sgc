@@ -78,11 +78,13 @@ test("pacote fonte executa em um projeto consumidor isolado", async () => {
 
     const diretorioBinario = path.join(diretorioTemporario, "bin");
     const caminhoSemgrep = path.join(diretorioBinario, "semgrep");
+    const caminhoRegrasSemgrep = path.join(diretorioConsumidor, "regras.yml");
     await mkdir(diretorioBinario, {recursive: true});
+    await escreverArquivo(caminhoRegrasSemgrep, "rules: []\n");
     await escreverArquivo(caminhoSemgrep, [
         "#!/bin/sh",
         "case \"$*\" in",
-        "  *ferramentas-projeto/qualidade/politicas/semgrep/sgc-qualidade.yml*) printf '{\"results\":[]}';;",
+        "  *regras.yml*) printf '{\"results\":[]}';;",
         "  *) exit 2;;",
         "esac",
         ""
@@ -92,7 +94,9 @@ test("pacote fonte executa em um projeto consumidor isolado", async () => {
         "codigo",
         "semgrep",
         "auditar",
-        "--json"
+        "--json",
+        "--regra",
+        caminhoRegrasSemgrep
     ], {
         cwd: diretorioConsumidor,
         env: {
@@ -110,6 +114,8 @@ test("pacote fonte executa em um projeto consumidor isolado", async () => {
         "semgrep",
         "auditar",
         "--json",
+        "--regra",
+        caminhoRegrasSemgrep,
         "--gravar"
     ], {
         cwd: diretorioConsumidor,

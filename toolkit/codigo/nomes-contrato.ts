@@ -1,5 +1,5 @@
 const VERSAO_INVENTARIO_SIMBOLOS = 1 as const;
-const VERSAO_AUDITORIA_NOMENCLATURA = 1 as const;
+const VERSAO_AUDITORIA_NOMENCLATURA = 2 as const;
 const VERSAO_AUDITORIA_IDIOMA = 2 as const;
 
 export {

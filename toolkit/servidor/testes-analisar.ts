@@ -20,6 +20,7 @@ import {
     inferirCategoria,
     lerConteudoFonte,
     normalizarCaminho,
+    POLITICA_CLASSIFICACAO_GENERICA,
     SUFIXOS_TESTE,
     type PoliticaClassificacaoTestes
 } from "./biblioteca/testes-analisar-regras.js";
@@ -149,7 +150,9 @@ function lerArgumentos(argumentos: string[]): OpcoesAnalisar {
         arquivoJacoco: lerOpcao(argumentos, "--arquivo-jacoco", undefined) ?? null,
         politica: caminhoPolitica
             ? carregarPoliticaClassificacao(path.resolve(base, caminhoPolitica))
-            : POLITICA_CLASSIFICACAO_TESTES_SGC,
+            : fs.existsSync(path.join(base, "toolkit", "ferramentas.ts"))
+                ? POLITICA_CLASSIFICACAO_TESTES_SGC
+                : POLITICA_CLASSIFICACAO_GENERICA,
         ajuda: argumentos.includes("--help") || argumentos.includes("-h"),
         gravar: argumentos.includes("--gravar"),
         emitirJson: argumentos.includes("--json") || argumentos.includes("--json-resumido"),

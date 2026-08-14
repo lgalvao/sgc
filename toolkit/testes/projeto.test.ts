@@ -492,6 +492,29 @@ describe("Comandos de projeto do toolkit", () => {
         ]);
     });
 
+    test("nao classifica erro operacional npm como achado", async () => {
+        const diretorioBase = await mkdtemp(path.join(os.tmpdir(), "sgc-dependencias-erro-operacional-"));
+        const resultado = await executarAuditoriaDependencias({
+            base: diretorioBase,
+            escopos: [{
+                titulo: "Vulnerabilidades",
+                segmento: "cliente",
+                comando: "npm",
+                argumentos: ["audit", "--json"],
+                codigoNaoZeroIndicaAchados: true
+            }],
+            executarComando: async () => ({
+                exitCode: 1,
+                stdout: JSON.stringify({error: {code: "ENOLOCK", summary: "lockfile ausente"}})
+            })
+        });
+
+        expect(resultado).toMatchObject({
+            statusGeral: "falha",
+            resultados: [{escopo: "Vulnerabilidades", codigoSaida: 1, status: "falha"}]
+        });
+    });
+
     test("filtra major ignorada de TypeScript sem ocultar outras atualizacoes npm", () => {
         const resultado = filtrarSaidaNpmOutdated(JSON.stringify({
             typescript: [{current: "6.0.3", latest: "7.0.2", dependent: "toolkit"}],

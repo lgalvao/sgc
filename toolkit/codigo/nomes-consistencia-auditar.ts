@@ -32,12 +32,6 @@ interface ParametroForaPadrao {
     formato: FormatoNome;
 }
 
-interface ParametroComId {
-    arquivo: string;
-    membro: string;
-    parametro: string;
-}
-
 interface PacoteForaPadrao {
     pacote: string;
     partesInvalidas: string[];
@@ -54,7 +48,6 @@ interface AuditoriaNomes {
         tiposForaPadrao: number;
         membrosForaPadrao: number;
         parametrosForaPadrao: number;
-        parametrosComId: number;
         pacotesJavaForaPadrao: number;
     };
     formatosArquivos: Record<string, Record<string, string[]>>;
@@ -62,7 +55,6 @@ interface AuditoriaNomes {
     tiposForaPadrao: TipoForaPadrao[];
     membrosForaPadrao: MembroForaPadrao[];
     parametrosForaPadrao: ParametroForaPadrao[];
-    parametrosComId: ParametroComId[];
     pacotesJavaForaPadrao: PacoteForaPadrao[];
 }
 
@@ -80,7 +72,6 @@ interface ResumoAuditoriaNomes {
         tiposForaPadrao: TipoForaPadrao[];
         membrosForaPadrao: MembroForaPadrao[];
         parametrosForaPadrao: ParametroForaPadrao[];
-        parametrosComId: ParametroComId[];
         pacotesJavaForaPadrao: PacoteForaPadrao[];
     };
 }
@@ -146,14 +137,13 @@ function filtrarSimbolosForaPadrao(inventario: InventarioSimbolos): {
     tiposForaPadrao: TipoForaPadrao[];
     membrosForaPadrao: MembroForaPadrao[];
     parametrosForaPadrao: ParametroForaPadrao[];
-    parametrosComId: ParametroComId[];
 } {
     const tiposForaPadrao: TipoForaPadrao[] = [];
     const membrosForaPadrao: MembroForaPadrao[] = [];
     const parametrosForaPadrao: ParametroForaPadrao[] = [];
-    const parametrosComId: ParametroComId[] = [];
 
     for (const arquivo of inventario.arquivos) {
+        const arquivoTeste = /(?:^|\/)(?:src\/test|testes|tests|e2e)(?:\/|$)|\.(?:spec|test)\.[^.]+$/i.test(arquivo.caminho);
         for (const tipo of arquivo.tipos) {
             const formato = classificarFormatoNome(tipo.nome);
             if (formato !== "PascalCase") {
@@ -171,7 +161,12 @@ function filtrarSimbolosForaPadrao(inventario: InventarioSimbolos): {
                 continue;
             }
             const formato = classificarFormatoNome(membro.nome);
-            if (formato !== "camelCase" && formato !== "minusculo") {
+            const formatoValido = membro.categoria === "componente-lazy"
+                ? formato === "PascalCase"
+                : formato === "camelCase"
+                    || formato === "minusculo"
+                    || (arquivoTeste && membro.categoria === "metodo" && /^[a-z][A-Za-z0-9_]*$/.test(membro.nome));
+            if (!formatoValido) {
                 membrosForaPadrao.push({
                     arquivo: arquivo.caminho,
                     categoria: membro.categoria,
@@ -195,18 +190,11 @@ function filtrarSimbolosForaPadrao(inventario: InventarioSimbolos): {
                     });
                 }
 
-                if (parametro === "id" || parametro.endsWith("Id") || parametro.endsWith("_id")) {
-                    parametrosComId.push({
-                        arquivo: arquivo.caminho,
-                        membro: membro.assinatura,
-                        parametro
-                    });
-                }
             }
         }
     }
 
-    return {tiposForaPadrao, membrosForaPadrao, parametrosForaPadrao, parametrosComId};
+    return {tiposForaPadrao, membrosForaPadrao, parametrosForaPadrao};
 }
 
 function auditarPacotesJava(inventario: InventarioSimbolos): PacoteForaPadrao[] {
@@ -238,7 +226,6 @@ function montarResumo(auditoria: AuditoriaNomes): string {
     linhas.push(`- Tipos fora do padrao PascalCase: ${auditoria.indicadores.tiposForaPadrao}`);
     linhas.push(`- Membros fora do padrao camelCase: ${auditoria.indicadores.membrosForaPadrao}`);
     linhas.push(`- Parametros fora do padrao camelCase: ${auditoria.indicadores.parametrosForaPadrao}`);
-    linhas.push(`- Parametros com uso de 'id': ${auditoria.indicadores.parametrosComId}`);
     linhas.push(`- Pacotes Java fora de lowercase.dotted: ${auditoria.indicadores.pacotesJavaForaPadrao}`);
     linhas.push("");
     linhas.push("## Formatos de arquivos por extensao");
@@ -269,15 +256,6 @@ function montarResumo(auditoria: AuditoriaNomes): string {
         linhas.push(`- ${item.assinatura} (${item.formato}) em ${item.arquivo}`);
     }
     if (auditoria.membrosForaPadrao.length === 0) {
-        linhas.push("- Nenhum encontrado");
-    }
-
-    linhas.push("");
-    linhas.push("### Parametros com `id`");
-    for (const item of auditoria.parametrosComId.slice(0, 20)) {
-        linhas.push(`- ${item.parametro} em ${item.membro} (${item.arquivo})`);
-    }
-    if (auditoria.parametrosComId.length === 0) {
         linhas.push("- Nenhum encontrado");
     }
 
@@ -321,7 +299,6 @@ function criarResumoJson(auditoria: AuditoriaNomes): ResumoAuditoriaNomes {
             tiposForaPadrao: auditoria.tiposForaPadrao.slice(0, limiteItens),
             membrosForaPadrao: auditoria.membrosForaPadrao.slice(0, limiteItens),
             parametrosForaPadrao: auditoria.parametrosForaPadrao.slice(0, limiteItens),
-            parametrosComId: auditoria.parametrosComId.slice(0, limiteItens),
             pacotesJavaForaPadrao: auditoria.pacotesJavaForaPadrao.slice(0, limiteItens),
         },
     };
@@ -344,8 +321,7 @@ async function executarAuditoriaNomes({
     const {
         tiposForaPadrao,
         membrosForaPadrao,
-        parametrosForaPadrao,
-        parametrosComId
+        parametrosForaPadrao
     } = filtrarSimbolosForaPadrao(dadosInventario);
     const pacotesJavaForaPadrao = auditarPacotesJava(dadosInventario);
 
@@ -359,7 +335,6 @@ async function executarAuditoriaNomes({
             tiposForaPadrao: tiposForaPadrao.length,
             membrosForaPadrao: membrosForaPadrao.length,
             parametrosForaPadrao: parametrosForaPadrao.length,
-            parametrosComId: parametrosComId.length,
             pacotesJavaForaPadrao: pacotesJavaForaPadrao.length
         },
         formatosArquivos,
@@ -367,7 +342,6 @@ async function executarAuditoriaNomes({
         tiposForaPadrao,
         membrosForaPadrao,
         parametrosForaPadrao,
-        parametrosComId,
         pacotesJavaForaPadrao
     };
 
@@ -389,7 +363,6 @@ async function executarAuditoriaNomes({
     escreverLinha(`Tipos fora de PascalCase: ${auditoria.indicadores.tiposForaPadrao}`);
     escreverLinha(`Membros fora de camelCase: ${auditoria.indicadores.membrosForaPadrao}`);
     escreverLinha(`Parametros fora de camelCase: ${auditoria.indicadores.parametrosForaPadrao}`);
-    escreverLinha(`Parametros com 'id': ${auditoria.indicadores.parametrosComId}`);
     escreverLinha(`Pacotes Java fora de lowercase.dotted: ${auditoria.indicadores.pacotesJavaForaPadrao}`);
     if (gravar) {
         const destinoJson = path.isAbsolute(caminhoSaida) ? caminhoSaida : path.resolve(baseResolvida, caminhoSaida);
