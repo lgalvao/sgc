@@ -11,7 +11,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "smtp-server": "^3.19.3"
+    "smtp-server": "^3.19.9"
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.13.0",
