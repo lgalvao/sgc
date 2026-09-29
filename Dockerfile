@@ -54,7 +54,7 @@ COPY . .
 RUN --mount=type=cache,target=/root/.gradle \
     ./gradlew :backend:bootJar -x test --no-daemon --configuration-cache
 # Estágio 2: Extrator (prepara as camadas do Spring Boot)
-FROM docker.io/library/amazoncorretto:26-al2023-headless AS extrator
+FROM docker.io/library/amazoncorretto:27-al2023-headless AS extrator
 WORKDIR /aplicacao
 
 # Re-aplica certificados para o extrator
@@ -68,7 +68,7 @@ COPY --from=build-env /build/backend/build/libs/*.jar aplicacao.jar
 RUN mkdir extraido && java -Djarmode=tools -jar aplicacao.jar extract --layers --launcher --destination extraido
 
 # Estágio 3: Imagem Final (Runtime)
-FROM docker.io/library/amazoncorretto:26-al2023-headless
+FROM docker.io/library/amazoncorretto:27-al2023-headless
 
 LABEL description="Sistema de Gestao de Competencias - SGC" \
       maintainer="SESEL <sesel@tre-pe.jus.br>" \

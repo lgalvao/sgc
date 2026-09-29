@@ -8,6 +8,7 @@ export default defineConfig({
         tsconfigPaths: true,
     },
     test: {
+        clearMocks: false,
         env: {
             TZ: "America/Sao_Paulo",
         },

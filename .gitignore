@@ -19,6 +19,7 @@ toolkit/dist/
 toolkit/coverage/
 toolkit/.vitest/
 e2e/node_modules/
+e2e-hom/node_modules/
 
 # Java
 /backend/src/main/resources/static/
