@@ -108,7 +108,7 @@ describe('Alerta A11y', () => {
     it('não tem violações de acessibilidade no modo simples', async () => {
         const {wrapper, alvo} = montarAlerta({mensagem: 'Hello world'});
         const results = await run(alvo);
-        expect(results).toHaveNoViolations();
+        expect(results.violations).toHaveLength(0);
         wrapper.unmount();
         alvo.remove();
     });
@@ -121,7 +121,7 @@ describe('Alerta A11y', () => {
             },
         });
         const results = await run(alvo);
-        expect(results).toHaveNoViolations();
+        expect(results.violations).toHaveLength(0);
         wrapper.unmount();
         alvo.remove();
     });

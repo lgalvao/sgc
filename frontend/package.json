@@ -47,7 +47,6 @@
     "vue-router": "^5.3.1"
   },
   "devDependencies": {
-    "@chialab/vitest-axe": "^0.19.2",
     "@eslint/js": "^10.0.1",
     "@pinia/testing": "^2.0.1",
     "@storybook/addon-docs": "^10.6.0",
