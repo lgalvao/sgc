@@ -49,9 +49,9 @@
     "@vue/compiler-sfc": "^3.5.39",
     "commander": "^15.0.0",
     "consola": "^3.4.2",
-    "dependency-cruiser": "^18.2.0",
+    "dependency-cruiser": "^18.4.0",
     "execa": "^10.0.1",
-    "fs-extra": "^11.4.0",
+    "fs-extra": "^11.4.1",
     "globby": "^16.2.4",
     "listr2": "^11.1.0",
     "openapi-typescript": "^7.13.0",
@@ -63,8 +63,8 @@
   },
   "devDependencies": {
     "@vitest/coverage-v8": "^5.0.2",
-    "knip": "^6.32.2",
-    "oxlint": "^1.80.0",
+    "knip": "^6.39.0",
+    "oxlint": "^1.86.0",
     "vitest": "^5.0.2"
   }
 }

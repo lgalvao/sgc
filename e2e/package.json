@@ -11,12 +11,12 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "smtp-server": "^3.19.3"
+    "smtp-server": "^3.19.16"
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.13.0",
-    "@playwright/test": "^1.62.1",
-    "@types/node": "^26.2.0",
+    "@playwright/test": "^1.63.0",
+    "@types/node": "^26.6.3",
     "typescript": "^6.0.3"
   }
 }
