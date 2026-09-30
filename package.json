@@ -44,6 +44,11 @@
     "release-it": "^21.1.0",
     "typescript": "^6.0.3"
   },
+  "overrides": {
+    "release-it": {
+      "undici": "7.29.1"
+    }
+  },
   "allowScripts": {
     "fsevents@2.3.3": true,
     "vue-demi@0.14.10": true,
