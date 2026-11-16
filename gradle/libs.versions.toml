@@ -1,24 +1,17 @@
 [versions]
-# Spring & Frameworks
 springBoot = "4.1.0"
 springDependencyManagement = "1.1.7"
 springDoc = "3.0.2"
-
-# Tools & Plugins
 jacoco = "0.8.15"
 spotbugs = "4.10.2"
 spotbugsPlugin = "6.4.8"
 pitest = "1.19.0"
 openRewrite = "7.18.0"
 gradleVersions = "0.61.0"
-
-# Security & Core Overrides
 jackson = "3.2.0"
 tomcat = "11.0.22"
 jjwt = "0.13.0"
 owaspSanitizer = "20260313.1"
-
-# Libs
 lombok = "1.18.46"
 openpdf = "3.0.5"
 rhino = "1.9.1"
@@ -27,7 +20,6 @@ jsoup = "1.18.3"
 h2 = "2.3.232"
 ojdbc = "23.26.1.0.0"
 
-# Test
 junit = "6.0.3"
 archunit = "1.4.1"
 jqwik = "1.9.3"
@@ -38,7 +30,6 @@ swaggerParser = "2.1.39"
 swaggerValidator = "2.46.1"
 
 [libraries]
-# Spring Boot Starters
 spring-boot-starter-actuator = { module = "org.springframework.boot:spring-boot-starter-actuator" }
 spring-boot-starter-aspectj = { module = "org.springframework.boot:spring-boot-starter-aspectj" }
 spring-boot-starter-cache = { module = "org.springframework.boot:spring-boot-starter-cache" }
@@ -51,7 +42,6 @@ spring-boot-starter-thymeleaf = { module = "org.springframework.boot:spring-boot
 spring-boot-configuration-processor = { module = "org.springframework.boot:spring-boot-configuration-processor" }
 spring-boot-devtools = { module = "org.springframework.boot:spring-boot-devtools" }
 
-# Security & Core Overrides
 jackson-bom = { module = "tools.jackson:jackson-bom", version.ref = "jackson" }
 jackson-core = { module = "tools.jackson.core:jackson-core", version.ref = "jackson" }
 tomcat-embed-core = { module = "org.apache.tomcat.embed:tomcat-embed-core", version.ref = "tomcat" }
@@ -59,11 +49,7 @@ jjwt-api = { module = "io.jsonwebtoken:jjwt-api", version.ref = "jjwt" }
 jjwt-impl = { module = "io.jsonwebtoken:jjwt-impl", version.ref = "jjwt" }
 jjwt-jackson = { module = "io.jsonwebtoken:jjwt-jackson", version.ref = "jjwt" }
 owasp-java-html-sanitizer = { module = "com.googlecode.owasp-java-html-sanitizer:owasp-java-html-sanitizer", version.ref = "owaspSanitizer" }
-
-# Observability
 micrometer-registry-prometheus = { module = "io.micrometer:micrometer-registry-prometheus" }
-
-# General Libs
 lombok = { module = "org.projectlombok:lombok", version.ref = "lombok" }
 jakarta-servlet-api = { module = "jakarta.servlet:jakarta.servlet-api" }
 openpdf = { module = "com.github.librepdf:openpdf", version.ref = "openpdf" }
@@ -74,8 +60,6 @@ h2 = { module = "com.h2database:h2", version.ref = "h2" }
 ojdbc11 = { module = "com.oracle.database.jdbc:ojdbc11", version.ref = "ojdbc" }
 springdoc-openapi = { module = "org.springdoc:springdoc-openapi-starter-webmvc-ui", version.ref = "springDoc" }
 hibernate-validator-processor = { module = "org.hibernate.validator:hibernate-validator-annotation-processor", version = "9.1.0.Final" }
-
-# Test Libs
 junit-bom = { module = "org.junit:junit-bom", version.ref = "junit" }
 spring-boot-starter-test = { module = "org.springframework.boot:spring-boot-starter-test" }
 spring-security-test = { module = "org.springframework.security:spring-security-test" }
