@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<!--suppress JSUnresolvedReference -->
+<html xmlns:th="http://www.thymeleaf.org" lang="pt">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Atribuição Temporária</title>
+    <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}">
+</head>
+
+<body>
+<div class="container mt-4">
+    <h2>Atribuição temporária</h2>
+
+    <form th:action="@{/api/atribuicoes}" method="post" class="mt-4">
+        <div class="mb-3">
+            <label for="processoId" class="form-label">Processo</label>
+            <select class="form-select" id="processoId" name="processoId" required>
+                <option value="">Selecione um processo</option>
+                <option th:each="processo : ${processos}" th:value="${processo.id}" th:text="${processo.nome}">
+                </option>
+            </select>
+        </div>
+
+        <div class="mb-3">
+            <label for="unidadeId" class="form-label">Unidade</label>
+            <select class="form-select" id="unidadeId" name="unidadeId" required>
+                <option value="">Selecione uma unidade</option>
+                <option th:each="unidade : ${unidades}" th:value="${unidade.id}" th:text="${unidade.nome}">
+                </option>
+            </select>
+        </div>
+
+        <div class="mb-3">
+            <label for="servidorId" class="form-label">Servidor</label>
+            <select class="form-select" id="servidorId" name="servidorId" required>
+                <option value="">Selecione um servidor</option>
+                <option th:each="servidor : ${servidores}"
+                        th:value="${servidor.id}"
+                        th:text="${servidor.nome}">
+                </option>
+            </select>
+        </div>
+
+        <div class="mb-3">
+            <label for="dataInicio" class="form-label">Data de Início</label>
+            <input type="date" class="form-control" id="dataInicio" name="dataInicio" required>
+        </div>
+
+        <div class="mb-3">
+            <label for="dataTermino" class="form-label">Data de Término</label>
+            <input type="date" class="form-control" id="dataTermino" name="dataTermino" required>
+        </div>
+
+        <div class="mb-3">
+            <label for="justificativa" class="form-label">Justificativa</label>
+            <textarea class="form-control" id="justificativa" name="justificativa" rows="3" required></textarea>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Salvar</button>
+    </form>
+</div>
+
+<script th:src="@{/js/bootstrap.bundle.min.js}"></script>
+<script>
+    document.getElementById('unidadeId').addEventListener('change', function () {
+        const unidadeId = this.value;
+        if (unidadeId) {
+            fetch(`/api/servidores/unidade/${unidadeId}`)
+                .then(response => response.json())
+                .then(servidores => {
+                    const servidorSelect = document.getElementById('servidorId');
+                    servidorSelect.innerHTML = '<option value="">Selecione um servidor</option>';
+                    servidores.forEach(servidor => {
+                        const option = document.createElement('option');
+                        option.value = servidor.id;
+                        option.textContent = servidor.nome;
+                        servidorSelect.appendChild(option);
+                    });
+                });
+        }
+    });
+</script>
+</body>
+
+</html>

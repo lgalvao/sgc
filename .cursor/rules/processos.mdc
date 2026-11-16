@@ -1,0 +1,16 @@
+# Fluxo de Trabalho de Processos
+
+Este documento descreve o fluxo de trabalho, estados e notificações relacionados à gestão de processos no SGC.
+
+- SEDOC (com direitos administrativos) inicia um novo processo de mapeamento via Dashboard > "Novo Processo".
+- Campos obrigatórios: nome do processo, prazo, unidades participantes.
+- Ações automáticas: sincronização com SGRH, criação de registros de Processo de unidade para cada unidade, envio de notificações para chefes, gestores e administradores.
+- Estados do processo: NAO_INICIADO (inicial), EM_ANDAMENTO (ativo), FINALIZADO (concluído).
+- Estados de Processo de unidade da unidade: NAO_INICIADO, EM_ANDAMENTO, FINALIZADA, VALIDADA
+- Notificações são enviadas em: início, aproximação do prazo, devolução, solicitações de validação e conclusão do processo.
+- Arquivos principais: [ProcessoController.java](mdc:src/main/java/sesel/sgc/processo/ProcessoController.java), ProcessoService.java, views em [templates/processos/](mdc:src/main/resources/templates/processo) (form, detalhes, lista).
+
+description: Fluxos básicos do projeto
+globs:
+alwaysApply: false
+---

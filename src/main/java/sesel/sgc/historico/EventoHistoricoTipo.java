@@ -1,0 +1,13 @@
+package sesel.sgc.historico;
+
+public enum EventoHistoricoTipo {
+    CRIACAO_PROCESSO,
+    INICIO_PROCESSO,
+    INICIO_CADASTRO,
+    FINALIZACAO_CADASTRO,
+    ATRIBUICAO_TEMPORARIA,
+    VALIDACAO,
+    DEVOLUCAO,
+    HOMOLOGACAO,
+    GERACAO_MAPA
+}

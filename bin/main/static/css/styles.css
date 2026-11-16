@@ -1,0 +1,114 @@
+/* Estilos gerais */
+body {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+main {
+    flex: 1;
+}
+
+/* Estilos para badges de status */
+.badge {
+    font-weight: 500;
+    padding: 0.5em 0.75em;
+}
+
+.badge.finalizada {
+    background-color: #6f42c1;
+}
+
+/* Melhorias na tabela */
+.table th {
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    letter-spacing: 1px;
+}
+
+/* Cards */
+.card {
+    border: none;
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    margin-bottom: 1.5rem;
+}
+
+.card-header {
+    background-color: #f8f9fa;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    padding: 1rem 1.25rem;
+}
+
+/* Botões com ícones */
+.btn i {
+    margin-right: 0.25rem;
+}
+
+/* Formulários */
+.form-label {
+    font-weight: 500;
+    margin-bottom: 0.25rem;
+}
+
+/* Validação de formulários */
+
+/* Navbar personalizada */
+
+/* Footer fixo */
+footer {
+    margin-top: auto;
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+    .btn {
+        padding: 0.25rem 0.5rem;
+        font-size: 0.875rem;
+    }
+    
+    .table th, .table td {
+        padding: 0.5rem;
+    }
+}
+
+/* Animações */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Estilos para mensagens de feedback */
+.alert {
+    border: none;
+    border-left: 4px solid;
+    border-radius: 0.25rem;
+}
+
+.alert-success {
+    background-color: #d1e7dd;
+    border-left-color: #0f5132;
+    color: #0f5132;
+}
+
+.alert-danger {
+    background-color: #f8d7da;
+    border-left-color: #842029;
+    color: #842029;
+}
+
+/* Melhorias na acessibilidade */
+:focus {
+    outline: 3px solid rgba(13, 110, 253, 0.5);
+    outline-offset: 2px;
+}
+
+/* Estilos para cards de dashboard */
+
+/* Estilos para ícones */
+
+/* Estilos para a página de login */
+
+/* Estilos para a página 404 */
+
+/* Estilos para tooltips personalizados */

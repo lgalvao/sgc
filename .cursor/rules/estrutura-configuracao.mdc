@@ -1,0 +1,29 @@
+## Estrutura do Projeto
+- O ponto de entrada principal da aplicação é [Sgc.java](mdc:src/main/java/sesel/sgc/Sgc.java), que inicia a aplicação Spring Boot.
+- A configuração da aplicação é gerenciada em [Config.java](mdc:src/main/java/sesel/sgc/Config.java) e [ConfigSeguranca.java](mdc:src/main/java/sesel/sgc/seguranca/ConfigSeguranca.java).
+- Os controllers são organizados por domínio e podem ser encontrados em arquivos terminados com `Controller.java` em [src/main/java/sesel/sgc/](mdc:src/main/java/sesel/sgc), como [HomeController.java](mdc:src/main/java/sesel/sgc/HomeController.java), [ProcessoController.java](mdc:src/main/java/sesel/sgc/processo/ProcessoController.java) e outros.
+- Recursos estáticos (JS, CSS) estão localizados em [src/main/resources/static/](mdc:src/main/resources/static).
+- Os templates HTML estão em [src/main/resources/templates/](mdc:src/main/resources/templates).
+
+## Configuração
+- Configurações da aplicação devem ser mantidas em [resources/application.yml](mdc:src/main/resources/application.yml).
+- Scripts de inicialização do banco de dados devem estar em [resources/schema.sql](mdc:src/main/resources/schema.sql) e [resources/data.sql](mdc:src/main/resources/data.sql).
+
+## Templates e Views
+- O sistema não deve usar REST nem ResponseEntity.
+- As views devem ser implementadas com Thymeleaf e organizadas em subpastas por domínio em [resources/templates/](mdc:src/main/resources/templates).
+- Fragmentos reutilizáveis devem ser colocados em [templates/fragments/](mdc:src/main/resources/templates/fragments).
+- Siga o padrão de nomenclatura: [domínio]-[ação].html (ex: processo-lista.html, unidade-form.html).
+
+## Segurança
+- A configuração de segurança deve ser centralizada no pacote [seguranca](mdc:src/main/java/sesel/sgc/seguranca/).
+- O controle de autenticação e autorização é feito via Spring Security.
+- Dados de teste para usuários podem ser inicializados via classes específicas no mesmo pacote.
+
+## Logging
+- Para habilitar logging em uma classe, use `@Slf4j` do Lombok.
+
+description: Arquitetura e configuração	do Projeto
+globs:
+alwaysApply: false
+---

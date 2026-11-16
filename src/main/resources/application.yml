@@ -1,0 +1,23 @@
+spring:
+  application:
+    name: sgc
+  thymeleaf:
+    prefix: classpath:/templates/
+    suffix: .html
+    mode: HTML
+    cache: false
+  datasource:
+    url: jdbc:postgresql://localhost:5432/postgres
+    username: leonardo
+    password: 12345678
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 2
+      idle-timeout: 30000
+      max-lifetime: 600000
+      connection-timeout: 30000
+  jpa:
+    defer-datasource-initialization: true
+    hibernate.ddl-auto: update
+    properties.hibernate.default_schema: sgc
+    open-in-view: false

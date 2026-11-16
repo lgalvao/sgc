@@ -1,0 +1,39 @@
+<!-- Fragmento Thymeleaf para um item de conhecimento -->
+<div class="conhecimento-item" th:fragment="conhecimentoItem(indexAtividade, indexConhecimento, conhecimento)">
+    <div class="row">
+        <div class="col-md-10">
+            <label for="conhecimentoDescricao" th:for="|conhecimentoDescricao${indexAtividade}_${indexConhecimento}|"
+                   class="form-label">
+                Descrição do Conhecimento <span class="text-danger">*</span>
+            </label>
+            <div class="input-group">
+                <input id="conhecimentoDescricao" type="text"
+                       class="form-control"
+                       th:name="|atividades[${indexAtividade}].conhecimentos[${indexConhecimento}].descricao|"
+                       th:id="|conhecimentoDescricao${indexAtividade}_${indexConhecimento}|"
+                       th:value="${conhecimento != null ? conhecimento.descricao : ''}"
+                       required
+                       placeholder="Descreva o conhecimento"
+                       th:attr="data-testid=|conhecimento-descricao-${indexAtividade}-${indexConhecimento}|" />
+                <button type="button" class="btn btn-success btn-confirmar-conhecimento" title="Adicionar Conhecimento"
+                        th:attr="data-testid=|confirmar-conhecimento-${indexAtividade}-${indexConhecimento}|">
+                    <i class="fas fa-check"></i> Adicionar
+                </button>
+            </div>
+            <small class="form-text text-muted">Pressione Enter ou clique em Adicionar para confirmar.</small>
+            <div class="invalid-feedback">
+                A descrição do conhecimento é obrigatória.
+            </div>
+        </div>
+        <div class="col-md-2 d-flex align-items-end">
+            <button type="button" class="btn btn-sm btn-danger btn-remove-conhecimento" title="Remover Conhecimento">
+                <i class="fas fa-trash"></i>
+            </button>
+        </div>
+    </div>
+    <input type="hidden" th:name="|atividades[${indexAtividade}].conhecimentos[${indexConhecimento}].id|"/>
+    <input type="hidden" th:name="|atividades[${indexAtividade}].conhecimentos[${indexConhecimento}].atividadeId|"
+           value=""/>
+    <!-- Campo hidden para o tipo do conhecimento, fixo como TECNICO -->
+    <input type="hidden" th:name="|atividades[${indexAtividade}].conhecimentos[${indexConhecimento}].tipo|" value="TECNICO"/>
+</div> 

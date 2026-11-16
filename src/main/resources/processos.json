@@ -1,0 +1,102 @@
+[
+  {
+    "id": "550e8400-e29b-41d4-a716-446655440001",
+    "nome": "Processo de Mapeamento de Competências - 2025",
+    "dataLimite": "2025-12-31",
+    "situacao": "CRIADO",
+    "unidades": [
+      {
+        "id": "550e8400-e29b-41d4-a716-446655440002",
+        "nome": "SEDOC",
+        "tipo": "OPERACIONAL"
+      },
+      {
+        "id": "550e8400-e29b-41d4-a716-446655440003",
+        "nome": "SGP",
+        "tipo": "INTEROPERACIONAL"
+      },
+      {
+        "id": "550e8400-e29b-41d4-a716-446655440004",
+        "nome": "SJ",
+        "tipo": "OPERACIONAL"
+      }
+    ],
+    "subprocessos": [
+      {
+        "id": "550e8400-e29b-41d4-a716-446655440005",
+        "nome": "Subprocesso de Análise Inicial",
+        "unidade": "SEDOC"
+      },
+      {
+        "id": "550e8400-e29b-41d4-a716-446655440006",
+        "nome": "Subprocesso de Validação",
+        "unidade": "SGP"
+      }
+    ]
+  },
+  {
+    "id": "550e8400-e29b-41d4-a716-446655440007",
+    "nome": "Processo de Teste 2",
+    "dataLimite": "2025-06-30",
+    "situacao": "EM_ANDAMENTO",
+    "unidades": [
+      {
+        "id": "550e8400-e29b-41d4-a716-446655440008",
+        "nome": "STIC",
+        "tipo": "INTEROPERACIONAL"
+      },
+      {
+        "id": "550e8400-e29b-41d4-a716-446655440009",
+        "nome": "COSIS",
+        "tipo": "OPERACIONAL"
+      },
+      {
+        "id": "550e8400-e29b-41d4-a716-446655440010",
+        "nome": "SESEL",
+        "tipo": "INTEROPERACIONAL"
+      }
+    ],
+    "subprocessos": [
+      {
+        "id": "550e8400-e29b-41d4-a716-446655440011",
+        "nome": "Subprocesso de Implementação",
+        "unidade": "STIC"
+      }
+    ]
+  },
+  {
+    "id": "550e8400-e29b-41d4-a716-446655440012",
+    "nome": "Processo de Teste 3",
+    "dataLimite": "2025-09-30",
+    "situacao": "CRIADO",
+    "unidades": [
+      {
+        "id": "550e8400-e29b-41d4-a716-446655440013",
+        "nome": "SEDOC",
+        "tipo": "OPERACIONAL"
+      },
+      {
+        "id": "550e8400-e29b-41d4-a716-446655440014",
+        "nome": "SGP",
+        "tipo": "INTEROPERACIONAL"
+      }
+    ],
+    "subprocessos": [
+      {
+        "id": "550e8400-e29b-41d4-a716-446655440015",
+        "nome": "Subprocesso de Revisão",
+        "unidade": "SEDOC"
+      },
+      {
+        "id": "550e8400-e29b-41d4-a716-446655440016",
+        "nome": "Subprocesso de Aprovação",
+        "unidade": "SGP"
+      },
+      {
+        "id": "550e8400-e29b-41d4-a716-446655440017",
+        "nome": "Subprocesso de Finalização",
+        "unidade": "SEDOC"
+      }
+    ]
+  }
+]

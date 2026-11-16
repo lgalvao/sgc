@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<!--suppress HtmlFormInputWithoutLabel -->
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{fragments/layout}"
+      lang="pt-BR">
+
+<head>
+    <meta charset="utf-8">
+    <title>Cadastro de Atividades e Conhecimentos</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+
+<body>
+<div layout:fragment="content">
+    <div class="container-fluid">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a th:href="@{/}">Início</a></li>
+                <li class="breadcrumb-item"><a th:href="@{/templates/processo}">Processos de mapeamento</a></li>
+                <li class="breadcrumb-item" th:if="${processoId != null}">
+                    <a th:href="@{/processo/{id}(id=${processoId})}">Processo de unidade</a>
+                </li>
+                <li class="breadcrumb-item active" aria-current="page">Atividades</li>
+            </ol>
+        </nav>
+        <div>
+            <h5 class="mb-3">Cadastro de Atividades e Conhecimentos</h5>
+            <div th:if="*{atividades == null or #lists.size(atividades) == 0}" class="text-muted mb-3">Sem atividades cadastradas.</div>
+            <form th:object="${atividadeForm}" th:action="@{/processo-unidade/__${processoUnidadeId}__/atividades}"
+                  method="post" data-testid="form-atividades"
+                  onsubmit="return handleFormSubmit(event)">
+                <script th:inline="javascript">
+                    function handleFormSubmit(event) {
+                        const clickedButton = document.querySelector('button[type=submit][clicked=true]');
+                        if (clickedButton && clickedButton.value.startsWith('removerAtividade-')) {
+                            if (!confirm('Tem certeza que deseja remover esta atividade?')) {
+                                event.preventDefault();
+                                return false;
+                            }
+                        }
+                        return true;
+                    }
+
+                    document.addEventListener('DOMContentLoaded', function () {
+                        const form = document.querySelector('form[data-testid="form-atividades"]');
+                        const buttons = form.querySelectorAll('button[type="submit"]');
+                        buttons.forEach(button => {
+                            button.addEventListener('click', function () {
+                                buttons.forEach(btn => btn.removeAttribute('clicked'));
+                                this.setAttribute('clicked', 'true');
+                            });
+                        });
+                    });
+                </script>
+                <div th:each="atividade, iStat : ${atividadeForm.atividades}" class="card mb-4">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <input type="hidden" th:field="*{atividades[__${iStat.index}__].id}" />
+                            <input type="text" th:field="*{atividades[__${iStat.index}__].descricao}"
+                                   class="form-control fw-bold fs-6 me-2" placeholder="Descreva a atividade" required
+                                   maxlength="255" style="max-width: 400px;" th:disabled="${somenteLeitura ?: false}"
+                                   th:attr="data-testid=|atividade-descricao-${iStat.index}|"/>
+                            <button type="submit" name="acao" th:value="|removerAtividade-${iStat.index}|"
+                                    class="btn btn-sm btn-outline-danger" th:if="${!(somenteLeitura ?: false)}">Remover
+                                Atividade
+                            </button>
+                        </div>
+                        <input type="hidden" th:field="*{atividades[__${iStat.index}__].adicionandoConhecimento}" />
+                        <input type="hidden" th:field="*{atividades[__${iStat.index}__].novoConhecimento}" />
+                        <ul class="list-group mb-3 ms-3">
+                            <li th:each="conhecimento, kStat : ${atividade.conhecimentos}" class="list-group-item d-flex justify-content-between align-items-center px-0">
+                                <span th:text="${conhecimento.descricao}"></span>
+                                <input type="hidden"
+                                       th:field="*{atividades[__${iStat.index}__].conhecimentos[__${kStat.index}__].descricao}"
+                                       th:attr="data-testid=|conhecimento-descricao-${iStat.index}-${kStat.index}|"/>
+                                <input type="hidden" th:field="*{atividades[__${iStat.index}__].conhecimentos[__${kStat.index}__].tipo}" />
+                                <button type="submit" name="acao"
+                                        th:value="|removerConhecimento-${iStat.index}-${kStat.index}|"
+                                        class="btn btn-sm btn-outline-danger ms-2"
+                                        th:if="${!(somenteLeitura ?: false)}">Remover
+                                </button>
+                            </li>
+                        </ul>
+                        <div class="row g-2 align-items-center ms-3">
+                            <!-- Input field for adding knowledge -->
+                            <div th:if="${atividadesEmModoAdicionar.contains(iStat.index)}"
+                                 class="mt-3 p-3 border rounded bg-light">
+                                <div class="row g-2 align-items-center">
+                                    <div class="col-auto flex-grow-1">
+                                        <input type="text"
+                                               th:field="*{atividades[__${iStat.index}__].novoConhecimento}"
+                                               class="form-control"
+                                               placeholder="Descreva o conhecimento"
+                                               maxlength="255"
+                                               th:attr="data-testid=|novo-conhecimento-${iStat.index}|"/>
+                                    </div>
+                                    <div class="col-auto">
+                                        <button type="submit"
+                                                name="acao"
+                                                th:value="|adicionarConhecimento-${iStat.index}|"
+                                                class="btn btn-outline-primary">
+                                            Salvar
+                                        </button>
+                                        <button type="button" class="btn btn-sm btn-outline-secondary me-2"
+                                                th:onclick="|document.getElementById('conhecimento-${iStat.index}').value = ''|">
+                                            Limpar
+                                        </button>
+                                        <a th:href="@{/processo-unidade/__${processoUnidadeId}__/atividades/cancelar-adicionar-conhecimento(index=${iStat.index})}"
+                                           class="btn btn-sm btn-outline-danger">
+                                            Cancelar
+                                        </a>
+                                        <button type="submit"
+                                                name="acao"
+                                                th:value="|cancelarAdicionarConhecimento-${iStat.index}|"
+                                                class="btn btn-outline-secondary ms-2">
+                                            Cancelar
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Button to show input field -->
+                            <div th:if="${!somenteLeitura and !atividadesEmModoAdicionar.contains(iStat.index)}"
+                                 class="mt-2">
+                                <a th:href="@{/processo-unidade/__${processoUnidadeId}__/atividades/adicionar-conhecimento(index=${iStat.index})}"
+                                   class="btn btn-outline-primary"
+                                   th:data-index="${iStat.index}"
+                                   th:attr="data-testid=|btn-adicionar-conhecimento-${iStat.index}|"
+                                   th:onclick="|console.log('Add conhecimento clicked for index: ${iStat.index}'); return true;|">
+                                    <i class="bi bi-plus-circle me-1"></i> Adicionar Conhecimento
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="mb-4" th:if="${!(somenteLeitura ?: false)}">
+                    <div th:if="${adicionandoAtividade ?: false}">
+                        <div class="row g-2 align-items-center">
+                            <div class="col-auto flex-grow-1">
+                                <input type="text" th:field="*{novaAtividadeDescricao}" class="form-control"
+                                       placeholder="Descreva a atividade" maxlength="255"
+                                       data-testid="nova-atividade-descricao"/>
+                            </div>
+                            <div class="col-auto">
+                                <button type="submit" name="acao" value="salvarNovaAtividade" class="btn btn-success"
+                                        th:attr="data-testid='btn-salvar-nova-atividade'">Salvar
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div th:if="${!(adicionandoAtividade ?: false)}">
+                        <button type="submit" name="acao" value="iniciarAdicionarAtividade"
+                                class="btn btn-outline-primary" data-testid="btn-adicionar-atividade">Adicionar
+                            Atividade
+                        </button>
+                    </div>
+                </div>
+            </form>
+            <div class="d-flex justify-content-end mt-4">
+                <a th:href="@{/processo/__${processoId}__}" class="btn btn-secondary me-2">Voltar</a>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

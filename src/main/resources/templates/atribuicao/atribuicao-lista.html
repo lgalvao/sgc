@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="pt">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Atribuições</title>
+    <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+
+<body>
+    <div class="container mt-4">
+        <h2>Atribuições</h2>
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Unidade</th>
+                    <th>Servidor</th>
+                    <th>Processo</th>
+                    <th>Data Início</th>
+                    <th>Data Término</th>
+                    <th>Justificativa</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="atribuicao : ${atribuicoes}">
+                    <td th:text="${atribuicao.unidade.nome}"></td>
+                    <td th:text="${atribuicao.servidor.nome}"></td>
+                    <td th:text="${atribuicao.processo.nome}"></td>
+                    <td th:text="${atribuicao.dataInicio}"></td>
+                    <td th:text="${atribuicao.dataTermino}"></td>
+                    <td th:text="${atribuicao.justificativa}"></td>
+                    <td>
+                        <form th:action="@{'/atribuicoes/remover/' + ${atribuicao.id}}" method="post" style="display:inline;">
+                            <input type="hidden" name="unidadeId" th:value="${atribuicao.unidade.id}" />
+                            <button type="submit" class="btn btn-danger btn-sm">Remover</button>
+                        </form>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</body>
+
+</html>

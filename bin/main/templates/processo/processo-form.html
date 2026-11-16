@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<!--suppress HtmlFormInputWithoutLabel -->
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{fragments/layout}" lang="pt-BR">
+
+<head>
+    <meta charset="utf-8">
+    <title>Novo processo de mapeamento - SGC</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+
+<body>
+<div layout:fragment="content">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 data-testid="novo-processo-title">Novo processo de mapeamento</h2>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            <form th:action="@{/processo}" th:object="${processo}" method="post"
+                  title="Formulário de novo processo de mapeamento">
+                <div class="mb-3">
+                    <label for="nome" class="form-label">Nome do processo</label>
+                    <input type="text" class="form-control" id="nome" th:field="*{nome}">
+                    <div class="invalid-feedback" th:if="${#fields.hasErrors('nome')}" th:errors="*{nome}"></div>
+                </div>
+
+                <div class="mb-3">
+                    <label for="dataLimite" class="form-label">Data limite</label>
+                    <input type="date" class="form-control" id="dataLimite" th:field="*{dataLimite}">
+                    <div class="invalid-feedback" th:if="${#fields.hasErrors('dataLimite')}"
+                         th:errors="*{dataLimite}"></div>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Unidades participantes</label>
+                    <div class="border rounded p-3">
+                        <div th:if="${#fields.hasErrors('unidadesParticipantes')}">
+                            <div class="alert alert-danger" th:errors="*{unidadesParticipantes}"></div>
+                        </div>
+                        <div th:replace="~{this :: unidadeTreeFragment(${unidades}, 0)}"></div>
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-end">
+                    <a th:href="@{/}" class="btn btn-secondary me-2">Cancelar</a>
+                    <button type="submit" class="btn btn-primary" data-testid="iniciar-processo-btn">Iniciar Processo
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Fragmento recursivo para exibir a árvore de unidades -->
+<th:block th:fragment="unidadeTreeFragment(unidades, nivel)">
+    <div th:each="unidade : ${unidades}">
+        <div class="form-check" th:classappend="' ms-' + (${nivel} * 2)">
+            <input class="form-check-input unidade-checkbox" type="checkbox"
+                   th:field="*{unidadesParticipantes}"
+                   th:value="${unidade.id}"
+                   th:id="'unidade-' + ${unidade.id}"
+                   th:data-id="${unidade.id}"
+                   th:data-parent="${unidade.idUnidadeSuperior != null ? unidade.idUnidadeSuperior : ''}">
+            <label class="form-check-label" th:for="'unidade-' + ${unidade.id}" th:text="${unidade.nome}"></label>
+        </div>
+        <div th:if="${unidade.possuiSubordinadas()}">
+            <div th:replace="~{this :: unidadeTreeFragment(${unidade.subordinadas}, ${nivel + 1})}"></div>
+        </div>
+    </div>
+</th:block>
+
+<!-- Adicionar required ao menos em um checkbox para validação HTML -->
+<script th:inline="javascript">
+    // Apenas para garantir que pelo menos um checkbox seja selecionado (HTML5)
+    document.addEventListener('DOMContentLoaded', function () {
+        const form = document.querySelector('form[title]');
+        if (form) {
+            const checkboxes = form.querySelectorAll('input[type="checkbox"][name*="unidadesParticipantes"]');
+            if (checkboxes.length > 0) {
+                checkboxes[0].setAttribute('required', 'required');
+            }
+        }
+    });
+</script>
+
+<!-- JS para seleção em cascata -->
+<script th:inline="javascript">
+    document.addEventListener('DOMContentLoaded', function () {
+        // Seleção em cascata
+        document.querySelectorAll('.unidade-checkbox').forEach(function (checkbox) {
+            checkbox.addEventListener('change', function () {
+                const id = this.getAttribute('data-id');
+                const checked = this.checked;
+                const subs = document.querySelectorAll('.unidade-checkbox[data-parent="' + id + '"]');
+                console.log('Superior:', id, 'Checked:', checked, 'Subordinadas:', Array.from(subs).map(s => s.getAttribute('data-id')));
+                // Seleciona/desseleciona todas as subordinadas
+                subs.forEach(function (sub) {
+                    sub.checked = checked;
+                    // Dispara o evento para recursão
+                    sub.dispatchEvent(new Event('change'));
+                });
+            });
+        });
+        // Feedback visual para obrigatoriedade
+        var form = document.querySelector('form[title]');
+        if (form) {
+            form.addEventListener('submit', function (e) {
+                var checkboxes = form.querySelectorAll('input[type="checkbox"][name*="unidadesParticipantes"]');
+                var algumMarcado = Array.from(checkboxes).some(function (cb) {
+                    return cb.checked;
+                });
+                if (!algumMarcado) {
+                    checkboxes.forEach(function (cb) {
+                        cb.classList.add('is-invalid');
+                    });
+                    e.preventDefault();
+                } else {
+                    checkboxes.forEach(function (cb) {
+                        cb.classList.remove('is-invalid');
+                    });
+                }
+            });
+        }
+    });
+</script>
+</body>
+
+</html>

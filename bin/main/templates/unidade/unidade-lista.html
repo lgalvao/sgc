@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{fragments/layout}" lang="pt-BR">
+
+<head>
+    <title>Unidades</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+
+<body>
+<div layout:fragment="content">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Unidades</h2>
+        <a th:href="@{/templates/unidade/novo}" class="btn btn-primary">
+            <i class="fas fa-plus"></i> Nova unidade
+        </a>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            <div class="text-center py-4">
+                <i class="fas fa-sitemap fa-3x text-muted mb-3"></i>
+                <p class="text-muted">Funcionalidade em desenvolvimento</p>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+
+</html>
